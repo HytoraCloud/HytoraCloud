@@ -1,0 +1,32 @@
+package de.lystx.cloudsystem.handler.group;
+
+import de.lystx.cloudsystem.CloudSystem;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInUpdateServiceGroup;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutUpdateServiceGroup;
+import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
+import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.server.impl.GroupService;
+
+public class PacketHandlerGroupUpdate extends PacketHandlerAdapter {
+
+    private final CloudSystem cloudSystem;
+
+    public PacketHandlerGroupUpdate(CloudSystem cloudSystem) {
+        this.cloudSystem = cloudSystem;
+    }
+
+    @Override
+    public void handle(Packet packet) {
+        if (packet instanceof PacketPlayInUpdateServiceGroup) {
+            PacketPlayInUpdateServiceGroup packetPlayInUpdateServiceGroup = (PacketPlayInUpdateServiceGroup)packet;
+            ServiceGroup group = packetPlayInUpdateServiceGroup.getServiceGroup();
+            ServiceGroup get = this.cloudSystem.getService(GroupService.class).getGroup(group.getName());
+            this.cloudSystem.getService(GroupService.class).updateGroup(get, group);
+            this.cloudSystem.getService().updateGroup(get, group);
+            this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutUpdateServiceGroup(get));
+            this.cloudSystem.reload("services");
+        }
+    }
+}

@@ -1,0 +1,8 @@
+author: Lystx
+name: CloudAPI
+main: de.lystx.cloudapi.bukkit.CloudServer
+version: 1.0
+description: ServerAPI for HytoraCloud
+commands:
+  service:
+    aliases: [this, cloudserver, hs]
