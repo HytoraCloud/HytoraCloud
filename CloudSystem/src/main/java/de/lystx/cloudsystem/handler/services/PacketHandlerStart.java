@@ -8,7 +8,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 
 public class PacketHandlerStart extends PacketHandlerAdapter {
 

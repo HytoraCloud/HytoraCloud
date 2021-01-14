@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGro
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -12,9 +12,8 @@ import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 import lombok.Setter;
 

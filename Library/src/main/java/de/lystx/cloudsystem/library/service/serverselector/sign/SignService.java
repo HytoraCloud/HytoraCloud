@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.DefaultSignLayout;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.SignLayOut;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 
 import java.io.File;

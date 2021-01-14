@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.elements.packets.communication;
 
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 
 @Getter

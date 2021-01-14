@@ -2,10 +2,8 @@ package de.lystx.cloudsystem.library.service.permission.impl;
 
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermissionPool;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.util.UUIDService;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 
 import java.io.File;

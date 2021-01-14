@@ -5,7 +5,7 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import org.bukkit.Bukkit;
 
 public class PacketHandlerBukkitNPCs extends PacketHandlerAdapter {

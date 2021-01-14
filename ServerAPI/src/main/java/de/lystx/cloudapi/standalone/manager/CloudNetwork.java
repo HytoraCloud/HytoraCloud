@@ -8,7 +8,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStop
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 import lombok.Setter;
 

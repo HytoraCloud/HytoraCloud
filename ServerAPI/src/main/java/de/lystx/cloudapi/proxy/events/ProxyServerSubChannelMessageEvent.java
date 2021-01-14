@@ -1,6 +1,6 @@
 package de.lystx.cloudapi.proxy.events;
 
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import net.md_5.bungee.api.plugin.Event;
 
 public class ProxyServerSubChannelMessageEvent extends Event {

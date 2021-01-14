@@ -14,6 +14,8 @@ import java.util.Objects;
 @Getter
 public class FileService extends CloudService {
 
+    private final File startSh;
+    private final File startBat;
 
     private final File cloudDirectory;
     private final File configFile;
@@ -40,6 +42,9 @@ public class FileService extends CloudService {
 
     public FileService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
+
+        this.startBat = new File("start.bat");
+        this.startSh = new File("start.sh");
 
         this.cloudDirectory = new File("./local/");
         this.configFile = new File(this.cloudDirectory, "config.json");
@@ -71,6 +76,14 @@ public class FileService extends CloudService {
     public void check() {
         this.cloudDirectory.mkdirs();
 
+        if (!this.startSh.exists() || !this.startSh.exists()) {
+
+            this.copyFileWithURL("/implements/start/start.bat", this.startBat);
+            this.copyFileWithURL("/implements/start/start.sh", this.startSh);
+            System.exit(0);
+            return;
+        }
+
         this.serverDirectory.mkdirs();
         this.staticServerDirectory.mkdirs();
         this.dynamicServerDirectory.mkdirs();
@@ -100,7 +113,7 @@ public class FileService extends CloudService {
 
         } catch (IOException e) {}
         File cloudAPI = new File(this.pluginsDirectory, "CloudAPI.jar");
-        if (!this.copyFileWithURL("/implements/plugins/CloudAPI", cloudAPI) && !cloudAPI.exists()) {
+        if (!this.copyFileWithURL("/implements/plugins/CloudAPI.jar", cloudAPI) && !cloudAPI.exists()) {
             getCloudLibrary().getConsole().getLogger().sendMessage("§b------------------------------------------------------------------------------------------------");
             getCloudLibrary().getConsole().getLogger().sendMessage("\n" +
                     "\n" +

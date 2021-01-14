@@ -17,7 +17,7 @@ import de.lystx.cloudsystem.library.service.server.other.manager.PortService;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStart;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStop;
 import de.lystx.cloudsystem.library.utils.Action;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 import lombok.Setter;
 

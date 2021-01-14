@@ -5,7 +5,7 @@ import de.lystx.cloudapi.bukkit.manager.npc.impl.Hologram;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateNPC;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInRemoveNPC;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

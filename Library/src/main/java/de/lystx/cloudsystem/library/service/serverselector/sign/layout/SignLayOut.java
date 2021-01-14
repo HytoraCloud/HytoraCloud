@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.library.service.serverselector.sign.layout;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import de.lystx.cloudsystem.library.utils.Document;
+import de.lystx.cloudsystem.library.elements.other.Document;
 
 public class SignLayOut {
 
