@@ -12,6 +12,7 @@
         <module>Library</module>
         <module>CloudSystem</module>
         <module>ServerAPI</module>
+        <module>CloudNetwork</module>
     </modules>
 
     <properties>

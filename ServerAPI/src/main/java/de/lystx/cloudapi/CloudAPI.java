@@ -9,6 +9,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
+import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
@@ -27,6 +28,7 @@ public class CloudAPI {
 
     private NetworkConfig networkConfig;
     private PermissionPool permissionPool;
+    private Statistics statistics;
     private Map<Integer, String> proxies;
 
     private final CloudLibrary cloudLibrary;
@@ -48,6 +50,7 @@ public class CloudAPI {
         this.network = new CloudNetwork(this);
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool();
+        this.statistics = new Statistics();
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
         this.useChat = false;
@@ -60,6 +63,7 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerPermissionPool(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerNetwork(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
+        this.cloudClient.registerPacketHandler(new PacketHandlerStatistics(this));
 
         this.cloudClient.connect();
     }
@@ -74,7 +78,6 @@ public class CloudAPI {
     }
 
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
-        System.out.println("[" + prefix + "] " + message);
         this.cloudClient.sendPacket(new PacketPlayInLog(prefix, message, showUpInConsole));
     }
 

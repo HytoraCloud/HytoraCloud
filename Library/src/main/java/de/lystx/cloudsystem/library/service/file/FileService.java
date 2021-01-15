@@ -20,9 +20,13 @@ public class FileService extends CloudService {
     private final File cloudDirectory;
     private final File configFile;
     private final File permissionsFile;
-    private final File signsFile;
+
+    private final File npcDirectory;
     private final File npcFile;
+
+    private final File signDirectory;
     private final File signLayoutFile;
+    private final File signsFile;
 
     private final File serverDirectory;
     private final File staticServerDirectory;
@@ -37,7 +41,9 @@ public class FileService extends CloudService {
 
     private final File globalDirectory;
     private final File pluginsDirectory;
+    private final File modulesDirectory;
     private final File apiDirectory;
+    private final File statsFile;
     private final File versionsDirectory;
 
     public FileService(CloudLibrary cloudLibrary, String name, Type type) {
@@ -57,9 +63,13 @@ public class FileService extends CloudService {
         this.databaseDirectory = new File(this.cloudDirectory, "database/");
         this.cloudPlayerDirectory = new File(this.databaseDirectory, "players/");
 
-        this.signsFile = new File(this.databaseDirectory, "signs.json");
-        this.npcFile = new File(this.databaseDirectory, "npcs.json");
-        this.signLayoutFile = new File(this.databaseDirectory, "signLayouts.json");
+        this.npcDirectory = new File(this.databaseDirectory, "npcSelector/");
+        this.npcFile = new File(this.npcDirectory, "npcs.json");
+
+        this.signDirectory = new File(this.databaseDirectory, "signSelector/");
+        this.signsFile = new File(this.signDirectory, "signs.json");
+        this.signLayoutFile = new File(this.signDirectory, "signLayouts.json");
+        this.statsFile = new File(this.databaseDirectory, "stats.json");
 
         this.groupsDirectory = new File(this.cloudDirectory, "groups/");
         this.templatesDirectory = new File(this.cloudDirectory, "templates/");
@@ -69,6 +79,7 @@ public class FileService extends CloudService {
         this.apiDirectory = new File(this.globalDirectory, "api/");
         this.versionsDirectory = new File(this.globalDirectory, "versions/");
         this.logsDirectory = new File(this.globalDirectory, "logs/");
+        this.modulesDirectory = new File(this.globalDirectory, "modules/");
 
         this.check();
     }
@@ -91,6 +102,8 @@ public class FileService extends CloudService {
         this.dynamicServerDirectory.mkdirs();
 
         this.databaseDirectory.mkdirs();
+        this.signDirectory.mkdirs();
+        this.npcDirectory.mkdirs();
         this.cloudPlayerDirectory.mkdirs();
 
         this.groupsDirectory.mkdirs();
@@ -101,6 +114,7 @@ public class FileService extends CloudService {
         this.apiDirectory.mkdirs();
         this.versionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
+        this.modulesDirectory.mkdirs();
 
         try {
             for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {
@@ -162,39 +176,6 @@ public class FileService extends CloudService {
             return false;
         }
     }
-
-    public Boolean download(String Url, File location) {
-        try {
-            BufferedInputStream inputStream = new BufferedInputStream((new URL(Url)).openStream());
-            try {
-                FileOutputStream fileOS = new FileOutputStream(location);
-                try {
-                    byte[] data = new byte[1024];
-                    int byteContent;
-                    while ((byteContent = inputStream.read(data, 0, 1024)) != -1)
-                        fileOS.write(data, 0, byteContent);
-                    fileOS.close();
-                } catch (Throwable throwable) {
-                    try {
-                        fileOS.close();
-                    } catch (Throwable throwable1) {
-                        throwable.addSuppressed(throwable1);
-                    }
-                    throw throwable;
-                }
-                inputStream.close();
-            } catch (Throwable throwable) {
-                try {
-                    inputStream.close();
-                } catch (Throwable throwable1) {
-                    throwable.addSuppressed(throwable1);
-                }
-                throw throwable;
-            }
-        } catch (IOException iOException) {}
-        return true;
-    }
-
 
     public void write(File file, String message) {
         if (!file.exists()) {

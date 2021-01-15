@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStar
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
@@ -38,8 +39,8 @@ public class CloudNetwork {
         return this.getService(this.cloudAPI.getProxies().get(port));
     }
 
-    public void sendCustomMessage(String channel, String key, Document document) {
-        this.cloudAPI.getCloudClient().sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString()));
+    public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
+        this.cloudAPI.getCloudClient().sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), type));
     }
 
     public void startService(ServiceGroup serviceGroup) {

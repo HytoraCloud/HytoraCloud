@@ -46,6 +46,9 @@ public class PermsCommand extends Command {
                             new LinkedList<>()
                     );
                     CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().getPermissionGroups().add(permissionGroup);
+                    CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
+                    CloudSystem.getInstance().getService(PermissionService.class).load();
+                    CloudSystem.getInstance().reload("permissions");
                     console.getLogger().sendMessage("INFO", "§9The permissionGroup §a" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId() + " §9was created!");
                 });
             } else if (args[0].equalsIgnoreCase("list")) {
@@ -97,6 +100,7 @@ public class PermsCommand extends Command {
                         Integer i = Integer.parseInt(args[3]);
                         pool.updatePermissionGroup(player, group, i);
                         pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
+                        CloudSystem.getInstance().getService(PermissionService.class).load();
                         CloudSystem.getInstance().reload("permissions");
                         console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime " + pool.getPlayerData(player).getValidadilityTime());
                     } catch (NumberFormatException e) {
@@ -105,6 +109,7 @@ public class PermsCommand extends Command {
                 } else {
                     pool.updatePermissionGroup(player, group, -1);
                     pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
+                    CloudSystem.getInstance().getService(PermissionService.class).load();
                     CloudSystem.getInstance().reload("permissions");
                     console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime Lifetime");
                 }

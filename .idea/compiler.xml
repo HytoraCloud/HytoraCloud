@@ -10,6 +10,7 @@
         <module name="CloudSystem" />
         <module name="ServerAPI" />
         <module name="Library" />
+        <module name="CloudNetwork" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

@@ -28,6 +28,7 @@ public class ServiceCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
+
         if (commandSender instanceof Player) {
             Player player = (Player)commandSender;
             if (player.hasPermission("cloudsystem.command.service")) {

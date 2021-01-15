@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.server.other.process;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -36,7 +37,6 @@ public class ServiceProviderStart {
 
             serverLocation.mkdirs();
             plugins.mkdirs();
-
             try {
                 FileUtils.copyDirectory(templateLocation, serverLocation);
                 for (File file : Objects.requireNonNull(cloudLibrary.getService(FileService.class).getPluginsDirectory().listFiles())) {
@@ -46,6 +46,10 @@ public class ServiceProviderStart {
                 this.cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cSomething went wrong while copying files for server §e" + service.getName() + "§c!");
             }
 
+            File world = new File(serverLocation, "world/");
+            if (cloudLibrary.getService(ConfigService.class).getNetworkConfig().isFastStartup() && !world.exists()) {
+                cloudLibrary.getService(FileService.class).copyFileWithURL("/implements/world/", world);
+            }
             if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                 jarFile = "bungeeCord.jar";
                 FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getApiDirectory(), "server-icon.png"), new File(serverLocation, "server-icon.png"));

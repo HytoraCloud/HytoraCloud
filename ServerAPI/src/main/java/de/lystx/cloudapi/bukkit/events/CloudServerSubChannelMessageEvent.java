@@ -33,7 +33,7 @@ public class CloudServerSubChannelMessageEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return this.getHandlers();
+        return handlerList;
     }
 
     public static HandlerList getHandlerList() {

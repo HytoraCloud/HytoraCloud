@@ -26,7 +26,7 @@ public class CloudPlayerService extends CloudService {
         this.dir = cloudLibrary.getService(FileService.class).getCloudPlayerDirectory();
     }
 
-    public void registerPlayer(CloudPlayer cloudPlayer) {
+    public boolean registerPlayer(CloudPlayer cloudPlayer) {
         this.cloudPlayers.add(cloudPlayer);
 
         File file = new File(dir, cloudPlayer.getUuid() + ".json");
@@ -42,11 +42,13 @@ public class CloudPlayerService extends CloudService {
                     cloudPlayer.getIpAddress(),
                     true));
             document.save();
+            return false;
         } else {
             Document document = new Document(file);
             CloudPlayerData cloudPlayerData = document.getObject(document.getJsonObject(), CloudPlayerData.class);
             CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionGroup(), cloudPlayerData.getTempPermissionGroup(), cloudPlayerData.getValidadilityTime(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart());
             this.setPlayerData(cloudPlayer.getUuid(), newData);
+            return true;
         }
     }
 

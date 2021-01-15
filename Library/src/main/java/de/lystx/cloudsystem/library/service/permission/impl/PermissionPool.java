@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermis
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.util.UUIDService;
 import lombok.Getter;
 
 import java.io.File;
@@ -73,7 +74,7 @@ public class PermissionPool implements Serializable {
     }
 
     public void updatePermissionGroup(String playerName, PermissionGroup group, Integer days) {
-        CloudPlayerData data = this.getPlayerData(playerName);
+        CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
         if (data == null) {
             return;
         }
@@ -125,7 +126,7 @@ public class PermissionPool implements Serializable {
                 return cloudPlayerData;
             }
         }
-        CloudPlayerData data = new CloudPlayerData(UUID.randomUUID(), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true);
+        CloudPlayerData data = new CloudPlayerData(UUIDService.getUUID(playerName), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true);
         data.setDefault(true);
         return data;
     }

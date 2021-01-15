@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.elements.other;
 
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 
 import java.util.UUID;
@@ -24,5 +25,5 @@ public interface NetworkHandler {
 
     void onNetworkPing(UUID connectionUUID);
 
-    void onDocumentReceive(String channel, String key, Document document);
+    void onDocumentReceive(String channel, String key, Document document, ServiceType type);
 }

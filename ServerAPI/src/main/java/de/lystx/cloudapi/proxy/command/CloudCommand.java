@@ -51,11 +51,11 @@ public class CloudCommand extends Command {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7CloudSystem Version §a1.0");
                     } else if (args[0].equalsIgnoreCase("shutdown")) {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Cloud will be shut down in §e3 Seconds§8...");
+                        CloudAPI.getInstance().setJoinable(false);
+                        for (ProxiedPlayer proxiedPlayer : ProxyServer.getInstance().getPlayers()) {
+                            proxiedPlayer.disconnect(new TextComponent(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!"));
+                        }
                         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
-                            for (ProxiedPlayer proxiedPlayer : ProxyServer.getInstance().getPlayers()) {
-                                proxiedPlayer.disconnect(new TextComponent(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!"));
-                            }
-
                             CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInShutdown());
                         }, 60L);
                     } else {
@@ -92,20 +92,25 @@ public class CloudCommand extends Command {
                     } else if (args[0].equalsIgnoreCase("list")) {
                         if (args[1].equalsIgnoreCase("group")) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Groups:");
-                            CloudAPI.getInstance().getNetwork().getServiceGroups().forEach(groups -> player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §fGroup §8┃ §bName§8: §7" + groups.getName() + " §7| §bTemplate§8: §7" + groups.getTemplate() + "MB"));
+                            CloudAPI.getInstance().getNetwork().getServiceGroups().forEach(groups -> player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §b" + groups.getName() + " §8| §bTemplate§8: §7" + groups.getTemplate()));
                         } else if (args[1].equalsIgnoreCase("proxy")) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Proxys:");
                             CloudAPI.getInstance().getNetwork().getServices().forEach(service -> {
                                 if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
-                                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §fProxy §8┃ §bName§8: §7" + service.getName() + " §7| §bID§8: §7" + service.getServiceID());
+                                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §b" + service.getName() + " §8| §bUUID§8: §7" + service.getUniqueId());
                                 }
                             });
                         } else if (args[1].equalsIgnoreCase("server")) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Servers:");
                             CloudAPI.getInstance().getNetwork().getServices().forEach(service -> {
                                 if (service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
-                                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §fServer §8┃ §bName§8: §7" + service.getName() + " §7| §bID§8: §7" + service.getServiceID());
+                                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §b" + service.getName() + " §8| §7" + service.getServiceState().getColor() + service.getServiceState().name());
                                 }
+                            });
+                        } else if (args[1].equalsIgnoreCase("maintenance")) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Players:");
+                            CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().forEach(whitelisted -> {
+                                player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §7" + whitelisted);
                             });
                         } else {
                             this.help(player);
@@ -155,7 +160,7 @@ public class CloudCommand extends Command {
                             CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInNetworkConfig);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + playername + " §7was removed from maintenance§8!");
                         } else {
-                            Boolean maintenance = Boolean.valueOf(args[2]);
+                            boolean maintenance = Boolean.parseBoolean(args[2]);
                             if (CloudAPI.getInstance().getNetwork().getServiceGroup(groupname) == null) {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cdoesn't exist!");
                                 return;
@@ -193,7 +198,7 @@ public class CloudCommand extends Command {
     public void help(ProxiedPlayer player) {
         player.sendMessage("§bHytoraCloud §7Help§8:");
         player.sendMessage("§8§m--------------------------------------");
-        player.sendMessage("  §8» §b/cloud list <group/proxy/server> §8┃ §7Lists network specified things");
+        player.sendMessage("  §8» §b/cloud list <group/proxy/server/maintenance> §8┃ §7Lists network specified things");
         player.sendMessage("  §8» §b/cloud ver §8┃ §7Shows the current version");
         player.sendMessage("  §8» §b/cloud shutdown §8┃ §7Shuts down the cloud");
         player.sendMessage("  §8» §b/cloud rl §8┃ §7Reloads the cloud");

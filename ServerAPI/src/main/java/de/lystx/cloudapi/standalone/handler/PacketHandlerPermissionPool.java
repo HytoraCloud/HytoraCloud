@@ -18,7 +18,6 @@ public class PacketHandlerPermissionPool extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutPermissionPool) {
             this.cloudAPI.messageCloud("CLOUDAPI", cloudAPI.getService().getName() +  " received §aPermissionPool", false);
-            System.out.println("[CLOUDAPI] Received PermissionPool!");
             PacketPlayOutPermissionPool packetPlayOutPermissionPool = (PacketPlayOutPermissionPool)packet;
             PermissionPool permissionPool = packetPlayOutPermissionPool.getPermissionPool();
             this.cloudAPI.setPermissionPool(permissionPool);

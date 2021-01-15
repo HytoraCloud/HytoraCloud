@@ -4,6 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.ProxyServerSubChannelMessageEvent;
 import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;
@@ -22,6 +23,9 @@ public class PacketHandlerProxySubChannel extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketCommunicationSubMessage) {
             PacketCommunicationSubMessage subMessage = (PacketCommunicationSubMessage)packet;
+            if (!subMessage.getType().equals(ServiceType.PROXY)) {
+                return;
+            }
             ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerSubChannelMessageEvent(subMessage.getChannel(), subMessage.getChannel(), subMessage.getDocument()));
         }
     }

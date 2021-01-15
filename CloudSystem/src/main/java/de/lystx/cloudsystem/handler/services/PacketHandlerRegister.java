@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.handler.services;
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
@@ -23,6 +24,8 @@ public class PacketHandlerRegister extends PacketHandlerAdapter {
             PacketPlayInRegister packetPlayInRegister = (PacketPlayInRegister)packet;
             Service service = packetPlayInRegister.getService();
             this.cloudSystem.getService().registerService(service);
+
+            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("startedServices");
             this.cloudSystem.reload();
             this.cloudSystem.getService(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 3L);
         }

@@ -18,4 +18,7 @@ public class CloudSetup extends Setup {
 
     @SetupPart(question = "What's the name of the first Admin?", id = 4, forbiddenAnswers = {"Notch"})
     private String firstAdmin;
+
+    @SetupPart(question = "Should services boot up as fast as possible? (Uses more CPU Usage)", id = 5, forbiddenAnswers = {""})
+    private boolean fastStartup;
 }

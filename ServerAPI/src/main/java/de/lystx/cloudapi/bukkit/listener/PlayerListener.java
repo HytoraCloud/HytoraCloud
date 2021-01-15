@@ -2,8 +2,10 @@ package de.lystx.cloudapi.bukkit.listener;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
+import de.lystx.cloudapi.bukkit.events.CloudServerSubChannelMessageEvent;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
+import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -61,6 +63,11 @@ public class PlayerListener implements Listener {
         PacketReader packetReader = this.packetReaders.get(player.getUniqueId());
         packetReader.uninject();
         this.packetReaders.remove(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 
     @EventHandler

@@ -18,7 +18,6 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutNetworkConfig) {
-            System.out.println("[CLOUDAPI] Received NetworkConfig!");
             PacketPlayOutNetworkConfig packetPlayOutNetworkConfig = (PacketPlayOutNetworkConfig)packet;
             this.cloudAPI.setNetworkConfig(packetPlayOutNetworkConfig.getNetworkConfig());
 

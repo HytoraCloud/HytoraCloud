@@ -28,7 +28,7 @@ public abstract class Setup {
                 this.setupParts.put(field, field.getAnnotation(SetupPart.class));
         }
         this.currentPart = getEntry(1);
-        this.cloudConsole.getLogger().sendMessage("§7[§fSETUP§7] " + (this.currentPart.getValue()).question() + " §7(§a" + (this.currentPart.getKey()).getType().getSimpleName() + "§7)");
+        this.cloudConsole.getLogger().sendMessage("SETUP", (this.currentPart.getValue()).question() + " §7(§a" + (this.currentPart.getKey()).getType().getSimpleName() + "§7)");
         while (this.current < this.setupParts.size() + 1) {
             String line = scanner.getLogger().readLine();
             next(line);
@@ -47,32 +47,32 @@ public abstract class Setup {
     public void next(String lastAnswer) {
         if (this.currentPart != null) {
             if (lastAnswer.equalsIgnoreCase("cancel")) {
-                this.cloudConsole.getLogger().sendMessage("§cThe current §esetup §cwas cancelled!");
+                this.cloudConsole.getLogger().sendMessage("SETUP", "§cThe current §esetup §cwas cancelled!");
                 this.wasCancelled = true;
                 this.current = (current + 10000);
                 return;
             }
             if (isAnswerForbidden(this.currentPart.getValue(), lastAnswer)) {
-                this.cloudConsole.getLogger().sendMessage("Error", !lastAnswer.trim().isEmpty() ? "§cThe answer '§e" + lastAnswer + "§c' §cmay not be used for this question!" : "§cThis §eanswer §cmay not be used for this question!");
+                this.cloudConsole.getLogger().sendMessage("ERROR", !lastAnswer.trim().isEmpty() ? "§cThe answer '§e" + lastAnswer + "§c' §cmay not be used for this question!" : "§cThis §eanswer §cmay not be used for this question!");
                 return;
             }
             (this.currentPart.getKey()).setAccessible(true);
             try {
                 Object value = parse(this.currentPart.getKey(), lastAnswer);
                 if (value == null) {
-                    this.cloudConsole.getLogger().sendMessage("Error", "§cPlease try again");
+                    this.cloudConsole.getLogger().sendMessage("ERROR", "§cPlease try again");
                     return;
                 }
                 (this.currentPart.getKey()).set(this, value);
             } catch (Exception ex) {
-                this.cloudConsole.getLogger().sendMessage("Error", "§cPlease enter a valid format");
+                this.cloudConsole.getLogger().sendMessage("ERROR", "§cPlease enter a valid format");
                 return;
             }
         }
         this.current++;
         this.currentPart = getEntry(this.current);
         if (this.currentPart != null)
-            this.cloudConsole.getLogger().sendMessage("§7[§fSETUP§7] " + (this.currentPart.getValue()).question() + " §7(§a" + ((Field)this.currentPart.getKey()).getType().getSimpleName() + "§7)");
+            this.cloudConsole.getLogger().sendMessage("SETUP",  (this.currentPart.getValue()).question() + " §7(§a" + ((Field)this.currentPart.getKey()).getType().getSimpleName() + "§7)");
     }
 
     public Object parse(Field field, String s) {

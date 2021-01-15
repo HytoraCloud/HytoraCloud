@@ -23,7 +23,6 @@ public class PacketHandlerServices extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutServices) {
-            System.out.println("[CLOUDAPI] Received Online Services!");
             PacketPlayOutServices packetPlayOutServices = (PacketPlayOutServices)packet;
             this.cloudAPI.getNetwork().setServices(packetPlayOutServices.getServices());
             for (List<Service> value : packetPlayOutServices.getServices().values()) {

@@ -42,8 +42,6 @@ public class ServerService extends CloudService {
     private final ServiceProviderStop providerStop;
 
 
-    int tryy = 0;
-
     public ServerService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
         this.actions = new HashMap<>();
@@ -184,6 +182,7 @@ public class ServerService extends CloudService {
         if (!this.getCloudLibrary().isRunning()) {
             return;
         }
+
         if (service.getPort() <= 0) {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
             service = new Service(service.getName(), service.getUniqueId(), serviceGroup, this.idService.getFreeID(serviceGroup.getName()), port, service.getServiceState());
