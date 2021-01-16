@@ -64,6 +64,7 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerNetwork(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerStatistics(this));
+        this.cloudClient.registerPacketHandler(new PacketHandlerCommunication(this));
 
         this.cloudClient.connect();
     }

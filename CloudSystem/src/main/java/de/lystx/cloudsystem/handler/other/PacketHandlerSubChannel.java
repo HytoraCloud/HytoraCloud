@@ -7,15 +7,12 @@ import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class PacketHandlerSubChannel extends PacketHandlerAdapter {
 
-
     private final CloudSystem cloudSystem;
-
-    public PacketHandlerSubChannel(CloudSystem cloudSystem) {
-        this.cloudSystem = cloudSystem;
-    }
 
     @Override
     public void handle(Packet packet) {

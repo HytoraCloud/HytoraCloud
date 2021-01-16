@@ -9,7 +9,6 @@ import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 
 import java.lang.reflect.Field;
-import java.text.ParseException;
 
 public class EditCommand extends Command {
 
@@ -19,6 +18,7 @@ public class EditCommand extends Command {
 
     @Override
     public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+
         if (args.length == 3) {
             String groupName = args[0];
             ServiceGroup group = cloudLibrary.getService(GroupService.class).getGroup(groupName);

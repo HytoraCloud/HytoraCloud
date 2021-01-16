@@ -5,10 +5,12 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.utils.Action;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -28,7 +30,7 @@ public class ServiceProviderStart {
     }
 
 
-    public void autoStartService(Service service, Document propertiess) {
+    public void autoStartService(Service service, Document propertiess, Action action) {
         try {
             File templateLocation = new File(cloudLibrary.getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
             File serverLocation = new File(service.getServiceGroup().isDynamic() ? cloudLibrary.getService(FileService.class).getDynamicServerDirectory() : cloudLibrary.getService(FileService.class).getStaticServerDirectory(), service.getServiceGroup().getName() + "/" + service.getName() + "/");
@@ -143,11 +145,34 @@ public class ServiceProviderStart {
                 }
             }
 
+            File cloud = new File(serverLocation + "/CLOUD/");
+            cloud.mkdirs();
+            Document document = new Document();
+            document.appendAll(service);
+            if (propertiess != null) {
+                document.append("properties", propertiess);
+            }
+            document.save(new File(cloud, "connection.json"));
+
             FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), jarFile), new File(serverLocation, jarFile));
+
+
             ProcessBuilder processBuilder = new ProcessBuilder(
                     "java",
                     "-XX:+UseG1GC",
                     "-XX:MaxGCPauseMillis=50",
+                    "-XX:+AlwaysPreTouch",
+                    "-XX:+DisableExplicitGC",
+                    "-XX:+UseG1GC",
+                    "-XX:+UnlockExperimentalVMOptions",
+                    "-XX:MaxGCPauseMillis=50",
+                    "-XX:G1HeapRegionSize=4M",
+                    "-XX:TargetSurvivorRatio=90",
+                    "-XX:G1NewSizePercent=50",
+                    "-XX:G1MaxNewSizePercent=80",
+                    "-XX:InitiatingHeapOccupancyPercent=10",
+                    "-XX:G1MixedGCLiveThresholdPercent=50",
+                    "-XX:+AggressiveOpts",
                     "-XX:-UseAdaptiveSizePolicy",
                     "-XX:CompileThreshold=100",
                     "-Dio.netty.leakDetectionLevel=DISABLED",
@@ -160,17 +185,11 @@ public class ServiceProviderStart {
             processBuilder.directory(serverLocation);
             Process process = processBuilder.start();
             CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());
-            this.cloudLibrary.getService(ScreenService.class).registerScreen(cloudScreen, service.getName());
+            this.cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> {
+                this.cloudLibrary.getService(ScreenService.class).registerScreen(cloudScreen, service.getName());
+                cloudScreen.start();
+            }, 5L);
             this.service.notifyStart(service);
-
-            File cloud = new File(serverLocation + "/CLOUD/");
-            cloud.mkdirs();
-            Document document = new Document();
-            document.appendAll(service);
-            if (propertiess != null) {
-                document.append("properties", propertiess);
-            }
-            document.save(new File(cloud, "connection.json"));
         } catch (IOException e) {
             e.printStackTrace();
         }

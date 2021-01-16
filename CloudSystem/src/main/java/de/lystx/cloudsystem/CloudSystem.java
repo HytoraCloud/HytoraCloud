@@ -23,7 +23,6 @@ import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutClo
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutServices;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
@@ -62,6 +61,7 @@ public class CloudSystem extends CloudLibrary {
     private static CloudSystem instance;
 
     private final String version;
+    private final CloudScreenPrinter screenPrinter;
     private ServerService service;
 
     public CloudSystem() {
@@ -71,7 +71,7 @@ public class CloudSystem extends CloudLibrary {
         this.cloudServices.add(new CommandService(this, "Command", CloudService.Type.MANAGING));
         this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.Type.UTIL));
         this.console = new CloudConsole(this.getService(LoggerService.class), this.getService(CommandService.class), System.getProperty("user.name"));
-        this.screenPrinter = new CloudScreenPrinter(CloudSystem.getInstance().getConsole(), CloudSystem.getInstance());
+        this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
         this.cloudServices.add(new FileService(this, "File", CloudService.Type.CONFIG));
         this.cloudServices.add(new ConfigService(this, "Config", CloudService.Type.CONFIG));
@@ -100,7 +100,7 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new CreateCommand("create", "Creates cloudstuff", "add"));
         this.getService(CommandService.class).registerCommand(new PermsCommand("perms", "Manages permissions", "cperms", "permissions"));
         this.getService(CommandService.class).registerCommand(new RunCommand("run", "Starts new services", "start"));
-        this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", new CloudScreenPrinter(this.console, this), "sc"));
+        this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             this.console.getLogger().sendMessage("§9-----------------------------------------");

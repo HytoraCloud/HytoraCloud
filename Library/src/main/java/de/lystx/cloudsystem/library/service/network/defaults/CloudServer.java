@@ -9,7 +9,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.PacketHand
 
 import java.io.IOException;
 
-public class CloudServer {
+public class CloudServer implements CloudExecutor {
 
     private final String host;
     private final Integer port;

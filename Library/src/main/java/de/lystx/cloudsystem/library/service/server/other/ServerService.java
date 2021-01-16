@@ -187,13 +187,14 @@ public class ServerService extends CloudService {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
             service = new Service(service.getName(), service.getUniqueId(), serviceGroup, this.idService.getFreeID(serviceGroup.getName()), port, service.getServiceState());
         }
-        this.actions.put(service.getName(), new Action());
+        Action action = new Action();
+        this.actions.put(service.getName(), action);
         this.globalServices.add(service);
         List<Service> services = this.getServices(serviceGroup);
         services.add(service);
 
         this.services.put(serviceGroup, services);
-        this.providerStart.autoStartService(service, properties);
+        this.providerStart.autoStartService(service, properties, action);
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStartedServer(service));
 
     }

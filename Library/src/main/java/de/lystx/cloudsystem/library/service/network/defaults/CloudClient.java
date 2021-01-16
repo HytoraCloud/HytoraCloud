@@ -10,7 +10,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CloudClient {
+public class CloudClient implements CloudExecutor{
 
 
     private final NetworkChannel networkChannel;

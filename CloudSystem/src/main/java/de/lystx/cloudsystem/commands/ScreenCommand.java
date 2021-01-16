@@ -9,9 +9,11 @@ import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 
+import java.util.ConcurrentModificationException;
+
 public class ScreenCommand extends Command {
 
-    private CloudScreenPrinter screenPrinter;
+    private final CloudScreenPrinter screenPrinter;
 
     public ScreenCommand(String name, String description, CloudScreenPrinter screenPrinter, String... aliases) {
         super(name, description, aliases);
@@ -41,20 +43,33 @@ public class ScreenCommand extends Command {
             String subject = args[0];
             String serverName = args[1];
             if (subject.equalsIgnoreCase("join") || subject.equalsIgnoreCase("-s") || subject.equalsIgnoreCase("-p") || subject.equalsIgnoreCase("-c")) {
-                if (CloudSystem.getInstance().getService(ScreenService.class).getScreenByName(serverName) != null) {
-                    CloudScreen screen = CloudSystem.getInstance().getService(ScreenService.class).getScreenByName(serverName);
-                    this.screenPrinter = CloudSystem.getInstance().getScreenPrinter();
-                    this.screenPrinter.create(screen);
-                    this.screenPrinter.start();
-                    return;
-                }
-                colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cThe service §e" + serverName + " §cis not online!");
+               CloudScreen screen = CloudSystem.getInstance().getService(ScreenService.class).getScreenByName(serverName);
+               if (screen != null) {
+                   if (screen.getCachedLines().isEmpty()) {
+                       colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
+                       return;
+                   }
+                   screen.setCloudConsole(colouredConsoleProvider);
+                   screen.setScreenPrinter(screenPrinter);
+                   if (!screen.isRunning()) {
+                       //screen.start();
+                   }
+                   colouredConsoleProvider.getLogger().sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
+                   this.screenPrinter.create(screen);
+                   try {
+                       for (String cachedLine : screen.getCachedLines()) {
+                           colouredConsoleProvider.getLogger().sendMessage("§9[§b" + screen.getName() + "§9]§f" + cachedLine);
+                       }
+                   } catch (ConcurrentModificationException ignored) {}
+               } else {
+                   colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cThe service §e" + serverName + " §cis not online!");
+               }
                 return;
             }
-            sendUsage(colouredConsoleProvider);
+            this.sendUsage(colouredConsoleProvider);
             return;
         }
-        sendUsage(colouredConsoleProvider);
+        this.sendUsage(colouredConsoleProvider);
     }
 
     private void sendUsage(CloudConsole colouredConsoleProvider) {

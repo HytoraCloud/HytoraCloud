@@ -34,14 +34,20 @@ public final class CommandService extends CloudService {
         if (!active) {
             return;
         }
-        if (this.getCloudLibrary().getScreenPrinter().isInScreen()) {
-            if (line.equalsIgnoreCase("leave") || line.equalsIgnoreCase("-l") || line.equalsIgnoreCase("quit")) {
-                this.getCloudLibrary().getScreenPrinter().quitCurrentScreen();
-            } else {
-                this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutExecuteCommand(this.getCloudLibrary().getScreenPrinter().getScreen().getName(), line));
+        try {
+            if (this.getCloudLibrary().getScreenPrinter().isInScreen()) {
+                if (line.equalsIgnoreCase("sc leave")
+                        || line.equalsIgnoreCase("screen leave")
+                        || line.equalsIgnoreCase("leave")
+                        || line.equalsIgnoreCase("-l")
+                        || line.equalsIgnoreCase("quit")) {
+                    this.getCloudLibrary().getScreenPrinter().quitCurrentScreen();
+                } else {
+                    this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutExecuteCommand(this.getCloudLibrary().getScreenPrinter().getScreen().getName(), line));
+                }
+                return;
             }
-            return;
-        }
+        } catch (NullPointerException ignored) {}
         String commandText = line.split(" ")[0];
         String[] split = line.substring(commandText.length()).split(" ");
         Command command = this.getCommand(commandText);

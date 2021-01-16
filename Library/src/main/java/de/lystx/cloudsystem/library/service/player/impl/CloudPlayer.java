@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.elements.packets.communication.*;
-import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
+import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,31 +25,31 @@ public class CloudPlayer implements Serializable {
         this.proxy = proxy;
     }
 
-    public void sendMessage(CloudClient executor, String message) {
+    public void sendMessage(CloudExecutor executor, String message) {
         executor.sendPacket(new PacketCommunicationSendMessage(this.uuid, message));
     }
 
-    public void playSound(CloudClient executor, String sound, float v1, float v2) {
+    public void playSound(CloudExecutor executor, String sound, float v1, float v2) {
         executor.sendPacket(new PacketCommunicationPlaySound(this.name, sound, v1, v2));
     }
 
-    public void sendTitle(CloudClient executor, String title, String subtitle) {
+    public void sendTitle(CloudExecutor executor, String title, String subtitle) {
         executor.sendPacket(new PacketCommunicationSendTitle(this.name, title, subtitle));
     }
 
-    public void fallback(CloudClient executor) {
+    public void fallback(CloudExecutor executor) {
         executor.sendPacket(new PacketCommunicationFallback(this.name));
     }
 
-    public void sendToServer(CloudClient executor, String server) {
+    public void sendToServer(CloudExecutor executor, String server) {
         executor.sendPacket(new PacketCommunicationSendToServer(this.name, server));
     }
 
-    public void kick(CloudClient executor, String reason) {
+    public void kick(CloudExecutor executor, String reason) {
         executor.sendPacket(new PacketCommunicationKick(this.name, reason));
     }
 
-    public void sendActionbar(CloudClient executor, String message) {
+    public void sendActionbar(CloudExecutor executor, String message) {
         executor.sendPacket(new PacketCommunicationSendActionbar(this.name, message));
     }
 }

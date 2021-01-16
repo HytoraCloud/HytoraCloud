@@ -5,18 +5,20 @@ import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommuni
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class PacketHandlerCloudPlayerCommunication extends PacketHandlerAdapter {
 
     private final CloudSystem cloudSystem;
 
-    public PacketHandlerCloudPlayerCommunication(CloudSystem cloudSystem) {
-        this.cloudSystem = cloudSystem;
-    }
-
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketCommunication) {
+            PacketCommunication packetCommunication = (PacketCommunication)packet;
+            if (!packetCommunication.isSendBack()) {
+                return;
+            }
             this.cloudSystem.getService(CloudNetworkService.class).sendPacket(packet);
         }
     }
