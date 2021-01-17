@@ -30,76 +30,70 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInRegisterCloudPlayer) {
             PacketPlayInRegisterCloudPlayer packetPlayInRegisterCloudPlayer = (PacketPlayInRegisterCloudPlayer) packet;
-            if (this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInRegisterCloudPlayer.getUuid()) != null) {
+            CloudPlayer cloudPlayer = packetPlayInRegisterCloudPlayer.getCloudPlayer();
+
+            if (this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(cloudPlayer.getName()) != null) {
                 return;
             }
-            CloudPlayer cloudPlayer = new CloudPlayer(packetPlayInRegisterCloudPlayer.getName(), packetPlayInRegisterCloudPlayer.getUuid(), packetPlayInRegisterCloudPlayer.getIpAddress(), packetPlayInRegisterCloudPlayer.getCurrentServer(), packetPlayInRegisterCloudPlayer.getCurrentProxy());
             if (!this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(cloudPlayer)) {
                 this.cloudSystem.getService(StatisticsService.class).getStatistics().add("registeredPlayers");
-                this.cloudSystem.reload("statistics");
             }
-            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
-            this.cloudSystem.reload("statistics");
-            this.cloudSystem.reload("cloudPlayers");
-            if (!cloudSystem.isRunning()) {
+
+            if (!cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
+                this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
+                this.cloudSystem.reload("statistics");
+                this.cloudSystem.reload("cloudPlayers");
+            }
+
+            if (!cloudSystem.isRunning() || (this.cloudSystem.getScreenPrinter().getScreen() != null && this.cloudSystem.getScreenPrinter().isInScreen())) {
                 return;
             }
+            if (cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
+                this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is logging on on §a" + cloudPlayer.getProxy());
+            } else {
+                this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is connected on §a" + cloudPlayer.getServer() + " §7| §bProxy " + cloudPlayer.getProxy());
+            }
 
-            Service service = this.cloudSystem.getService().getService(cloudPlayer.getServer());
-            this.cloudSystem.getService(CloudPlayerService.class).setOnlinePlayerState(service, cloudPlayer, true);
-            this.cloudSystem.getService(CloudPlayerService.class).reloadOnlinePlayers();
-            this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is connected on §a" + cloudPlayer.getServer() + " §7| §bProxy " + cloudPlayer.getProxy());
         } else if (packet instanceof PacketPlayInPlayerExecuteCommand) {
-            PacketPlayInPlayerExecuteCommand packetPlayInPlayerExecuteCommand = (PacketPlayInPlayerExecuteCommand)packet;
-
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
             this.cloudSystem.reload("statistics");
        } else if (packet instanceof PacketPlayInUnregisterCloudPlayer) {
             PacketPlayInUnregisterCloudPlayer packetPlayInUnregisterCloudPlayer = (PacketPlayInUnregisterCloudPlayer)packet;
-            UUID uuid = packetPlayInUnregisterCloudPlayer.getUuid();
-            CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(uuid);
-            if (cloudPlayer == null) {
-                if (!cloudSystem.isRunning()) {
+            CloudPlayer cloudPlayer = this
+                    .cloudSystem
+                    .getService(CloudPlayerService.class)
+                    .getOnlinePlayer(packetPlayInUnregisterCloudPlayer.getName());
+            if (cloudPlayer != null) {
+                this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
+                this.cloudSystem.reload("cloudPlayers");
+
+                if (!cloudSystem.isRunning() || (this.cloudSystem.getScreenPrinter().getScreen() != null && this.cloudSystem.getScreenPrinter().isInScreen())) {
                     return;
                 }
-                this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutForceRegisterPlayer(uuid));
-                //this.cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cTried to unregister a cloudplayer who isn't registered! Recaching player...");
-                return;
+                if (cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
+                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cPlayer §e" + cloudPlayer.getName() + " §ccouldnt be logged in!");
+                } else {
+                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is disconnected from §a" + cloudPlayer.getServer());
+                }
+
             }
-            this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
-
-            Service service = this.cloudSystem.getService().getService(cloudPlayer.getServer());
-            this.cloudSystem.getService(CloudPlayerService.class).setOnlinePlayerState(service, cloudPlayer, false);
-            this.cloudSystem.getService(CloudPlayerService.class).reloadOnlinePlayers();
-
-             this.cloudSystem.reload("cloudPlayers");
-            if (!cloudSystem.isRunning()) {
-                return;
-            }
-            this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is disconnected from §a" + cloudPlayer.getServer());
-
         } else if (packet instanceof PacketPlayInCloudPlayerServerChange) {
             PacketPlayInCloudPlayerServerChange packetPlayInCloudPlayerServerChange = (PacketPlayInCloudPlayerServerChange)packet;
-            UUID uuid = packetPlayInCloudPlayerServerChange.getUuid();
-            CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(uuid);
-            if (cloudPlayer == null) {
-                if (!cloudSystem.isRunning()) {
-                    return;
-                }
-                this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutForceRegisterPlayer(uuid));
-                //this.cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cTried to change server of a cloudplayer who isn't registered! Recaching player...");
-                return;
+            CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInCloudPlayerServerChange.getCloudPlayer().getName());
+            if (cloudPlayer != null) {
+                CloudPlayer newCloudPlayer = new CloudPlayer(
+                        cloudPlayer.getName(),
+                        cloudPlayer.getUuid(),
+                        cloudPlayer.getIpAddress(),
+                        packetPlayInCloudPlayerServerChange.getNewServer(),
+                        cloudPlayer.getProxy()
+                );
+
+                this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer); //Remove old player
+                this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(newCloudPlayer); //Add new player
+                this.cloudSystem.reload("cloudPlayers"); //Update players for all services
             }
 
-            CloudPlayer newCloudPlayer = new CloudPlayer(cloudPlayer.getName(), cloudPlayer.getUuid(), cloudPlayer.getIpAddress(), packetPlayInCloudPlayerServerChange.getNewServer(), cloudPlayer.getProxy());
-            this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
-            this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(newCloudPlayer);
-
-            Service service = this.cloudSystem.getService().getService(cloudPlayer.getServer());
-            this.cloudSystem.getService(CloudPlayerService.class).setOnlinePlayerState(service, cloudPlayer, false);
-            this.cloudSystem.getService(CloudPlayerService.class).setOnlinePlayerState(service, newCloudPlayer, true);
-            this.cloudSystem.getService(CloudPlayerService.class).reloadOnlinePlayers();
-             this.cloudSystem.reload("cloudPlayers");
         }
     }
 }

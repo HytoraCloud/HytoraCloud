@@ -46,18 +46,6 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
         } else if (packet instanceof PacketCommunicationKick) {
             PacketCommunicationKick kick = (PacketCommunicationKick)packet;
             ProxyServer.getInstance().getPlayer(kick.getName()).disconnect(kick.getReason());
-        } else if (packet instanceof PacketPlayOutForceRegisterPlayer) {
-            try {
-                UUID uuid = ((PacketPlayOutForceRegisterPlayer) packet).getUuid();
-                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-                CloudProxy.getInstance().updatePermissions(player);
-                this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInRegisterCloudPlayer(player.getName(), player.getAddress().getAddress().getHostAddress(),
-                        player.getServer().getInfo().getName(),
-                        CloudAPI.getInstance().getNetwork().getProxy(player.getPendingConnection().getVirtualHost().getPort()).getName(),
-                        player.getUniqueId()));
-            } catch (NullPointerException e) {
-                CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cCouldn't §eforce cache §cplayer for uuid §e" + ((PacketPlayOutForceRegisterPlayer) packet).getUuid());
-            }
         }
     }
 }

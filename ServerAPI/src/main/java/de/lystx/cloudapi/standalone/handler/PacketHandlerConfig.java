@@ -20,7 +20,7 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
         if (packet instanceof PacketPlayOutNetworkConfig) {
             PacketPlayOutNetworkConfig packetPlayOutNetworkConfig = (PacketPlayOutNetworkConfig)packet;
             this.cloudAPI.setNetworkConfig(packetPlayOutNetworkConfig.getNetworkConfig());
-
+            CloudAPI.getInstance().setJoinable(true);
         }
     }
 }

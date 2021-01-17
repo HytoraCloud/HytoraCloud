@@ -12,7 +12,7 @@ public class PacketPlayInRegister extends Packet implements Serializable {
     private final Service service;
 
     public PacketPlayInRegister(Service service) {
-        super(PacketPlayInRegister.class);
+        super();
         this.service = service;
     }
 }

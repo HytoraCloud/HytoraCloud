@@ -10,15 +10,15 @@ import java.io.Serializable;
 public class PacketPlayInCreateNPC extends Packet implements Serializable {
 
     private final String key;
-    private final String document;
+    private final String doc;
 
-    public PacketPlayInCreateNPC(String key, String document) {
-        super(PacketPlayInCreateNPC.class);
+    public PacketPlayInCreateNPC(String key, String doc) {
+        super();
         this.key = key;
-        this.document = document;
+        this.doc = doc;
     }
 
     public Document getDocument() {
-        return new Document(this.document);
+        return new Document(this.doc);
     }
 }

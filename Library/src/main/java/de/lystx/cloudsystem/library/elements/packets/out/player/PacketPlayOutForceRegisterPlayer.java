@@ -13,7 +13,7 @@ public class PacketPlayOutForceRegisterPlayer extends Packet implements Serializ
     private final UUID uuid;
 
     public PacketPlayOutForceRegisterPlayer(UUID uuid) {
-        super(PacketPlayOutForceRegisterPlayer.class);
+        super();
         this.uuid = uuid;
     }
 }

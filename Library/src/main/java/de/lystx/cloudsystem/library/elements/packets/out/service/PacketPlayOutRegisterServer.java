@@ -12,7 +12,7 @@ public class PacketPlayOutRegisterServer extends Packet implements Serializable 
     private final Service service;
 
     public PacketPlayOutRegisterServer(Service service) {
-        super(PacketPlayOutRegisterServer.class);
+        super();
         this.service = service;
     }
 }

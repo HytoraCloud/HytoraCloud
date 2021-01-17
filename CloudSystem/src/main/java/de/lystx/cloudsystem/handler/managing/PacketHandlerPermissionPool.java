@@ -20,10 +20,11 @@ public class PacketHandlerPermissionPool extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInPermissionPool) {
-            //this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§2Received new §aPermissionPool§2! Updating values...");
             PacketPlayInPermissionPool packetPlayInPermissionPool = (PacketPlayInPermissionPool)packet;
             PermissionPool permissionPool = packetPlayInPermissionPool.getPermissionPool();
             this.cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
+            this.cloudSystem.getService(PermissionService.class).save();
+            this.cloudSystem.getService(PermissionService.class).load();
             this.cloudSystem.reload("permissions");
         }
     }

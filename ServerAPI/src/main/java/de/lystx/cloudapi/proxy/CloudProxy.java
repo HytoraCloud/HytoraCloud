@@ -84,9 +84,11 @@ public class CloudProxy extends Plugin {
                 } catch (NullPointerException e) {
                     data.setIpAddress("0");
                 }
-                this.cloudAPI.getPermissionPool().updatePermissionGroup(player.getName(), this.cloudAPI.getPermissionPool().getPermissionGroup(data.getPermissionGroup()), -1);
-                CloudAPI.getInstance().getPermissionPool().updatePlayerData(player.getName(), data);
-                CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+                if (!this.cloudAPI.getPermissionPool().isAvailable()) {
+                    return;
+                }
+                this.cloudAPI.getPermissionPool().updatePlayerData(player.getName(), data);
+                this.cloudAPI.getPermissionPool().update(this.cloudAPI.getCloudClient());
             }
             PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
             if (group == null) {

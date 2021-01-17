@@ -257,6 +257,16 @@ public class Document implements Serializable {
         return result;
     }
 
+    public <T> List<T> getList(String key, Class<?> getAs) {
+        List<T> result = new LinkedList<>();
+        for (JsonElement element : this.getJsonArray(key)) {
+            if (element instanceof JsonObject) {
+                result.add((T)new Document().getObject(element.getAsJsonObject(), getAs));
+            }
+        }
+        return result;
+    }
+
     public Document getDocument(String key) {
         try {
             return new Document(this.jsonObject.get(key).getAsJsonObject());

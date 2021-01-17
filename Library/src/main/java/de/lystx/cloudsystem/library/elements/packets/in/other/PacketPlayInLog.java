@@ -13,7 +13,7 @@ public class PacketPlayInLog extends Packet implements Serializable {
     private final boolean showUpInConsole;
 
     public PacketPlayInLog(String prefix, String message, boolean showUpInConsole) {
-        super(PacketPlayInLog.class);
+        super();
         this.prefix = prefix;
         this.message = message;
         this.showUpInConsole = showUpInConsole;

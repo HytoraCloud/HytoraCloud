@@ -16,10 +16,11 @@ public class MessageConfig implements Serializable {
     private final String networkStillBootingMessage;
     private final String groupMaintenanceMessage;
     private final String alreadyConnectedMessage;
+    private final String alreadyOnNetworkMessage;
     private final String serverShutdownMessage;
     private final String errorMessage;
 
-    public MessageConfig(String prefix, String serverStartMessage, String serverStopMessage, String alreadyHubMessage, String noHubMessage, String maintenanceKickMessage, String networkStillBootingMessage, String groupMaintenanceMessage, String alreadyConnectedMessage, String serverShutdownMessage, String errorMessage) {
+    public MessageConfig(String prefix, String serverStartMessage, String serverStopMessage, String alreadyHubMessage, String noHubMessage, String maintenanceKickMessage, String networkStillBootingMessage, String groupMaintenanceMessage, String alreadyConnectedMessage, String alreadyOnNetworkMessage, String serverShutdownMessage, String errorMessage) {
         this.prefix = prefix;
         this.serverStartMessage = serverStartMessage;
         this.serverStopMessage = serverStopMessage;
@@ -29,6 +30,7 @@ public class MessageConfig implements Serializable {
         this.networkStillBootingMessage = networkStillBootingMessage;
         this.groupMaintenanceMessage = groupMaintenanceMessage;
         this.alreadyConnectedMessage = alreadyConnectedMessage;
+        this.alreadyOnNetworkMessage = alreadyOnNetworkMessage;
         this.serverShutdownMessage = serverShutdownMessage;
         this.errorMessage = errorMessage;
     }

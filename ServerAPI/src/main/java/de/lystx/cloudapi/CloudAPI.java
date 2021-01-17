@@ -82,8 +82,8 @@ public class CloudAPI {
         this.cloudClient.sendPacket(new PacketPlayInLog(prefix, message, showUpInConsole));
     }
 
-    public void messageCloud(String prefix, String message) {
-        this.messageCloud(prefix, message, true);
+    public void messageCloud(String prefix, Object message) {
+        this.messageCloud(prefix, String.valueOf(message), true);
     }
 
     public Service getService() {

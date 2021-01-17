@@ -11,7 +11,7 @@ public class PacketPlayInStopServer extends Packet implements Serializable {
     private final Service service;
 
     public PacketPlayInStopServer(Service service) {
-        super(PacketPlayInStopServer.class);
+        super();
         this.service = service;
     }
 

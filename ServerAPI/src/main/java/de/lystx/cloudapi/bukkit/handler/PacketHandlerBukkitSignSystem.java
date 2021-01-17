@@ -21,7 +21,6 @@ public class PacketHandlerBukkitSignSystem extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutCloudSigns) {
-            CloudAPI.getInstance().setJoinable(true);
             PacketPlayOutCloudSigns packetPlayOutCloudSigns = (PacketPlayOutCloudSigns)packet;
             CloudServer.getInstance().getSignManager().setSignLayOut(new SignLayOut(new Document(packetPlayOutCloudSigns.getSignLayOut())));
             CloudServer.getInstance().getSignManager().setCloudSigns(packetPlayOutCloudSigns.getCloudSigns());

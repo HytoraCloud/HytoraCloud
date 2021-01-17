@@ -71,15 +71,17 @@ public class CloudServer extends JavaPlugin {
             try {
                 data.setIpAddress(player.getAddress().getHostName());
             } catch (NullPointerException e) {
-                data.setIpAddress("0");
+                data.setIpAddress("127.0.0.1");
             }
-            this.cloudAPI.getPermissionPool().updatePermissionGroup(player.getName(), this.cloudAPI.getPermissionPool().getPermissionGroup(data.getPermissionGroup()), -1);
-            CloudAPI.getInstance().getPermissionPool().updatePlayerData(player.getName(), data);
-            CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+            if (!this.cloudAPI.getPermissionPool().isAvailable()) {
+                return;
+            }
+            this.cloudAPI.getPermissionPool().updatePlayerData(player.getName(), data);
+            this.cloudAPI.getPermissionPool().update(this.cloudAPI.getCloudClient());
         }
         PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
         if (group == null) {
-            CloudAPI.getInstance().messageCloud(this.cloudAPI.getService().getName(), "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
+            this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
             return;
         }
         for (PermissionAttachmentInfo effectivePermission : player.getEffectivePermissions()) {

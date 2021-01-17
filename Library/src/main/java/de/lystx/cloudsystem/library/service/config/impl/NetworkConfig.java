@@ -76,6 +76,7 @@ public class NetworkConfig implements Serializable {
                         "%prefix%§cThe CloudSystem is still booting up! There are no servers to connect on at this time!",
                         "%prefix%§cThe servergroup §e%group% §cis in maintenance!",
                         "%prefix%§cYou are alread connected to this service!",
+                        "%prefix%§cYou are alread on the network!",
                         "%prefix%§cThis server was shut down!",
                         "%prefix%§cAn error occured§8: §e%error%"
                         ),

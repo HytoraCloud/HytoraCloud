@@ -76,6 +76,9 @@ public class ServerService extends CloudService {
         if (!this.getCloudLibrary().isRunning()) {
             return;
         }
+        if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
+            return;
+        }
         this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7has §astarted §7| §bID " + service.getServiceID() + " §7| §bPort " + service.getPort() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name() );
 
     }
@@ -88,6 +91,10 @@ public class ServerService extends CloudService {
         services.remove(remove);
         this.services.put(service.getServiceGroup(), services);
         if (!this.getCloudLibrary().isRunning()) {
+            return;
+        }
+
+        if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
             return;
         }
         this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7has §4stopped §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name());
@@ -157,9 +164,14 @@ public class ServerService extends CloudService {
             this.services.put(service.getServiceGroup(), list);
         }
         Action action = this.actions.getOrDefault(service.getName(), new Action());
-        this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§aChannel §7[§a" + service.getName() + "@" + service.getUniqueId() + "§7] §aconnected §7[§2" + action.getMS() + "sec§7]");
+
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutRegisterServer(service));
         this.actions.remove(service.getName());
+        if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
+            return;
+        }
+        this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§aChannel §7[§a" + service.getName() + "@" + service.getUniqueId() + "§7] §aconnected §7[§2" + action.getMS() + "sec§7]");
+
     }
 
     public void needServices(ServiceGroup serviceGroup) {
@@ -241,6 +253,9 @@ public class ServerService extends CloudService {
 
     public void stopServices() {
         for (ServiceGroup serviceGroup : this.services.keySet()) {
+            if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
+                return;
+            }
             this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The services of the group §c" + serviceGroup.getName() + " §7are now §4shutting down §7| §bServices " + this.services.get(serviceGroup).size());
         }
         if (this.globalServices == null) {

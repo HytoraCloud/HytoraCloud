@@ -9,10 +9,9 @@ import java.io.Serializable;
 @Getter
 public class PacketPlayOutPermissionPool extends Packet implements Serializable {
 
-    private final PermissionPool permissionPool;
-
     public PacketPlayOutPermissionPool(PermissionPool permissionPool) {
-        super(PacketPlayOutPermissionPool.class);
-        this.permissionPool = permissionPool;
+        this.append("key", "pool");
+        this.append("groups", permissionPool.getPermissionGroups());
+        this.append("pool", permissionPool.getPlayerCache());
     }
 }

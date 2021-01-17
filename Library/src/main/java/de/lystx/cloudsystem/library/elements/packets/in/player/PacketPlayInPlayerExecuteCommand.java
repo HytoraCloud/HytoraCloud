@@ -12,7 +12,7 @@ public class PacketPlayInPlayerExecuteCommand extends Packet implements Serializ
     private final String command;
 
     public PacketPlayInPlayerExecuteCommand(String player, String command) {
-        super(PacketPlayInPlayerExecuteCommand.class);
+        super();
         this.player = player;
         this.command = command;
     }

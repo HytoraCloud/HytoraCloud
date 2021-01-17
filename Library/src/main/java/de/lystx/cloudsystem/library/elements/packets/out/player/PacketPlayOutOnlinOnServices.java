@@ -16,7 +16,7 @@ public class PacketPlayOutOnlinOnServices extends Packet implements Serializable
     private final Map<ServiceGroup, Map<Service, List<CloudPlayer>>> cloudPlayers;
 
     public PacketPlayOutOnlinOnServices(Map<ServiceGroup, Map<Service, List<CloudPlayer>>> cloudPlayers) {
-        super(PacketPlayOutOnlinOnServices.class);
+        super();
         this.cloudPlayers = cloudPlayers;
     }
 }

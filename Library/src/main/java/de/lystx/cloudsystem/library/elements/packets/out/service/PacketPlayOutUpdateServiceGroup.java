@@ -12,7 +12,7 @@ public class PacketPlayOutUpdateServiceGroup extends Packet implements Serializa
     private final ServiceGroup serviceGroup;
 
     public PacketPlayOutUpdateServiceGroup(ServiceGroup serviceGroup) {
-        super(PacketPlayOutUpdateServiceGroup.class);
+        super();
         this.serviceGroup = serviceGroup;
     }
 }

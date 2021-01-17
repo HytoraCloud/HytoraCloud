@@ -12,7 +12,7 @@ public class PacketPlayOutStopServer extends Packet implements Serializable {
     private final Service service;
 
     public PacketPlayOutStopServer(Service service) {
-        super(PacketPlayOutStopServer.class);
+        super();
         this.service = service;
     }
 

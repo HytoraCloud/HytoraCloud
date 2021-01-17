@@ -15,7 +15,7 @@ public class PacketPlayOutServices extends Packet implements Serializable {
     private final Map<ServiceGroup, List<Service>> services;
 
     public PacketPlayOutServices(Map<ServiceGroup, List<Service>> services) {
-        super(PacketPlayOutServices.class);
+        super();
         this.services = services;
     }
 }

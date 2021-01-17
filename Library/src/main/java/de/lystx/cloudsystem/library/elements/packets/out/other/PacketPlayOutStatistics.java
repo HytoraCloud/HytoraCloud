@@ -12,7 +12,7 @@ public class PacketPlayOutStatistics extends Packet implements Serializable {
     private final Statistics statistics;
 
     public PacketPlayOutStatistics(Statistics statistics) {
-        super(PacketPlayOutStatistics.class);
+        super();
         this.statistics = statistics;
     }
 }

@@ -14,7 +14,7 @@ public class PacketPlayInStartService extends Packet implements Serializable {
     private final String properties;
 
     public PacketPlayInStartService(Service service, String properties) {
-        super(PacketPlayInStartService.class);
+        super();
         this.service = service;
         this.properties = properties;
     }

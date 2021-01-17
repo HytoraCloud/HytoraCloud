@@ -6,6 +6,6 @@ public class PacketPlayInReload extends Packet {
 
 
     public PacketPlayInReload() {
-        super(PacketPlayInReload.class);
+        super();
     }
 }

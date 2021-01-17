@@ -17,12 +17,10 @@ public class CloudPlayerService extends CloudService {
 
     private final List<CloudPlayer> cloudPlayers;
     private final File dir;
-    private final Map<ServiceGroup, Map<Service, List<CloudPlayer>>> onlinePlayers;
 
     public CloudPlayerService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
         this.cloudPlayers = new LinkedList<>();
-        this.onlinePlayers = new HashMap<>();
         this.dir = cloudLibrary.getService(FileService.class).getCloudPlayerDirectory();
     }
 
@@ -51,44 +49,6 @@ public class CloudPlayerService extends CloudService {
             return true;
         }
     }
-
-    public void setOnlinePlayerState(Service service, CloudPlayer player, boolean add) {
-
-
-        Service safeService = this.getCloudLibrary().getService(ServerService.class).getService(service.getName());
-
-        Map<Service, List<CloudPlayer>> players = this.onlinePlayers.get(safeService.getServiceGroup());
-        if (players == null) {
-            players = new HashMap<>();
-        }
-        List<CloudPlayer> cloudPlayers = players.get(safeService);
-        if (cloudPlayers == null) {
-            cloudPlayers = new LinkedList<>();
-        }
-        if (add) {
-            cloudPlayers.add(this.getOnlinePlayer(player.getName()));
-        } else {
-            cloudPlayers.remove(this.getOnlinePlayer(player.getName()));
-        }
-        players.put(safeService, cloudPlayers);
-        this.onlinePlayers.put(safeService.getServiceGroup(), players);
-    }
-
-    public void reloadOnlinePlayers() {
-        //this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutOnlinOnServices(this.onlinePlayers));
-    }
-
-    public void clearGroup(String name) {
-        ServiceGroup group;
-        for (ServiceGroup serviceGroup : this.onlinePlayers.keySet()) {
-            if (serviceGroup.getName().equalsIgnoreCase(name)) {
-                group = serviceGroup;
-                this.onlinePlayers.put(group, new HashMap<>());
-            }
-        }
-
-    }
-
 
 
     public CloudPlayerData getPlayerData(UUID uuid) {

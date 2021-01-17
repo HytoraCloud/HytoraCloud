@@ -22,7 +22,9 @@ public class PacketHandlerStopServer extends PacketHandlerAdapter {
             try {
                 PacketPlayInStopServer packetPlayInStopServer = (PacketPlayInStopServer) packet;
                 Service service = packetPlayInStopServer.getService();
-                this.cloudSystem.getService(CloudPlayerService.class).clearGroup(service.getServiceGroup().getName());
+                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getName().equalsIgnoreCase(service.getName())) {
+                    cloudSystem.getScreenPrinter().quitCurrentScreen();
+                }
                 this.cloudSystem.getService().stopService(this.cloudSystem.getService().getService(service.getName()));
             } catch (NullPointerException ignored) {}
         }

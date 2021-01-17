@@ -26,54 +26,41 @@ public class ScreenCommand extends Command {
             if (subject.equalsIgnoreCase("leave")) {
                 if (this.screenPrinter.isInScreen()) {
                     this.screenPrinter.quitCurrentScreen();
-                    return;
+                } else {
+                    colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cYou are not in a screen Session!");
                 }
-                colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cYou are not in a screen Session!");
-                return;
-            }
-            if (subject.equalsIgnoreCase("list")) {
+            } else if (subject.equalsIgnoreCase("list")) {
                 colouredConsoleProvider.getLogger().sendMessage("§9CloudScreens§7:");
                 CloudSystem.getInstance().getService(ScreenService.class).getMap().forEach((s, screen) -> colouredConsoleProvider.getLogger().sendMessage("INFO", s));
-                return;
+            } else {
+                String serverName = args[0];
+                CloudScreen screen = CloudSystem.getInstance().getService(ScreenService.class).getScreenByName(serverName);
+                if (screen != null) {
+                    if (screen.getCachedLines().isEmpty()) {
+                        colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
+                        return;
+                    }
+                    screen.setCloudConsole(colouredConsoleProvider);
+                    screen.setScreenPrinter(screenPrinter);
+                    colouredConsoleProvider.getLogger().sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
+                    this.screenPrinter.create(screen);
+                    try {
+                        for (String cachedLine : screen.getCachedLines()) {
+                            colouredConsoleProvider.getLogger().sendMessage("§9[§b" + screen.getName() + "§9]§f " + cachedLine);
+                        }
+                    } catch (ConcurrentModificationException ignored) {}
+                } else {
+                    colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cThe service §e" + serverName + " §cis not online!");
+                }
             }
-            sendUsage(colouredConsoleProvider);
-            return;
-        }
-        if (args.length == 2) {
-            String subject = args[0];
-            String serverName = args[1];
-            if (subject.equalsIgnoreCase("join") || subject.equalsIgnoreCase("-s") || subject.equalsIgnoreCase("-p") || subject.equalsIgnoreCase("-c")) {
-               CloudScreen screen = CloudSystem.getInstance().getService(ScreenService.class).getScreenByName(serverName);
-               if (screen != null) {
-                   if (screen.getCachedLines().isEmpty()) {
-                       colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
-                       return;
-                   }
-                   screen.setCloudConsole(colouredConsoleProvider);
-                   screen.setScreenPrinter(screenPrinter);
-                   if (!screen.isRunning()) {
-                       //screen.start();
-                   }
-                   colouredConsoleProvider.getLogger().sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
-                   this.screenPrinter.create(screen);
-                   try {
-                       for (String cachedLine : screen.getCachedLines()) {
-                           colouredConsoleProvider.getLogger().sendMessage("§9[§b" + screen.getName() + "§9]§f" + cachedLine);
-                       }
-                   } catch (ConcurrentModificationException ignored) {}
-               } else {
-                   colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cThe service §e" + serverName + " §cis not online!");
-               }
-                return;
-            }
+        } else {
             this.sendUsage(colouredConsoleProvider);
-            return;
         }
-        this.sendUsage(colouredConsoleProvider);
+
     }
 
     private void sendUsage(CloudConsole colouredConsoleProvider) {
-        colouredConsoleProvider.getLogger().sendMessage("INFO", "§9screen <-s> <server> §7| §bJoins screen session");
+        colouredConsoleProvider.getLogger().sendMessage("INFO", "§9screen <server> §7| §bJoins screen session");
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9screen <leave> §7| §bLeaves screen session");
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9screen <list> §7| §bLists screen sessions");
     }

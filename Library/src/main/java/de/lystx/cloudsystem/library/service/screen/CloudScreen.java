@@ -51,7 +51,7 @@ public class CloudScreen {
                 this.cachedLines.add(line);
                 if (screenPrinter != null && cloudConsole != null && screenPrinter.getScreen() != null) {
                     if (screenPrinter.getScreen().getName().equalsIgnoreCase(this.name)) {
-                        this.cloudConsole.getLogger().sendMessage(line);
+                        this.cloudConsole.getLogger().sendMessage("§9[§b" + this.name + "§9]§f " + line);
                     }
                 }
             } catch (NoSuchElementException ignored) {}

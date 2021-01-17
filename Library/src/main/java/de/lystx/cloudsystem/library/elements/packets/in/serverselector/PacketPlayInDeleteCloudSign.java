@@ -12,7 +12,7 @@ public class PacketPlayInDeleteCloudSign extends Packet implements Serializable 
     private final CloudSign cloudSign;
 
     public PacketPlayInDeleteCloudSign(CloudSign cloudSign) {
-        super(PacketPlayInDeleteCloudSign.class);
+        super();
         this.cloudSign = cloudSign;
     }
 }

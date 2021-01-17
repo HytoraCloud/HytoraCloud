@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutEx
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,6 +43,8 @@ public final class CommandService extends CloudService {
                         || line.equalsIgnoreCase("-l")
                         || line.equalsIgnoreCase("quit")) {
                     this.getCloudLibrary().getScreenPrinter().quitCurrentScreen();
+                } else if (line.equalsIgnoreCase("shutdown")) {
+                        this.getCloudLibrary().getService(ServerService.class).stopService(this.getCloudLibrary().getService(ServerService.class).getService(this.getCloudLibrary().getScreenPrinter().getScreen().getName()));
                 } else {
                     this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutExecuteCommand(this.getCloudLibrary().getScreenPrinter().getScreen().getName(), line));
                 }

@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.util.UUIDService;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.File;
 import java.io.Serializable;
@@ -16,17 +17,24 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-@Getter
+@Getter @Setter
 public class PermissionPool implements Serializable {
 
-    private final List<PermissionGroup> permissionGroups;
-    private final List<CloudPlayerData> playerCache;
+    private List<PermissionGroup> permissionGroups;
+    private List<CloudPlayerData> playerCache;
     private final SimpleDateFormat format;
 
     public PermissionPool() {
         this.permissionGroups = new LinkedList<>();
         this.playerCache = new LinkedList<>();
         this.format = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss", Locale.GERMAN);
+    }
+
+    public boolean isAvailable() {
+        if (this.playerCache.isEmpty()) {
+            return false;
+        }
+        return !this.permissionGroups.isEmpty();
     }
 
     public void update(CloudClient connection) {
@@ -62,7 +70,7 @@ public class PermissionPool implements Serializable {
         if (data == null) {
             return false;
         }
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(this.format.toPattern());
         String bis = data.getValidadilityTime();
         if (bis.equalsIgnoreCase("lifetime") || bis.trim().isEmpty()) {
             return true;
@@ -126,7 +134,7 @@ public class PermissionPool implements Serializable {
                 return cloudPlayerData;
             }
         }
-        CloudPlayerData data = new CloudPlayerData(UUIDService.getUUID(playerName), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true);
+        CloudPlayerData data = new CloudPlayerData(Objects.requireNonNull(UUIDService.getUUID(playerName)), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true);
         data.setDefault(true);
         return data;
     }
@@ -163,6 +171,14 @@ public class PermissionPool implements Serializable {
             }
         }
         return null;
+    }
+
+    public UUID tryUUID(String name) {
+        return this.getUUID(name) == null ? UUIDService.getUUID(name) : this.getUUID(name);
+    }
+
+    public String tryName(UUID uuid) {
+        return this.getName(uuid) == null ? UUIDService.getName(uuid) : this.getName(uuid);
     }
 
     public String getName(UUID uuid) {

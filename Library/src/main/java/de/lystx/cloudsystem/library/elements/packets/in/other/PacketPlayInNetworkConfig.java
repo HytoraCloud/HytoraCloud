@@ -12,7 +12,7 @@ public class PacketPlayInNetworkConfig extends Packet implements Serializable {
     private final NetworkConfig networkConfig;
 
     public PacketPlayInNetworkConfig(NetworkConfig networkConfig) {
-        super(PacketPlayInNetworkConfig.class);
+        super();
         this.networkConfig = networkConfig;
     }
 }

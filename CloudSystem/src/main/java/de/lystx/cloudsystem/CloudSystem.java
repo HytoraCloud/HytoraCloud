@@ -26,6 +26,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
+import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
@@ -172,7 +173,6 @@ public class CloudSystem extends CloudLibrary {
                 document.append("fastStartup", sp.isFastStartup());
                 document.append("host", sp.getHostname());
                 document.append("port", sp.getPort());
-                document.append("cloudAdmin", sp.getFirstAdmin());
                 Document proxy = document.getDocument("proxyConfig");
                 proxy.append("maxPlayers", sp.getMaxPlayers());
                 proxy.append("whitelistedPlayers", Collections.singleton(sp.getFirstAdmin()));
@@ -184,7 +184,7 @@ public class CloudSystem extends CloudLibrary {
 
                 this.getService(GroupService.class).createGroup(new ServiceGroup(
                         UUID.randomUUID(),
-                        "Proxy",
+                        "Bungee",
                         "default",
                         ServiceType.PROXY,
                         1,
@@ -230,8 +230,8 @@ public class CloudSystem extends CloudLibrary {
             if (type.equalsIgnoreCase("all")) {
                 this.reload("config");
                 this.reload("services");
-                this.reload("permissions");
                 this.reload("cloudPlayers");
+                this.reload("permissions");
                 this.getService(Scheduler.class).scheduleDelayedTask(() -> {
                     this.reload("statistics");
                     this.reload("signs");
@@ -241,7 +241,6 @@ public class CloudSystem extends CloudLibrary {
                 this.getService(ConfigService.class).reload();
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNetworkConfig(this.getService(ConfigService.class).getNetworkConfig()));
             } else if (type.equalsIgnoreCase("permissions")) {
-                this.getService(PermissionService.class).load();
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutPermissionPool(this.getService(PermissionService.class).loadEntries()));
             } else if (type.equalsIgnoreCase("statistics")) {
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStatistics(this.getService(StatisticsService.class).getStatistics()));
@@ -253,7 +252,7 @@ public class CloudSystem extends CloudLibrary {
                 this.getService(NPCService.class).load();
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNPCs(this.getService(NPCService.class).getDocument().toString()));
             } else if (type.equalsIgnoreCase("cloudPlayers")) {
-                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayers(this.getService(CloudPlayerService.class).getOnlinePlayers()));
+               this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayers(this.getService(CloudPlayerService.class).getOnlinePlayers()));
             } else if (type.equalsIgnoreCase("services")) {
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutServices(this.getService().getServices()));
             }

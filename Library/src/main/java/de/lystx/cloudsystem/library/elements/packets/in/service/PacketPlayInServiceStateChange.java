@@ -14,7 +14,7 @@ public class PacketPlayInServiceStateChange extends Packet implements Serializab
     private final ServiceState serviceState;
 
     public PacketPlayInServiceStateChange(Service service, ServiceState serviceState) {
-        super(PacketPlayInServiceStateChange.class);
+        super();
         this.service = service;
         this.serviceState = serviceState;
     }

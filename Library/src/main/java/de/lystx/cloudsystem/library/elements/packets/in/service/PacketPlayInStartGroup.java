@@ -12,7 +12,7 @@ public class PacketPlayInStartGroup extends Packet implements Serializable {
     private final ServiceGroup serviceGroup;
 
     public PacketPlayInStartGroup(ServiceGroup serviceGroup) {
-        super(PacketPlayInStartGroup.class);
+        super();
         this.serviceGroup = serviceGroup;
     }
 }

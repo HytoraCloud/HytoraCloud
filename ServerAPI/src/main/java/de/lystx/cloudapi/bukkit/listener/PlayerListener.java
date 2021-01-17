@@ -33,12 +33,6 @@ public class PlayerListener implements Listener {
     }
 
 
-    @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
-        CloudServer.getInstance().updatePermissions(player);
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         boolean allow = false;
@@ -53,7 +47,16 @@ public class PlayerListener implements Listener {
         }
 
         if (!allow && CloudAPI.getInstance().getCloudPlayers().get(event.getPlayer().getName()) == null || !CloudAPI.getInstance().isJoinable()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cPlease join only via the given §eproxies§c!");
+            try {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cPlease join only via the given §eproxies§c!");
+            } catch (NullPointerException e) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§cThere was an error§c! Try again!");
+            }
+
+        } else if (!CloudAPI.getInstance().getPermissionPool().isAvailable()) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cThe server isn't ready yet! Try again in a few seconds!");
+        } else {
+            CloudServer.getInstance().updatePermissions(event.getPlayer());
         }
     }
 
@@ -83,7 +86,7 @@ public class PlayerListener implements Listener {
             CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup());
         }
 
-        if (CloudAPI.getInstance().isNametags()) {
+        if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getPermissionGroup(onlinePlayer.getName());
                 CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
@@ -97,7 +100,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
-        if (CloudAPI.getInstance().isUseChat()) {
+        if (CloudAPI.getInstance().isUseChat() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
             event.setCancelled(true);
             String message = event.getMessage();
             PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getPermissionGroup(event.getPlayer().getName());

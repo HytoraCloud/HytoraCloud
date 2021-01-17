@@ -1,21 +1,21 @@
 package de.lystx.cloudsystem.library.service.network.connection.packet;
 
-import lombok.Getter;
+import de.lystx.cloudsystem.library.elements.other.Document;
 
 import java.io.Serializable;
 
-@Getter
 public class Packet implements Serializable {
 
-    private final String key;
-    private final Object object;
+    private String document = "{}";
 
-    public Packet(Class<?> clazz) {
-        this(clazz.getSimpleName(), "no_object");
+    public Packet append(String key, Object value) {
+        Document document = document();
+        document.append(key, value);
+        this.document = document.toString();
+        return this;
     }
 
-    public Packet(String key, Object o) {
-        this.key = key;
-        this.object = o;
+    public Document document() {
+        return new Document(this.document);
     }
 }

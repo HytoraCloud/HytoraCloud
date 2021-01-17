@@ -9,7 +9,7 @@ public class PacketPlayOutNPCs extends Packet implements Serializable {
     private final String config;
 
     public PacketPlayOutNPCs(String config) {
-        super(PacketPlayOutNPCs.class);
+        super();
         this.config = config;
     }
 

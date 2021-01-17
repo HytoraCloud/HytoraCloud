@@ -11,7 +11,7 @@ public class PacketPlayInRemoveNPC extends Packet implements Serializable {
     private final String key;
 
     public PacketPlayInRemoveNPC(String key) {
-        super(PacketPlayInRemoveNPC.class);
+        super();
         this.key = key;
     }
 
