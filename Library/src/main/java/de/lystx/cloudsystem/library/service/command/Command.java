@@ -20,4 +20,6 @@ public abstract class Command {
 
     public abstract void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args);
 
+
+    public void correctSyntax(CloudConsole console) {}
 }

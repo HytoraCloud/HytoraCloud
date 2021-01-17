@@ -1,13 +1,10 @@
 package de.lystx.cloudsystem.library.service.player;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.elements.other.Document;
 
 import java.io.File;
@@ -38,13 +35,16 @@ public class CloudPlayerService extends CloudService {
                     "",
                     new LinkedList<>(),
                     cloudPlayer.getIpAddress(),
-                    true));
+                    true,
+                    new Date().getTime(),
+                    0L
+            ));
             document.save();
             return false;
         } else {
             Document document = new Document(file);
             CloudPlayerData cloudPlayerData = document.getObject(document.getJsonObject(), CloudPlayerData.class);
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionGroup(), cloudPlayerData.getTempPermissionGroup(), cloudPlayerData.getValidadilityTime(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionGroup(), cloudPlayerData.getTempPermissionGroup(), cloudPlayerData.getValidadilityTime(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
             this.setPlayerData(cloudPlayer.getUuid(), newData);
             return true;
         }
@@ -66,6 +66,9 @@ public class CloudPlayerService extends CloudService {
     }
 
     public void removePlayer(CloudPlayer cloudPlayer) {
+        CloudPlayerData data = this.getPlayerData(cloudPlayer.getUuid());
+        data.setLastLogin(new Date().getTime());
+        this.setPlayerData(cloudPlayer.getUuid(), data);
         this.cloudPlayers.remove(this.getOnlinePlayer(cloudPlayer.getName()));
     }
 

@@ -7,7 +7,6 @@ import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlaye
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.UUIDService;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -83,16 +82,21 @@ public class PlayerListener implements Listener {
         }
     }
 
+
     @EventHandler
     public void onJoin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
         CloudProxy.getInstance().updatePermissions(player);
         this.cloudAPI.getScheduler().scheduleDelayedTask(() -> {
             this.registerPlayer(player);
-        }, 10L);
+        }, 4L);
     }
 
+
     public void registerPlayer(ProxiedPlayer player) {
+        if (player.getServer() == null) {
+            return;
+        }
         this.registerPlayer(player.getName(), player.getUniqueId(), player.getServer().getInfo().getName(), player.getAddress().getAddress().getHostAddress(), player.getPendingConnection().getVirtualHost().getPort());
     }
 

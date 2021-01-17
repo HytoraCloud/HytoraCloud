@@ -92,6 +92,7 @@ public class ServiceProviderStart {
                         "    tab_size: 60\n" +
                         "    ping_passthrough: false\n" +
                         "    force_default_server: false\n" +
+                        "    proxy_protocol: true\n" +
                         "ip_forward: true\n" +
                         "network_compression_threshold: 256\n" +
                         "groups:\n" +

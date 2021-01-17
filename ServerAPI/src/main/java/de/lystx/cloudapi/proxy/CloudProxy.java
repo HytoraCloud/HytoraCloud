@@ -74,7 +74,7 @@ public class CloudProxy extends Plugin {
         return -1;
     }
 
-    public void updatePermissions(ProxiedPlayer player) {
+    public boolean updatePermissions(ProxiedPlayer player) {
         try {
             CloudPlayerData data = this.cloudAPI.getPermissionPool().getPlayerDataOrDefault(player.getName());
             if (data.isDefault() || !this.cloudAPI.getPermissionPool().isRankValid(player.getName())) {
@@ -84,16 +84,13 @@ public class CloudProxy extends Plugin {
                 } catch (NullPointerException e) {
                     data.setIpAddress("0");
                 }
-                if (!this.cloudAPI.getPermissionPool().isAvailable()) {
-                    return;
-                }
                 this.cloudAPI.getPermissionPool().updatePlayerData(player.getName(), data);
                 this.cloudAPI.getPermissionPool().update(this.cloudAPI.getCloudClient());
             }
             PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
             if (group == null) {
                 this.cloudAPI.messageCloud("ProxyCloudAPI", "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
-                return;
+                return false;
             }
             for (String permission : group.getPermissions()) {
                 player.setPermission(permission, true);
@@ -111,6 +108,8 @@ public class CloudProxy extends Plugin {
         } catch (Exception e) {
             this.cloudAPI.messageCloud("ProxyCloudAPI", "§cCouldnt update permissions of §e" + player.getName() + "§c!");
             this.cloudAPI.messageCloud("ProxyCloudAPI", "§cException: §e" + e.getMessage());
+            return false;
         }
+        return true;
     }
 }

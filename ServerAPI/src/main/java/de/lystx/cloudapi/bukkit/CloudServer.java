@@ -65,52 +65,55 @@ public class CloudServer extends JavaPlugin {
     }
 
     public void updatePermissions(Player player) {
-        CloudPlayerData data = this.cloudAPI.getPermissionPool().getPlayerDataOrDefault(player.getName());
-        if (data.isDefault() || !this.cloudAPI.getPermissionPool().isRankValid(player.getName())) {
-            data.setUuid(player.getUniqueId());
-            try {
-                data.setIpAddress(player.getAddress().getHostName());
-            } catch (NullPointerException e) {
-                data.setIpAddress("127.0.0.1");
+        if (this.cloudAPI.getCloudPlayers().get(player.getName()) != null) {
+            CloudPlayerData data = this.cloudAPI.getPermissionPool().getPlayerDataOrDefault(player.getName());
+            if (this.cloudAPI.getPermissionPool().isAvailable()) {
+                if (data.isDefault() || !this.cloudAPI.getPermissionPool().isRankValid(player.getName())) {
+                    data.setUuid(player.getUniqueId());
+                    try {
+                        data.setIpAddress(player.getAddress().getHostName());
+                    } catch (NullPointerException e) {
+                        data.setIpAddress("127.0.0.1");
+                    }
+                    this.cloudAPI.getPermissionPool().updatePlayerData(player.getName(), data);
+                    this.cloudAPI.getPermissionPool().update(this.cloudAPI.getCloudClient());
+                }
             }
-            if (!this.cloudAPI.getPermissionPool().isAvailable()) {
+            PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
+            if (group == null) {
+                this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
                 return;
             }
-            this.cloudAPI.getPermissionPool().updatePlayerData(player.getName(), data);
-            this.cloudAPI.getPermissionPool().update(this.cloudAPI.getCloudClient());
-        }
-        PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
-        if (group == null) {
-            this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
-            return;
-        }
-        for (PermissionAttachmentInfo effectivePermission : player.getEffectivePermissions()) {
-            player.addAttachment(this, effectivePermission.getPermission(), false);
-        }
-        player.setOp(false);
-        boolean op = false;
-        for (String permission : group.getPermissions()) {
-            if (permission.equalsIgnoreCase("*")) {
-                op = true;
+            for (PermissionAttachmentInfo effectivePermission : player.getEffectivePermissions()) {
+                player.addAttachment(this, effectivePermission.getPermission(), false);
             }
-            player.addAttachment(this, permission, true);
-        }
-
-        for (String inheritance : group.getInheritances()) {
-            PermissionGroup permissionGroup = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(inheritance);
-            for (String permission : permissionGroup.getPermissions()) {
+            player.setOp(false);
+            boolean op = false;
+            for (String permission : group.getPermissions()) {
                 if (permission.equalsIgnoreCase("*")) {
                     op = true;
                 }
                 player.addAttachment(this, permission, true);
             }
-        }
-        for (String permission : data.getPermissions()) {
-            if (permission.equalsIgnoreCase("*")) {
-                op = true;
+
+            for (String inheritance : group.getInheritances()) {
+                PermissionGroup permissionGroup = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(inheritance);
+                for (String permission : permissionGroup.getPermissions()) {
+                    if (permission.equalsIgnoreCase("*")) {
+                        op = true;
+                    }
+                    player.addAttachment(this, permission, true);
+                }
             }
-            player.addAttachment(this, permission, true);
+            for (String permission : data.getPermissions()) {
+                if (permission.equalsIgnoreCase("*")) {
+                    op = true;
+                }
+                player.addAttachment(this, permission, true);
+            }
+            if (op) player.setOp(true);
+        } else {
+            this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);
         }
-        if (op) player.setOp(true);
     }
 }

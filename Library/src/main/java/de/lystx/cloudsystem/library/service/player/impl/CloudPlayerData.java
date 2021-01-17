@@ -19,10 +19,14 @@ public class CloudPlayerData implements Serializable {
     private String ipAddress;
     private boolean notifyServerStart;
     private boolean isDefault;
+    private long firstLogin;
+    private long lastLogin;
 
-    public CloudPlayerData(UUID uuid, String name, String permissionGroup, String tempPermissionGroup, String validadilityTime, List<String> permissions, String ipAddress, boolean notifyServerStart) {
+    public CloudPlayerData(UUID uuid, String name, String permissionGroup, String tempPermissionGroup, String validadilityTime, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
         this.uuid = uuid.toString();
         this.name = name;
+        this.firstLogin = firstLogin;
+        this.lastLogin = lastLogin;
         this.isDefault = false;
         this.permissionGroup = permissionGroup;
         this.tempPermissionGroup = tempPermissionGroup;

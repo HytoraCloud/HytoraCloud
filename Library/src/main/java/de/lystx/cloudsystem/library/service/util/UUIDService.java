@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -42,22 +43,17 @@ public class UUIDService {
         return null;
     }
 
-    public static String getName(UUID uuid) {
+    public static String getName(UUID uuid) throws IOException, NullPointerException{
        if (nameCache.containsKey(uuid)) {
           return nameCache.get(uuid);
        }
-       try {
-          HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
-          connection.setReadTimeout(5000);
-          UUIDService[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDService[].class);
-          UUIDService currentNameData = nameHistory[nameHistory.length - 1];
-          uuidCache.put(currentNameData.name.toLowerCase(), uuid);
-          nameCache.put(uuid, currentNameData.name);
-          return currentNameData.name;
-       } catch (Exception e) {
-          e.printStackTrace();
-       }
-       return null;
+      HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
+      connection.setReadTimeout(5000);
+      UUIDService[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDService[].class);
+      UUIDService currentNameData = nameHistory[nameHistory.length - 1];
+      uuidCache.put(currentNameData.name.toLowerCase(), uuid);
+      nameCache.put(uuid, currentNameData.name);
+      return currentNameData.name;
     }
 
     public String getName() {

@@ -53,24 +53,29 @@ public class TablistListener implements Listener {
                 .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance()));
     }
 
+    public void doUpdate() {
+        this.updateTab();
+        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
+    }
+
     @EventHandler
     public void on(ServerConnectEvent e) {
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
+        this.doUpdate();
     }
 
     @EventHandler
     public void on(ServerSwitchEvent e) {
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
+        this.doUpdate();
     }
 
     @EventHandler
     public void on(ServerDisconnectEvent e) {
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
+        this.doUpdate();
     }
 
     @EventHandler
     public void on(PostLoginEvent event) {
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
+        this.doUpdate();
     }
 
 }

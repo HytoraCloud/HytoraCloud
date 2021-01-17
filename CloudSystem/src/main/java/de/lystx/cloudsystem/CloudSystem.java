@@ -102,6 +102,7 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new PermsCommand("perms", "Manages permissions", "cperms", "permissions"));
         this.getService(CommandService.class).registerCommand(new RunCommand("run", "Starts new services", "start"));
         this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
+        this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             this.console.getLogger().sendMessage("§9-----------------------------------------");

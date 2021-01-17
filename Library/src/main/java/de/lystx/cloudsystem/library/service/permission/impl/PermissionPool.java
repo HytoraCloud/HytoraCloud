@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,10 +32,7 @@ public class PermissionPool implements Serializable {
     }
 
     public boolean isAvailable() {
-        if (this.playerCache.isEmpty()) {
-            return false;
-        }
-        return !this.permissionGroups.isEmpty();
+        return (!this.permissionGroups.isEmpty() || !this.playerCache.isEmpty());
     }
 
     public void update(CloudClient connection) {
@@ -134,7 +132,7 @@ public class PermissionPool implements Serializable {
                 return cloudPlayerData;
             }
         }
-        CloudPlayerData data = new CloudPlayerData(Objects.requireNonNull(UUIDService.getUUID(playerName)), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true);
+        CloudPlayerData data = new CloudPlayerData(Objects.requireNonNull(UUIDService.getUUID(playerName)), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true, new Date().getTime(), new Date().getTime());
         data.setDefault(true);
         return data;
     }
@@ -160,9 +158,24 @@ public class PermissionPool implements Serializable {
             dataDoc.appendAll(cloudPlayerData);
             dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".json"));
         }
+        this.clearInvalidUUIDs(directory);
         return document;
     }
 
+    public void clearInvalidUUIDs(File directory) {
+        new Thread(() -> {
+            for (File file : Objects.requireNonNull(directory.listFiles())) {
+                String uuid = file.getName().split("\\.")[0];
+                try {
+                    if (UUIDService.getName(UUID.fromString(uuid)) == null) {
+                        file.delete();
+                    }
+                } catch (NullPointerException | IOException e) {
+                    file.delete();
+                }
+            }
+        }, "async_uuid_clear_cache").start();
+    }
 
     public UUID getUUID(String name) {
         for (CloudPlayerData data : this.playerCache) {
@@ -178,7 +191,11 @@ public class PermissionPool implements Serializable {
     }
 
     public String tryName(UUID uuid) {
-        return this.getName(uuid) == null ? UUIDService.getName(uuid) : this.getName(uuid);
+        try {
+            return this.getName(uuid) == null ? UUIDService.getName(uuid) : this.getName(uuid);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     public String getName(UUID uuid) {

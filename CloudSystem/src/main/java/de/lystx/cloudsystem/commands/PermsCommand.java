@@ -9,13 +9,10 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
-import de.lystx.cloudsystem.library.service.setup.Setup;
 import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupSetup;
-import de.lystx.cloudsystem.library.service.util.UUIDService;
 
 import java.util.LinkedList;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class PermsCommand extends Command {
 
@@ -62,12 +59,12 @@ public class PermsCommand extends Command {
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("info")) {
                 String player = args[1];
-                UUID uuid = UUIDService.getUUID(player);
+                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
+                UUID uuid = pool.tryUUID(player);
                 if (uuid == null) {
                     console.getLogger().sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
                     return;
                 }
-                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
                 PermissionGroup permissionGroup = pool.getPermissionGroup(player);
                 if (permissionGroup == null) {
                     console.getLogger().sendMessage("ERROR", "§cThe player §e" + player + " §cis not registered!");
@@ -83,12 +80,12 @@ public class PermsCommand extends Command {
         } else if (args.length == 4) {
             if (args[0].equalsIgnoreCase("set")) {
                 String player = args[1];
-                UUID uuid = UUIDService.getUUID(player);
+                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
+                UUID uuid = pool.tryUUID(player);
                 if (uuid == null) {
                     console.getLogger().sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
                     return;
                 }
-                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
                 String permissionGroup = args[2];
                 PermissionGroup group = pool.getPermissionGroupFromName(permissionGroup);
                 if (group == null) {
@@ -123,10 +120,10 @@ public class PermsCommand extends Command {
 
 
     public void help(CloudConsole console) {
-        console.getLogger().sendMessage("§9Help for §bPermsService§7:");
-        console.getLogger().sendMessage("§9perms <create> §7| Creates a new permissionGroup");
-        console.getLogger().sendMessage("§9perms <list> §7| Lists all groups");
-        console.getLogger().sendMessage("§9perms set <name> <group> <lifetime/time_in_days> §7| Sets the group of a player");
-        console.getLogger().sendMessage("§9perms info <name> §7| Displays infos about a player");
+        console.getLogger().sendMessage("INFO", "§9Help for §bPermsService§7:");
+        console.getLogger().sendMessage("INFO", "§9perms <create> §7| Creates a new permissionGroup");
+        console.getLogger().sendMessage("INFO", "§9perms <list> §7| Lists all groups");
+        console.getLogger().sendMessage("INFO", "§9perms set <name> <group> <lifetime/time_in_days> §7| Sets the group of a player");
+        console.getLogger().sendMessage("INFO", "§9perms info <name> §7| Displays infos about a player");
     }
 }

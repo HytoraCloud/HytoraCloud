@@ -12,7 +12,6 @@ public class PacketPlayInRegisterCloudPlayer extends Packet implements Serializa
     private final CloudPlayer cloudPlayer;
 
     public PacketPlayInRegisterCloudPlayer(CloudPlayer cloudPlayer) {
-        super();
         this.cloudPlayer = cloudPlayer;
     }
 }

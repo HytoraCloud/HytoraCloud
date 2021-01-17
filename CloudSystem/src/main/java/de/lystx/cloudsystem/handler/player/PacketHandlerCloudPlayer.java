@@ -79,20 +79,21 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             }
         } else if (packet instanceof PacketPlayInCloudPlayerServerChange) {
             PacketPlayInCloudPlayerServerChange packetPlayInCloudPlayerServerChange = (PacketPlayInCloudPlayerServerChange)packet;
-            CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInCloudPlayerServerChange.getCloudPlayer().getName());
-            if (cloudPlayer != null) {
-                CloudPlayer newCloudPlayer = new CloudPlayer(
-                        cloudPlayer.getName(),
-                        cloudPlayer.getUuid(),
-                        cloudPlayer.getIpAddress(),
-                        packetPlayInCloudPlayerServerChange.getNewServer(),
-                        cloudPlayer.getProxy()
-                );
-
-                this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer); //Remove old player
-                this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(newCloudPlayer); //Add new player
-                this.cloudSystem.reload("cloudPlayers"); //Update players for all services
-            }
+            try {
+                CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInCloudPlayerServerChange.getCloudPlayer().getName());
+                if (cloudPlayer != null) {
+                    CloudPlayer newCloudPlayer = new CloudPlayer(
+                            cloudPlayer.getName(),
+                            cloudPlayer.getUuid(),
+                            cloudPlayer.getIpAddress(),
+                            packetPlayInCloudPlayerServerChange.getNewServer(),
+                            cloudPlayer.getProxy()
+                    );
+                    this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer); //Remove old player
+                    this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(newCloudPlayer); //Add new player
+                    this.cloudSystem.reload("cloudPlayers"); //Update players for all services
+                }
+            } catch (NullPointerException e) {}
 
         }
     }

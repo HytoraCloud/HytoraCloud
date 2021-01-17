@@ -24,12 +24,14 @@ public class CloudConsole extends Thread {
                 this.logger.getConsoleReader().setPrompt("");
                 this.logger.getConsoleReader().resetPromptLine("", "", 0);
                 String line;
-                if ((line = this.logger.getConsoleReader().readLine(this.logger.colorString("§9Cloud§b@§7" + this.buffer.replace('-', ' ') + " §f» §7 "))) != null) {
-                    if (!line.trim().isEmpty()) {
-                        this.logger.getConsoleReader().setPrompt("");
-                        this.commandManager.execute(line, this);
+                try {
+                    if ((line = this.logger.getConsoleReader().readLine(this.logger.colorString("§9Cloud§b@§7" + this.buffer.replace('-', ' ') + " §f» §7 "))) != null) {
+                        if (!line.trim().isEmpty()) {
+                            this.logger.getConsoleReader().setPrompt("");
+                            this.commandManager.execute(line, this);
+                        }
                     }
-                }
+                } catch (Exception e) {}
             } catch (IOException throwable) {}
         }
     }
