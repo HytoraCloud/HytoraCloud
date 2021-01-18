@@ -52,7 +52,6 @@ public class CloudProxy extends Plugin {
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerConnectListener());
 
-        this.getProxy().getPluginManager().registerCommand(this, new HubCommand());
         this.getProxy().getPluginManager().registerCommand(this, new PermsCommand());
         this.getProxy().getPluginManager().registerCommand(this, new CloudCommand());
         this.getProxy().getPluginManager().registerCommand(this, new ListCommand());

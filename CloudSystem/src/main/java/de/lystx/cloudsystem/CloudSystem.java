@@ -1,34 +1,16 @@
 package de.lystx.cloudsystem;
 
+import de.lystx.cloudsystem.booting.impl.CloudBootingSetupDone;
+import de.lystx.cloudsystem.booting.impl.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.commands.*;
-import de.lystx.cloudsystem.handler.group.PacketHandlerCoypTemplate;
-import de.lystx.cloudsystem.handler.group.PacketHandlerGroupUpdate;
-import de.lystx.cloudsystem.handler.managing.PacketHandlerCloudSign;
-import de.lystx.cloudsystem.handler.managing.PacketHandlerConfig;
-import de.lystx.cloudsystem.handler.managing.PacketHandlerMessage;
-import de.lystx.cloudsystem.handler.managing.PacketHandlerPermissionPool;
-import de.lystx.cloudsystem.handler.managing.PacketHandlerNPC;
-import de.lystx.cloudsystem.handler.other.PacketHandlerReload;
-import de.lystx.cloudsystem.handler.other.PacketHandlerShutdown;
-import de.lystx.cloudsystem.handler.other.PacketHandlerSubChannel;
-import de.lystx.cloudsystem.handler.player.PacketHandlerCloudPlayer;
-import de.lystx.cloudsystem.handler.player.PacketHandlerCloudPlayerCommunication;
-import de.lystx.cloudsystem.handler.services.PacketHandlerRegister;
-import de.lystx.cloudsystem.handler.services.PacketHandlerServiceUpdate;
-import de.lystx.cloudsystem.handler.services.PacketHandlerStart;
-import de.lystx.cloudsystem.handler.services.PacketHandlerStopServer;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.out.other.*;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayers;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutServices;
-import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
@@ -37,7 +19,6 @@ import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import de.lystx.cloudsystem.library.service.util.LogService;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
@@ -47,15 +28,13 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
-import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.UUID;
 
-@Getter
+@Getter @Setter
 public class CloudSystem extends CloudLibrary {
 
     @Getter
@@ -63,7 +42,7 @@ public class CloudSystem extends CloudLibrary {
 
     private final String version;
     private final CloudScreenPrinter screenPrinter;
-    private ServerService service;
+    public ServerService service;
 
     public CloudSystem() {
         super();
@@ -105,120 +84,9 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
-            this.console.getLogger().sendMessage("§9-----------------------------------------");
-            this.console.getLogger().sendMessage("§b\n" +
-                    "    __  __      __                   ________                __\n" +
-                    "   / / / /_  __/ /_____  _________ _/ ____/ /___  __  ______/ /\n" +
-                    "  / /_/ / / / / __/ __ \\/ ___/ __ `/ /   / / __ \\/ / / / __  / \n" +
-                    " / __  / /_/ / /_/ /_/ / /  / /_/ / /___/ / /_/ / /_/ / /_/ /  \n" +
-                    "/_/ /_/\\__, /\\__/\\____/_/   \\__,_/\\____/_/\\____/\\__,_/\\__,_/   \n" +
-                    "      /____/                                                   \n" +
-                    "\n");
-            this.console.getLogger().sendMessage("INFO", "§9Version §7: §b" + this.version);
-            this.console.getLogger().sendMessage("INFO", "§9Developer §7: §bLystx");
-            this.console.getLogger().sendMessage("INFO", "§bLoading §fCloudSystem§9...");
-            this.console.getLogger().sendMessage("§9-----------------------------------------");
-
-            this.cloudServices.add(new CloudNetworkService(this, "CloudNetwork", CloudService.Type.NETWORK));
-            this.cloudServices.add(new ModuleService(this, "Modules", CloudService.Type.MANAGING));
-            this.cloudServices.add(this.service = new ServerService(this, "Services", CloudService.Type.NETWORK));
-
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerRegister(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerStopServer(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudPlayer(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerStart(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerReload(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerShutdown(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerConfig(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerGroupUpdate(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCoypTemplate(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerPermissionPool(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerMessage(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerServiceUpdate(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudSign(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudPlayerCommunication(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerNPC(this));
-            this.getService(CloudNetworkService.class).registerHandler(new PacketHandlerSubChannel(this));
-
-            this.getService(StatisticsService.class).getStatistics().add("bootedUp");
-            this.reload("statistics");
-
+            new CloudBootingSetupDone(this);
         } else {
-            this.console.getLogger().sendMessage("§9-----------------------------------------");
-            this.console.getLogger().sendMessage("§b\n" +
-                    "   _____      __            \n" +
-                    "  / ___/___  / /___  ______ \n" +
-                    "  \\__ \\/ _ \\/ __/ / / / __ \\\n" +
-                    " ___/ /  __/ /_/ /_/ / /_/ /\n" +
-                    "/____/\\___/\\__/\\__,_/ .___/ \n" +
-                    "                   /_/      \n");
-            this.console.getLogger().sendMessage("§9-----------------------------------------");
-            this.console.getLogger().sendMessage("SETUP", "§cSeems like you haven't set up §eHytoraCloud§c yet§c!");
-            this.console.getLogger().sendMessage("SETUP", "§cLet's fix this quite quick...");
-            this.console.getLogger().sendMessage("SETUP", "§cKnown bugs:");
-            this.console.getLogger().sendMessage("SETUP", "  §7» §cConsole prefix shown up twice (Only in Setup)");
-            this.console.getLogger().sendMessage("SETUP", "  §7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
-            this.console.getLogger().sendMessage();
-            this.console.getLogger().sendMessage();
-            this.getService(CommandService.class).setActive(false);
-            CloudSetup cloudSetup = new CloudSetup();
-            cloudSetup.start(this.console, setup -> {
-                if (setup.wasCancelled()) {
-                    console.getLogger().sendMessage("ERROR", "§cYou are §enot §callowed to §4cancel §cthis setup! Restart the cloud!");
-                    System.exit(0);
-                }
-                this.getService(CommandService.class).setActive(true);
-                CloudSetup sp = (CloudSetup) setup;
-                Document document = this.getService(ConfigService.class).getDocument();
-                document.append("setupDone", true);
-                document.append("fastStartup", sp.isFastStartup());
-                document.append("host", sp.getHostname());
-                document.append("port", sp.getPort());
-                Document proxy = document.getDocument("proxyConfig");
-                proxy.append("maxPlayers", sp.getMaxPlayers());
-                proxy.append("whitelistedPlayers", Collections.singleton(sp.getFirstAdmin()));
-                document.append("proxyConfig", proxy);
-                document.save();
-                PermissionPool permissionPool = this.getService(PermissionService.class).getPermissionPool();
-                permissionPool.updatePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1);
-                permissionPool.save(this.getService(FileService.class).getPermissionsFile(), this.getService(FileService.class).getCloudPlayerDirectory());
-
-                this.getService(GroupService.class).createGroup(new ServiceGroup(
-                        UUID.randomUUID(),
-                        "Bungee",
-                        "default",
-                        ServiceType.PROXY,
-                        1,
-                        1,
-                        512,
-                        128,
-                        50,
-                        100,
-                        false,
-                        false,
-                        true
-                ));
-
-
-                this.getService(GroupService.class).createGroup(new ServiceGroup(
-                        UUID.randomUUID(),
-                        "Lobby",
-                        "default",
-                        ServiceType.SPIGOT,
-                        2,
-                        1,
-                        512,
-                        128,
-                        50,
-                        100,
-                        false,
-                        true,
-                        true
-                ));
-
-                this.console.getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
-                System.exit(0);
-            });
+            new CloudBootingSetupNotDone(this);
         }
     }
 
@@ -238,6 +106,7 @@ public class CloudSystem extends CloudLibrary {
                     this.reload("signs");
                     this.reload("npcs");
                 }, 5L);
+                this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
             } else if (type.equalsIgnoreCase("config")) {
                 this.getService(ConfigService.class).reload();
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNetworkConfig(this.getService(ConfigService.class).getNetworkConfig()));
@@ -246,29 +115,24 @@ public class CloudSystem extends CloudLibrary {
             } else if (type.equalsIgnoreCase("statistics")) {
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStatistics(this.getService(StatisticsService.class).getStatistics()));
             } else if (type.equalsIgnoreCase("signs")) {
-                this.getService(SignService.class).load();
-                this.getService(SignService.class).loadSigns();
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudSigns(this.getService(SignService.class).getCloudSigns(), this.getService(SignService.class).getSignLayOut().getDocument().toString()));
             } else if (type.equalsIgnoreCase("npcs")) {
-                this.getService(NPCService.class).load();
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNPCs(this.getService(NPCService.class).getDocument().toString()));
             } else if (type.equalsIgnoreCase("cloudPlayers")) {
                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayers(this.getService(CloudPlayerService.class).getOnlinePlayers()));
             } else if (type.equalsIgnoreCase("services")) {
                 this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutServices(this.getService().getServices()));
             }
-            this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
         } catch (NullPointerException e) {
             this.console.getLogger().sendMessage("ERROR", "§cYou can't reload at the moment! Try again in a few seconds!");
         }
     }
 
     public void shutdown() {
-        this.getService(CommandService.class).setActive(false);
-        this.getConsole().interrupt();
         this.setRunning(false);
-        this.getService(StatisticsService.class).save();
+        this.getConsole().interrupt();
         this.getService().stopServices();
+        this.getService(StatisticsService.class).save();
         this.getService(LogService.class).save();
         this.getService(PermissionService.class).save();
         this.getService(SignService.class).save();
@@ -278,11 +142,7 @@ public class CloudSystem extends CloudLibrary {
         this.getService(Scheduler.class).scheduleDelayedTask(() -> {
             try {
                 FileUtils.deleteDirectory(this.getService(FileService.class).getDynamicServerDirectory());
-            } catch (IOException e) {
-                try {
-                    FileUtils.deleteDirectory(this.getService(FileService.class).getDynamicServerDirectory());
-                } catch (IOException ignored) {}
-            }
+            } catch (IOException ignored) {}
         }, 20L);
         this.getService(Scheduler.class).scheduleDelayedTask(() -> this.getService(CloudNetworkService.class).shutdown(), 60L);
         this.getService(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 80L);

@@ -36,7 +36,7 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         boolean allow = false;
-        for (Integer value : CloudAPI.getInstance().getProxies().keySet()) {
+        for (Integer value : CloudAPI.getInstance().getNetwork().getProxies().keySet()) {
             Service service = CloudAPI.getInstance().getNetwork().getProxy(value);
             if (service == null) {
                 continue;
@@ -45,16 +45,24 @@ public class PlayerListener implements Listener {
                 allow = true;
             }
         }
-
-        if (!allow && CloudAPI.getInstance().getCloudPlayers().get(event.getPlayer().getName()) == null || !CloudAPI.getInstance().isJoinable()) {
+        if (CloudAPI.getInstance().getNetwork().getServices().isEmpty()) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cTry again in a few seconds! §8[§bServices§8]");
+            return;
+        }
+        if (CloudAPI.getInstance().getNetwork().getServiceGroups().isEmpty()) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cTry again in a few seconds! §8[§bGroups§8]");
+            return;
+        }
+        if (!CloudAPI.getInstance().getPermissionPool().isAvailable()) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cTry again in a few seconds! §8[§bPermissionPool§8]");
+            return;
+        }
+        if (!allow || !CloudAPI.getInstance().isJoinable()) {
             try {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cPlease join only via the given §eproxies§c!");
             } catch (NullPointerException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§cThere was an error§c! Try again!");
             }
-
-        } else if (!CloudAPI.getInstance().getPermissionPool().isAvailable()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cThe server isn't ready yet! Try again in a few seconds!");
         } else {
             CloudServer.getInstance().updatePermissions(event.getPlayer());
         }
@@ -86,16 +94,13 @@ public class PlayerListener implements Listener {
             CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup());
         }
 
+        CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
         if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getPermissionGroup(onlinePlayer.getName());
                 CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
             }
         }
-        if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
-            return;
-        }
-        CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
     }
 
     @EventHandler
@@ -133,7 +138,7 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
         if (cloudPlayer == null) {
-            player.sendMessage(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getErrorMessage().replace("%error%",
+            player.sendMessage(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getErrorMessage().replace("&", "§").replace("%error%",
                     "You couldn't be found in global CloudPlayer list! Either rejoin or notify a server Administrator or a Cloud Administrator!").replace("%prefix%", CloudAPI.getInstance().getPrefix()));
             return;
         }
@@ -147,7 +152,7 @@ public class PlayerListener implements Listener {
                 return;
             }
             if (meta.getName().equalsIgnoreCase(CloudAPI.getInstance().getService().getName())) {
-                player.sendMessage(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix()));
+                player.sendMessage(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("&", "§").replace("%prefix%", CloudAPI.getInstance().getPrefix()));
                 return;
             }
             cloudPlayer.sendToServer(CloudAPI.getInstance().getCloudClient(), meta.getName());

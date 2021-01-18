@@ -10,7 +10,7 @@ import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.utils.Action;
+import de.lystx.cloudsystem.library.service.util.Action;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -30,6 +30,7 @@ public class ServiceProviderStart {
     }
 
 
+
     public void autoStartService(Service service, Document propertiess, Action action) {
         try {
             File templateLocation = new File(cloudLibrary.getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
@@ -39,22 +40,24 @@ public class ServiceProviderStart {
 
             serverLocation.mkdirs();
             plugins.mkdirs();
+
             try {
                 FileUtils.copyDirectory(templateLocation, serverLocation);
                 for (File file : Objects.requireNonNull(cloudLibrary.getService(FileService.class).getPluginsDirectory().listFiles())) {
-                    FileUtils.copyFile(file, new File(plugins, file.getName()));
+                    if (file.isDirectory()) {
+                        FileUtils.copyDirectory(file, new File(plugins, file.getName()));
+                    } else {
+                        FileUtils.copyFile(file, new File(plugins, file.getName()));
+                    }
                 }
             } catch (IOException e) {
-                this.cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cSomething went wrong while copying files for server §e" + service.getName() + "§c!");
+                e.printStackTrace();
             }
+            cloudLibrary.getService(FileService.class).copyFileWithURL("/implements/plugins/CloudAPI.jar", new File(plugins, "CloudAPI.jar"));
 
-            File world = new File(serverLocation, "world/");
-            if (cloudLibrary.getService(ConfigService.class).getNetworkConfig().isFastStartup() && !world.exists()) {
-                cloudLibrary.getService(FileService.class).copyFileWithURL("/implements/world/", world);
-            }
             if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                 jarFile = "bungeeCord.jar";
-                FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getApiDirectory(), "server-icon.png"), new File(serverLocation, "server-icon.png"));
+                FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getGlobalDirectory(), "server-icon.png"), new File(serverLocation, "server-icon.png"));
                 FileWriter writer = new FileWriter(serverLocation + "/config.yml");
                 writer.write("player_limit: 550\n" +
                         "permissions:\n" +
@@ -79,7 +82,7 @@ public class ServiceProviderStart {
                         "    restricted: false\n" +
                         "listeners:\n" +
                         "  - query_port: 25577\n" +
-                        "    motd: \"&bProxyCloudServiceMotdDefault &7by Lystx\"\n" +
+                        "    motd: \"&bHytoraCloud &7Default Motd &7by Lystx\"\n" +
                         "    priorities:\n" +
                         "      - Lobby-1\n" +
                         "    bind_local_address: true\n" +
@@ -92,7 +95,7 @@ public class ServiceProviderStart {
                         "    tab_size: 60\n" +
                         "    ping_passthrough: false\n" +
                         "    force_default_server: false\n" +
-                        "    proxy_protocol: true\n" +
+                        "    proxy_protocol: " + cloudLibrary.getService(ConfigService.class).getNetworkConfig().isProxyProtocol() + "\n" +
                         "ip_forward: true\n" +
                         "network_compression_threshold: 256\n" +
                         "groups:\n" +

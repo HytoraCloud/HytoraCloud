@@ -3,6 +3,7 @@ package de.lystx.cloudapi.standalone.manager;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroup;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroupWithProperties;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartService;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -20,10 +21,12 @@ public class CloudNetwork {
 
     private final CloudAPI cloudAPI;
     private Map<ServiceGroup, List<Service>> services;
+    private Map<Integer, String> proxies;
 
     public CloudNetwork(CloudAPI cloudAPI) {
         this.cloudAPI = cloudAPI;
         this.services = new HashMap<>();
+        this.proxies = new HashMap<>();
     }
 
     public ServiceGroup getServiceGroup(String groupName) {
@@ -36,7 +39,7 @@ public class CloudNetwork {
     }
 
     public Service getProxy(Integer port) {
-        return this.getService(this.cloudAPI.getProxies().get(port));
+        return this.getService(this.proxies.get(port));
     }
 
     public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
@@ -52,8 +55,13 @@ public class CloudNetwork {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartService(service, properties.toString()));
     }
 
-    public void startService(String name, String serviceGroup) {
-        this.startService(name, serviceGroup, null);
+
+    public void startService(String serviceGroup, Document properties) {
+        this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties));
+    }
+
+    public void startService(String serviceGroup) {
+        this.startService(serviceGroup, null);
     }
 
     public List<Service> getServices() {
@@ -79,18 +87,15 @@ public class CloudNetwork {
         return null;
     }
 
-
     public void stopServices(ServiceGroup group) {
         for (Service service : this.services.get(this.getServiceGroup(group.getName()))) {
             this.stopService(service);
         }
     }
 
-
     public List<ServiceGroup> getServiceGroups() {
         return new LinkedList<>(this.services.keySet());
     }
-
 
     public void stopService(Service service) {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStopServer(service));

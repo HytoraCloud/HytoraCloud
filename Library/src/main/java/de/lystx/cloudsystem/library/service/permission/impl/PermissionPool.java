@@ -127,14 +127,14 @@ public class PermissionPool implements Serializable {
     }
 
     public CloudPlayerData getPlayerDataOrDefault(String playerName) {
-        for (CloudPlayerData cloudPlayerData : this.playerCache) {
-            if (cloudPlayerData.getName().equalsIgnoreCase(playerName)) {
-                return cloudPlayerData;
-            }
+        CloudPlayerData pre = this.getPlayerData(playerName);
+        if (pre == null) {
+            CloudPlayerData data = new CloudPlayerData(Objects.requireNonNull(UUIDService.getUUID(playerName)), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true, new Date().getTime(), new Date().getTime());
+            data.setDefault(true);
+            return data;
+        } else {
+            return pre;
         }
-        CloudPlayerData data = new CloudPlayerData(Objects.requireNonNull(UUIDService.getUUID(playerName)), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true, new Date().getTime(), new Date().getTime());
-        data.setDefault(true);
-        return data;
     }
 
     public PermissionGroup getPermissionGroupFromName(String name) {

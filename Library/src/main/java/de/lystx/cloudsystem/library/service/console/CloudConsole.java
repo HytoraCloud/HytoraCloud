@@ -19,7 +19,7 @@ public class CloudConsole extends Thread {
     }
 
     public void run() {
-        while (this.isAlive()) {
+        while (!this.isInterrupted()) {
             try {
                 this.logger.getConsoleReader().setPrompt("");
                 this.logger.getConsoleReader().resetPromptLine("", "", 0);

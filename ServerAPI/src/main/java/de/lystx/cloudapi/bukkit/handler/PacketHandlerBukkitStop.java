@@ -24,7 +24,7 @@ public class PacketHandlerBukkitStop extends PacketHandlerAdapter {
             Service service = packetPlayOutStopServer.getService();
             if (service.getName().equalsIgnoreCase(cloudAPI.getService().getName())) {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> onlinePlayer.kickPlayer(this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                    Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> onlinePlayer.kickPlayer(this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix())));
                 }
                 cloudAPI.getScheduler().scheduleDelayedTask(Bukkit::shutdown, 1L);
             }

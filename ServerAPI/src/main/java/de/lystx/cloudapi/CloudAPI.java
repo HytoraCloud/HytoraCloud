@@ -29,7 +29,6 @@ public class CloudAPI {
     private NetworkConfig networkConfig;
     private PermissionPool permissionPool;
     private Statistics statistics;
-    private Map<Integer, String> proxies;
 
     private final CloudLibrary cloudLibrary;
     private final CloudClient cloudClient;
@@ -44,7 +43,6 @@ public class CloudAPI {
     public CloudAPI() {
         instance = this;
         this.cloudLibrary = new CloudLibrary();
-        this.proxies = new HashMap<>();
         this.cloudClient =  this.cloudLibrary.getCloudClient();
 
         this.network = new CloudNetwork(this);

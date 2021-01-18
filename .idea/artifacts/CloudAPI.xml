@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="CloudAPI">
-    <output-path>E:/Localhost/CloudSystem/local/global/plugins</output-path>
+    <output-path>$PROJECT_DIR$/CloudSystem/src/main/resources/implements/plugins</output-path>
     <root id="archive" name="CloudAPI.jar">
       <element id="module-output" name="Library" />
       <element id="module-output" name="ServerAPI" />

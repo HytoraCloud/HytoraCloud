@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.command.HubCommand;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutServices;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -49,6 +50,11 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
         } else if (packet instanceof PacketPlayOutNetworkConfig) {
             cloudAPI.getScheduler().scheduleDelayedTask(() -> {
                 CloudProxy.getInstance().getNetworkManager().switchMaintenance(this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance());
+                if (this.cloudAPI.getNetworkConfig().getProxyConfig().isHubCommandEnabled()) {
+                    CloudProxy.getInstance().getProxy().getPluginManager().registerCommand(CloudProxy.getInstance(), new HubCommand());
+                } else {
+                    CloudProxy.getInstance().getProxy().getPluginManager().unregisterCommand(new HubCommand());
+                }
             }, 2L);
         }
     }

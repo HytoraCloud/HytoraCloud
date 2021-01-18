@@ -28,7 +28,7 @@ public class PacketHandlerServices extends PacketHandlerAdapter {
             for (List<Service> value : packetPlayOutServices.getServices().values()) {
                 for (Service service : value) {
                     if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
-                        this.cloudAPI.getProxies().put(service.getPort(), service.getName());
+                        this.cloudAPI.getNetwork().getProxies().put(service.getPort(), service.getName());
                     }
                 }
             }

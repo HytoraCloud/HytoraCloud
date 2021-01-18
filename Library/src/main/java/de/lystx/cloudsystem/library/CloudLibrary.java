@@ -22,7 +22,7 @@ import java.util.List;
 public class CloudLibrary implements Serializable {
 
 
-    protected final List<CloudService> cloudServices;
+    public final List<CloudService> cloudServices;
 
     protected final String host;
     protected final Integer port;

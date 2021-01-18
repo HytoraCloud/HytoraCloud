@@ -19,16 +19,18 @@ public class NetworkConfig implements Serializable {
     private Integer port;
     private boolean setupDone;
     private boolean fastStartup;
+    private boolean proxyProtocol;
 
     private ProxyConfig proxyConfig;
     private MessageConfig messageConfig;
     private FallbackConfig fallbackConfig;
 
-    public NetworkConfig(String host, Integer port, boolean setupDone, boolean fastStartup, ProxyConfig proxyConfig, MessageConfig messageConfig, FallbackConfig fallbackConfig) {
+    public NetworkConfig(String host, Integer port, boolean setupDone, boolean fastStartup, boolean proxyProtocol, ProxyConfig proxyConfig, MessageConfig messageConfig, FallbackConfig fallbackConfig) {
         this.host = host;
         this.port = port;
         this.setupDone = setupDone;
         this.fastStartup = fastStartup;
+        this.proxyProtocol = proxyProtocol;
         this.proxyConfig = proxyConfig;
         this.messageConfig = messageConfig;
         this.fallbackConfig = fallbackConfig;
@@ -41,7 +43,9 @@ public class NetworkConfig implements Serializable {
                 2131,
                 false,
                 true,
+                true,
                 new ProxyConfig(
+                        true,
                         true,
                         true,
                         100,

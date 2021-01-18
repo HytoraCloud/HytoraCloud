@@ -101,6 +101,10 @@ public class SignUpdater  {
                     this.setOfflineSigns(groupName, current);
                     if (cloudSign != null) {
                         Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
+
+                        if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
+                            return;
+                        }
                         try {
                             serverPinger.pingServer(current.getHost(), current.getPort(), 2500);
                         } catch (IOException exception) {
@@ -141,7 +145,9 @@ public class SignUpdater  {
     public void setOfflineSigns(String group, Service service) {
         this.getOfflineSigns(group).forEach(cloudSign -> {
             Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
-
+            if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
+                return;
+            }
             Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
 
             if (!blockAt.getType().equals(Material.WALL_SIGN)) return;

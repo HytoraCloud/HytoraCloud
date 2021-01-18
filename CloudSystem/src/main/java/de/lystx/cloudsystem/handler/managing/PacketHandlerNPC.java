@@ -21,10 +21,12 @@ public class PacketHandlerNPC extends PacketHandlerAdapter {
             PacketPlayInCreateNPC packetPlayInCreateNPC = (PacketPlayInCreateNPC)packet;
             this.cloudSystem.getService(NPCService.class).append(packetPlayInCreateNPC.getKey(), packetPlayInCreateNPC.getDocument());
             this.cloudSystem.getService(NPCService.class).save();
+            this.cloudSystem.getService(NPCService.class).load();
             this.cloudSystem.reload("npcs");
         } else if (packet instanceof PacketPlayInRemoveNPC) {
             this.cloudSystem.getService(NPCService.class).remove(((PacketPlayInRemoveNPC) packet).getKey());
             this.cloudSystem.getService(NPCService.class).save();
+            this.cloudSystem.getService(NPCService.class).load();
             this.cloudSystem.reload("npcs");
         }
     }

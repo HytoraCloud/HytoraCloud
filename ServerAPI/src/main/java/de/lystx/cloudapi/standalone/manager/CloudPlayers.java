@@ -8,10 +8,7 @@ import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPi
 import lombok.Setter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Setter
@@ -19,14 +16,11 @@ public class CloudPlayers {
 
     private final CloudAPI cloudAPI;
     private List<CloudPlayer> cloudPlayers;
-    private Map<ServiceGroup, Map<Service, List<CloudPlayer>>> onlinePlayers;
 
     public CloudPlayers(CloudAPI cloudAPI) {
         this.cloudAPI = cloudAPI;
-        this.onlinePlayers = new HashMap<>();
         this.cloudPlayers = new LinkedList<>();
     }
-
 
 
     public int getOnGroup(String groupName) {
@@ -48,47 +42,18 @@ public class CloudPlayers {
         }
     }
 
-    /*public List<CloudPlayer> getOnGroup(String groupName) {
-        List<CloudPlayer> list = new LinkedList<>();
-        for (Service service : this.cloudAPI.getNetwork().getServices(this.cloudAPI.getNetwork().getServiceGroup(groupName))) {
-            list.addAll(this.getOnServer(service.getName()));
-        }
-        return list;
-    }
-
-    public List<CloudPlayer> getOnServer(String serverName) {
-        Service service = this.getService(serverName);
-        if (service == null) {
-            this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cTried getting onlinePlayers on §e" + serverName + " §cbut server wasn't found!");
-            return null;
-        }
-        Map<Service, List<CloudPlayer>> players = this.onlinePlayers.get(this.getGroup(service.getServiceGroup().getName()));
-        return players.get(service);
-    }
-
-    private ServiceGroup getGroup(String name) {
-        for (ServiceGroup serviceGroup : this.onlinePlayers.keySet()) {
-            if (serviceGroup.getName().equalsIgnoreCase(name)) {
-                return serviceGroup;
-            }
-        }
-        return null;
-    }
-
-    private Service getService(String name) {
-        for (Map<Service, List<CloudPlayer>> value : this.onlinePlayers.values()) {
-            for (Service service : value.keySet()) {
-                if (service.getName().equalsIgnoreCase(name)) {
-                    return service;
-                }
-            }
-        }
-        return null;
-    }*/
-
     public CloudPlayer get(String name) {
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
             if (cloudPlayer.getName().equalsIgnoreCase(name)) {
+                return cloudPlayer;
+            }
+        }
+        return null;
+    }
+
+    public CloudPlayer get(UUID uuid) {
+        for (CloudPlayer cloudPlayer : this.cloudPlayers) {
+            if (cloudPlayer.getUuid() == uuid) {
                 return cloudPlayer;
             }
         }

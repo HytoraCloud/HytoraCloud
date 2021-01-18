@@ -7,8 +7,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Objects;
 
 @Getter
@@ -42,7 +40,6 @@ public class FileService extends CloudService {
     private final File globalDirectory;
     private final File pluginsDirectory;
     private final File modulesDirectory;
-    private final File apiDirectory;
     private final File statsFile;
     private final File versionsDirectory;
 
@@ -76,7 +73,6 @@ public class FileService extends CloudService {
 
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");
-        this.apiDirectory = new File(this.globalDirectory, "api/");
         this.versionsDirectory = new File(this.globalDirectory, "versions/");
         this.logsDirectory = new File(this.globalDirectory, "logs/");
         this.modulesDirectory = new File(this.globalDirectory, "modules/");
@@ -111,7 +107,6 @@ public class FileService extends CloudService {
 
         this.globalDirectory.mkdirs();
         this.pluginsDirectory.mkdirs();
-        this.apiDirectory.mkdirs();
         this.versionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
         this.modulesDirectory.mkdirs();
@@ -126,55 +121,24 @@ public class FileService extends CloudService {
             }
 
         } catch (IOException e) {}
-        File cloudAPI = new File(this.pluginsDirectory, "CloudAPI.jar");
-        if (!this.copyFileWithURL("/implements/plugins/CloudAPI.jar", cloudAPI) && !cloudAPI.exists()) {
-            getCloudLibrary().getConsole().getLogger().sendMessage("§b------------------------------------------------------------------------------------------------");
-            getCloudLibrary().getConsole().getLogger().sendMessage("\n" +
-                    "\n" +
-                    "§c\n" +
-                    " ______                       _   _          _____ _                 _          _____ _____ \n" +
-                    "|  ____|                     | \\ | |        / ____| |               | |   /\\   |  __ \\_   _|\n" +
-                    "| |__   _ __ _ __ ___  _ __  |  \\| | ___   | |    | | ___  _   _  __| |  /  \\  | |__) || |  \n" +
-                    "|  __| | '__| '__/ _ \\| '__| | . ` |/ _ \\  | |    | |/ _ \\| | | |/ _` | / /\\ \\ |  ___/ | |  \n" +
-                    "| |____| |  | | | (_) | |    | |\\  | (_) | | |____| | (_) | |_| | (_| |/ ____ \\| |    _| |_ \n" +
-                    "|______|_|  |_|  \\___/|_|    |_| \\_|\\___/   \\_____|_|\\___/ \\__,_|\\__,_/_/    \\_\\_|   |_____|\n" +
-                    "\n");
-            getCloudLibrary().getConsole().getLogger().sendMessage("§4\n" +
-                    "  _____ _                    _                _____ _                 _  _____           _                       \n" +
-                    " / ____| |                  (_)              / ____| |               | |/ ____|         | |                      \n" +
-                    "| (___ | |_ ___  _ __  _ __  _ _ __   __ _  | |    | | ___  _   _  __| | (___  _   _ ___| |_ ___ _ __ ___        \n" +
-                    " \\___ \\| __/ _ \\| '_ \\| '_ \\| | '_ \\ / _` | | |    | |/ _ \\| | | |/ _` |\\___ \\| | | / __| __/ _ \\ '_ ` _ \\       \n" +
-                    " ____) | || (_) | |_) | |_) | | | | | (_| | | |____| | (_) | |_| | (_| |____) | |_| \\__ \\ ||  __/ | | | | |_ _ _ \n" +
-                    "|_____/ \\__\\___/| .__/| .__/|_|_| |_|\\__, |  \\_____|_|\\___/ \\__,_|\\__,_|_____/ \\__, |___/\\__\\___|_| |_| |_(_|_|_)\n" +
-                    "                | |   | |             __/ |                                     __/ |                            \n" +
-                    "                |_|   |_|            |___/                                     |___/                             \n" +
-                    "\n");
-            getCloudLibrary().getConsole().getLogger().sendMessage("§b------------------------------------------------------------------------------------------------");
-            System.exit(0);
-        }
-
         this.copyFileWithURL("/implements/versions/spigot/spigot.jar", new File(this.versionsDirectory, "spigot.jar"));
         this.copyFileWithURL("/implements/versions/bungeecord/bungeeCord.jar", new File(this.versionsDirectory, "bungeeCord.jar"));
-        this.copyFileWithURL("/implements/server-icon.png", new File(this.apiDirectory, "server-icon.png"));
+        this.copyFileWithURL("/implements/server-icon.png", new File(this.globalDirectory, "server-icon.png"));
         this.copyFileWithURL("/implements/plugins/LabyModAPI.jar", new File(this.pluginsDirectory, "LabyModAPI.jar"));
     }
 
-    public boolean copyFileWithURL(String filename, File location) {
+    public void copyFileWithURL(String filename, File location) {
         try {
             URL inputUrl = getClass().getResource(filename);
             if (location.exists()) {
-                return false;
+                return;
             }
             try {
                 FileUtils.copyURLToFile(inputUrl, location);
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
             }
-            return true;
-        } catch (NullPointerException e) {
-            return false;
-        }
+        } catch (NullPointerException e) { }
     }
 
     public void write(File file, String message) {

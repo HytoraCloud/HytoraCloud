@@ -36,7 +36,7 @@ public class PacketHandlerBukkitServerUpdate extends PacketHandlerAdapter {
                         if (onlinePlayer.hasPermission("cloudsystem.group.maintenance")) {
                             continue;
                         }
-                        onlinePlayer.kickPlayer(this.cloudAPI.getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("%prefix%", this.cloudAPI.getPrefix())
+                        onlinePlayer.kickPlayer(this.cloudAPI.getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix())
                                 .replace("%group%", group.getName()));
                     }
                 }

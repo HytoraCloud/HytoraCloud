@@ -21,7 +21,7 @@ public class PacketHandlerBukkitCommand extends PacketHandlerAdapter {
         if (packet instanceof PacketPlayOutExecuteCommand) {
             PacketPlayOutExecuteCommand packetPlayOutExecuteCommand = (PacketPlayOutExecuteCommand)packet;
             if ((packetPlayOutExecuteCommand.getService().equalsIgnoreCase(cloudAPI.getService().getName()) || packetPlayOutExecuteCommand.getService() == null)) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packetPlayOutExecuteCommand.getExecution());
+                cloudAPI.getScheduler().runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packetPlayOutExecuteCommand.getExecution()));
             }
         }
     }

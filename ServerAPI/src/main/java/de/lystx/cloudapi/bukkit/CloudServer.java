@@ -3,6 +3,7 @@ package de.lystx.cloudapi.bukkit;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.command.ServiceCommand;
 import de.lystx.cloudapi.bukkit.handler.*;
+import de.lystx.cloudapi.bukkit.listener.CloudListener;
 import de.lystx.cloudapi.bukkit.listener.NPCListener;
 import de.lystx.cloudapi.bukkit.listener.PlayerListener;
 import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
@@ -39,8 +40,7 @@ public class CloudServer extends JavaPlugin {
         this.nametagManager = new NametagManager();
         this.npcManager = new NPCManager();
 
-        this.cloudAPI.setNametags(true);
-        this.cloudAPI.setUseChat(true);
+        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitCommand(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));

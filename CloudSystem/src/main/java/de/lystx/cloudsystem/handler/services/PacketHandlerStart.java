@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.handler.services;
 
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroup;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroupWithProperties;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartService;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
@@ -21,7 +22,15 @@ public class PacketHandlerStart extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInStartGroup) {
-            PacketPlayInStartGroup packetPlayInStartGroup = (PacketPlayInStartGroup)packet;
+            PacketPlayInStartGroup packetPlayInStartGroup = (PacketPlayInStartGroup) packet;
+            ServiceGroup group = packetPlayInStartGroup.getServiceGroup();
+            ServiceGroup get = this.cloudSystem.getService(GroupService.class).getGroup(group.getName());
+            if (get == null) {
+                return;
+            }
+            this.cloudSystem.getService().startService(get);
+        } else if (packet instanceof PacketPlayInStartGroupWithProperties) {
+            PacketPlayInStartGroupWithProperties packetPlayInStartGroup = (PacketPlayInStartGroupWithProperties) packet;
             ServiceGroup group = packetPlayInStartGroup.getServiceGroup();
             ServiceGroup get = this.cloudSystem.getService(GroupService.class).getGroup(group.getName());
             if (get == null) {

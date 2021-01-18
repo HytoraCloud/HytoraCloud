@@ -11,15 +11,17 @@ public class ProxyConfig implements Serializable {
 
     private boolean enabled;
     private boolean maintenance;
+    private boolean hubCommandEnabled;
     private int maxPlayers;
     private List<String> whitelistedPlayers;
     private TabList tabList;
     private Motd motdNormal;
     private Motd motdMaintenance;
 
-    public ProxyConfig(boolean enabled, boolean maintenance, int maxPlayers, List<String> whitelistedPlayers, TabList tabList, Motd motdNormal, Motd motdMaintenance) {
+    public ProxyConfig(boolean enabled, boolean maintenance, boolean hubCommandEnabled, int maxPlayers, List<String> whitelistedPlayers, TabList tabList, Motd motdNormal, Motd motdMaintenance) {
         this.enabled = enabled;
         this.maintenance = maintenance;
+        this.hubCommandEnabled = hubCommandEnabled;
         this.maxPlayers = maxPlayers;
         this.whitelistedPlayers = whitelistedPlayers;
         this.tabList = tabList;

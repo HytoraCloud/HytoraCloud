@@ -67,6 +67,9 @@ public class NPCManager {
     }
 
     public void updateNPCS(Document document, Player player) {
+        if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
+            return;
+        }
         for (NPC npc : this.npcs.keySet()) {
             npc.destroy();
         }
@@ -80,6 +83,9 @@ public class NPCManager {
         for (String key : document.keys()) {
             Document doc = document.getDocument(key);
             Document loc = doc.getDocument("location");
+            if (!loc.getString("world").equalsIgnoreCase(player.getWorld().getName())) {
+                return;
+            }
             Location location = new Location(Bukkit.getWorld(loc.getString("world")), loc.getDouble("x"), loc.getDouble("y"), loc.getDouble("z"),
                     loc.getFloat("yaw"), loc.getFloat("pitch"));
             String name = doc.getString("name");

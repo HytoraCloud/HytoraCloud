@@ -16,7 +16,7 @@ import de.lystx.cloudsystem.library.service.server.other.manager.IDService;
 import de.lystx.cloudsystem.library.service.server.other.manager.PortService;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStart;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStop;
-import de.lystx.cloudsystem.library.utils.Action;
+import de.lystx.cloudsystem.library.service.util.Action;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 import lombok.Setter;
@@ -197,7 +197,8 @@ public class ServerService extends CloudService {
 
         if (service.getPort() <= 0) {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-            service = new Service(service.getName(), service.getUniqueId(), serviceGroup, this.idService.getFreeID(serviceGroup.getName()), port, service.getServiceState());
+            int id = this.idService.getFreeID(serviceGroup.getName());
+            service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, service.getServiceState());
         }
         Action action = new Action();
         this.actions.put(service.getName(), action);
@@ -215,10 +216,14 @@ public class ServerService extends CloudService {
     }
 
     public void startService(ServiceGroup serviceGroup) {
+        this.startService(serviceGroup, (Document)null);
+    }
+
+    public void startService(ServiceGroup serviceGroup, Document properties) {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
         Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, ServiceState.LOBBY);
-        this.startService(serviceGroup, service);
+        this.startService(serviceGroup, service, properties);
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutRegisterServer(service));
     }
 

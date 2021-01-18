@@ -27,7 +27,7 @@ public class PacketHandlerRegister extends PacketHandlerAdapter {
             this.cloudSystem.getService().registerService(service);
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("startedServices");
             this.cloudSystem.reload();
-            this.cloudSystem.getService(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 3L);
+            this.cloudSystem.getService(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 10L);
         }
     }
 }

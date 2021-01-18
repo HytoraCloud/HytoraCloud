@@ -35,6 +35,7 @@ public class NetworkManager {
             return;
         }
         String stopMessage = CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getServerStartMessage().
+                replace("&", "§").
                 replace("%server%", servername).
                 replace("%prefix%", CloudAPI.getInstance().getPrefix());
         player.sendMessage(new TextComponent(stopMessage));
@@ -50,6 +51,7 @@ public class NetworkManager {
         }
         ProxyServer.getInstance().getServers().remove(servername);
         String stopMessage = CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getServerStopMessage().
+                replace("&", "§").
                 replace("%server%", servername).
                 replace("%prefix%", CloudAPI.getInstance().getPrefix());
         player.sendMessage(new TextComponent(stopMessage));
