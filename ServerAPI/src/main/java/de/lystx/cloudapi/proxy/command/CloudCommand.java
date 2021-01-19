@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -71,6 +72,15 @@ public class CloudCommand extends Command {
                         }
                         CloudAPI.getInstance().getNetwork().startService(group);
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start a new service of group §a" + group.getName() + "§8...");
+                    } else if (args[0].equalsIgnoreCase("log")) {
+                        String s = args[1];
+                        Service service = CloudAPI.getInstance().getNetwork().getService(s);
+                        if (service == null) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe service §e" + s + " §cseems not to be online!");
+                            return;
+                        }
+                        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
+                        CloudAPI.getInstance().getCloudPlayers().sendLog(cloudPlayer, service);
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         String s = args[1];
                         Service service = CloudAPI.getInstance().getNetwork().getService(s);
@@ -209,6 +219,7 @@ public class CloudCommand extends Command {
         player.sendMessage("  §8» §b/cloud stopGroup <group> §8┃ §7Stops all servers from a group");
         player.sendMessage("  §8» §b/cloud copy <server> <template> §8┃ §7Copies a server into a template");
         player.sendMessage("  §8» §b/cloud stop <server> §8┃ §7Stops a specific server or proxy");
+        player.sendMessage("  §8» §b/cloud log <server> §8┃ §7Logs a servers output");
         player.sendMessage("  §8» §b/cloud toggle §8┃ §7Toggles Server notifications");
         player.sendMessage("§8§m--------------------------------------");
     }

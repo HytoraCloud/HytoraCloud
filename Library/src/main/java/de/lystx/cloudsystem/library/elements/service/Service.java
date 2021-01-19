@@ -1,12 +1,14 @@
 package de.lystx.cloudsystem.library.elements.service;
 
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@Getter
+@Getter @Setter
 public class Service implements Serializable {
 
     private final String name;
@@ -16,6 +18,7 @@ public class Service implements Serializable {
     private final int port;
     private final String host;
     private final ServiceState serviceState;
+    private String properties;
 
     public Service(String name, UUID uniqueId, ServiceGroup serviceGroup, int serviceID, int port, ServiceState serviceState) {
         this.name = name;
@@ -26,5 +29,9 @@ public class Service implements Serializable {
         this.host = "127.0.0.1";
         this.serviceState = serviceState;
 
+    }
+
+    public Document getProperties() {
+        return new Document(this.properties);
     }
 }

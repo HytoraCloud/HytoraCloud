@@ -39,6 +39,7 @@ public class FileService extends CloudService {
 
     private final File globalDirectory;
     private final File pluginsDirectory;
+    private final File bungeeCordPluginsDirectory;
     private final File modulesDirectory;
     private final File statsFile;
     private final File versionsDirectory;
@@ -73,6 +74,7 @@ public class FileService extends CloudService {
 
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");
+        this.bungeeCordPluginsDirectory = new File(this.globalDirectory, "bungeePlugins/");
         this.versionsDirectory = new File(this.globalDirectory, "versions/");
         this.logsDirectory = new File(this.globalDirectory, "logs/");
         this.modulesDirectory = new File(this.globalDirectory, "modules/");
@@ -107,6 +109,7 @@ public class FileService extends CloudService {
 
         this.globalDirectory.mkdirs();
         this.pluginsDirectory.mkdirs();
+        this.bungeeCordPluginsDirectory.mkdirs();
         this.versionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
         this.modulesDirectory.mkdirs();

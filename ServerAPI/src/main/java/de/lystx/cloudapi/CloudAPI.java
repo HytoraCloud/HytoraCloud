@@ -4,7 +4,9 @@ package de.lystx.cloudapi;
 import de.lystx.cloudapi.standalone.handler.*;
 import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
+import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -33,6 +35,7 @@ public class CloudAPI {
     private final CloudLibrary cloudLibrary;
     private final CloudClient cloudClient;
     private final CloudNetwork network;
+    private final Templates templates;
     private final CloudPlayers cloudPlayers;
 
     private boolean nametags;
@@ -48,6 +51,7 @@ public class CloudAPI {
         this.network = new CloudNetwork(this);
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool();
+        this.templates = new Templates(this);
         this.statistics = new Statistics();
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
@@ -67,10 +71,16 @@ public class CloudAPI {
         this.cloudClient.connect();
     }
 
+
     public void shutdown() {
         this.cloudClient.sendPacket(new PacketPlayInStopServer(this.getService()));
         this.cloudClient.disconnect();
     }
+
+    public void sendCommand(String command) {
+        this.cloudClient.sendPacket(new PacketPlayInCommand(command));
+    }
+
 
     public void sendPacket(Packet packet) {
         this.cloudClient.sendPacket(packet);
@@ -89,7 +99,7 @@ public class CloudAPI {
     }
 
     public Document getProperties() {
-        return this.getDocument().getDocument("properties");
+        return this.getService().getProperties();
     }
 
     public Document getDocument() {

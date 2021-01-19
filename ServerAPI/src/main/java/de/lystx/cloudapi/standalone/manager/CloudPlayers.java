@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInGetLog;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -22,6 +23,10 @@ public class CloudPlayers {
         this.cloudPlayers = new LinkedList<>();
     }
 
+
+    public void sendLog(CloudPlayer cloudPlayer, Service service) {
+        this.cloudAPI.sendPacket(new PacketPlayInGetLog(service, cloudPlayer.getName()));
+    }
 
     public int getOnGroup(String groupName) {
         int count = 0;

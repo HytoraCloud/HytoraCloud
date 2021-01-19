@@ -40,6 +40,7 @@ public class CloudProxy extends Plugin {
         this.networkManager = new NetworkManager();
         this.services = new LinkedList<>();
 
+
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStartServer(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStopServer(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyConfig(this.cloudAPI));
@@ -56,8 +57,8 @@ public class CloudProxy extends Plugin {
         this.getProxy().getPluginManager().registerCommand(this, new CloudCommand());
         this.getProxy().getPluginManager().registerCommand(this, new ListCommand());
 
-        this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));
 
+        this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));
         Runtime.getRuntime().addShutdownHook(new Thread(() -> this.cloudAPI.shutdown()));
     }
 

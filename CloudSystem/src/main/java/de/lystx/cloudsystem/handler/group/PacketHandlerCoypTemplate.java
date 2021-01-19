@@ -2,9 +2,12 @@ package de.lystx.cloudsystem.handler.group;
 
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInCopyTemplate;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInCreateTemplate;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 
 public class PacketHandlerCoypTemplate extends PacketHandlerAdapter {
@@ -17,14 +20,14 @@ public class PacketHandlerCoypTemplate extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInCopyTemplate) {
-            PacketPlayInCopyTemplate packetPlayInCopyTemplate = (PacketPlayInCopyTemplate)packet;
-            Service service = packetPlayInCopyTemplate.getService();
-            Service get = this.cloudSystem.getService().getService(service.getName());
+        if (packet instanceof PacketPlayInCreateTemplate) {
+            PacketPlayInCreateTemplate packetPlayInCreateTemplate = (PacketPlayInCreateTemplate)packet;
+            ServiceGroup group = packetPlayInCreateTemplate.getServiceGroup();
+            ServiceGroup get = this.cloudSystem.getService(GroupService.class).getGroup(group.getName());
             if (get == null) {
                 return;
             }
-            this.cloudSystem.getService(TemplateService.class).copy(get, packetPlayInCopyTemplate.getTemplate());
+            this.cloudSystem.getService(TemplateService.class).createTemplate(get, packetPlayInCreateTemplate.getTemplate());
         }
     }
 }

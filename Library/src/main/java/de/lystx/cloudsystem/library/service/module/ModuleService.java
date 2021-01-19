@@ -19,7 +19,7 @@ public class ModuleService extends CloudService {
 
     public ModuleService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
-        this.moduleDir = cloudLibrary.getService(FileService.class).getCloudDirectory();
+        this.moduleDir = cloudLibrary.getService(FileService.class).getModulesDirectory();
         moduleDir.mkdirs();
         this.modules = new LinkedList<>();
 

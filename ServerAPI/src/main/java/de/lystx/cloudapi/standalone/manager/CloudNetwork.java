@@ -2,10 +2,7 @@ package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroup;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroupWithProperties;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartService;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
+import de.lystx.cloudsystem.library.elements.packets.in.service.*;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
@@ -36,6 +33,10 @@ public class CloudNetwork {
             }
         }
         return null;
+    }
+
+    public void updateServiceGroup(ServiceGroup serviceGroup) {
+        this.cloudAPI.sendPacket(new PacketPlayInUpdateServiceGroup(serviceGroup));
     }
 
     public Service getProxy(Integer port) {

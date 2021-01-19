@@ -27,21 +27,12 @@ public class ModuleLoader {
         this.modulesDir = modulesDir;
     }
 
-    public int getSize() {
-        int ret = 0;
-        for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
-            if (file.getName().endsWith(".jar")) {
-                ret++;
-            }
-        }
-        return ret;
-    }
-
     public void loadModules() {
-        if (this.getSize() == 0) {
+        if (Objects.requireNonNull(this.modulesDir.listFiles()).length == 0) {
             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cNo modules to §eload§c!");
         } else {
             try {
+                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§9There are §b" + Objects.requireNonNull(this.modulesDir.listFiles()).length + " §9Modules to load!");
                 for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
                     if (file.getName().endsWith(".jar")) {
                         HytoraClassLoader classLoader = new HytoraClassLoader(file);
@@ -65,10 +56,16 @@ public class ModuleLoader {
                                 File directory = new File(this.moduleService.getModuleDir(), mod.getInfo().getName());
                                 directory.mkdirs();
                                 mod.setModuleDirectory(directory);
-                                mod.setConfig(new Document(new File(directory, "config.json")));
+                                File file1 = new File(directory, "config.json");
+                                Document config = new Document(file1);
+                                if (!file1.exists()) {
+                                    config.save();
+                                }
+                                mod.setConfig(config);
+                                mod.onLoadConfig(cloudLibrary);
                                 moduleService.getModules().add(mod);
                                 ModuleInfo info = mod.getInfo();
-                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§7The Module §c" + info.getName() + " §7by §c" + info.getAuthor() + " §7Version§8: §c" + info.getVersion() + " §7was loaded§8!");
+                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§7The Module §b" + info.getName() + " §7by §b" + info.getAuthor() + " §7Version§8: §b" + info.getVersion() + " §7was loaded§8!");
                             } else {
                                 this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cThe provided MainClass of the Module §e" + file.getName() + " §cdoesn't extends the Module.class!");
                             }

@@ -200,6 +200,7 @@ public class ServerService extends CloudService {
             int id = this.idService.getFreeID(serviceGroup.getName());
             service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, service.getServiceState());
         }
+        service.setProperties((properties == null ? new Document() : properties).toString());
         Action action = new Action();
         this.actions.put(service.getName(), action);
         this.globalServices.add(service);

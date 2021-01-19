@@ -26,7 +26,10 @@ public class TemplateService extends CloudService {
     }
 
     public void createTemplate(ServiceGroup serviceGroup) {
-        File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/" + serviceGroup.getTemplate());
+        this.createTemplate(serviceGroup, serviceGroup.getTemplate());
+    }
+    public void createTemplate(ServiceGroup serviceGroup, String template) {
+        File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/" + template);
         dir.mkdirs();
         File plugins = new File(dir, "plugins/");
         if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT)) {

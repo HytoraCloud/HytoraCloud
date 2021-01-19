@@ -2,11 +2,10 @@ package de.lystx.cloudsystem.booting.impl;
 
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.handler.group.PacketHandlerCoypTemplate;
+import de.lystx.cloudsystem.handler.group.PacketHandlerCreateTemplate;
 import de.lystx.cloudsystem.handler.group.PacketHandlerGroupUpdate;
 import de.lystx.cloudsystem.handler.managing.*;
-import de.lystx.cloudsystem.handler.other.PacketHandlerReload;
-import de.lystx.cloudsystem.handler.other.PacketHandlerShutdown;
-import de.lystx.cloudsystem.handler.other.PacketHandlerSubChannel;
+import de.lystx.cloudsystem.handler.other.*;
 import de.lystx.cloudsystem.handler.player.PacketHandlerCloudPlayer;
 import de.lystx.cloudsystem.handler.player.PacketHandlerCloudPlayerCommunication;
 import de.lystx.cloudsystem.handler.services.PacketHandlerRegister;
@@ -59,6 +58,9 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudPlayerCommunication(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerNPC(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerSubChannel(cloudSystem));
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCommand(cloudSystem));
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCreateTemplate(cloudSystem));
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerLog(cloudSystem));
 
         cloudSystem.getService(StatisticsService.class).getStatistics().add("bootedUp");
         cloudSystem.reload("statistics");

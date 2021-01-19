@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Level;
 
 
@@ -43,11 +44,14 @@ public class ServiceProviderStart {
 
             try {
                 FileUtils.copyDirectory(templateLocation, serverLocation);
-                for (File file : Objects.requireNonNull(cloudLibrary.getService(FileService.class).getPluginsDirectory().listFiles())) {
-                    if (file.isDirectory()) {
-                        FileUtils.copyDirectory(file, new File(plugins, file.getName()));
-                    } else {
-                        FileUtils.copyFile(file, new File(plugins, file.getName()));
+                if (service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
+                    File folder = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? cloudLibrary.getService(FileService.class).getBungeeCordPluginsDirectory() : cloudLibrary.getService(FileService.class).getPluginsDirectory();
+                    for (File file : Objects.requireNonNull(folder.listFiles())) {
+                        if (file.isDirectory()) {
+                            FileUtils.copyDirectory(file, new File(plugins, file.getName()));
+                        } else {
+                            FileUtils.copyFile(file, new File(plugins, file.getName()));
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -55,6 +59,7 @@ public class ServiceProviderStart {
             }
             cloudLibrary.getService(FileService.class).copyFileWithURL("/implements/plugins/CloudAPI.jar", new File(plugins, "CloudAPI.jar"));
 
+            service.setProperties((propertiess == null ? new Document() : propertiess).toString());
             if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                 jarFile = "bungeeCord.jar";
                 FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getGlobalDirectory(), "server-icon.png"), new File(serverLocation, "server-icon.png"));
@@ -148,14 +153,10 @@ public class ServiceProviderStart {
                     exception.printStackTrace();
                 }
             }
-
             File cloud = new File(serverLocation + "/CLOUD/");
             cloud.mkdirs();
             Document document = new Document();
             document.appendAll(service);
-            if (propertiess != null) {
-                document.append("properties", propertiess);
-            }
             document.save(new File(cloud, "connection.json"));
 
             FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), jarFile), new File(serverLocation, jarFile));
