@@ -33,6 +33,8 @@ import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Getter @Setter
 public class CloudSystem extends CloudLibrary {
@@ -46,6 +48,7 @@ public class CloudSystem extends CloudLibrary {
 
     public CloudSystem() {
         super();
+        Logger.getLogger("LOGGER-CLASS").setLevel(Level.OFF);
         instance = this;
         this.version = "1.0";
         this.cloudServices.add(new CommandService(this, "Command", CloudService.Type.MANAGING));
@@ -82,6 +85,7 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new RunCommand("run", "Starts new services", "start"));
         this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
         this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
+        this.getService(CommandService.class).registerCommand(new ModulesCommand("modules", "Manages modules", "pl", "plugins"));
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             new CloudBootingSetupDone(this);
@@ -102,9 +106,9 @@ public class CloudSystem extends CloudLibrary {
                 this.reload("cloudPlayers");
                 this.reload("permissions");
                 this.getService(Scheduler.class).scheduleDelayedTask(() -> {
-                    this.reload("statistics");
                     this.reload("signs");
                     this.reload("npcs");
+                    this.reload("statistics");
                 }, 5L);
                 this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
             } else if (type.equalsIgnoreCase("config")) {

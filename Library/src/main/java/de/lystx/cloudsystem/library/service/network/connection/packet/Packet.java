@@ -9,8 +9,15 @@ public class Packet implements Serializable {
     private String document = "{}";
 
     public Packet append(String key, Object value) {
-        Document document = document();
+        Document document = this.document();
         document.append(key, value);
+        this.document = document.toString();
+        return this;
+    }
+
+    public Packet append(Object value) {
+        Document document = this.document();
+        document.appendAll(value);
         this.document = document.toString();
         return this;
     }

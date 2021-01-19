@@ -27,6 +27,10 @@ public class ModuleService extends CloudService {
         this.load();
     }
 
+    public Module getModule(String name) {
+        return this.modules.stream().filter((module -> module.getInfo().getName().equalsIgnoreCase(name))).findFirst().orElse(null);
+    }
+
     public void load() {
         this.moduleLoader.loadModules();
         this.modules.forEach((module -> {

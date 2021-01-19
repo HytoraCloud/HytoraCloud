@@ -30,19 +30,25 @@ public class CloudPlayers {
 
     public int getOnGroup(String groupName) {
         int count = 0;
-        for (Service service : this.cloudAPI.getNetwork().getServices(this.cloudAPI.getNetwork().getServiceGroup(groupName))) {
-            count += this.getOnServer(service.getName());
-        }
+        try {
+            for (Service service : this.cloudAPI.getNetwork().getServices(this.cloudAPI.getNetwork().getServiceGroup(groupName))) {
+                count += this.getOnServer(service.getName());
+            }
+        } catch (NullPointerException e) {}
         return count;
     }
 
     public int getOnServer(String serverName) {
-        Service service = this.cloudAPI.getNetwork().getService(serverName);
-        ServerPinger pinger = new ServerPinger();
         try {
-            pinger.pingServer(service.getHost(), service.getPort(), 20);
-            return pinger.getPlayers();
-        } catch (IOException e) {
+            Service service = this.cloudAPI.getNetwork().getService(serverName);
+            ServerPinger pinger = new ServerPinger();
+            try {
+                pinger.pingServer(service.getHost(), service.getPort(), 20);
+                return pinger.getPlayers();
+            } catch (IOException e) {
+                return 0;
+            }
+        } catch (NullPointerException e) {
             return 0;
         }
     }

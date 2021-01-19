@@ -44,14 +44,12 @@ public class ServiceProviderStart {
 
             try {
                 FileUtils.copyDirectory(templateLocation, serverLocation);
-                if (service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
-                    File folder = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? cloudLibrary.getService(FileService.class).getBungeeCordPluginsDirectory() : cloudLibrary.getService(FileService.class).getPluginsDirectory();
-                    for (File file : Objects.requireNonNull(folder.listFiles())) {
-                        if (file.isDirectory()) {
-                            FileUtils.copyDirectory(file, new File(plugins, file.getName()));
-                        } else {
-                            FileUtils.copyFile(file, new File(plugins, file.getName()));
-                        }
+                File folder = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? cloudLibrary.getService(FileService.class).getBungeeCordPluginsDirectory() : cloudLibrary.getService(FileService.class).getSpigotPluginsDirectory();
+                for (File file : Objects.requireNonNull(folder.listFiles())) {
+                    if (file.isDirectory()) {
+                        FileUtils.copyDirectory(file, new File(plugins, file.getName()));
+                    } else {
+                        FileUtils.copyFile(file, new File(plugins, file.getName()));
                     }
                 }
             } catch (IOException e) {

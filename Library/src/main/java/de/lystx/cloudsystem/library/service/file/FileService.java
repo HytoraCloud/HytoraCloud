@@ -39,6 +39,7 @@ public class FileService extends CloudService {
 
     private final File globalDirectory;
     private final File pluginsDirectory;
+    private final File spigotPluginsDirectory;
     private final File bungeeCordPluginsDirectory;
     private final File modulesDirectory;
     private final File statsFile;
@@ -74,7 +75,8 @@ public class FileService extends CloudService {
 
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");
-        this.bungeeCordPluginsDirectory = new File(this.globalDirectory, "bungeePlugins/");
+        this.bungeeCordPluginsDirectory = new File(this.pluginsDirectory, "bungee/");
+        this.spigotPluginsDirectory = new File(this.pluginsDirectory, "spigot/");
         this.versionsDirectory = new File(this.globalDirectory, "versions/");
         this.logsDirectory = new File(this.globalDirectory, "logs/");
         this.modulesDirectory = new File(this.globalDirectory, "modules/");
@@ -110,6 +112,7 @@ public class FileService extends CloudService {
         this.globalDirectory.mkdirs();
         this.pluginsDirectory.mkdirs();
         this.bungeeCordPluginsDirectory.mkdirs();
+        this.spigotPluginsDirectory.mkdirs();
         this.versionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
         this.modulesDirectory.mkdirs();
@@ -127,7 +130,7 @@ public class FileService extends CloudService {
         this.copyFileWithURL("/implements/versions/spigot/spigot.jar", new File(this.versionsDirectory, "spigot.jar"));
         this.copyFileWithURL("/implements/versions/bungeecord/bungeeCord.jar", new File(this.versionsDirectory, "bungeeCord.jar"));
         this.copyFileWithURL("/implements/server-icon.png", new File(this.globalDirectory, "server-icon.png"));
-        this.copyFileWithURL("/implements/plugins/LabyModAPI.jar", new File(this.pluginsDirectory, "LabyModAPI.jar"));
+        this.copyFileWithURL("/implements/plugins/LabyModAPI.jar", new File(this.spigotPluginsDirectory, "LabyModAPI.jar"));
     }
 
     public void copyFileWithURL(String filename, File location) {

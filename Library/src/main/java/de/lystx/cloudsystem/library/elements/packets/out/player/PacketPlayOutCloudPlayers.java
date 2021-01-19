@@ -13,7 +13,6 @@ public class PacketPlayOutCloudPlayers extends Packet implements Serializable {
     private final List<CloudPlayer> cloudPlayers;
 
     public PacketPlayOutCloudPlayers(List<CloudPlayer> cloudPlayers) {
-        super();
         this.cloudPlayers = cloudPlayers;
     }
 }
