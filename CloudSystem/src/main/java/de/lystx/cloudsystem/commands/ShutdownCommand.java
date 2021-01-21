@@ -15,6 +15,10 @@ public class ShutdownCommand extends Command {
 
     @Override
     public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+        if (args.length != 0) {
+            console.getLogger().sendMessage("ERROR", "§cPlease do not provide any arguments after §e<shutdown>§c!");
+            return;
+        }
         console.getLogger().sendMessage("COMMAND", "§cThe CloudSystem will §eshut down §cin 3 seconds...");
         CloudSystem.getInstance().shutdown();
     }

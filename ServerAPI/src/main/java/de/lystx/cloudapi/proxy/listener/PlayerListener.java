@@ -1,7 +1,9 @@
 package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.events.GlobalChatEvent;
 import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
@@ -54,16 +56,9 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onCommand(ChatEvent event) {
-        String cmd = event.getMessage().split(" ")[0].replace("/", "");
-        for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
-            if (command.getValue().getName().equalsIgnoreCase(cmd)) {
-                if (event.getSender() instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) event.getSender();
-                    this.cloudAPI.sendPacket(new PacketPlayInPlayerExecuteCommand(player.getName(), event.getMessage()));
-                    break;
-                }
-            }
-        }
+        String message = event.getMessage();
+        String player = ((ProxiedPlayer)event.getSender()).getName();
+        cloudAPI.sendPacket(new PacketCommunicationPlayerChat(player, message));
     }
 
     @EventHandler

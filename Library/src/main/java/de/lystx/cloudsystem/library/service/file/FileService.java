@@ -44,6 +44,8 @@ public class FileService extends CloudService {
     private final File modulesDirectory;
     private final File statsFile;
     private final File versionsDirectory;
+    private final File spigotVersionsDirectory;
+    private final File oldSpigotVersionsDirectory;
 
     public FileService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
@@ -78,6 +80,8 @@ public class FileService extends CloudService {
         this.bungeeCordPluginsDirectory = new File(this.pluginsDirectory, "bungee/");
         this.spigotPluginsDirectory = new File(this.pluginsDirectory, "spigot/");
         this.versionsDirectory = new File(this.globalDirectory, "versions/");
+        this.spigotVersionsDirectory = new File(this.versionsDirectory, "downloads/");
+        this.oldSpigotVersionsDirectory = new File(this.versionsDirectory, "old/");
         this.logsDirectory = new File(this.globalDirectory, "logs/");
         this.modulesDirectory = new File(this.globalDirectory, "modules/");
 
@@ -114,6 +118,8 @@ public class FileService extends CloudService {
         this.bungeeCordPluginsDirectory.mkdirs();
         this.spigotPluginsDirectory.mkdirs();
         this.versionsDirectory.mkdirs();
+        this.spigotVersionsDirectory.mkdirs();
+        this.oldSpigotVersionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
         this.modulesDirectory.mkdirs();
 
@@ -147,13 +153,22 @@ public class FileService extends CloudService {
         } catch (NullPointerException e) { }
     }
 
+    public void download(String url, File location) {
+        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+        FileOutputStream fileOutputStream = new FileOutputStream(location)) {
+            byte[] dataBuffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
+        } catch (IOException e) {}
+    }
+
     public void write(File file, String message) {
         if (!file.exists()) {
             try {
                 file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } catch (IOException e) { }
         }
         try {
             FileWriter filewriter=new FileWriter(file, true);

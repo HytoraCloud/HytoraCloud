@@ -26,6 +26,7 @@ public class ScreenCommand extends Command {
             if (subject.equalsIgnoreCase("leave")) {
                 if (this.screenPrinter.isInScreen()) {
                     this.screenPrinter.quitCurrentScreen();
+                    this.screenPrinter.quitCurrentScreen();
                 } else {
                     colouredConsoleProvider.getLogger().sendMessage("ERROR", "§cYou are not in a screen Session!");
                 }

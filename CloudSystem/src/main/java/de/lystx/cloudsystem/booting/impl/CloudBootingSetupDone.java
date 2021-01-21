@@ -61,6 +61,7 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCommand(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCreateTemplate(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerLog(cloudSystem));
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerTPS(cloudSystem));
 
         cloudSystem.getService(StatisticsService.class).getStatistics().add("bootedUp");
         cloudSystem.reload("statistics");

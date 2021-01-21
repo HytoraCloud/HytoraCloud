@@ -81,6 +81,14 @@ public class CloudCommand extends Command {
                         }
                         CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
                         CloudAPI.getInstance().getCloudPlayers().sendLog(cloudPlayer, service);
+                    } else if (args[0].equalsIgnoreCase("tps")) {
+                        String groupname = args[1];
+                        ServiceGroup group = CloudAPI.getInstance().getNetwork().getServiceGroup(groupname);
+                        if (group == null) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cseems not to exist!");
+                            return;
+                        }
+                        CloudAPI.getInstance().getNetwork().sendTPS(group, CloudAPI.getInstance().getCloudPlayers().get(player.getName()));
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         String s = args[1];
                         Service service = CloudAPI.getInstance().getNetwork().getService(s);
@@ -221,6 +229,7 @@ public class CloudCommand extends Command {
         player.sendMessage("  §8» §b/cloud stop <server> §8┃ §7Stops a specific server or proxy");
         player.sendMessage("  §8» §b/cloud log <server> §8┃ §7Logs a servers output");
         player.sendMessage("  §8» §b/cloud toggle §8┃ §7Toggles Server notifications");
+        player.sendMessage("  §8» §b/cloud tps <group> §8┃ §7Shows tps of all servers of group (might lag)");
         player.sendMessage("§8§m--------------------------------------");
     }
 }

@@ -26,8 +26,8 @@ public enum Spigot {
     V1_15_2("https://cdn.getbukkit.org/spigot/spigot-1.15.2.jar", "spigot-1.15.2.jar", 23),
     V1_16_1("https://cdn.getbukkit.org/spigot/spigot-1.16.1.jar", "spigot-1.16.1.jar", 24);
 
-    private String url;
-    private String jarName;
+    private final String url;
+    private final String jarName;
     private int id;
 
     Spigot(String url, String jarName, int id) {

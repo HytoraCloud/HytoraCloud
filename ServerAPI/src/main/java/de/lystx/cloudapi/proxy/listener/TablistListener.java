@@ -3,7 +3,13 @@ package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
+import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -14,13 +20,60 @@ import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.util.UUID;
+
 public class TablistListener implements Listener {
 
     private final CloudAPI cloudAPI;
 
     public TablistListener() {
         this.cloudAPI = CloudAPI.getInstance();
+        this.cloudAPI.getCloudClient().registerHandler(new NetworkHandler() {
+            @Override
+            public void onServerStart(Service service) {
 
+            }
+
+            @Override
+            public void onServerStop(Service service) {
+
+            }
+
+            @Override
+            public void onServerUpdate(Service service) {
+
+            }
+
+            @Override
+            public void onGroupUpdate(ServiceGroup group) {
+
+            }
+
+            @Override
+            public void onPlayerJoin(CloudPlayer cloudPlayer) {
+                doUpdate();
+            }
+
+            @Override
+            public void onServerChange(CloudPlayer cloudPlayer, String server) {
+
+            }
+
+            @Override
+            public void onPlayerQuit(CloudPlayer cloudPlayer) {
+                doUpdate();
+            }
+
+            @Override
+            public void onNetworkPing(UUID connectionUUID) {
+
+            }
+
+            @Override
+            public void onDocumentReceive(String channel, String key, Document document, ServiceType type) {
+
+            }
+        });
     }
 
     public void updateTab() {
@@ -57,6 +110,8 @@ public class TablistListener implements Listener {
         this.updateTab();
         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
     }
+
+
 
     @EventHandler
     public void on(ServerConnectEvent e) {

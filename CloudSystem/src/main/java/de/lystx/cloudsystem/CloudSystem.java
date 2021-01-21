@@ -86,6 +86,7 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
         this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
         this.getService(CommandService.class).registerCommand(new ModulesCommand("modules", "Manages modules", "pl", "plugins"));
+        this.getService(CommandService.class).registerCommand(new DownloadCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             new CloudBootingSetupDone(this);

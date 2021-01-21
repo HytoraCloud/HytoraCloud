@@ -2,12 +2,14 @@ package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.service.*;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -74,7 +76,11 @@ public class CloudNetwork {
     }
 
     public List<Service> getServices(ServiceGroup serviceGroup) {
-        return this.services.get(this.getServiceGroup(serviceGroup.getName()));
+        try {
+            return this.services.get(this.getServiceGroup(serviceGroup.getName()));
+        } catch (NullPointerException e) {
+            return new LinkedList<>();
+        }
     }
 
     public Service getService(String name) {
@@ -102,4 +108,10 @@ public class CloudNetwork {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStopServer(service));
     }
 
+    public void sendTPS(ServiceGroup group, CloudPlayer cloudPlayer) {
+        cloudPlayer.sendMessage(this.cloudAPI.getCloudClient(), this.cloudAPI.getPrefix() + "§7TPS of group §b" + group.getName() + "§8:");
+        for (Service service : this.getServices(this.getServiceGroup(group.getName()))) {
+            this.cloudAPI.sendPacket(new PacketPlayOutTPS(cloudPlayer.getName(), service, null));
+        }
+    }
 }
