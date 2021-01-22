@@ -25,7 +25,7 @@ public class PacketHandlerServiceUpdate extends PacketHandlerAdapter {
             ServiceState serviceState = serviceStateChange.getServiceState();
             this.cloudSystem.getService().updateService(online, serviceState);
             this.cloudSystem.getService(CloudNetworkService.class).sendPacket(packet);
-            this.cloudSystem.reload("services");
+            this.cloudSystem.reload();
         }
     }
 }

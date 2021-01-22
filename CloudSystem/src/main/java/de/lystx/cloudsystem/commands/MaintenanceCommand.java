@@ -30,14 +30,14 @@ public class MaintenanceCommand extends Command {
                     config.setProxyConfig(proxyConfig);
                     CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
                     CloudSystem.getInstance().getService(ConfigService.class).save();
-                    CloudSystem.getInstance().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNetworkConfig(config));
+                    CloudSystem.getInstance().reload();
                     colouredConsoleProvider.getLogger().sendMessage("INFO", "§9The network is now in §amaintenance§9!");
                 } else {
                     proxyConfig.setMaintenance(false);
                     config.setProxyConfig(proxyConfig);
                     CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
                     CloudSystem.getInstance().getService(ConfigService.class).save();
-                    CloudSystem.getInstance().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNetworkConfig(config));
+                    CloudSystem.getInstance().reload();
                     colouredConsoleProvider.getLogger().sendMessage("INFO", "§9The network is no longer in §cmaintenance§9!");
                 }
             } else {
@@ -53,7 +53,7 @@ public class MaintenanceCommand extends Command {
                 config.setProxyConfig(proxyConfig);
                 CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getService(ConfigService.class).save();
-                CloudSystem.getInstance().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNetworkConfig(config));
+                CloudSystem.getInstance().reload();
                 colouredConsoleProvider.getLogger().sendMessage("COMMAND", "§7The player §a" + user + " §7was added to maintenance§8!");
             } else if (identifier.equalsIgnoreCase("remove")) {
                 whitelist.remove(user);
@@ -61,7 +61,7 @@ public class MaintenanceCommand extends Command {
                 config.setProxyConfig(proxyConfig);
                 CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getService(ConfigService.class).save();
-                CloudSystem.getInstance().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNetworkConfig(config));
+                CloudSystem.getInstance().reload();
                 colouredConsoleProvider.getLogger().sendMessage("COMMAND", "§7The player §a" + user + " §7was removed to maintenance§8!");
             } else {
                 sendUsage(colouredConsoleProvider);

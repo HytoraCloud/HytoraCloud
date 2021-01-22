@@ -102,7 +102,7 @@ public class ServiceProviderStart {
                         "ip_forward: true\n" +
                         "network_compression_threshold: 256\n" +
                         "groups:\n" +
-                        "  Lystx:\n" +
+                        "  md_5:\n" +
                         "    - admin\n" +
                         "connection_throttle: -1\n" +
                         "stats: 13be5ac9-5731-4502-9ccc-c4a80163f14a\n" +

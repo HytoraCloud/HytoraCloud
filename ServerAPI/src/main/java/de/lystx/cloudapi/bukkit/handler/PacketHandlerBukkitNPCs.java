@@ -2,6 +2,7 @@ package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -18,9 +19,9 @@ public class PacketHandlerBukkitNPCs extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayOutNPCs) {
-            PacketPlayOutNPCs packetPlayOutNPCs = (PacketPlayOutNPCs)packet;
-            Bukkit.getOnlinePlayers().forEach(player -> CloudServer.getInstance().getNpcManager().updateNPCS(new Document(packetPlayOutNPCs.getConfig()), player));
+        if (packet instanceof PacketPlayOutGlobalInfo) {
+            PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo) packet;
+            Bukkit.getOnlinePlayers().forEach(player -> CloudServer.getInstance().getNpcManager().updateNPCS(new Document(info.getNpcs()), player));
         }
     }
 }

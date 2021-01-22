@@ -6,6 +6,7 @@ import de.lystx.cloudapi.bukkit.events.CloudServerSubChannelMessageEvent;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutForceRegisterPlayer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -101,6 +102,11 @@ public class PlayerListener implements Listener {
                 CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
             }
         }
+        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
+            if (CloudAPI.getInstance().getCloudPlayers().get(player.getName()) == null) {
+                CloudAPI.getInstance().sendPacket(new PacketPlayOutForceRegisterPlayer(player.getName()));
+            }
+        }, 4L);
     }
 
     @EventHandler

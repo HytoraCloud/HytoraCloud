@@ -26,7 +26,7 @@ public class PacketHandlerGroupUpdate extends PacketHandlerAdapter {
             this.cloudSystem.getService(GroupService.class).updateGroup(get, group);
             this.cloudSystem.getService().updateGroup(get, group);
             this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutUpdateServiceGroup(get));
-            this.cloudSystem.reload("services");
+            this.cloudSystem.reload();
         }
     }
 }

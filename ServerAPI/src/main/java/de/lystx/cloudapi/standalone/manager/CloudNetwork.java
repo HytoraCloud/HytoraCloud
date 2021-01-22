@@ -3,12 +3,14 @@ package de.lystx.cloudapi.standalone.manager;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.in.service.*;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import lombok.Setter;
@@ -92,6 +94,14 @@ public class CloudNetwork {
             }
         }
         return null;
+    }
+
+    public void updateNetworkConfig(NetworkConfig networkConfig) {
+        this.cloudAPI.sendPacket(new PacketPlayInNetworkConfig(networkConfig));
+    }
+
+    public void shutdownCloud() {
+        this.cloudAPI.sendPacket(new PacketPlayInShutdown());
     }
 
     public void stopServices(ServiceGroup group) {

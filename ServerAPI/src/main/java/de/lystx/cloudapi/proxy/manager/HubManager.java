@@ -25,6 +25,9 @@ public class HubManager {
     public void send(ProxiedPlayer player) {
         if (isFallback(player)) {
             String message = this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix());
+            if (message.trim().isEmpty()) {
+                return;
+            }
             player.sendMessage(new TextComponent(message));
         } else {
             this.sendPlayerToFallback(player);

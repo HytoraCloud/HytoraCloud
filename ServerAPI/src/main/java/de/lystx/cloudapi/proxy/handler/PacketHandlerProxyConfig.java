@@ -2,6 +2,7 @@ package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.HubCommand;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutServices;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -28,16 +29,21 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayOutServices) {
-            CloudAPI.getInstance().setJoinable(true);
-            PacketPlayOutServices packetPlayOutServices = (PacketPlayOutServices)packet;
-            Map<ServiceGroup, List<Service>> services = packetPlayOutServices.getServices();
+        if (packet instanceof PacketPlayOutGlobalInfo) {
+            PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo)packet;
+            CloudProxy.getInstance().getNetworkManager().switchMaintenance(info.getNetworkConfig().getProxyConfig().isMaintenance());
+            if (info.getNetworkConfig().getProxyConfig().isHubCommandEnabled()) {
+                CloudProxy.getInstance().getProxy().getPluginManager().registerCommand(CloudProxy.getInstance(), new HubCommand());
+            } else {
+                CloudProxy.getInstance().getProxy().getPluginManager().unregisterCommand(new HubCommand());
+            }
+            Map<ServiceGroup, List<Service>> services = info.getServices();
             for (List<Service> value : services.values()) {
                 for (Service service : value) {
                     CloudProxy.getInstance().getServices().add(service);
                     if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
-                        ServerInfo info = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress("127.0.0.1", service.getPort()), "CloudService", false);
-                        ProxyServer.getInstance().getServers().put(service.getName(), info);
+                        ServerInfo i = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress("127.0.0.1", service.getPort()), "CloudService", false);
+                        ProxyServer.getInstance().getServers().put(service.getName(), i);
                     }
                 }
             }
@@ -47,15 +53,6 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
                     ProxyServer.getInstance().getServers().remove(service.getName());
                 }
             }
-        } else if (packet instanceof PacketPlayOutNetworkConfig) {
-            cloudAPI.getScheduler().scheduleDelayedTask(() -> {
-                CloudProxy.getInstance().getNetworkManager().switchMaintenance(this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance());
-                if (this.cloudAPI.getNetworkConfig().getProxyConfig().isHubCommandEnabled()) {
-                    CloudProxy.getInstance().getProxy().getPluginManager().registerCommand(CloudProxy.getInstance(), new HubCommand());
-                } else {
-                    CloudProxy.getInstance().getProxy().getPluginManager().unregisterCommand(new HubCommand());
-                }
-            }, 2L);
         }
     }
 }

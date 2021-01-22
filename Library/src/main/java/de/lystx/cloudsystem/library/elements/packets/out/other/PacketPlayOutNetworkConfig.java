@@ -12,7 +12,6 @@ public class PacketPlayOutNetworkConfig extends Packet implements Serializable {
     private final NetworkConfig networkConfig;
 
     public PacketPlayOutNetworkConfig(NetworkConfig networkConfig) {
-        super();
         this.networkConfig = networkConfig;
     }
 

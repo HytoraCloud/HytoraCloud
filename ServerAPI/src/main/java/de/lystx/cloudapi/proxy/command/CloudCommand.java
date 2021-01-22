@@ -56,9 +56,7 @@ public class CloudCommand extends Command {
                         for (ProxiedPlayer proxiedPlayer : ProxyServer.getInstance().getPlayers()) {
                             proxiedPlayer.disconnect(new TextComponent(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!"));
                         }
-                        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
-                            CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInShutdown());
-                        }, 60L);
+                        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> CloudAPI.getInstance().getNetwork().shutdownCloud(), 60L);
                     } else {
                         this.help(player);
                     }
@@ -72,6 +70,7 @@ public class CloudCommand extends Command {
                         }
                         CloudAPI.getInstance().getNetwork().startService(group);
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start a new service of group §a" + group.getName() + "§8...");
+
                     } else if (args[0].equalsIgnoreCase("log")) {
                         String s = args[1];
                         Service service = CloudAPI.getInstance().getNetwork().getService(s);
@@ -92,12 +91,12 @@ public class CloudCommand extends Command {
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         String s = args[1];
                         Service service = CloudAPI.getInstance().getNetwork().getService(s);
-                        if (service == null) {
+                        if (service == null || ProxyServer.getInstance().getServerInfo(s) == null) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe service §e" + s + " §cseems not to be online!");
                             return;
                         }
-                        CloudAPI.getInstance().getNetwork().stopService(service);
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to stop service §c" + service.getName() + "§8...");
+                        CloudAPI.getInstance().getNetwork().stopService(service);
                     } else if (args[0].equalsIgnoreCase("stopGroup")) {
                         String g = args[1];
                         ServiceGroup group = CloudAPI.getInstance().getNetwork().getServiceGroup(g);
@@ -137,7 +136,23 @@ public class CloudCommand extends Command {
                         this.help(player);
                     }
                 } else if (args.length == 3) {
-                    if (args[0].equalsIgnoreCase("maintenance")) {
+                    if (args[0].equalsIgnoreCase("run")) {
+                        try {
+                            int id = Integer.parseInt(args[2]);
+                            String groupname = args[1];
+                            ServiceGroup group = CloudAPI.getInstance().getNetwork().getServiceGroup(groupname);
+                            if (group == null) {
+                                player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cseems not to exist!");
+                                return;
+                            }
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start §b" + id + " §7new services of group §a" + group.getName() + "§8...");
+                            for (int i = 0; i < id; i++) {
+                                CloudAPI.getInstance().getNetwork().startService(group);
+                            }
+                        } catch (NumberFormatException e) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid number!");
+                        }
+                    } else if (args[0].equalsIgnoreCase("maintenance")) {
                         String groupname = args[1];
                         if (groupname.equalsIgnoreCase("switch")) {
                             Boolean maintenance = Boolean.valueOf(args[2]);
@@ -145,8 +160,7 @@ public class CloudCommand extends Command {
                             ProxyConfig proxyConfig = networkConfig.getProxyConfig();
                             proxyConfig.setMaintenance(maintenance);
                             networkConfig.setProxyConfig(proxyConfig);
-                            PacketPlayInNetworkConfig packetPlayInNetworkConfig = new PacketPlayInNetworkConfig(networkConfig);
-                            CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInNetworkConfig);
+                            CloudAPI.getInstance().getNetwork().updateNetworkConfig(networkConfig);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Set maintenance of §bCloudSystem §7to §b" + (maintenance ? "§a" : "§c") + maintenance + "§8!");
                         } else if (groupname.equalsIgnoreCase("add")) {
                             String playername = args[2];
@@ -160,8 +174,7 @@ public class CloudCommand extends Command {
                             List<String> whitelist = proxyConfig.getWhitelistedPlayers();
                             whitelist.add(playername);
                             networkConfig.setProxyConfig(proxyConfig);
-                            PacketPlayInNetworkConfig packetPlayInNetworkConfig = new PacketPlayInNetworkConfig(networkConfig);
-                            CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInNetworkConfig);
+                            CloudAPI.getInstance().getNetwork().updateNetworkConfig(networkConfig);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + playername + " §7was added to maintenance§8!");
                         } else if (groupname.equalsIgnoreCase("remove")) {
                             String playername = args[2];
@@ -174,8 +187,7 @@ public class CloudCommand extends Command {
                             List<String> whitelist = proxyConfig.getWhitelistedPlayers();
                             whitelist.remove(playername);
                             networkConfig.setProxyConfig(proxyConfig);
-                            PacketPlayInNetworkConfig packetPlayInNetworkConfig = new PacketPlayInNetworkConfig(networkConfig);
-                            CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInNetworkConfig);
+                            CloudAPI.getInstance().getNetwork().updateNetworkConfig(networkConfig);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + playername + " §7was removed from maintenance§8!");
                         } else {
                             boolean maintenance = Boolean.parseBoolean(args[2]);
@@ -185,8 +197,7 @@ public class CloudCommand extends Command {
                             }
                             ServiceGroup serviceGroup = CloudAPI.getInstance().getNetwork().getServiceGroup(groupname);
                             serviceGroup.setMaintenance(maintenance);
-                            PacketPlayInUpdateServiceGroup packetPlayInUpdateServiceGroup = new PacketPlayInUpdateServiceGroup(serviceGroup);
-                            CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInUpdateServiceGroup);
+                            CloudAPI.getInstance().getNetwork().updateServiceGroup(serviceGroup);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Set maintenance of group §b" + groupname + " §7to §b" + (maintenance ? "§a" : "§c") + maintenance + "§8!");
                         }
 
@@ -198,8 +209,8 @@ public class CloudCommand extends Command {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe service §e" + servername + " §cdoesn't exist!");
                             return;
                         }
-                        PacketPlayInCopyTemplate packetPlayInCopyTemplate = new PacketPlayInCopyTemplate(service, templatename);
-                        CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInCopyTemplate);
+
+                        CloudAPI.getInstance().getTemplates().copy(servername, templatename);
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Copied §b" + servername + " §7into template §b" + templatename);
                     } else {
                         this.help(player);

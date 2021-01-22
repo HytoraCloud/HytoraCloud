@@ -24,9 +24,23 @@ public class RunCommand extends Command {
                 return;
             }
             CloudSystem.getInstance().getService().startService(serviceGroup);
-
+        } else if (args.length == 2) {
+            try {
+                int id = Integer.parseInt(args[1]);
+                String group = args[0];
+                ServiceGroup serviceGroup = cloudLibrary.getService(GroupService.class).getGroup(group);
+                if (serviceGroup == null) {
+                    console.getLogger().sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
+                    return;
+                }
+                for (int i = 0; i < id; i++) {
+                    CloudSystem.getInstance().getService().startService(serviceGroup);
+                }
+            } catch (NumberFormatException e) {
+                console.getLogger().sendMessage("ERROR", "§cPlease provide a valid number!");
+            }
         } else {
-            console.getLogger().sendMessage("ERROR", "§crun <group>");
+            console.getLogger().sendMessage("ERROR", "§crun <group> <number>");
         }
     }
 }

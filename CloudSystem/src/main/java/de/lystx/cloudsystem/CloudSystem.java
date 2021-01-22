@@ -4,9 +4,7 @@ import de.lystx.cloudsystem.booting.impl.CloudBootingSetupDone;
 import de.lystx.cloudsystem.booting.impl.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.packets.out.other.*;
-import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayers;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutServices;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
@@ -96,38 +94,17 @@ public class CloudSystem extends CloudLibrary {
     }
 
     public void reload() {
-        this.reload("all");
-    }
-
-    public void reload(String type) {
         try {
-            if (type.equalsIgnoreCase("all")) {
-                this.reload("config");
-                this.reload("services");
-                this.reload("cloudPlayers");
-                this.reload("permissions");
-                this.getService(Scheduler.class).scheduleDelayedTask(() -> {
-                    this.reload("signs");
-                    this.reload("npcs");
-                    this.reload("statistics");
-                }, 5L);
-                this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
-            } else if (type.equalsIgnoreCase("config")) {
-                this.getService(ConfigService.class).reload();
-                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNetworkConfig(this.getService(ConfigService.class).getNetworkConfig()));
-            } else if (type.equalsIgnoreCase("permissions")) {
-                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutPermissionPool(this.getService(PermissionService.class).loadEntries()));
-            } else if (type.equalsIgnoreCase("statistics")) {
-                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStatistics(this.getService(StatisticsService.class).getStatistics()));
-            } else if (type.equalsIgnoreCase("signs")) {
-                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudSigns(this.getService(SignService.class).getCloudSigns(), this.getService(SignService.class).getSignLayOut().getDocument().toString()));
-            } else if (type.equalsIgnoreCase("npcs")) {
-                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNPCs(this.getService(NPCService.class).getDocument().toString()));
-            } else if (type.equalsIgnoreCase("cloudPlayers")) {
-               this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayers(this.getService(CloudPlayerService.class).getOnlinePlayers()));
-            } else if (type.equalsIgnoreCase("services")) {
-                this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutServices(this.getService().getServices()));
-            }
+            this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
+                    this.getService(ConfigService.class).getNetworkConfig(),
+                    this.getService().getServices(),
+                    this.getService(PermissionService.class).getPermissionPool(),
+                    this.getService(CloudPlayerService.class).getOnlinePlayers(),
+                    this.getService(StatisticsService.class).getStatistics(),
+                    this.getService(SignService.class).getCloudSigns(),
+                    this.getService(SignService.class).getSignLayOut().getDocument().toString(),
+                    this.getService(NPCService.class).getDocument().toString()
+            ));
         } catch (NullPointerException e) {
             this.console.getLogger().sendMessage("ERROR", "§cYou can't reload at the moment! Try again in a few seconds!");
         }

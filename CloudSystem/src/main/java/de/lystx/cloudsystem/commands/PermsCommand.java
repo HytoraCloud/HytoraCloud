@@ -45,7 +45,8 @@ public class PermsCommand extends Command {
                     CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().getPermissionGroups().add(permissionGroup);
                     CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
                     CloudSystem.getInstance().getService(PermissionService.class).load();
-                    CloudSystem.getInstance().reload("permissions");
+                    CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
+                    CloudSystem.getInstance().reload();
                     console.getLogger().sendMessage("INFO", "§9The permissionGroup §a" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId() + " §9was created!");
                 });
             } else if (args[0].equalsIgnoreCase("list")) {
@@ -98,7 +99,8 @@ public class PermsCommand extends Command {
                         pool.updatePermissionGroup(player, group, i);
                         pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
                         cloudLibrary.getService(PermissionService.class).load();
-                        CloudSystem.getInstance().reload("permissions");
+                        CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
+                        CloudSystem.getInstance().reload();
                         console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime " + pool.getPlayerData(player).getValidadilityTime());
                     } catch (NumberFormatException e) {
                         console.getLogger().sendMessage("ERROR", "§cPlease provide a §evalid number §cor enter §elifetime§c!");
@@ -107,7 +109,8 @@ public class PermsCommand extends Command {
                     pool.updatePermissionGroup(player, group, -1);
                     pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
                     cloudLibrary.getService(PermissionService.class).load();
-                    CloudSystem.getInstance().reload("permissions");
+                    CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
+                    CloudSystem.getInstance().reload();
                     console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime Lifetime");
                 }
             } else {

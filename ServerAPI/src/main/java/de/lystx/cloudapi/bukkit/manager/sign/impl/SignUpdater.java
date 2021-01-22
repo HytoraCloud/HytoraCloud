@@ -130,6 +130,10 @@ public class SignUpdater  {
         }, 0, repeat);
     }
 
+    public void removeService(String name) {
+
+    }
+
     public SignGroup createSignGroup(String name) {
         SignGroup signGroup = new SignGroup(name.toUpperCase());
         int count = 1;

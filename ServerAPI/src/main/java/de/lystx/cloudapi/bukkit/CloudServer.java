@@ -85,9 +85,7 @@ public class CloudServer extends JavaPlugin {
                 this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
                 return;
             }
-            for (PermissionAttachmentInfo effectivePermission : player.getEffectivePermissions()) {
-                player.addAttachment(this, effectivePermission.getPermission(), false);
-            }
+
             player.setOp(false);
             boolean op = false;
             for (String permission : group.getPermissions()) {

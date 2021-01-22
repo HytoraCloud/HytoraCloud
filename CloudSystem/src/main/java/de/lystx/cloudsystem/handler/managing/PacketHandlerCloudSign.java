@@ -27,7 +27,7 @@ public class PacketHandlerCloudSign extends PacketHandlerAdapter {
                 this.cloudSystem.getService(SignService.class).save();
                 this.cloudSystem.getService(SignService.class).load();
                 this.cloudSystem.getService(SignService.class).loadSigns();
-                this.cloudSystem.reload("signs");
+                this.cloudSystem.reload();
             }
 
         } else if (packet instanceof PacketPlayInDeleteCloudSign) {
@@ -39,7 +39,7 @@ public class PacketHandlerCloudSign extends PacketHandlerAdapter {
                 this.cloudSystem.getService(SignService.class).save();
                 this.cloudSystem.getService(SignService.class).load();
                 this.cloudSystem.getService(SignService.class).loadSigns();
-                this.cloudSystem.reload("signs");
+                this.cloudSystem.reload();
             }
         }
     }

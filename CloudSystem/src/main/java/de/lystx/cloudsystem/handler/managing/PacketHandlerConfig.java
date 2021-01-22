@@ -22,7 +22,8 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
             NetworkConfig config = packetPlayInNetworkConfig.getNetworkConfig();
             this.cloudSystem.getService(ConfigService.class).setNetworkConfig(config);
             this.cloudSystem.getService(ConfigService.class).save();
-            this.cloudSystem.reload("config");
+            this.cloudSystem.getService(ConfigService.class).reload();
+            this.cloudSystem.reload();
         }
     }
 }

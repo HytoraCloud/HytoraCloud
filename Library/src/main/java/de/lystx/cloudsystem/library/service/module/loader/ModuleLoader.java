@@ -27,12 +27,26 @@ public class ModuleLoader {
         this.modulesDir = modulesDir;
     }
 
+
+    public int getSize() {
+        int i = 0;
+        for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
+            if (!file.isFile()) {
+                continue;
+            }
+            if (file.getName().endsWith(".jar")) {
+                i++;
+            }
+        }
+        return i;
+    }
+
     public void loadModules() {
-        if (Objects.requireNonNull(this.modulesDir.listFiles()).length == 0) {
+        if (this.getSize() == 0) {
             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cNo modules to §eload§c!");
         } else {
             try {
-                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§9There are §b" + Objects.requireNonNull(this.modulesDir.listFiles()).length + " §9Modules to load!");
+                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§9There are §b" + this.getSize() + " §9Modules to load!");
                 for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
                     if (file.getName().endsWith(".jar")) {
                         HytoraClassLoader classLoader = new HytoraClassLoader(file);

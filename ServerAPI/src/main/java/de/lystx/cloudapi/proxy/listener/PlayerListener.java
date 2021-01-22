@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.events.CloudLoginFailEvent;
 import de.lystx.cloudapi.proxy.events.GlobalChatEvent;
 import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
@@ -34,8 +35,14 @@ public class PlayerListener implements Listener {
     public void onLogin(LoginEvent event) {
         try {
             if (this.cloudAPI.getNetwork().getServices().isEmpty() || !this.cloudAPI.isJoinable()) {
+                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.NO_SERVICES);
+                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
                 event.setCancelled(true);
-                event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getNetworkStillBootingMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                if (failEvent.isCancelled()) {
+                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+                } else {
+                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getNetworkStillBootingMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                }
                 return;
             }
             String name = this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId());
@@ -43,12 +50,25 @@ public class PlayerListener implements Listener {
                 return;
             }
             if (this.cloudAPI.getCloudPlayers().get(name) != null) {
+                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
+                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
                 event.setCancelled(true);
-                event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                if (failEvent.isCancelled()) {
+                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+                } else {
+                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                }
             }
             if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance() && !this.cloudAPI.getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(name)) {
+
+                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.MAINTENANCE);
+                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
                 event.setCancelled(true);
-                event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                if (failEvent.isCancelled()) {
+                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+                } else {
+                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                }
             }
 
         } catch (Exception ignored) {}
