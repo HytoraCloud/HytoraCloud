@@ -21,6 +21,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.plugin.IllegalPluginAccessException;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,81 +53,83 @@ public class SignUpdater  {
     }
 
     public void run() {
-
         long repeat = plugin.getSignLayOut().getRepeatTick();
         animationScheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(CloudServer.getInstance(), () -> {
-            freeSignMap.clear();
-            servicesCloudSign.clear();
+            try {
 
-            List<Service> serverMetas = new ArrayList<>();
+                freeSignMap.clear();
+                servicesCloudSign.clear();
 
-            for (ServiceGroup globalServerGroup : cloudAPI.getNetwork().getServiceGroups()) {
-                String groupName = globalServerGroup.getName();
+                List<Service> serverMetas = new ArrayList<>();
 
-                serverMetas.clear();
-                for (Service service : this.cloudAPI.getNetwork().getServices()) {
-                    if (service.getServiceGroup().getName().equalsIgnoreCase(groupName) && !service.getServiceState().equals(ServiceState.INGAME) && !service.getServiceState().equals(ServiceState.OFFLINE)) {
-                        serverMetas.add(service);
+                for (ServiceGroup globalServerGroup : cloudAPI.getNetwork().getServiceGroups()) {
+                    String groupName = globalServerGroup.getName();
+
+                    serverMetas.clear();
+                    for (Service service : this.cloudAPI.getNetwork().getServices()) {
+                        if (service.getServiceGroup().getName().equalsIgnoreCase(groupName) && !service.getServiceState().equals(ServiceState.INGAME) && !service.getServiceState().equals(ServiceState.OFFLINE)) {
+                            serverMetas.add(service);
+                        }
                     }
+                    if (serverMetas.isEmpty()) {
+                        return;
+                    }
+
+                    serverMetas.forEach(current -> {
+                        if (current.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+                            return;
+                        }
+                        int serverId = current.getServiceID();
+                        SignGroup signGroup = this.createSignGroup(groupName);
+                        if (signGroup == null) {
+                            this.cloudAPI.messageCloud(CloudAPI.getInstance().getService().getName(), "SignSystem didnt find any signs!", false);
+                            return;
+                        }
+                        HashMap<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
+
+                        CloudSign cloudSign = signs.get(serverId);
+                        servicesCloudSign.put(cloudSign, current);
+
+                        if (this.freeSignMap.containsKey(groupName)) {
+                            Map<Integer, CloudSign> onlineSigns = this.freeSignMap.get(groupName);
+                            onlineSigns.put(serverId, cloudSign);
+                            this.freeSignMap.replace(groupName, onlineSigns);
+                        } else {
+                            Map<Integer, CloudSign> onlineSins = new HashMap<>();
+                            onlineSins.put(serverId, cloudSign);
+                            this.freeSignMap.put(groupName, onlineSins);
+                        }
+
+                        this.setOfflineSigns(groupName, current);
+                        if (cloudSign != null) {
+                            Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
+
+                            if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
+                                return;
+                            }
+                            try {
+                                serverPinger.pingServer(current.getHost(), current.getPort(), 2500);
+                            } catch (IOException exception) {
+                                Bukkit.getLogger().log(Level.SEVERE,"Something is wrong when pinging Server", exception);
+                            }
+                            Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
+                            if (!blockAt.getType().equals(Material.WALL_SIGN)) {
+                                return;
+                            }
+                            Sign sign = (Sign) blockAt.getState();
+                            this.signUpdate(sign, current, serverPinger);
+                            sign.update();
+                        }
+                    });
                 }
-                if (serverMetas.isEmpty()) {
+
+                if(animationsTick >= CloudServer.getInstance().getSignManager().getSignLayOut().getAnimationTick()) {
+                    animationsTick = 0;
                     return;
                 }
 
-                serverMetas.forEach(current -> {
-                    if (current.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
-                        return;
-                    }
-                    int serverId = current.getServiceID();
-                    SignGroup signGroup = this.createSignGroup(groupName);
-                    if (signGroup == null) {
-                        this.cloudAPI.messageCloud(CloudAPI.getInstance().getService().getName(), "SignSystem didnt find any signs!", false);
-                        return;
-                    }
-                    HashMap<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
-
-                    CloudSign cloudSign = signs.get(serverId);
-                    servicesCloudSign.put(cloudSign, current);
-
-                    if (this.freeSignMap.containsKey(groupName)) {
-                        Map<Integer, CloudSign> onlineSigns = this.freeSignMap.get(groupName);
-                        onlineSigns.put(serverId, cloudSign);
-                        this.freeSignMap.replace(groupName, onlineSigns);
-                    } else {
-                        Map<Integer, CloudSign> onlineSins = new HashMap<>();
-                        onlineSins.put(serverId, cloudSign);
-                        this.freeSignMap.put(groupName, onlineSins);
-                    }
-
-                    this.setOfflineSigns(groupName, current);
-                    if (cloudSign != null) {
-                        Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
-
-                        if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
-                            return;
-                        }
-                        try {
-                            serverPinger.pingServer(current.getHost(), current.getPort(), 2500);
-                        } catch (IOException exception) {
-                            Bukkit.getLogger().log(Level.SEVERE,"Something is wrong when pinging Server", exception);
-                        }
-                        Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
-                        if (!blockAt.getType().equals(Material.WALL_SIGN)) {
-                            return;
-                        }
-                        Sign sign = (Sign) blockAt.getState();
-                        this.signUpdate(sign, current, serverPinger);
-                        sign.update();
-                    }
-                });
-            }
-
-            if(animationsTick >= CloudServer.getInstance().getSignManager().getSignLayOut().getAnimationTick()) {
-                animationsTick = 0;
-                return;
-            }
-
-            this.animationsTick++;
+                this.animationsTick++;
+            } catch (IllegalPluginAccessException e) {}
         }, 0, repeat);
     }
 

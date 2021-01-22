@@ -11,6 +11,8 @@ public interface NetworkHandler {
 
     void onServerStart(Service service);
 
+    void onServerQueue(Service service);
+
     void onServerStop(Service service);
 
     void onServerUpdate(Service service);

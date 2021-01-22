@@ -60,27 +60,27 @@ public class CloudAPI {
         this.joinable = false;
 
         this.cloudClient.registerPacketHandler(new PacketHandlerConfig(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerServices(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerCloudPlayers(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerPermissionPool(this));
+        this.cloudClient.registerPacketHandler(new PacketHandlerCommand(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerNetwork(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerStatistics(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerCommunication(this));
 
         this.cloudClient.connect();
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
     }
 
+    public void disconnect() {
+        this.cloudClient.disconnect();
+    }
 
     public void shutdown() {
         this.cloudClient.sendPacket(new PacketPlayInStopServer(this.getService()));
-        this.cloudClient.disconnect();
+        this.disconnect();
     }
 
     public void sendCommand(String command) {
         this.cloudClient.sendPacket(new PacketPlayInCommand(command));
     }
-
 
     public void sendPacket(Packet packet) {
         this.cloudClient.sendPacket(packet);

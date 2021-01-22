@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceStateChange;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceUpdate;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutRegisterServer;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStartedServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStopServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutUpdateServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -21,10 +22,17 @@ public class PacketHandlerNetwork extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayOutRegisterServer) {
+        if (packet instanceof PacketPlayOutStartedServer) {
+            Service service = ((PacketPlayOutStartedServer) packet).getService();
+            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
+                networkHandler.onServerQueue(service);
+                networkHandler.onServerUpdate(service);
+            }
+        } else if (packet instanceof PacketPlayOutRegisterServer) {
             Service service = ((PacketPlayOutRegisterServer) packet).getService();
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onServerStart(service);
+                networkHandler.onServerUpdate(service);
             }
         } else if (packet instanceof PacketPlayOutStopServer) {
             Service service = ((PacketPlayOutStopServer) packet).getService();
@@ -34,6 +42,10 @@ public class PacketHandlerNetwork extends PacketHandlerAdapter {
         } else if (packet instanceof PacketPlayOutUpdateServiceGroup) {
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onGroupUpdate(((PacketPlayOutUpdateServiceGroup) packet).getServiceGroup());
+                for (Service service : cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(((PacketPlayOutUpdateServiceGroup) packet).getServiceGroup().getName()))) {
+                    networkHandler.onServerUpdate(service);
+                    networkHandler.onServerUpdate(service);
+                }
             }
         } else if ( packet instanceof PacketPlayInServiceStateChange) {
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {

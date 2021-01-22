@@ -9,7 +9,6 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudapi.proxy.command.CloudCommand;
-import de.lystx.cloudapi.proxy.command.HubCommand;
 import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;
 import lombok.Getter;
@@ -60,11 +59,13 @@ public class CloudProxy extends Plugin {
 
 
         this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> this.cloudAPI.shutdown()));
     }
 
     @Override
     public void onDisable() {
+        if (this.cloudAPI.getCloudClient().isConnected()) {
+            this.cloudAPI.disconnect();
+        }
     }
 
 
@@ -75,7 +76,7 @@ public class CloudProxy extends Plugin {
         return -1;
     }
 
-    public boolean updatePermissions(ProxiedPlayer player) {
+    public void updatePermissions(ProxiedPlayer player) {
         try {
             CloudPlayerData data = this.cloudAPI.getPermissionPool().getPlayerDataOrDefault(player.getName());
             if (data.isDefault() || !this.cloudAPI.getPermissionPool().isRankValid(player.getName())) {
@@ -91,7 +92,7 @@ public class CloudProxy extends Plugin {
             PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
             if (group == null) {
                 this.cloudAPI.messageCloud("ProxyCloudAPI", "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
-                return false;
+                return;
             }
             for (String permission : group.getPermissions()) {
                 player.setPermission(permission, true);
@@ -109,8 +110,6 @@ public class CloudProxy extends Plugin {
         } catch (Exception e) {
             this.cloudAPI.messageCloud("ProxyCloudAPI", "§cCouldnt update permissions of §e" + player.getName() + "§c!");
             this.cloudAPI.messageCloud("ProxyCloudAPI", "§cException: §e" + e.getMessage());
-            return false;
         }
-        return true;
     }
 }

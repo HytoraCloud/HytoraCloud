@@ -34,8 +34,16 @@ public class CloudClient implements CloudExecutor {
         return adapterHandler;
     }
 
+    public ConnectionClient getConnectionClient() {
+        return connectionClient;
+    }
+
     public void connect() {
         this.connectionClient = new ConnectionClient(this.adapterHandler, this.networkChannel, this.host, this.port, 5000);
+    }
+
+    public boolean isConnected() {
+        return (this.connectionClient != null);
     }
 
     public void disconnect() {

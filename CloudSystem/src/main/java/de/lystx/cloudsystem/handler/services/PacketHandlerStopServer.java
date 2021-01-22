@@ -5,14 +5,12 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStop
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class PacketHandlerStopServer extends PacketHandlerAdapter {
 
+@AllArgsConstructor @Getter
+public class PacketHandlerStopServer extends PacketHandlerAdapter {
 
     private final CloudSystem cloudSystem;
 

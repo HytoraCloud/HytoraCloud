@@ -40,9 +40,7 @@ public class CloudServer extends JavaPlugin {
         this.nametagManager = new NametagManager();
         this.npcManager = new NPCManager();
 
-        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
 
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitCommand(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitServerUpdate(this.cloudAPI));
@@ -54,15 +52,23 @@ public class CloudServer extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         this.getServer().getPluginManager().registerEvents(new NPCListener(), this);
         this.getCommand("service").setExecutor(new ServiceCommand());
+        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
 
         this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> this.cloudAPI.shutdown()));
     }
 
     @Override
     public void onDisable() {
+        if (this.cloudAPI.getCloudClient().isConnected()) {
+            this.cloudAPI.disconnect();
+        }
         int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
         Bukkit.getScheduler().cancelTask(animationScheduler);
+    }
+
+    public void executeCommand(String command) {
+        Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+        //cloudAPI.getScheduler().runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
     }
 
     public void updatePermissions(Player player) {

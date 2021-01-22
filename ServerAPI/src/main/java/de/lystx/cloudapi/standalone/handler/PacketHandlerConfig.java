@@ -21,7 +21,6 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-
         if (packet instanceof PacketPlayOutGlobalInfo) {
             this.cloudAPI.setJoinable(true);
             PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo)packet;

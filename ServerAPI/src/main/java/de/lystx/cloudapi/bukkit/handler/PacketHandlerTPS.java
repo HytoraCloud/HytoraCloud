@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
+import org.bukkit.Bukkit;
 
 import java.text.DecimalFormat;
 
@@ -20,7 +21,7 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutTPS) {
             if (((PacketPlayOutTPS) packet).getTps() == null && ((PacketPlayOutTPS) packet).getService().getName().equalsIgnoreCase(cloudAPI.getService().getName())) {
-                String tps = "";
+                String tps;
                 double[] arrayOfDouble = (MinecraftServer.getServer()).recentTps;
                 DecimalFormat decimalFormat = new DecimalFormat("##.#");
                 int i = arrayOfDouble.length;

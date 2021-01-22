@@ -19,6 +19,11 @@ public class CloudListener implements NetworkHandler {
     }
 
     @Override
+    public void onServerQueue(Service service) {
+        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+    }
+
+    @Override
     public void onServerStop(Service service) {
         CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
     }

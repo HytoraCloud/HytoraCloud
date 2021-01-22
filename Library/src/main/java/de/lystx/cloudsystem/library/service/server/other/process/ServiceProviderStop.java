@@ -29,7 +29,9 @@ public class ServiceProviderStop {
             return false;
         }
         screen.getProcess().destroy();
-        screen.getThread().stop();
+        if (screen.getThread().isAlive()) {
+            screen.getThread().stop();
+        }
 
         if (service.getServiceGroup().isDynamic()) {
             try {

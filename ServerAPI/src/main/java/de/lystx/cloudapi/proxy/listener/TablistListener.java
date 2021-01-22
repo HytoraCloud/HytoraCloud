@@ -35,6 +35,11 @@ public class TablistListener implements Listener {
             }
 
             @Override
+            public void onServerQueue(Service service) {
+
+            }
+
+            @Override
             public void onServerStop(Service service) {
 
             }

@@ -8,12 +8,9 @@ import java.io.Serializable;
 @Getter
 public class PacketPlayOutExecuteCommand extends Packet implements Serializable {
 
-    private final String service;
-    private final String execution;
-
     public PacketPlayOutExecuteCommand(String service, String execution) {
-        super();
-        this.service = service;
-        this.execution = execution;
+        this.append("key", "executeCommand");
+        this.append("service", service);
+        this.append("command", execution);
     }
 }
