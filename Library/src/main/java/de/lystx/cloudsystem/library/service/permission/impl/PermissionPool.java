@@ -125,6 +125,14 @@ public class PermissionPool implements Serializable {
         }
         return null;
     }
+    public CloudPlayerData getPlayerData(UUID uuid) {
+        for (CloudPlayerData cloudPlayerData : this.playerCache) {
+            if (cloudPlayerData.getUuid().equals(uuid)) {
+                return cloudPlayerData;
+            }
+        }
+        return null;
+    }
 
     public CloudPlayerData getPlayerDataOrDefault(String playerName) {
         CloudPlayerData pre = this.getPlayerData(playerName);
@@ -135,6 +143,37 @@ public class PermissionPool implements Serializable {
         } else {
             return pre;
         }
+    }
+    
+    public boolean hasPermission(String playerName, String permission) {
+        boolean is = false;
+        CloudPlayerData data = this.getPlayerData(playerName);
+        if (data != null) {
+            if (data.getPermissions().contains(permission)) {
+                is = true;
+            }
+            PermissionGroup permissionGroup = this.getPermissionGroupFromName(data.getPermissionGroup());
+            if (permissionGroup != null) {
+                for (String p : permissionGroup.getPermissions()) {
+                    if (p.equalsIgnoreCase(permission)) {
+                        is = true;
+                        break;
+                    }
+                }
+                for (String i : permissionGroup.getInheritances()) {
+                    PermissionGroup inheritance = this.getPermissionGroupFromName(i);
+                    if (inheritance != null) {
+                        for (String p : inheritance.getPermissions()) {
+                            if (p.equalsIgnoreCase(permission)) {
+                                is = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return is;
     }
 
     public PermissionGroup getPermissionGroupFromName(String name) {

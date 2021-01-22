@@ -33,6 +33,7 @@ public class CloudBootingSetupNotDone {
         cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§cLet's fix cloudSystem quite quick...");
         cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§cKnown bugs:");
         cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cConsole prefix shown up twice (Only in Setup)");
+        cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cSetup crashes if trying to use history (arrow keys)");
         cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
         cloudSystem.getConsole().getLogger().sendMessage();
         cloudSystem.getConsole().getLogger().sendMessage();

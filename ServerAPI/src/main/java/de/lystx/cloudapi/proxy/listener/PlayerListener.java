@@ -9,8 +9,10 @@ import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloud
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudapi.proxy.CloudProxy;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -59,7 +61,8 @@ public class PlayerListener implements Listener {
                     event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
                 }
             }
-            if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance() && !this.cloudAPI.getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(name)) {
+            boolean is = this.cloudAPI.getPermissionPool().hasPermission(name, "cloudsystem.network.maintenance");
+            if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance() && !this.cloudAPI.getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(name) && !is) {
 
                 CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.MAINTENANCE);
                 ProxyServer.getInstance().getPluginManager().callEvent(failEvent);

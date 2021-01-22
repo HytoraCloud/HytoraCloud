@@ -43,7 +43,7 @@ public class PacketHandlerCloudTPS extends PacketHandlerAdapter {
 
             player.sendMessage(cloudSystem.getService(CloudNetworkService.class).getCloudServer(),
                     cloudSystem.getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix().replace("&", "§") +
-                    "§bTPS is§8: §b" + tps);
+                    "§6TPS§8: §b" + tps);
         }
     }
 }
