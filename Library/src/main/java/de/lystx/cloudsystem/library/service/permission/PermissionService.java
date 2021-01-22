@@ -31,7 +31,7 @@ public class PermissionService extends CloudService {
         this.loadEntries();
     }
 
-    public PermissionPool loadEntries() {
+    public void loadEntries() {
         File dir = getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory();
         for (File listFile : Objects.requireNonNull(dir.listFiles())) {
             Document document = Document.fromFile(listFile);
@@ -45,7 +45,6 @@ public class PermissionService extends CloudService {
             }
             this.permissionPool.getPlayerCache().add(playerData);
         }
-        return this.permissionPool;
     }
 
     public void load() {
@@ -67,7 +66,14 @@ public class PermissionService extends CloudService {
                         "cloudsystem.command",
                         "cloudsystem.perms.command",
                         "cloudsystem.command.service",
-                        "cloudsystem.notify"
+                        "cloudsystem.notify",
+                        "bungeecord.command.alert",
+                        "bungeecord.command.end",
+                        "bungeecord.command.ip",
+                        "bungeecord.command.reload",
+                        "bungeecord.command.send",
+                        "bungeecord.command.server",
+                        "bungeecord.command.list"
                     ),
                     Collections.singletonList("Player")
             );

@@ -6,10 +6,13 @@ import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHan
 import de.lystx.cloudsystem.library.service.network.connection.channel.base.NetworkChannel;
 import de.lystx.cloudsystem.library.service.network.connection.client.connection.ConnectionClient;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedList;
 import java.util.List;
 
+@Setter @Getter
 public class CloudClient implements CloudExecutor {
 
 
@@ -18,8 +21,8 @@ public class CloudClient implements CloudExecutor {
     private final List<NetworkHandler> networkHandlers;
     private ConnectionClient connectionClient;
 
-    private final String host;
-    private final Integer port;
+    private String host;
+    private Integer port;
 
     public CloudClient(String host, Integer port, NetworkChannel networkChannel, AdapterHandler adapterHandler) {
         this.networkChannel = networkChannel;

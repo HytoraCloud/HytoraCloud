@@ -56,7 +56,7 @@ public class CloudNetwork {
     }
 
     public void startService(String name, String serviceGroup, Document properties) {
-        Service service = new Service(name, UUID.randomUUID(), this.getServiceGroup(serviceGroup), -1, -1, ServiceState.LOBBY);
+        Service service = new Service(name, UUID.randomUUID(), this.getServiceGroup(serviceGroup), -1, -1, -1, ServiceState.LOBBY);
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartService(service, properties.toString()));
     }
 

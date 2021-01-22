@@ -32,7 +32,7 @@ public class ServiceProviderStart {
 
 
 
-    public void autoStartService(Service service, Document propertiess, Action action) {
+    public void autoStartService(Service service, Document propertiess) {
         try {
             File templateLocation = new File(cloudLibrary.getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
             File serverLocation = new File(service.getServiceGroup().isDynamic() ? cloudLibrary.getService(FileService.class).getDynamicServerDirectory() : cloudLibrary.getService(FileService.class).getStaticServerDirectory(), service.getServiceGroup().getName() + "/" + service.getName() + "/");

@@ -6,13 +6,15 @@ import de.lystx.cloudsystem.library.service.network.connection.channel.base.Netw
 import de.lystx.cloudsystem.library.service.network.connection.client.connection.ConnectionServer;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketHandler;
+import lombok.Setter;
 
 import java.io.IOException;
 
+@Setter
 public class CloudServer implements CloudExecutor {
 
-    private final String host;
-    private final Integer port;
+    private String host;
+    private Integer port;
 
     private ConnectionServer server;
     private final NetworkChannel networkChannel;

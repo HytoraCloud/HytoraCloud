@@ -1,14 +1,13 @@
 package de.lystx.cloudsystem;
 
-import de.lystx.cloudsystem.booting.impl.CloudBootingSetupDone;
-import de.lystx.cloudsystem.booting.impl.CloudBootingSetupNotDone;
+import de.lystx.cloudsystem.booting.CloudBootingSetupDone;
+import de.lystx.cloudsystem.booting.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -27,6 +26,7 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
+import de.lystx.cloudsystem.other.TicksPerSecond;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
@@ -43,13 +43,15 @@ public class CloudSystem extends CloudLibrary {
 
     private final String version;
     private final CloudScreenPrinter screenPrinter;
+    private final TicksPerSecond ticksPerSecond;
     public ServerService service;
 
     public CloudSystem() {
         super();
-        Logger.getLogger("LOGGER-CLASS").setLevel(Level.OFF);
         instance = this;
         this.version = "1.0";
+
+        this.ticksPerSecond = new TicksPerSecond(this);
         this.cloudServices.add(new CommandService(this, "Command", CloudService.Type.MANAGING));
         this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.Type.UTIL));
         this.console = new CloudConsole(this.getService(LoggerService.class), this.getService(CommandService.class), System.getProperty("user.name"));
@@ -96,6 +98,7 @@ public class CloudSystem extends CloudLibrary {
 
     public void reload() {
         try {
+            this.getService(PermissionService.class).loadEntries();
             this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
                     this.getService().getServices(),

@@ -106,7 +106,7 @@ public class ServerService extends CloudService {
     public void updateService(Service service, ServiceState state) {
         List<Service> services = this.getServices(service.getServiceGroup());
         services.remove(service);
-        Service newService = new Service(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), state);
+        Service newService = new Service(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), state);
         services.add(newService);
         this.services.put(service.getServiceGroup(), services);
     }
@@ -120,14 +120,14 @@ public class ServerService extends CloudService {
                         id++;
                     }
                     int port = this.portService.getFreePort();
-                    cloudServers.add(new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, ServiceState.LOBBY));
+                    cloudServers.add(new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY));
                 } else {
                     int id = this.idService.getFreeID(serviceGroup.getName());
                     if (id == 0) {
                         id++;
                     }
                     int port = this.portService.getFreeProxyPort();
-                    cloudProxies.add(new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, ServiceState.LOBBY));
+                    cloudProxies.add(new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY));
                 }
             }
         }
@@ -186,7 +186,7 @@ public class ServerService extends CloudService {
                 for (int i = this.getServices(serviceGroup).size(); i < serviceGroup.getMinServer(); i++) {
                     int id = idService.getFreeID(serviceGroup.getName());
                     int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-                    Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, ServiceState.LOBBY);
+                    Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY);
                     this.startService(serviceGroup, service);
                 }
             }
@@ -201,18 +201,19 @@ public class ServerService extends CloudService {
         if (service.getPort() <= 0) {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
             int id = this.idService.getFreeID(serviceGroup.getName());
-            service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, service.getServiceState());
+            service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), service.getServiceState());
         }
         service.setProperties((properties == null ? new Document() : properties).toString());
-        Action action = new Action();
-        this.actions.put(service.getName(), action);
         this.globalServices.add(service);
         List<Service> services = this.getServices(serviceGroup);
         services.add(service);
-
         this.services.put(serviceGroup, services);
-        this.providerStart.autoStartService(service, properties, action);
+        this.providerStart.autoStartService(service, properties);
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStartedServer(service));
+        Service finalService = service;
+        this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
+            this.actions.put(finalService.getName(), new Action());
+        }, 60L);
 
     }
     public void startService(ServiceGroup serviceGroup, Service service) {
@@ -226,7 +227,7 @@ public class ServerService extends CloudService {
     public void startService(ServiceGroup serviceGroup, Document properties) {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-        Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, ServiceState.LOBBY);
+        Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY);
         this.startService(serviceGroup, service, properties);
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutRegisterServer(service));
     }

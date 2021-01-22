@@ -43,22 +43,22 @@ public class ModuleLoader {
 
     public void loadModules() {
         if (this.getSize() == 0) {
-            this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cNo modules to §eload§c!");
+            this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cNo modules to §eload§c!");
         } else {
             try {
-                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§9There are §b" + this.getSize() + " §9Modules to load!");
+                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§9There are §b" + this.getSize() + " §9Modules to load!");
                 for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
                     if (file.getName().endsWith(".jar")) {
                         HytoraClassLoader classLoader = new HytoraClassLoader(file);
                         Document document = new Document(classLoader.loadJson("config.json"));
                         if (document.isEmpty()) {
-                            this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
+                            this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
                             return;
                         }
                         if (document.has("main") && document.has("author") && document.has("version") && document.has("name")) {
                             Class<?> cl = classLoader.findClass(document.getString("main"));
                             if (cl == null) {
-                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cThe provided MainClass of the Module §e" + file.getName() + " §ccouldn't be found!");
+                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §ccouldn't be found!");
                                 return;
                             }
                             if (cl.getSuperclass().getName().equalsIgnoreCase(Module.class.getName())) {
@@ -79,12 +79,12 @@ public class ModuleLoader {
                                 mod.onLoadConfig(cloudLibrary);
                                 moduleService.getModules().add(mod);
                                 ModuleInfo info = mod.getInfo();
-                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§7The Module §b" + info.getName() + " §7by §b" + info.getAuthor() + " §7Version§8: §b" + info.getVersion() + " §7was loaded§8!");
+                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§7The Module §b" + info.getName() + " §7by §b" + info.getAuthor() + " §7Version§8: §b" + info.getVersion() + " §7was loaded§8!");
                             } else {
-                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cThe provided MainClass of the Module §e" + file.getName() + " §cdoesn't extends the Module.class!");
+                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §cdoesn't extends the Module.class!");
                             }
                         } else {
-                            this.cloudLibrary.getConsole().getLogger().sendMessage("MODULE", "§cA Module doesn't have all needed attributes in the §econfig.json§c!");
+                            this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cA Module doesn't have all needed attributes in the §econfig.json§c!");
                         }
                     }
                 }

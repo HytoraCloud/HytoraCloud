@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.command;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInCopyTemplate;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
@@ -37,6 +38,8 @@ public class CloudCommand extends Command {
                     if (args[0].equalsIgnoreCase("rl") || args[0].equalsIgnoreCase("reload")) {
                         CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInReload());
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");
+                    } else if (args[0].equalsIgnoreCase("tps")) {
+                        CloudAPI.getInstance().sendPacket(new PacketPlayInTPS(player.getName()));
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());
                         if (playerData == null) {
@@ -240,7 +243,8 @@ public class CloudCommand extends Command {
         player.sendMessage("  §8» §b/cloud stop <server> §8┃ §7Stops a specific server or proxy");
         player.sendMessage("  §8» §b/cloud log <server> §8┃ §7Logs a servers output");
         player.sendMessage("  §8» §b/cloud toggle §8┃ §7Toggles Server notifications");
-        player.sendMessage("  §8» §b/cloud tps <group> §8┃ §7Shows tps of all servers of group (might lag)");
+        player.sendMessage("  §8» §b/cloud tps <group> §8┃ §7Shows tps of all servers of group ");
+        player.sendMessage("  §8» §b/cloud tps §8┃ §7Shows tps of cloudsystem");
         player.sendMessage("§8§m--------------------------------------");
     }
 }
