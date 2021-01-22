@@ -26,7 +26,6 @@ public class ServiceProviderStop {
         String serverName = service.getName();
         CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getScreenByName(serverName);
         if (screen == null || screen.getServerDir() == null) {
-            cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cCouldnt stop Server §e" + serverName + " §cbecause no Screen was provided");
             return false;
         }
         screen.getProcess().destroy();

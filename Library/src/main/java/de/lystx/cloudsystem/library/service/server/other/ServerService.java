@@ -9,7 +9,10 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.manager.IDService;
@@ -235,15 +238,12 @@ public class ServerService extends CloudService {
 
     public void stopService(Service service, boolean newServices) {
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStopServer(service));
-        this
-                .idService
-                .removeID(
-                        service
-                                .getServiceGroup()
-                                .getName(),
-                        service
-                                .getServiceID()
-                );
+        for (CloudPlayer onlinePlayer : this.getCloudLibrary().getService(CloudPlayerService.class).getOnlinePlayers()) {
+            if (onlinePlayer.getServer().equalsIgnoreCase(service.getName())) {
+                onlinePlayer.kick(this.getCloudLibrary().getService(CloudNetworkService.class).getCloudServer(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix()));
+            }
+        }
+        this.idService.removeID(service.getServiceGroup().getName(), service.getServiceID());
         this.portService.removeProxyPort(service.getPort());
         this.portService.removePort(service.getPort());
         this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {

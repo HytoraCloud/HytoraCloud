@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.bukkit.events.CloudServerPacketReceiveEvent;
 import de.lystx.cloudapi.bukkit.events.CloudServerSubChannelMessageEvent;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
@@ -20,6 +21,7 @@ public class PacketHandlerBukkitSubChannel extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
+        Bukkit.getPluginManager().callEvent(new CloudServerPacketReceiveEvent(packet));
         if (packet instanceof PacketCommunicationSubMessage) {
             PacketCommunicationSubMessage subMessage = (PacketCommunicationSubMessage)packet;
             if (!subMessage.getType().equals(ServiceType.SPIGOT)) {

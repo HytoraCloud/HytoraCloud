@@ -2,6 +2,7 @@ package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.HubCommand;
+import de.lystx.cloudapi.proxy.events.ProxyPacketReceiveEvent;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutServices;
@@ -29,6 +30,7 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
+        ProxyServer.getInstance().getPluginManager().callEvent(new ProxyPacketReceiveEvent(packet));
         if (packet instanceof PacketPlayOutGlobalInfo) {
             PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo)packet;
             CloudProxy.getInstance().getNetworkManager().switchMaintenance(info.getNetworkConfig().getProxyConfig().isMaintenance());

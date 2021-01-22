@@ -79,6 +79,18 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (event.getMessage().startsWith("/stop") || event.getMessage().startsWith("/bukkit:stop")) {
+            if (!event.getPlayer().hasPermission("bukkit.command.stop")) {
+                event.getPlayer().sendMessage(CloudAPI.getInstance().getPrefix() +  "§cYou aren't allowed to perform this command!");
+                return;
+            }
+            event.setCancelled(true);
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> onlinePlayer.kickPlayer(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", CloudAPI.getInstance().getPrefix())));
+            }
+            CloudAPI.getInstance().getNetwork().stopService(CloudAPI.getInstance().getService());
+            CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 5L);
+        }
         CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 

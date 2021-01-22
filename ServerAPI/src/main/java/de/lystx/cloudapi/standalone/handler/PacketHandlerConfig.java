@@ -7,8 +7,6 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import lombok.Getter;
 import java.util.List;
 
@@ -27,6 +25,7 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
         if (packet instanceof PacketPlayOutGlobalInfo) {
             this.cloudAPI.setJoinable(true);
             PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo)packet;
+            this.cloudAPI.getCloudPlayers().getAll().clear();
             this.cloudAPI.setNetworkConfig(info.getNetworkConfig());
             this.cloudAPI.setPermissionPool(info.getPermissionPool());
             this.cloudAPI.getNetwork().setServices(info.getServices());
