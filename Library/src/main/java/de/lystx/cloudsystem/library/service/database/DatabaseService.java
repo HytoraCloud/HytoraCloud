@@ -26,7 +26,7 @@ public class DatabaseService extends CloudService {
 
     public DatabaseService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
-
+        this.database = new Files(this);
         this.document = new Document(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "database.json"));
         this.reload(document);
     }

@@ -27,8 +27,6 @@ public class MongoDB implements CloudDatabase {
     private MongoClient mongoClient;
 
     public MongoDB(DatabaseService databaseService) {
-        System.setProperty("DEBUG.MONGO", "false");
-        System.setProperty("DB.TRACE", "false");
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
         rootLogger.setLevel(Level.OFF);

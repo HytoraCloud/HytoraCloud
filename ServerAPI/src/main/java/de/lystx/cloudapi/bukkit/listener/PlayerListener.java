@@ -103,6 +103,17 @@ public class PlayerListener implements Listener {
         int onlinePlayers = Bukkit.getOnlinePlayers().size();
         int onlinepercent = ((onlinePlayers / Bukkit.getMaxPlayers()) * 100);
 
+        if (CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
+            if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
+                CloudServer.getInstance().getLabyMod().disableVoiceChat(player);
+            }
+            Service s = CloudAPI.getInstance().getService();
+            CloudServer.getInstance().getLabyMod().sendCurrentPlayingGamemode(player, true, CloudAPI.getInstance().getNetworkConfig().getLabyModConfig()
+                    .getServerSwitchMessage().replace("&", "§").replace("%service%", s.getName())
+                    .replace("%group%", s.getServiceGroup().getName())
+                    .replace("%online_players%", Bukkit.getOnlinePlayers().size() + " ")
+                    .replace("%max_players%", Bukkit.getMaxPlayers() + " "));
+        }
         if (onlinepercent >= onlinePlayers) {
             CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup());
         }

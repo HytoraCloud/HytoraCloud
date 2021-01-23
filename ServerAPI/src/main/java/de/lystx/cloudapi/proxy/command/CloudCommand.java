@@ -40,6 +40,11 @@ public class CloudCommand extends Command {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");
                     } else if (args[0].equalsIgnoreCase("tps")) {
                         CloudAPI.getInstance().sendPacket(new PacketPlayInTPS(player.getName()));
+                    } else if (args[0].equalsIgnoreCase("stats")) {
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§bStatistics§8:");
+                        CloudAPI.getInstance().getStatistics().getStats().forEach((stats, i) -> {
+                            player.sendMessage(" §8» §b" + stats + " §8┃ §7" + i);
+                        });
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());
                         if (playerData == null) {
@@ -245,6 +250,7 @@ public class CloudCommand extends Command {
         player.sendMessage("  §8» §b/cloud toggle §8┃ §7Toggles Server notifications");
         player.sendMessage("  §8» §b/cloud tps <group> §8┃ §7Shows tps of all servers of group ");
         player.sendMessage("  §8» §b/cloud tps §8┃ §7Shows tps of cloudsystem");
+        player.sendMessage("  §8» §b/cloud stats §8┃ §7Shows stats of cloudsystem");
         player.sendMessage("§8§m--------------------------------------");
     }
 }

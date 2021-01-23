@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.config.impl;
 
 import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.FallbackConfig;
+import de.lystx.cloudsystem.library.service.config.impl.labymod.LabyModConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.Motd;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
@@ -22,16 +23,18 @@ public class NetworkConfig implements Serializable {
     private boolean proxyProtocol;
 
     private ProxyConfig proxyConfig;
+    private LabyModConfig labyModConfig;
     private MessageConfig messageConfig;
     private FallbackConfig fallbackConfig;
 
-    public NetworkConfig(String host, Integer port, boolean setupDone, boolean fastStartup, boolean proxyProtocol, ProxyConfig proxyConfig, MessageConfig messageConfig, FallbackConfig fallbackConfig) {
+    public NetworkConfig(String host, Integer port, boolean setupDone, boolean fastStartup, boolean proxyProtocol, ProxyConfig proxyConfig, LabyModConfig labyModConfig, MessageConfig messageConfig, FallbackConfig fallbackConfig) {
         this.host = host;
         this.port = port;
         this.setupDone = setupDone;
         this.fastStartup = fastStartup;
         this.proxyProtocol = proxyProtocol;
         this.proxyConfig = proxyConfig;
+        this.labyModConfig = labyModConfig;
         this.messageConfig = messageConfig;
         this.fallbackConfig = fallbackConfig;
     }
@@ -69,6 +72,11 @@ public class NetworkConfig implements Serializable {
                                 "&8&m--------------------------------------------||&7||&7||&7                 &8» &bCloudSystem &8┃ &7made for &byou&8                 &8||    &8||&7                 &8➜ &bTwitter &8● &7@HytoraCloud         &8||&7                 &8➜ &bDiscord &8● &7discord.io/HytoraCloud    &8||&7                 &8➜ &bSpigotSupport &8● &71.8 &8- &71.16.1   &8||&8||&8||&8&m-------------------------------------------",
                                 "&8» &c&oMaintenance"
                         )
+                ),
+                new LabyModConfig(
+                        true,
+                        "§8» §7HytoraCloud §8× §b%service%",
+                        true
                 ),
                 new MessageConfig(
                         "§8» §bCloud §8┃ §7",

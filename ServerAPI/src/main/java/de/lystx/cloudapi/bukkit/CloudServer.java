@@ -6,6 +6,7 @@ import de.lystx.cloudapi.bukkit.handler.*;
 import de.lystx.cloudapi.bukkit.listener.CloudListener;
 import de.lystx.cloudapi.bukkit.listener.NPCListener;
 import de.lystx.cloudapi.bukkit.listener.PlayerListener;
+import de.lystx.cloudapi.bukkit.manager.labymod.LabyMod;
 import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
 import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
 import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
@@ -30,6 +31,7 @@ public class CloudServer extends JavaPlugin {
     private SignManager signManager;
     private NametagManager nametagManager;
     private NPCManager npcManager;
+    private LabyMod labyMod;
 
     @Override
     public void onEnable() {
@@ -39,7 +41,7 @@ public class CloudServer extends JavaPlugin {
         this.signManager = new SignManager(this);
         this.nametagManager = new NametagManager();
         this.npcManager = new NPCManager();
-
+        this.labyMod = new LabyMod(this.cloudAPI);
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
