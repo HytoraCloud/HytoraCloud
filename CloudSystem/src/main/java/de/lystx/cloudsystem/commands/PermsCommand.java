@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.command.Command;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
@@ -43,7 +44,7 @@ public class PermsCommand extends Command {
                             new LinkedList<>()
                     );
                     CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().getPermissionGroups().add(permissionGroup);
-                    CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
+                    CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                     CloudSystem.getInstance().getService(PermissionService.class).load();
                     CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                     CloudSystem.getInstance().reload();
@@ -97,7 +98,7 @@ public class PermsCommand extends Command {
                     try {
                         Integer i = Integer.parseInt(args[3]);
                         pool.updatePermissionGroup(player, group, i);
-                        pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
+                        pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                         cloudLibrary.getService(PermissionService.class).load();
                         CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                         CloudSystem.getInstance().reload();
@@ -107,7 +108,7 @@ public class PermsCommand extends Command {
                     }
                 } else {
                     pool.updatePermissionGroup(player, group, -1);
-                    pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory());
+                    pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                     cloudLibrary.getService(PermissionService.class).load();
                     CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                     CloudSystem.getInstance().reload();

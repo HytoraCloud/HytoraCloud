@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
+import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
@@ -63,6 +64,7 @@ public class CloudSystem extends CloudLibrary {
         this.cloudServices.add(new LogService(this, "Logging", CloudService.Type.UTIL));
         this.cloudServices.add(new StatisticsService(this, "Stats", CloudService.Type.UTIL));
 
+        this.cloudServices.add(new DatabaseService(this, "Database", CloudService.Type.MANAGING));
         this.cloudServices.add(new CloudPlayerService(this, "CloudPlayerService", CloudService.Type.MANAGING));
         this.cloudServices.add(new GroupService(this, "Groups", CloudService.Type.MANAGING));
         this.cloudServices.add(new TemplateService(this, "Templates", CloudService.Type.MANAGING));
@@ -118,13 +120,14 @@ public class CloudSystem extends CloudLibrary {
         this.setRunning(false);
         this.getConsole().interrupt();
         this.getService().stopServices();
+        //this.getService(DatabaseService.class).getDatabase().disconnect();
         this.getService(StatisticsService.class).save();
         this.getService(LogService.class).save();
-        this.getService(PermissionService.class).save();
         this.getService(SignService.class).save();
         this.getService(NPCService.class).save();
         this.getService(ConfigService.class).save();
         this.getService(ModuleService.class).shutdown();
+        this.getService(PermissionService.class).save();
         this.getService(Scheduler.class).scheduleDelayedTask(() -> {
             try {
                 FileUtils.deleteDirectory(this.getService(FileService.class).getDynamicServerDirectory());

@@ -120,8 +120,6 @@ public class CloudNetwork {
 
     public void sendTPS(ServiceGroup group, CloudPlayer cloudPlayer) {
         cloudPlayer.sendMessage(this.cloudAPI.getCloudClient(), this.cloudAPI.getPrefix() + "§7TPS of group §b" + group.getName() + "§8:");
-        for (Service service : this.getServices(this.getServiceGroup(group.getName()))) {
-            this.cloudAPI.sendPacket(new PacketPlayOutTPS(cloudPlayer.getName(), service, null));
-        }
+        this.cloudAPI.sendPacket(new PacketPlayOutTPS(cloudPlayer.getName(), null, null));
     }
 }

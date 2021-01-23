@@ -4,13 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter @Setter
 public class CloudPlayerData implements Serializable {
 
-    private String uuid;
+    private UUID uuid;
     private String name;
     private String permissionGroup;
     private String tempPermissionGroup;
@@ -23,7 +26,7 @@ public class CloudPlayerData implements Serializable {
     private long lastLogin;
 
     public CloudPlayerData(UUID uuid, String name, String permissionGroup, String tempPermissionGroup, String validadilityTime, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
-        this.uuid = uuid.toString();
+        this.uuid = uuid;
         this.name = name;
         this.firstLogin = firstLogin;
         this.lastLogin = lastLogin;
@@ -37,25 +40,18 @@ public class CloudPlayerData implements Serializable {
     }
 
     public void setUuid(UUID uuid) {
-        this.uuid = uuid.toString();
+        this.uuid = uuid;
     }
 
-    public UUID getUuid() {
-        return UUID.fromString(uuid);
+
+    public Map<String, Object> getAsMap() {
+        Map<String, Object> map = new HashMap<>();
+        for (Field declaredField : this.getClass().getDeclaredFields()) {
+            try {
+                map.put(declaredField.getName(), declaredField.get(this));
+            } catch (IllegalAccessException e) {}
+        }
+        return map;
     }
 
-    @Override
-    public String toString() {
-        return "CloudPlayerData{" +
-                "uuid='" + uuid + '\'' +
-                ", name='" + name + '\'' +
-                ", permissionGroup='" + permissionGroup + '\'' +
-                ", tempPermissionGroup='" + tempPermissionGroup + '\'' +
-                ", validadilityTime='" + validadilityTime + '\'' +
-                ", permissions=" + permissions +
-                ", ipAddress='" + ipAddress + '\'' +
-                ", notifyServerStart=" + notifyServerStart +
-                ", isDefault=" + isDefault +
-                '}';
-    }
 }

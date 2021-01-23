@@ -2,6 +2,7 @@ package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,8 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutTPS) {
-            if (((PacketPlayOutTPS) packet).getTps() == null && ((PacketPlayOutTPS) packet).getService().getName().equalsIgnoreCase(cloudAPI.getService().getName())) {
+            Service service = ((PacketPlayOutTPS) packet).getService();
+            if (((PacketPlayOutTPS) packet).getTps() == null && (service == null || service.getName().equalsIgnoreCase(cloudAPI.getService().getName()))) {
                 String tps;
                 double[] arrayOfDouble = (MinecraftServer.getServer()).recentTps;
                 DecimalFormat decimalFormat = new DecimalFormat("##.#");

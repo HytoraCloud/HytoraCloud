@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.permission;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
@@ -98,7 +99,7 @@ public class PermissionService extends CloudService {
         if (this.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory() == null) {
             return;
         }
-        this.permissionPool.save(this.file, this.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory());
+        this.permissionPool.save(this.file, this.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory(), getCloudLibrary().getService(DatabaseService.class).getDatabase());
     }
 
 }

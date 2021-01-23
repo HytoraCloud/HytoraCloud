@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.booting;
 
 import de.lystx.cloudsystem.CloudSystem;
-import de.lystx.cloudsystem.handler.group.PacketHandlerCoypTemplate;
+import de.lystx.cloudsystem.handler.group.PacketHandlerCopyTemplate;
 import de.lystx.cloudsystem.handler.group.PacketHandlerCreateTemplate;
 import de.lystx.cloudsystem.handler.group.PacketHandlerGroupUpdate;
 import de.lystx.cloudsystem.handler.managing.*;
@@ -14,6 +14,7 @@ import de.lystx.cloudsystem.handler.services.PacketHandlerStart;
 import de.lystx.cloudsystem.handler.services.PacketHandlerStopServer;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
+import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
@@ -37,6 +38,7 @@ public class CloudBootingSetupDone {
         cloudSystem.getConsole().getLogger().sendMessage("INFO", "§bLoading §fCloudSystem§9...");
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
 
+        cloudSystem.getService(DatabaseService.class).getDatabase().connect();
         cloudSystem.cloudServices.add(new CloudNetworkService(cloudSystem, "CloudNetwork", CloudService.Type.NETWORK));
         cloudSystem.cloudServices.add(new ModuleService(cloudSystem, "Modules", CloudService.Type.MANAGING));
 
@@ -50,7 +52,7 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerShutdown(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerConfig(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerGroupUpdate(cloudSystem));
-        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCoypTemplate(cloudSystem));
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCopyTemplate(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerPermissionPool(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerMessage(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerServiceUpdate(cloudSystem));

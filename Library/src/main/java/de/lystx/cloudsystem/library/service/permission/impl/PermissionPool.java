@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.service.permission.impl;
 
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermissionPool;
+import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.elements.other.Document;
@@ -185,7 +186,7 @@ public class PermissionPool implements Serializable {
         return null;
     }
 
-    public Document save(File file, File directory) {
+    public Document save(File file, File directory, CloudDatabase database) {
         Document document = new Document(file);
         for (PermissionGroup permissionGroup : this.permissionGroups) {
             document.append(permissionGroup.getName(), permissionGroup);
@@ -193,9 +194,10 @@ public class PermissionPool implements Serializable {
         document.save();
 
         for (CloudPlayerData cloudPlayerData : this.playerCache) {
-            Document dataDoc = new Document();
-            dataDoc.appendAll(cloudPlayerData);
-            dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".json"));
+            database.setPlayerData(cloudPlayerData.getUuid(), cloudPlayerData);
+            //Document dataDoc = new Document();
+            //dataDoc.appendAll(cloudPlayerData);
+            //dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".json"));
         }
         this.clearInvalidUUIDs(directory);
         return document;

@@ -6,12 +6,16 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
+import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
+import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.DatabaseSetup;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -44,8 +48,12 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cYou are §enot §callowed to §4cancel §ccloudSystem setup! Restart the cloud!");
                 System.exit(0);
             }
-            cloudSystem.getService(CommandService.class).setActive(true);
+
             CloudSetup sp = (CloudSetup) setup;
+            if (!sp.getDatabase().equalsIgnoreCase("FILES") && !sp.getDatabase().equalsIgnoreCase("MONGODB") && !sp.getDatabase().equalsIgnoreCase("MYSQL")) {
+                cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cPlease provide a §evalid database§c!");
+                System.exit(0);
+            }
             Document document = cloudSystem.getService(ConfigService.class).getDocument();
             document.append("setupDone", true);
             document.append("host", sp.getHostname());
@@ -56,10 +64,6 @@ public class CloudBootingSetupNotDone {
             proxy.append("whitelistedPlayers", Collections.singleton(sp.getFirstAdmin()));
             document.append("proxyConfig", proxy);
             document.save();
-            PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
-            permissionPool.updatePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1);
-            permissionPool.save(cloudSystem.getService(FileService.class).getPermissionsFile(), cloudSystem.getService(FileService.class).getCloudPlayerDirectory());
-
             cloudSystem.getService(GroupService.class).createGroup(new ServiceGroup(
                     UUID.randomUUID(),
                     "Bungee",
@@ -92,9 +96,35 @@ public class CloudBootingSetupNotDone {
                     true,
                     true
             ));
-
-            cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
-            System.exit(0);
+            if (!sp.getDatabase().equalsIgnoreCase("FILES")) {
+                cloudSystem.getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");
+                cloudSystem.getConsole().getLogger().sendMessage();
+                cloudSystem.getConsole().getLogger().sendMessage();
+                DatabaseSetup databaseSetup = new DatabaseSetup();
+                databaseSetup.start(cloudSystem.getConsole(), s -> {
+                    DatabaseSetup ds = (DatabaseSetup)s;
+                    Document document1 = new Document()
+                            .append("type", sp.getDatabase().toUpperCase())
+                            .append("host", ds.getHost())
+                            .append("port", ds.getPort())
+                            .append("username", ds.getUsername())
+                            .append("defaultDatabase", ds.getDefaultDatabase())
+                            .append("collectionOrTable", ds.getCollectionOrTable())
+                            .append("password", ds.getPassword());
+                    document1.save(new File(cloudSystem.getService(FileService.class).getDatabaseDirectory(), "database.json"));
+                    cloudSystem.getService(DatabaseService.class).reload(document1);
+                });
+            }
+            cloudSystem.getService(Scheduler.class).scheduleDelayedTask(() -> {
+                cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
+                PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
+                permissionPool.updatePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1);
+                permissionPool.save(cloudSystem.getService(FileService.class).getPermissionsFile(),
+                        cloudSystem.getService(FileService.class).getCloudPlayerDirectory(),
+                        cloudSystem.getService(DatabaseService.class).getDatabase());
+                cloudSystem.getService(DatabaseService.class).getDatabase().disconnect();
+                System.exit(0);
+            }, 20L);
         });
     }
 }
