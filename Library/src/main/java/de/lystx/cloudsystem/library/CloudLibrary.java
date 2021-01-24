@@ -39,9 +39,9 @@ public class CloudLibrary implements Serializable {
     protected CloudConsole console;
     protected CloudScreenPrinter screenPrinter;
 
+
     public CloudLibrary() {
         this.cloudServices = new LinkedList<>();
-
         this.host = "127.0.0.1";
         this.port = 2131;
         this.running = true;
@@ -63,4 +63,5 @@ public class CloudLibrary implements Serializable {
         }
         return null;
     }
+
 }

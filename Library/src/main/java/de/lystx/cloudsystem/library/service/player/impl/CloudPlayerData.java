@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,9 +16,7 @@ public class CloudPlayerData implements Serializable {
 
     private UUID uuid;
     private String name;
-    private String permissionGroup;
-    private String tempPermissionGroup;
-    private String validadilityTime;
+    private List<PermissionEntry> permissionEntries;
     private List<String> permissions;
     private String ipAddress;
     private boolean notifyServerStart;
@@ -25,15 +24,13 @@ public class CloudPlayerData implements Serializable {
     private long firstLogin;
     private long lastLogin;
 
-    public CloudPlayerData(UUID uuid, String name, String permissionGroup, String tempPermissionGroup, String validadilityTime, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
+    public CloudPlayerData(UUID uuid, String name, List<PermissionEntry> permissionEntries, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
         this.uuid = uuid;
         this.name = name;
         this.firstLogin = firstLogin;
         this.lastLogin = lastLogin;
         this.isDefault = false;
-        this.permissionGroup = permissionGroup;
-        this.tempPermissionGroup = tempPermissionGroup;
-        this.validadilityTime = validadilityTime;
+        this.permissionEntries = permissionEntries;
         this.permissions = permissions;
         this.ipAddress = ipAddress;
         this.notifyServerStart = notifyServerStart;
@@ -43,6 +40,14 @@ public class CloudPlayerData implements Serializable {
         this.uuid = uuid;
     }
 
+    public PermissionEntry getForGroup(String group) {
+        for (PermissionEntry permissionEntry : this.permissionEntries) {
+            if (group.equalsIgnoreCase(permissionEntry.getPermissionGroup())) {
+                return permissionEntry;
+            }
+        }
+        return null;
+    }
 
     public Map<String, Object> getAsMap() {
         Map<String, Object> map = new HashMap<>();

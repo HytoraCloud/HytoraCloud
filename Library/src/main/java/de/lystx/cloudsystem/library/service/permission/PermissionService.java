@@ -40,10 +40,6 @@ public class PermissionService extends CloudService {
             if (playerData == null) {
                 continue;
             }
-            PermissionGroup permissionGroup = this.permissionPool.getPermissionGroupFromName(playerData.getPermissionGroup());
-            if (permissionGroup == null) {
-                continue;
-            }
             this.permissionPool.getPlayerCache().add(playerData);
         }
     }

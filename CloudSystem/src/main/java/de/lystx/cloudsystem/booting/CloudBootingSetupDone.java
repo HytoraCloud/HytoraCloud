@@ -12,6 +12,7 @@ import de.lystx.cloudsystem.handler.services.PacketHandlerRegister;
 import de.lystx.cloudsystem.handler.services.PacketHandlerServiceUpdate;
 import de.lystx.cloudsystem.handler.services.PacketHandlerStart;
 import de.lystx.cloudsystem.handler.services.PacketHandlerStopServer;
+import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -33,7 +34,7 @@ public class CloudBootingSetupDone {
                 "/_/ /_/\\__, /\\__/\\____/_/   \\__,_/\\____/_/\\____/\\__,_/\\__,_/   \n" +
                 "      /____/                                                   \n" +
                 "\n");
-        cloudSystem.getConsole().getLogger().sendMessage("INFO", "§9Version §7: §b" + cloudSystem.getVersion());
+        cloudSystem.getConsole().getLogger().sendMessage("INFO", "§9Version §7: §b" + Updater.getCloudVersion());
         cloudSystem.getConsole().getLogger().sendMessage("INFO", "§9Developer §7: §bLystx");
         cloudSystem.getConsole().getLogger().sendMessage("INFO", "§bLoading §fCloudSystem§9...");
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");

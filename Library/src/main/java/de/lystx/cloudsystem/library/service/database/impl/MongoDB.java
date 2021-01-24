@@ -12,6 +12,7 @@ import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import lombok.Getter;
 import org.bson.Document;
 import org.slf4j.LoggerFactory;
@@ -50,9 +51,7 @@ public class MongoDB implements CloudDatabase {
             return new CloudPlayerData(
                     document.get("uuid", UUID.class),
                     document.getString("name"),
-                    document.getString("permissionGroup"),
-                    document.getString("tempPermissionGroup"),
-                    document.getString("validadilityTime"),
+                    document.get("permissionEntries", ArrayList.class),
                     document.get("permissions", ArrayList.class),
                     document.getString("ipAddress"),
                     document.getBoolean("notifyServerStart"),
@@ -92,22 +91,11 @@ public class MongoDB implements CloudDatabase {
     public void registerPlayer(CloudPlayer cloudPlayer) {
 
         if (!this.isRegistered(cloudPlayer.getUuid())) {
-            CloudPlayerData data = new CloudPlayerData(
-                    cloudPlayer.getUuid(),
-                    cloudPlayer.getName(),
-                    "Player",
-                    "Player",
-                    "",
-                    new LinkedList<>(),
-                    cloudPlayer.getIpAddress(),
-                    true,
-                    new Date().getTime(),
-                    0L
-            );
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
             this.setPlayerData(cloudPlayer.getUuid(), data);
         } else {
             CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionGroup(), cloudPlayerData.getTempPermissionGroup(), cloudPlayerData.getValidadilityTime(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
             this.setPlayerData(cloudPlayer.getUuid(), newData);
         }
     }

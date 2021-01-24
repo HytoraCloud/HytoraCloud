@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.UUIDService;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +15,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Getter @Setter
 public class PermissionPool implements Serializable {
@@ -45,13 +45,13 @@ public class PermissionPool implements Serializable {
         if (data == null) {
             return;
         }
+        this.playerCache.remove(data);
         List<String> permissions = data.getPermissions();
         if (add) {
             permissions.add(permission);
         } else {
             permissions.remove(permission);
         }
-        this.playerCache.remove(data);
         data.setPermissions(permissions);
         this.playerCache.add(data);
     }
@@ -64,58 +64,97 @@ public class PermissionPool implements Serializable {
         this.playerCache.set(this.playerCache.indexOf(oldData), newData);
     }
 
-    public Boolean isRankValid(String playerName) {
+    public boolean isRankValid(String playerName, PermissionGroup permissionGroup) {
         CloudPlayerData data = this.getPlayerData(playerName);
         if (data == null) {
             return false;
         }
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern(this.format.toPattern());
-        String bis = data.getValidadilityTime();
+        String bis = data.getForGroup(permissionGroup.getName()).getValidTime();
         if (bis.equalsIgnoreCase("lifetime") || bis.trim().isEmpty()) {
             return true;
         }
-        LocalDate date1 = LocalDate.parse(this.format.format(new Date()), dtf);
-        LocalDate date2 = LocalDate.parse(bis, dtf);
-        long daysBetween = ChronoUnit.DAYS.between(date1, date2);
-        return (daysBetween >= 1);
+        try {
+            Date date1 = new Date();
+            Date date2 = this.format.parse(bis);
+            return (this.getDateDiff(date1, date2) >= 1);
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
-    public void updatePermissionGroup(String playerName, PermissionGroup group, Integer days) {
+    private long getDateDiff(Date date1, Date date2) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return TimeUnit.MILLISECONDS.convert(diffInMillies,TimeUnit.MILLISECONDS);
+    }
+
+    public void removePermissionGroup(String playerName, PermissionGroup group) {
         CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
         if (data == null) {
             return;
         }
         this.playerCache.remove(data);
-        data.setPermissionGroup(group.getName());
-        if (days <= 0) {
-            data.setTempPermissionGroup(group.getName());
-            data.setValidadilityTime("");
-        } else {
-            if (this.getPermissionGroup(playerName) != null)  {
-                data.setPermissionGroup(this.getPermissionGroup(playerName).getName());
-            } else {
-                data.setPermissionGroup(group.getName());
-            }
+        List<PermissionEntry> permissionEntries = data.getPermissionEntries();
+        PermissionEntry permissionEntry = data.getForGroup(group.getName());
+        permissionEntries.remove(permissionEntry);
+        data.setPermissionEntries(permissionEntries);
+        this.playerCache.add(data);
+    }
 
+    public void updatePermissionGroup(String playerName, PermissionGroup group, Integer i, PermissionValidality validality) {
+        CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
+        if (data == null) {
+            return;
+        }
+        this.playerCache.remove(data);
+        List<PermissionEntry> permissionEntries = new LinkedList<>(data.getPermissionEntries());
+        PermissionEntry entry = new PermissionEntry(this.tryUUID(playerName), group.getName(), "");
+        permissionEntries.removeIf(permissionEntry -> permissionEntry.getPermissionGroup().equalsIgnoreCase(group.getName()));
+
+        if (i > 0) {
             Calendar c = Calendar.getInstance();
             try{
                 c.setTime(format.parse(this.format.format(new Date())));
             } catch(ParseException ignored){}
-            c.add(Calendar.DAY_OF_MONTH, days);
-            data.setValidadilityTime(this.format.format(c.getTime()));
+            int i1 = Calendar.SECOND;
+            if (validality.equals(PermissionValidality.MINUTE)) {
+                i1 = Calendar.MINUTE;
+            } else if (validality.equals(PermissionValidality.HOUR)) {
+                i1 = Calendar.HOUR;
+            } else if (validality.equals(PermissionValidality.DAY)) {
+                i1 = Calendar.DAY_OF_MONTH;
+            } else if (validality.equals(PermissionValidality.WEEK)) {
+                i1 = Calendar.WEEK_OF_MONTH;
+            } else if (validality.equals(PermissionValidality.MONTH)) {
+                i1 = Calendar.MONTH;
+            } else if (validality.equals(PermissionValidality.YEAR)) {
+                i1 = Calendar.YEAR;
+            }
+            c.add(i1, i);
+            entry.setValidTime(this.format.format(c.getTime()));
         }
+        permissionEntries.add(entry);
+        data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
     }
 
 
-    public PermissionGroup getPermissionGroup(String player) {
-        PermissionGroup group = null;
-        for (CloudPlayerData cloudPlayerData : this.playerCache) {
-            if (cloudPlayerData.getName().equalsIgnoreCase(player)) {
-                group = this.getPermissionGroupFromName(cloudPlayerData.getTempPermissionGroup());
+    public List<PermissionGroup> getPermissionGroups(String player) {
+        List<PermissionGroup> permissionGroups = new LinkedList<>();
+        CloudPlayerData data = this.getPlayerData(player);
+        if (data != null) {
+            for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
+                PermissionGroup permissionGroup = this.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
+                permissionGroups.add(permissionGroup);
             }
         }
-        return group == null ? new DefaultPermissionGroup() : group;
+        return permissionGroups;
+    }
+
+    public PermissionGroup getHighestPermissionGroup(String player) {
+        List<PermissionGroup> list = this.getPermissionGroups(player);
+        list.sort(Comparator.comparingInt(PermissionGroup::getId));
+        return list.get(0) == null ? new DefaultPermissionGroup() : list.get(0);
     }
 
     public CloudPlayerData getPlayerData(String playerName) {
@@ -138,7 +177,8 @@ public class PermissionPool implements Serializable {
     public CloudPlayerData getPlayerDataOrDefault(String playerName) {
         CloudPlayerData pre = this.getPlayerData(playerName);
         if (pre == null) {
-            CloudPlayerData data = new CloudPlayerData(Objects.requireNonNull(UUIDService.getUUID(playerName)), playerName, "Player", "Player", "", new LinkedList<>(), "127.0.0.1", true, new Date().getTime(), new Date().getTime());
+            UUID uuid = this.tryUUID(playerName);
+            CloudPlayerData data = new DefaultCloudPlayerData(uuid, playerName);
             data.setDefault(true);
             return data;
         } else {
@@ -153,21 +193,23 @@ public class PermissionPool implements Serializable {
             if (data.getPermissions().contains(permission)) {
                 is = true;
             }
-            PermissionGroup permissionGroup = this.getPermissionGroupFromName(data.getPermissionGroup());
-            if (permissionGroup != null) {
-                for (String p : permissionGroup.getPermissions()) {
-                    if (p.equalsIgnoreCase(permission)) {
-                        is = true;
-                        break;
+            for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
+                PermissionGroup permissionGroup = this.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
+                if (permissionGroup != null) {
+                    for (String p : permissionGroup.getPermissions()) {
+                        if (p.equalsIgnoreCase(permission)) {
+                            is = true;
+                            break;
+                        }
                     }
-                }
-                for (String i : permissionGroup.getInheritances()) {
-                    PermissionGroup inheritance = this.getPermissionGroupFromName(i);
-                    if (inheritance != null) {
-                        for (String p : inheritance.getPermissions()) {
-                            if (p.equalsIgnoreCase(permission)) {
-                                is = true;
-                                break;
+                    for (String i : permissionGroup.getInheritances()) {
+                        PermissionGroup inheritance = this.getPermissionGroupFromName(i);
+                        if (inheritance != null) {
+                            for (String p : inheritance.getPermissions()) {
+                                if (p.equalsIgnoreCase(permission)) {
+                                    is = true;
+                                    break;
+                                }
                             }
                         }
                     }

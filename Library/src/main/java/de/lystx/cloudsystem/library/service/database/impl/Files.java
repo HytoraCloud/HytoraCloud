@@ -4,11 +4,15 @@ import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGroup;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import lombok.Getter;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -35,23 +39,12 @@ public class Files implements CloudDatabase {
         File file = new File(dir, cloudPlayer.getUuid() + ".json");
         if (!file.exists()) {
             Document document = new Document(file);
-            document.appendAll(new CloudPlayerData(
-                    cloudPlayer.getUuid(),
-                    cloudPlayer.getName(),
-                    "Player",
-                    "Player",
-                    "",
-                    new LinkedList<>(),
-                    cloudPlayer.getIpAddress(),
-                    true,
-                    new Date().getTime(),
-                    0L
-            ));
+            document.appendAll(new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName()));
             document.save();
         } else {
             Document document = new Document(file);
             CloudPlayerData cloudPlayerData = document.getObject(document.getJsonObject(), CloudPlayerData.class);
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionGroup(), cloudPlayerData.getTempPermissionGroup(), cloudPlayerData.getValidadilityTime(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
             this.setPlayerData(cloudPlayer.getUuid(), newData);
         }
     }

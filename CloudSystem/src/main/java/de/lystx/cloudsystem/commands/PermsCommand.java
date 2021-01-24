@@ -10,6 +10,7 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality;
 import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupSetup;
 
 import java.util.LinkedList;
@@ -67,7 +68,7 @@ public class PermsCommand extends Command {
                     console.getLogger().sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
                     return;
                 }
-                PermissionGroup permissionGroup = pool.getPermissionGroup(player);
+                PermissionGroup permissionGroup = pool.getHighestPermissionGroup(player);
                 if (permissionGroup == null) {
                     console.getLogger().sendMessage("ERROR", "§cThe player §e" + player + " §cis not registered!");
                     return;
@@ -95,19 +96,44 @@ public class PermsCommand extends Command {
                     return;
                 }
                 if (!args[3].equalsIgnoreCase("lifetime")) {
+                    String data = args[3];
+                    PermissionValidality validality;
+                    String format;
+                    if (data.toLowerCase().endsWith("s")) {
+                        validality = PermissionValidality.SECOND;
+                        format = "s";
+                    } else if (data.toLowerCase().endsWith("min")) {
+                        validality = PermissionValidality.MINUTE;
+                        format = "min";
+                    } else if (data.toLowerCase().endsWith("h")) {
+                        validality = PermissionValidality.HOUR;
+                        format = "h";
+                    } else if (data.toLowerCase().endsWith("d")) {
+                        validality = PermissionValidality.DAY;
+                        format = "d";
+                    } else if (data.toLowerCase().endsWith("w")) {
+                        validality = PermissionValidality.WEEK;
+                        format = "w";
+                    } else if (data.toLowerCase().endsWith("m")) {
+                        validality = PermissionValidality.MONTH;
+                        format = "m";
+                    } else {
+                        validality = PermissionValidality.YEAR;
+                        format = "y";
+                    }
                     try {
-                        Integer i = Integer.parseInt(args[3]);
-                        pool.updatePermissionGroup(player, group, i);
+                        Integer i = Integer.parseInt(args[3].split(format)[0]);
+                        pool.updatePermissionGroup(player, group, i, validality);
                         pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                         cloudLibrary.getService(PermissionService.class).load();
                         CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                         CloudSystem.getInstance().reload();
-                        console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime " + pool.getPlayerData(player).getValidadilityTime());
+                        console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime " + i + " " + validality);
                     } catch (NumberFormatException e) {
                         console.getLogger().sendMessage("ERROR", "§cPlease provide a §evalid number §cor enter §elifetime§c!");
                     }
                 } else {
-                    pool.updatePermissionGroup(player, group, -1);
+                    pool.updatePermissionGroup(player, group, -1, PermissionValidality.DAY);
                     pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                     cloudLibrary.getService(PermissionService.class).load();
                     CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
@@ -127,7 +153,7 @@ public class PermsCommand extends Command {
         console.getLogger().sendMessage("INFO", "§9Help for §bPermsService§7:");
         console.getLogger().sendMessage("INFO", "§9perms <create> §7| Creates a new permissionGroup");
         console.getLogger().sendMessage("INFO", "§9perms <list> §7| Lists all groups");
-        console.getLogger().sendMessage("INFO", "§9perms set <name> <group> <lifetime/time_in_days> §7| Sets the group of a player");
-        console.getLogger().sendMessage("INFO", "§9perms info <name> §7| Displays infos about a player");
+        console.getLogger().sendMessage("INFO", "§9perms set <player> <group> <lifetime/timeSpan> §7| Sets the group of a player");
+        console.getLogger().sendMessage("INFO", "§9perms info <player> §7| Displays infos about a player");
     }
 }

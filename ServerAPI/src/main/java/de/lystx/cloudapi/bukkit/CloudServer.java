@@ -12,13 +12,17 @@ import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
 import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudapi.proxy.manager.CloudManager;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 @Getter
 public class CloudServer extends JavaPlugin {
@@ -73,52 +77,17 @@ public class CloudServer extends JavaPlugin {
         //cloudAPI.getScheduler().runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
     }
 
+
     public void updatePermissions(Player player) {
+
+        player.setOp(false);
         if (this.cloudAPI.getCloudPlayers().get(player.getName()) != null) {
-            CloudPlayerData data = this.cloudAPI.getPermissionPool().getPlayerDataOrDefault(player.getName());
-            if (this.cloudAPI.getPermissionPool().isAvailable()) {
-                if (data.isDefault() || !this.cloudAPI.getPermissionPool().isRankValid(player.getName())) {
-                    data.setUuid(player.getUniqueId());
-                    try {
-                        data.setIpAddress(player.getAddress().getHostName());
-                    } catch (NullPointerException e) {
-                        data.setIpAddress("127.0.0.1");
-                    }
-                    this.cloudAPI.getPermissionPool().updatePlayerData(player.getName(), data);
-                    this.cloudAPI.getPermissionPool().update(this.cloudAPI.getCloudClient());
+            this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> {
+                if (s.equalsIgnoreCase("*")) {
+                    player.setOp(true);
                 }
-            }
-            PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
-            if (group == null) {
-                this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
-                return;
-            }
-
-            player.setOp(false);
-            boolean op = false;
-            for (String permission : group.getPermissions()) {
-                if (permission.equalsIgnoreCase("*")) {
-                    op = true;
-                }
-                player.addAttachment(this, permission, true);
-            }
-
-            for (String inheritance : group.getInheritances()) {
-                PermissionGroup permissionGroup = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(inheritance);
-                for (String permission : permissionGroup.getPermissions()) {
-                    if (permission.equalsIgnoreCase("*")) {
-                        op = true;
-                    }
-                    player.addAttachment(this, permission, true);
-                }
-            }
-            for (String permission : data.getPermissions()) {
-                if (permission.equalsIgnoreCase("*")) {
-                    op = true;
-                }
-                player.addAttachment(this, permission, true);
-            }
-            if (op) player.setOp(true);
+                player.addAttachment(this, s, true);
+            });
         } else {
             this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);
         }

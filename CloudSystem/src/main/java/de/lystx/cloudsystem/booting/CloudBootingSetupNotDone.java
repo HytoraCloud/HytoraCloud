@@ -10,6 +10,7 @@ import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
@@ -59,6 +60,7 @@ public class CloudBootingSetupNotDone {
             document.append("host", sp.getHostname());
             document.append("port", sp.getPort());
             document.append("proxyProtocol", sp.isProxyProtocol());
+            document.append("autoUpdater", sp.isAutoUpdater());
             Document proxy = document.getDocument("proxyConfig");
             proxy.append("maxPlayers", sp.getMaxPlayers());
             proxy.append("whitelistedPlayers", Collections.singleton(sp.getFirstAdmin()));
@@ -118,7 +120,8 @@ public class CloudBootingSetupNotDone {
             cloudSystem.getService(Scheduler.class).scheduleDelayedTask(() -> {
                 cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
                 PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
-                permissionPool.updatePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1);
+                permissionPool.removePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Player"));
+                permissionPool.updatePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1, PermissionValidality.LIFETIME);
                 permissionPool.save(cloudSystem.getService(FileService.class).getPermissionsFile(),
                         cloudSystem.getService(FileService.class).getCloudPlayerDirectory(),
                         cloudSystem.getService(DatabaseService.class).getDatabase());

@@ -19,10 +19,13 @@ public class CloudSetup extends Setup {
     @SetupPart(question = "What's the name of the first Admin?", id = 4, forbiddenAnswers = {"Notch"})
     private String firstAdmin;
 
-    @SetupPart(question = "Enable ProxyProtocol? Used for sending MOTD data to something like a loadbalancer (Default: false)", id = 5)
+    @SetupPart(question = "Do you want the cloud to update it's self? (AutoUpdater but not working properly at the moment)", id = 5)
+    private boolean autoUpdater;
+
+    @SetupPart(question = "Enable ProxyProtocol? Used for sending MOTD data to something like a loadbalancer (Default: false)", id = 6)
     private boolean proxyProtocol;
 
-    @SetupPart(question = "What Datbase do you want to use? (MYSQL, MONGODB, FILES) You will have to enter your date in the next step!", id = 6, forbiddenAnswers = {""})
+    @SetupPart(question = "What Datbase do you want to use? (MYSQL, MONGODB, FILES) You will have to enter your date in the next step!", id = 7, forbiddenAnswers = {""})
     private String database;
 
 }

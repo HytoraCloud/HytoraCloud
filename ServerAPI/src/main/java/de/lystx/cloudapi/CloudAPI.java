@@ -14,7 +14,10 @@ import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
@@ -22,6 +25,7 @@ import lombok.Setter;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudAPI {
@@ -116,5 +120,47 @@ public class CloudAPI {
 
     public Scheduler getScheduler() {
         return this.cloudLibrary.getService(Scheduler.class);
+    }
+    
+    
+    public void updatePermissions(String player, UUID uuid, String ipAddress, Consumer<String> accept) {
+        CloudPlayerData data = this.permissionPool.getPlayerDataOrDefault(player);
+        List<PermissionEntry> entries = data.getPermissionEntries();
+
+        boolean changed = false;
+        try {
+            for (PermissionEntry permissionEntry : entries) {
+                PermissionGroup permissionGroup = permissionPool.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
+                if (!this.permissionPool.isRankValid(player, permissionGroup)) {
+                    changed = true;
+                    permissionPool.removePermissionGroup(player, permissionGroup);
+                    //entries.remove(permissionEntry);
+                }
+            }
+        } catch (ConcurrentModificationException e) {}
+
+        if (data.isDefault()) {
+            data.setUuid(uuid);
+            data.setIpAddress(ipAddress);
+        }
+        if (changed) {
+            data.setPermissionEntries(entries);
+            permissionPool.updatePlayerData(player, data);
+            permissionPool.update(this.cloudClient);
+        }
+        List<String> permissions = data.getPermissions();
+        for (PermissionEntry entry : entries) {
+            PermissionGroup group = permissionPool.getPermissionGroupFromName(entry.getPermissionGroup());
+            if (group == null) {
+                continue;
+            }
+            permissions.addAll(group.getPermissions());
+            for (String i : group.getInheritances()) {
+                permissions.addAll(permissionPool.getPermissionGroupFromName(i).getPermissions());
+            }
+        }
+        for (String permission : permissions) {
+            accept.accept(permission);
+        }
     }
 }

@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.booting.CloudBootingSetupDone;
 import de.lystx.cloudsystem.booting.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -42,7 +43,6 @@ public class CloudSystem extends CloudLibrary {
     @Getter
     private static CloudSystem instance;
 
-    private final String version;
     private final CloudScreenPrinter screenPrinter;
     private final TicksPerSecond ticksPerSecond;
     public ServerService service;
@@ -50,17 +50,16 @@ public class CloudSystem extends CloudLibrary {
     public CloudSystem() {
         super();
         instance = this;
-        this.version = "1.0";
 
         this.ticksPerSecond = new TicksPerSecond(this);
         this.cloudServices.add(new CommandService(this, "Command", CloudService.Type.MANAGING));
         this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.Type.UTIL));
         this.console = new CloudConsole(this.getService(LoggerService.class), this.getService(CommandService.class), System.getProperty("user.name"));
+
         this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
         this.cloudServices.add(new FileService(this, "File", CloudService.Type.CONFIG));
         this.cloudServices.add(new ConfigService(this, "Config", CloudService.Type.CONFIG));
-
         this.cloudServices.add(new LogService(this, "Logging", CloudService.Type.UTIL));
         this.cloudServices.add(new StatisticsService(this, "Stats", CloudService.Type.UTIL));
 
@@ -90,8 +89,17 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
         this.getService(CommandService.class).registerCommand(new ModulesCommand("modules", "Manages modules", "pl", "plugins"));
         this.getService(CommandService.class).registerCommand(new DownloadCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
-
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
+            if (this.getService(ConfigService.class).getNetworkConfig().isAutoUpdater()) {
+                /*this.getService(CommandService.class).setActive(false);
+                if (!Updater.check(this.console)) {
+                    this.console.getLogger().sendMessage("INFO", "§2Succesfully downloaded Version §a" + Updater.getSpigotVersion() + "§2!");
+                    System.exit(0);
+                } else {
+                    console.getLogger().sendMessage("INFO", "§2CloudSystem is §anewest version§2!");
+                }*/
+            }
+            this.getService(CommandService.class).setActive(true);
             new CloudBootingSetupDone(this);
         } else {
             new CloudBootingSetupNotDone(this);

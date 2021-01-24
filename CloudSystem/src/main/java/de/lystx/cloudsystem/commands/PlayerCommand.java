@@ -6,6 +6,8 @@ import de.lystx.cloudsystem.library.service.command.Command;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -50,11 +52,12 @@ public class PlayerCommand extends Command {
                     playerData = pool.getPlayerData(player);
                     console.getLogger().sendMessage("ERROR", "§aOnline §bInformation §7on " + cloudPlayer.getName() + "§7:");
                 }
-                String v = playerData.getValidadilityTime();
+                PermissionGroup permissionGroup = pool.getHighestPermissionGroup(player);
+                PermissionEntry permissionEntry = playerData.getForGroup(permissionGroup.getName());
+                String v = permissionEntry.getValidTime();
                 console.getLogger().sendMessage("INFO", "§7Name | §b" + playerData.getName());
                 console.getLogger().sendMessage("INFO", "§7UUID | §b" + playerData.getUuid());
-                console.getLogger().sendMessage("INFO", "§7PermissionGroup | §b" + playerData.getPermissionGroup());
-                console.getLogger().sendMessage("INFO", "   §7> §7Temporary | §b" + playerData.getTempPermissionGroup());
+                console.getLogger().sendMessage("INFO", "§7PermissionGroup | §b" + permissionGroup.getName());
                 console.getLogger().sendMessage("INFO", "   §7> §7Validality | §b" + (v.trim().isEmpty() ? "Lifetime" : v));
                 console.getLogger().sendMessage("INFO", "§7Ip Address | §b" + playerData.getIpAddress());
                 console.getLogger().sendMessage("INFO", "§7First login | §b" + pool.getFormat().format(new Date(playerData.getFirstLogin())));

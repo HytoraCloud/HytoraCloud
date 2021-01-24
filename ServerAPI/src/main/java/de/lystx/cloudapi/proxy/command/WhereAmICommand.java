@@ -20,8 +20,9 @@ public class WhereAmICommand extends Command {
     public void execute(CommandSender commandSender, String[] args) {
         if (commandSender instanceof ProxiedPlayer) {
             ProxiedPlayer player = (ProxiedPlayer)commandSender;
-            Service s = CloudAPI.getInstance().getService();
-            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§6" + s.getName() + "#" + s.getUniqueId());
+
+            Service s = CloudAPI.getInstance().getNetwork().getService(player.getServer().getInfo().getName());
+            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§6" + s.getName() + "#" + s.getUniqueId() + " §8«» §a" + CloudAPI.getInstance().getService().getName());
 
         }
     }

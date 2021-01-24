@@ -5,7 +5,9 @@ import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;
@@ -15,8 +17,11 @@ import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter
 public class CloudProxy extends Plugin {
@@ -76,40 +81,8 @@ public class CloudProxy extends Plugin {
         return -1;
     }
 
-    public void updatePermissions(ProxiedPlayer player) {
-        try {
-            CloudPlayerData data = this.cloudAPI.getPermissionPool().getPlayerDataOrDefault(player.getName());
-            if (data.isDefault() || !this.cloudAPI.getPermissionPool().isRankValid(player.getName())) {
-                data.setUuid(player.getUniqueId());
-                try {
-                    data.setIpAddress(player.getAddress().getHostName());
-                } catch (NullPointerException e) {
-                    data.setIpAddress("0");
-                }
-                this.cloudAPI.getPermissionPool().updatePlayerData(player.getName(), data);
-                this.cloudAPI.getPermissionPool().update(this.cloudAPI.getCloudClient());
-            }
-            PermissionGroup group = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(data.getPermissionGroup());
-            if (group == null) {
-                this.cloudAPI.messageCloud("ProxyCloudAPI", "§cTried updating permissions for §e" + player.getName() + " §cbut his permissionGroup wasn't found!");
-                return;
-            }
-            for (String permission : group.getPermissions()) {
-                player.setPermission(permission, true);
-            }
-            for (String i : group.getInheritances()) {
-                PermissionGroup inheritance = this.cloudAPI.getPermissionPool().getPermissionGroupFromName(i);
-                for (String permission : inheritance.getPermissions()) {
-                    player.setPermission(permission, true);
-                }
-            }
-            for (String permission : data.getPermissions()) {
-                player.setPermission(permission, true);
-            }
 
-        } catch (Exception e) {
-            this.cloudAPI.messageCloud("ProxyCloudAPI", "§cCouldnt update permissions of §e" + player.getName() + "§c!");
-            this.cloudAPI.messageCloud("ProxyCloudAPI", "§cException: §e" + e.getMessage());
-        }
+    public void updatePermissions(ProxiedPlayer player) {
+        this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> player.setPermission(s, true));
     }
 }

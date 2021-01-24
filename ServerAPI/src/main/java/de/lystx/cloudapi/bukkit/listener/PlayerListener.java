@@ -121,7 +121,7 @@ public class PlayerListener implements Listener {
         CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
         if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getPermissionGroup(onlinePlayer.getName());
+                PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
                 CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
             }
         }
@@ -137,7 +137,7 @@ public class PlayerListener implements Listener {
         if (CloudAPI.getInstance().isUseChat() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
             event.setCancelled(true);
             String message = event.getMessage();
-            PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getPermissionGroup(event.getPlayer().getName());
+            PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(event.getPlayer().getName());
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 onlinePlayer.sendMessage(CloudAPI.getInstance().getChatFormat()
                         .replace("%display%", group.getDisplay())

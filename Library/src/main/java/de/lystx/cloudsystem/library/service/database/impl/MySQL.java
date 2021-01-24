@@ -2,8 +2,10 @@ package de.lystx.cloudsystem.library.service.database.impl;
 
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 
 import java.sql.*;
 import java.util.*;
@@ -28,9 +30,7 @@ public class MySQL implements CloudDatabase {
                 PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + databaseService.getCollectionOrTable() + "(id INT AUTO_INCREMENT PRIMARY KEY NOT NULL, " +
                         "name VARCHAR(64), " +
                         "uuid VARCHAR(64), " +
-                        "permissionGroup VARCHAR(64), " +
-                        "tempPermissionGroup VARCHAR(64), " +
-                        "validadilityTime VARCHAR(64), " +
+                        "permissionEntries ANY(64), " +
                         "permissions VARCHAR(21844), " +
                         "ipAddress VARCHAR(64)" +
                         "notifyServerStart BOOL, " +
@@ -53,22 +53,11 @@ public class MySQL implements CloudDatabase {
     @Override
     public void registerPlayer(CloudPlayer cloudPlayer) {
         if (!this.isRegistered(cloudPlayer.getUuid())) {
-            CloudPlayerData data = new CloudPlayerData(
-                    cloudPlayer.getUuid(),
-                    cloudPlayer.getName(),
-                    "Player",
-                    "Player",
-                    "",
-                    new LinkedList<>(),
-                    cloudPlayer.getIpAddress(),
-                    true,
-                    new Date().getTime(),
-                    0L
-            );
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
             this.setPlayerData(cloudPlayer.getUuid(), data);
         } else {
             CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionGroup(), cloudPlayerData.getTempPermissionGroup(), cloudPlayerData.getValidadilityTime(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
             this.setPlayerData(cloudPlayer.getUuid(), newData);
         }
     }
@@ -107,9 +96,7 @@ public class MySQL implements CloudDatabase {
             CloudPlayerData cloudPlayerData = new CloudPlayerData(
                     uuid,
                     rs.getString("name"),
-                    rs.getString("permissionGroup"),
-                    rs.getString("tempPermissionGroup"),
-                    rs.getString("validadilityTime"),
+                    rs.getObject("permissionEntries", ArrayList.class),
                     this.fromMySQLString(rs.getString("permissions")),
                     rs.getString("ipAddress"),
                     rs.getBoolean("notifyServerStart"),
@@ -127,17 +114,15 @@ public class MySQL implements CloudDatabase {
     @Override
     public void setPlayerData(UUID uuid, CloudPlayerData data) {
         try {
-            PreparedStatement ps = this.connection.prepareStatement("INSERT INTO " + databaseService.getCollectionOrTable() + "(name,uuid,permissionGroup,tempPermissionGroup,validadilityTime,permissions,ipAddress,notifyServerStart,firstLogin,lastLogin) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            PreparedStatement ps = this.connection.prepareStatement("INSERT INTO " + databaseService.getCollectionOrTable() + "(name,uuid,permissionEntries,permissions,ipAddress,notifyServerStart,firstLogin,lastLogin) VALUES (?,?,?,?,?,?,?)");
             ps.setString(1, data.getName());
             ps.setString(2, data.getUuid().toString());
-            ps.setString(3, data.getPermissionGroup());
-            ps.setString(4, data.getTempPermissionGroup());
-            ps.setString(5, data.getValidadilityTime());
-            ps.setString(6, this.toMySQLString(data.getPermissions()));
-            ps.setString(7, data.getIpAddress());
-            ps.setBoolean(8, data.isNotifyServerStart());
-            ps.setLong(9, data.getFirstLogin());
-            ps.setLong(9, data.getLastLogin());
+            ps.setObject(3, data.getPermissionEntries());
+            ps.setString(4, this.toMySQLString(data.getPermissions()));
+            ps.setString(5, data.getIpAddress());
+            ps.setBoolean(6, data.isNotifyServerStart());
+            ps.setLong(7, data.getFirstLogin());
+            ps.setLong(8, data.getLastLogin());
             ps.executeUpdate();
             ps.close();
         } catch (SQLException exception) {}
