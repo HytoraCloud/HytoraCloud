@@ -89,16 +89,18 @@ public class PermissionPool implements Serializable {
     }
 
     public void removePermissionGroup(String playerName, PermissionGroup group) {
-        CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
-        if (data == null) {
-            return;
-        }
-        this.playerCache.remove(data);
-        List<PermissionEntry> permissionEntries = data.getPermissionEntries();
-        PermissionEntry permissionEntry = data.getForGroup(group.getName());
-        permissionEntries.remove(permissionEntry);
-        data.setPermissionEntries(permissionEntries);
-        this.playerCache.add(data);
+        try {
+            CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
+            if (data == null) {
+                return;
+            }
+            this.playerCache.remove(data);
+            List<PermissionEntry> permissionEntries = data.getPermissionEntries();
+            PermissionEntry permissionEntry = data.getForGroup(group.getName());
+            permissionEntries.remove(permissionEntry);
+            data.setPermissionEntries(permissionEntries);
+            this.playerCache.add(data);
+        } catch (Exception e) {}
     }
 
     public void updatePermissionGroup(String playerName, PermissionGroup group, Integer i, PermissionValidality validality) {

@@ -80,6 +80,25 @@ public class PermsCommand extends Command {
             } else {
                 this.help(console);
             }
+        } else if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("remove")) {
+                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
+                String player = args[1];
+                String group = args[2];
+                PermissionGroup permissionGroup = pool.getPermissionGroupFromName(group);
+                if (permissionGroup == null) {
+                    console.getLogger().sendMessage("ERROR", "§cThe permissionGroup §e" + group + " §cis invalid!");
+                    return;
+                }
+                pool.removePermissionGroup(player, permissionGroup);
+                pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
+                CloudSystem.getInstance().getService(PermissionService.class).load();
+                CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
+                CloudSystem.getInstance().reload();
+                console.getLogger().sendMessage("INFO", "§7The player §b" + player + " §7was removed from group §a" + permissionGroup.getName());
+            } else {
+                this.help(console);
+            }
         } else if (args.length == 4) {
             if (args[0].equalsIgnoreCase("set")) {
                 String player = args[1];
@@ -118,14 +137,14 @@ public class PermsCommand extends Command {
                         validality = PermissionValidality.MONTH;
                         format = "m";
                     } else {
-                        validality = PermissionValidality.YEAR;
-                        format = "y";
+                        console.getLogger().sendMessage("ERROR", "§cPlease provide a valid timespan like §e1d §cor §e1min§c!");
+                        return;
                     }
                     try {
                         Integer i = Integer.parseInt(args[3].split(format)[0]);
                         pool.updatePermissionGroup(player, group, i, validality);
                         pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
-                        cloudLibrary.getService(PermissionService.class).load();
+                        CloudSystem.getInstance().getService(PermissionService.class).load();
                         CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                         CloudSystem.getInstance().reload();
                         console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime " + i + " " + validality);
@@ -153,7 +172,8 @@ public class PermsCommand extends Command {
         console.getLogger().sendMessage("INFO", "§9Help for §bPermsService§7:");
         console.getLogger().sendMessage("INFO", "§9perms <create> §7| Creates a new permissionGroup");
         console.getLogger().sendMessage("INFO", "§9perms <list> §7| Lists all groups");
-        console.getLogger().sendMessage("INFO", "§9perms set <player> <group> <lifetime/timeSpan> §7| Sets the group of a player");
+        console.getLogger().sendMessage("INFO", "§9perms set <player> <group> <lifetime/timeSpan> §7| Adds player to a group");
+        console.getLogger().sendMessage("INFO", "§9perms remove <player> <group>  §7| Removes player from a group");
         console.getLogger().sendMessage("INFO", "§9perms info <player> §7| Displays infos about a player");
     }
 }

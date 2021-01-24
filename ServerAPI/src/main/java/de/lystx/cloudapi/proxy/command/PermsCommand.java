@@ -218,8 +218,8 @@ public class PermsCommand extends Command {
 								validality = PermissionValidality.MONTH;
 								format = "m";
 							} else {
-								validality = PermissionValidality.YEAR;
-								format = "y";
+								player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid timespan like §e1d §cor §e1y §cor §e1min§c!");
+								return;
 							}
 							try {
 								Integer i = Integer.parseInt(args[5].split(format)[0]);
