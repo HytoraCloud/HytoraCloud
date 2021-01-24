@@ -67,6 +67,7 @@ public class PermissionService extends CloudService {
                         "cloudsystem.command",
                         "cloudsystem.perms.command",
                         "cloudsystem.command.service",
+                        "cloudsystem.command.whereis",
                         "cloudsystem.notify",
                         "bungeecord.command.alert",
                         "bungeecord.command.end",

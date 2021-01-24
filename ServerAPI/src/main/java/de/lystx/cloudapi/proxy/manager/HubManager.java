@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.manager;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.events.HubCommandExecuteEvent;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
@@ -23,15 +24,19 @@ public class HubManager {
     }
 
     public void send(ProxiedPlayer player) {
+        HubCommandExecuteEvent.Result result;
         if (isFallback(player)) {
+            result = HubCommandExecuteEvent.Result.ALREADY_ON_LOBBY;
             String message = this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix());
             if (message.trim().isEmpty()) {
                 return;
             }
             player.sendMessage(new TextComponent(message));
         } else {
+            result = HubCommandExecuteEvent.Result.SUCCESS;
             this.sendPlayerToFallback(player);
         }
+        ProxyServer.getInstance().getPluginManager().callEvent(new HubCommandExecuteEvent(player, result));
     }
 
     public ServerInfo getInfo(ProxiedPlayer player) {

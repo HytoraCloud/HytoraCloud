@@ -1,14 +1,12 @@
 package de.lystx.cloudapi.proxy;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudapi.proxy.command.ListCommand;
-import de.lystx.cloudapi.proxy.command.PermsCommand;
+import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudapi.proxy.command.CloudCommand;
 import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;
 import lombok.Getter;
@@ -56,6 +54,8 @@ public class CloudProxy extends Plugin {
         this.getProxy().getPluginManager().registerCommand(this, new PermsCommand());
         this.getProxy().getPluginManager().registerCommand(this, new CloudCommand());
         this.getProxy().getPluginManager().registerCommand(this, new ListCommand());
+        this.getProxy().getPluginManager().registerCommand(this, new WhereIsCommand());
+        this.getProxy().getPluginManager().registerCommand(this, new WhereAmICommand());
 
 
         this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));

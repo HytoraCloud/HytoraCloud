@@ -101,6 +101,7 @@ public class CloudSystem extends CloudLibrary {
     public void reload() {
         try {
             this.getService(PermissionService.class).loadEntries();
+            this.getService(ConfigService.class).reload();
             this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
                     this.getService().getServices(),
@@ -120,14 +121,12 @@ public class CloudSystem extends CloudLibrary {
         this.setRunning(false);
         this.getConsole().interrupt();
         this.getService().stopServices();
-        //this.getService(DatabaseService.class).getDatabase().disconnect();
         this.getService(StatisticsService.class).save();
         this.getService(LogService.class).save();
         this.getService(SignService.class).save();
         this.getService(NPCService.class).save();
         this.getService(ConfigService.class).save();
         this.getService(ModuleService.class).shutdown();
-        this.getService(PermissionService.class).save();
         this.getService(Scheduler.class).scheduleDelayedTask(() -> {
             try {
                 FileUtils.deleteDirectory(this.getService(FileService.class).getDynamicServerDirectory());

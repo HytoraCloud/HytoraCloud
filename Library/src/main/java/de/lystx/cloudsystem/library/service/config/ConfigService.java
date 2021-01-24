@@ -21,11 +21,12 @@ public class ConfigService extends CloudService {
     }
 
     public void reload() {
-
         this.document = Document.fromFile(getCloudLibrary().getService(FileService.class).getConfigFile());
-        if (this.document.isEmpty() || !getCloudLibrary().getService(FileService.class).getConfigFile().exists()) {
+        if (!getCloudLibrary().getService(FileService.class).getConfigFile().exists()) {
             this.document.appendAll(NetworkConfig.defaultConfig());
             this.document.save();
+            this.reload();
+            return;
         }
         this.networkConfig = document.getObject(document.getJsonObject(), NetworkConfig.class);
     }
