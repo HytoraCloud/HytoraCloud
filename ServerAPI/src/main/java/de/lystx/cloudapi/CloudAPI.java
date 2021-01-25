@@ -148,7 +148,7 @@ public class CloudAPI {
             permissionPool.updatePlayerData(player, data);
             permissionPool.update(this.cloudClient);
         }
-        List<String> permissions = data.getPermissions();
+        List<String> permissions = new LinkedList<>();
         for (PermissionEntry entry : entries) {
             PermissionGroup group = permissionPool.getPermissionGroupFromName(entry.getPermissionGroup());
             if (group == null) {
@@ -159,6 +159,7 @@ public class CloudAPI {
                 permissions.addAll(permissionPool.getPermissionGroupFromName(i).getPermissions());
             }
         }
+        permissions.addAll(data.getPermissions());
         for (String permission : permissions) {
             accept.accept(permission);
         }

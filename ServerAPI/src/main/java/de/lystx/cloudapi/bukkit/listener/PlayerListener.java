@@ -72,7 +72,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        PacketReader packetReader = this.packetReaders.get(player.getUniqueId());
+        PacketReader packetReader = this.packetReaders.getOrDefault(player.getUniqueId(), new PacketReader(player));
         packetReader.uninject();
         this.packetReaders.remove(player.getUniqueId());
     }

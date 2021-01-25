@@ -10,7 +10,7 @@ import java.util.UUID;
 
 
 @Getter
-public class DefaultCloudPlayerData extends CloudPlayerData{
+public class DefaultCloudPlayerData extends CloudPlayerData {
 
     public DefaultCloudPlayerData(UUID uuid, String name) {
 

@@ -63,7 +63,6 @@ public class CloudBootingSetupNotDone {
             document.append("autoUpdater", sp.isAutoUpdater());
             Document proxy = document.getDocument("proxyConfig");
             proxy.append("maxPlayers", sp.getMaxPlayers());
-            proxy.append("whitelistedPlayers", Collections.singleton(sp.getFirstAdmin()));
             document.append("proxyConfig", proxy);
             document.save();
             cloudSystem.getService(GroupService.class).createGroup(new ServiceGroup(

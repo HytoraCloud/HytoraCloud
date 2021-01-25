@@ -83,10 +83,12 @@ public class CloudServer extends JavaPlugin {
         player.setOp(false);
         if (this.cloudAPI.getCloudPlayers().get(player.getName()) != null) {
             this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> {
-                if (s.equalsIgnoreCase("*")) {
-                    player.setOp(true);
-                }
-                player.addAttachment(this, s, true);
+                try {
+                    if (s.equalsIgnoreCase("*")) {
+                        player.setOp(true);
+                    }
+                    player.addAttachment(this, s, true);
+                } catch (NullPointerException e) {}
             });
         } else {
             this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);

@@ -12,10 +12,7 @@ import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import lombok.Getter;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 public class Files implements CloudDatabase {
@@ -33,21 +30,6 @@ public class Files implements CloudDatabase {
     public void disconnect() {}
 
 
-    @Override
-    public void registerPlayer(CloudPlayer cloudPlayer) {
-        File dir = this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory();
-        File file = new File(dir, cloudPlayer.getUuid() + ".json");
-        if (!file.exists()) {
-            Document document = new Document(file);
-            document.appendAll(new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName()));
-            document.save();
-        } else {
-            Document document = new Document(file);
-            CloudPlayerData cloudPlayerData = document.getObject(document.getJsonObject(), CloudPlayerData.class);
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
-            this.setPlayerData(cloudPlayer.getUuid(), newData);
-        }
-    }
 
     @Override
     public boolean isRegistered(UUID uuid) {
@@ -57,6 +39,19 @@ public class Files implements CloudDatabase {
     @Override
     public boolean isConnected() {
         return true;
+    }
+
+
+    @Override
+    public void registerPlayer(CloudPlayer cloudPlayer) {
+        if (!this.isRegistered(cloudPlayer.getUuid())) {
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
+            this.setPlayerData(cloudPlayer.getUuid(), data);
+        } else {
+            CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
+            this.setPlayerData(cloudPlayer.getUuid(), newData);
+        }
     }
 
     @Override
@@ -75,6 +70,21 @@ public class Files implements CloudDatabase {
         document.clear();
         document.appendAll(data);
         document.save();
+    }
+
+    @Override
+    public List<CloudPlayerData> loadEntries() {
+        List<CloudPlayerData> list = new LinkedList<>();
+        File dir = this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory();
+        for (File listFile : Objects.requireNonNull(dir.listFiles())) {
+            Document document = Document.fromFile(listFile);
+            CloudPlayerData playerData = document.getObject(document.getJsonObject(), CloudPlayerData.class);
+            if (playerData == null) {
+                continue;
+            }
+            list.add(playerData);
+        }
+        return list;
     }
 
 }

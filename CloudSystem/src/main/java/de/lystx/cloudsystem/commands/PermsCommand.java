@@ -63,20 +63,20 @@ public class PermsCommand extends Command {
             if (args[0].equalsIgnoreCase("info")) {
                 String player = args[1];
                 PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
+                PermissionGroup group = pool.getHighestPermissionGroup(player);
+                if (group == null) {
+                    console.getLogger().sendMessage("ERROR", "§cThe player §e" + player + " §cis not registered!");
+                    return;
+                }
                 UUID uuid = pool.tryUUID(player);
                 if (uuid == null) {
                     console.getLogger().sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
                     return;
                 }
-                PermissionGroup permissionGroup = pool.getHighestPermissionGroup(player);
-                if (permissionGroup == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe player §e" + player + " §cis not registered!");
-                    return;
-                }
                 console.getLogger().sendMessage("INFO", "§9Infos for §b" + player + "§7:");
-                console.getLogger().sendMessage("INFO", "§aPermissionGroup §7| §b" + permissionGroup.getName());
                 console.getLogger().sendMessage("INFO", "§aUUID §7| §b" + uuid);
                 console.getLogger().sendMessage("INFO", "§aName §7| §b" + player);
+                console.getLogger().sendMessage("INFO", "§aPermissionGroup §7| §b" + group.getName());
             } else {
                 this.help(console);
             }

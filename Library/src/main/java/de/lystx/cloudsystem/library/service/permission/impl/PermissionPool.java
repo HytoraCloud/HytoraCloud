@@ -111,8 +111,13 @@ public class PermissionPool implements Serializable {
         this.playerCache.remove(data);
         List<PermissionEntry> permissionEntries = new LinkedList<>(data.getPermissionEntries());
         PermissionEntry entry = new PermissionEntry(this.tryUUID(playerName), group.getName(), "");
-        permissionEntries.removeIf(permissionEntry -> permissionEntry.getPermissionGroup().equalsIgnoreCase(group.getName()));
+        for (PermissionEntry permissionEntry : permissionEntries) {
+            if (permissionEntry.getPermissionGroup().equalsIgnoreCase(entry.getPermissionGroup())) {
+                permissionEntries.remove(permissionEntry);
+            }
+        }
 
+        permissionEntries.add(entry);
         if (i > 0) {
             Calendar c = Calendar.getInstance();
             try{
@@ -135,7 +140,6 @@ public class PermissionPool implements Serializable {
             c.add(i1, i);
             entry.setValidTime(this.format.format(c.getTime()));
         }
-        permissionEntries.add(entry);
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
     }
@@ -143,20 +147,26 @@ public class PermissionPool implements Serializable {
 
     public List<PermissionGroup> getPermissionGroups(String player) {
         List<PermissionGroup> permissionGroups = new LinkedList<>();
-        CloudPlayerData data = this.getPlayerData(player);
-        if (data != null) {
-            for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
-                PermissionGroup permissionGroup = this.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
-                permissionGroups.add(permissionGroup);
+        try {
+            CloudPlayerData data = this.getPlayerData(player);
+            if (data != null) {
+                for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
+                    PermissionGroup permissionGroup = this.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
+                    permissionGroups.add(permissionGroup);
+                }
             }
-        }
+        } catch (NullPointerException e) {}
         return permissionGroups;
     }
 
     public PermissionGroup getHighestPermissionGroup(String player) {
         List<PermissionGroup> list = this.getPermissionGroups(player);
         list.sort(Comparator.comparingInt(PermissionGroup::getId));
-        return list.get(0) == null ? new DefaultPermissionGroup() : list.get(0);
+        if (list.isEmpty()) {
+            return new DefaultPermissionGroup();
+        } else {
+            return list.get(0);
+        }
     }
 
     public CloudPlayerData getPlayerData(String playerName) {
@@ -249,20 +259,23 @@ public class PermissionPool implements Serializable {
 
     public void clearInvalidUUIDs(File directory) {
         new Thread(() -> {
-            for (File file : Objects.requireNonNull(directory.listFiles())) {
-                String uuid = file.getName().split("\\.")[0];
-                try {
-                    if (UUIDService.getName(UUID.fromString(uuid)) == null) {
+            try {
+                for (File file : Objects.requireNonNull(directory.listFiles())) {
+                    try {
+                        String uuid = file.getName().split("\\.")[0];
+                        if (UUIDService.getName(UUID.fromString(uuid)) == null) {
+                            file.delete();
+                        }
+                    } catch (NullPointerException e) {
                         file.delete();
                     }
-                } catch (NullPointerException | IOException e) {
-                    file.delete();
                 }
+            } catch (NullPointerException | IOException e) {
             }
         }, "async_uuid_clear_cache").start();
     }
 
-    public UUID getUUID(String name) {
+    private UUID getUUID(String name) {
         for (CloudPlayerData data : this.playerCache) {
             if (data.getName().equalsIgnoreCase(name)) {
                 return data.getUuid();
@@ -283,7 +296,7 @@ public class PermissionPool implements Serializable {
         }
     }
 
-    public String getName(UUID uuid) {
+    private String getName(UUID uuid) {
         for (CloudPlayerData data : this.playerCache) {
             if (data.getUuid().equals(uuid)) {
                 return data.getName();

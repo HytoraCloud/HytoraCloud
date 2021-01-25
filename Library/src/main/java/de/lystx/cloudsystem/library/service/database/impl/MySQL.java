@@ -51,18 +51,6 @@ public class MySQL implements CloudDatabase {
     }
 
     @Override
-    public void registerPlayer(CloudPlayer cloudPlayer) {
-        if (!this.isRegistered(cloudPlayer.getUuid())) {
-            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
-            this.setPlayerData(cloudPlayer.getUuid(), data);
-        } else {
-            CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
-            this.setPlayerData(cloudPlayer.getUuid(), newData);
-        }
-    }
-
-    @Override
     public boolean isRegistered(UUID uuid) {
         try {
             PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + databaseService.getCollectionOrTable() + " WHERE uuid = ?");
@@ -83,6 +71,19 @@ public class MySQL implements CloudDatabase {
             return !this.connection.isClosed();
         } catch (SQLException throwables) {
             return false;
+        }
+    }
+
+
+    @Override
+    public void registerPlayer(CloudPlayer cloudPlayer) {
+        if (!this.isRegistered(cloudPlayer.getUuid())) {
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
+            this.setPlayerData(cloudPlayer.getUuid(), data);
+        } else {
+            CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
+            this.setPlayerData(cloudPlayer.getUuid(), newData);
         }
     }
 
@@ -126,6 +127,11 @@ public class MySQL implements CloudDatabase {
             ps.executeUpdate();
             ps.close();
         } catch (SQLException exception) {}
+    }
+
+    @Override
+    public List<CloudPlayerData> loadEntries() {
+        return new LinkedList<>();
     }
 
     public void update(UUID uuid, String key, Object value) {

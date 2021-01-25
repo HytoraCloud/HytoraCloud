@@ -34,13 +34,13 @@ public class StopCommand extends Command {
                     console.getLogger().sendMessage("ERROR", "§cThe group §e" + groupName + " §cseems not to exist!");
                     return;
                 }
-                CloudSystem.getInstance().getService().stopServices(group);
                 console.getLogger().sendMessage("COMMAND", "§7The group §a" + group.getName() + " §7was stopped§8!");
+                CloudSystem.getInstance().getService().stopServices(group);
             } else {
-                console.getLogger().sendMessage("ERROR", "§cstop <group <servicename>/servicename>");
+                console.getLogger().sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
             }
         } else {
-            console.getLogger().sendMessage("ERROR", "§cstop <group <servicename>/servicename>");
+            console.getLogger().sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
         }
     }
 }

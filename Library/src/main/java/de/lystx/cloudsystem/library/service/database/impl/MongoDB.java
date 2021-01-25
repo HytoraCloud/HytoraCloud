@@ -4,12 +4,14 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import com.mongodb.BasicDBObject;
+import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
@@ -18,6 +20,7 @@ import org.bson.Document;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 @Getter
 public class MongoDB implements CloudDatabase {
@@ -45,14 +48,32 @@ public class MongoDB implements CloudDatabase {
     }
 
     @Override
+    public void registerPlayer(CloudPlayer cloudPlayer) {
+        if (!this.isRegistered(cloudPlayer.getUuid())) {
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
+            this.setPlayerData(cloudPlayer.getUuid(), data);
+        } else {
+            CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
+            this.setPlayerData(cloudPlayer.getUuid(), newData);
+        }
+    }
+
+    @Override
     public CloudPlayerData getPlayerData(UUID uuid) {
         try {
-            Document document = this.getDocument("uuid", uuid);
+            Document document = this.getDocument("uuid", uuid.toString());
+            Document entries = document.get("permissionEntries", Document.class);
+            List<PermissionEntry> permissionEntries = new LinkedList<>();
+            for (String s : entries.keySet()) {
+                Document sub = entries.get(s, Document.class);
+                permissionEntries.add(new PermissionEntry(uuid, sub.getString("group"), sub.getString("validTime")));
+            }
             return new CloudPlayerData(
-                    document.get("uuid", UUID.class),
+                    uuid,
                     document.getString("name"),
-                    document.get("permissionEntries", ArrayList.class),
-                    document.get("permissions", ArrayList.class),
+                    permissionEntries,
+                    document.get("permissions", new ArrayList<>()),
                     document.getString("ipAddress"),
                     document.getBoolean("notifyServerStart"),
                     document.get("firstLogin", Long.class),
@@ -65,14 +86,36 @@ public class MongoDB implements CloudDatabase {
 
     @Override
     public void setPlayerData(UUID uuid, CloudPlayerData data) {
-        Document document = this.getDocument("uuid", uuid);
+        Document entries = new Document();
+        for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
+            uuid = permissionEntry.getUuid();
+            entries.append(UUID.randomUUID().toString(), new Document().append("group", permissionEntry.getPermissionGroup()).append("validTime", permissionEntry.getValidTime()));
+        }
+        Document document = this.getDocument("uuid", uuid.toString());
         Document doc = new Document();
-        doc.putAll(data.getAsMap());
+        doc.append("uuid", uuid.toString());
+        doc.append("name", data.getName());
+        doc.append("permissionEntries", entries);
+        doc.append("permissions", data.getPermissions());
+        doc.append("ipAddress", data.getIpAddress());
+        doc.append("notifyServerStart", data.isNotifyServerStart());
+        doc.append("firstLogin", data.getFirstLogin());
+        doc.append("lastLogin", data.getLastLogin());
         if (document == null) {
             this.insert(doc);
         } else {
             this.insert(document, doc);
         }
+    }
+
+    @Override
+    public List<CloudPlayerData> loadEntries() {
+        List<CloudPlayerData> list = new LinkedList<>();
+        for (Document document : this.getDocuments()) {
+            CloudPlayerData data = this.getPlayerData(UUID.fromString(document.getString("uuid")));
+            list.add(data);
+        }
+        return list;
     }
 
     @Override
@@ -88,21 +131,8 @@ public class MongoDB implements CloudDatabase {
     }
 
     @Override
-    public void registerPlayer(CloudPlayer cloudPlayer) {
-
-        if (!this.isRegistered(cloudPlayer.getUuid())) {
-            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
-            this.setPlayerData(cloudPlayer.getUuid(), data);
-        } else {
-            CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
-            this.setPlayerData(cloudPlayer.getUuid(), newData);
-        }
-    }
-
-    @Override
     public boolean isRegistered(UUID uuid) {
-        return this.getDocument("uuid", uuid) != null;
+        return this.getDocument("uuid", uuid.toString()) != null;
     }
 
 
@@ -116,14 +146,17 @@ public class MongoDB implements CloudDatabase {
         this.database.getCollection(this.databaseService.getCollectionOrTable()).insertOne(document);
     }
 
-    public void insert(Document document, Document newDocument) {
-        this.database.getCollection(this.databaseService.getCollectionOrTable()).replaceOne(document, newDocument);
+
+    public List<Document> getDocuments() {
+        List<Document> list = new LinkedList<>();
+        try {
+            this.database.getCollection(databaseService.getCollectionOrTable()).find().iterator().forEachRemaining(list::add);
+        } catch (NullPointerException e) {}
+        return list;
     }
 
-    public void submit(UUID uuid, String key, Object value) {
-        Document document = this.getDocument("uuid", uuid);
-        document.append(key, value);
-        this.database.getCollection(this.databaseService.getCollectionOrTable()).updateOne(Filters.eq("uuid", uuid), new BasicDBObject("$set", new BasicDBObject(key, value)));
+    public void insert(Document document, Document newDocument) {
+        this.database.getCollection(this.databaseService.getCollectionOrTable()).replaceOne(document, newDocument);
     }
 
     public Document getDocument(String key, Object value) {

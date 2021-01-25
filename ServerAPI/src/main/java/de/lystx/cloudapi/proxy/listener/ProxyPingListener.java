@@ -8,6 +8,7 @@ import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.Motd;
+import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
@@ -15,6 +16,7 @@ import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+@Getter
 public class ProxyPingListener implements Listener {
 
 
@@ -26,38 +28,41 @@ public class ProxyPingListener implements Listener {
 
     @EventHandler
     public void onProxyPing(ProxyPingEvent event) {
-        for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-            networkHandler.onNetworkPing(event.getConnection().getUniqueId());
-        }
+        try {
 
-        if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
-            return;
-        }
-        ServerPing ping = event.getResponse();
-        ServerPing.Players players = ping.getPlayers();
+            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
+                networkHandler.onNetworkPing(event.getConnection().getUniqueId());
+            }
 
-        ping.getPlayers().setMax(this.cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers());
+            if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
+                return;
+            }
+            ServerPing ping = event.getResponse();
+            ServerPing.Players players = ping.getPlayers();
 
-        Motd motd;
-        if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance()) {
-            motd = this.cloudAPI.getNetworkConfig().getProxyConfig().getMotdMaintenance();
-        } else {
-            motd = this.cloudAPI.getNetworkConfig().getProxyConfig().getMotdNormal();
-        }
+            ping.getPlayers().setMax(this.cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers());
 
-        if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
-            ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), event.getConnection().getVirtualHost().getPort())), 2));
-        }
+            Motd motd;
+            if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance()) {
+                motd = this.cloudAPI.getNetworkConfig().getProxyConfig().getMotdMaintenance();
+            } else {
+                motd = this.cloudAPI.getNetworkConfig().getProxyConfig().getMotdNormal();
+            }
 
-        if (motd.getProtocolString() != null && !motd.getProtocolString().trim().isEmpty()) {
-            players.setSample(new ServerPing.PlayerInfo[] { new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getProtocolString(), event.getConnection().getVirtualHost().getPort())).replace("||", "\n"), UUID.randomUUID())});
-        }
+            if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
+                ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), event.getConnection().getVirtualHost().getPort())), 2));
+            }
 
-        ping.setDescription(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getFirstLine(), event.getConnection().getVirtualHost().getPort())) + "\n" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getSecondLine(), event.getConnection().getVirtualHost().getPort())));
+            if (motd.getProtocolString() != null && !motd.getProtocolString().trim().isEmpty()) {
+                players.setSample(new ServerPing.PlayerInfo[] { new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getProtocolString(), event.getConnection().getVirtualHost().getPort())).replace("||", "\n"), UUID.randomUUID())});
+            }
 
-        ping.setPlayers(players);
+            ping.setDescription(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getFirstLine(), event.getConnection().getVirtualHost().getPort())) + "\n" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getSecondLine(), event.getConnection().getVirtualHost().getPort())));
 
-        event.setResponse(ping);
+            ping.setPlayers(players);
+
+            event.setResponse(ping);
+        } catch (NullPointerException e) {}
     }
 
 

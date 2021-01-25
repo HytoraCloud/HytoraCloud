@@ -13,10 +13,12 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
@@ -98,30 +100,32 @@ public class PlayerListener implements Listener {
                 networkHandler.onServerChange(cloudPlayer, info.getName());
             }
         }
+        if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
+            this.registerPlayer(player, event.getTarget());
+        }
     }
 
+    @EventHandler
+    public void on(PermissionCheckEvent event) {
+        CommandSender player = event.getSender();
+        event.setHasPermission(cloudAPI.getPermissionPool().hasPermission(player.getName(), event.getPermission()));
+    }
 
     @EventHandler
     public void onJoin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
         CloudProxy.getInstance().updatePermissions(player);
-        this.cloudAPI.getScheduler().scheduleDelayedTask(() -> {
-            this.registerPlayer(player);
-        }, 4L);
     }
 
 
-    public void registerPlayer(ProxiedPlayer player) {
-        if (player.getServer() == null) {
+    public void registerPlayer(ProxiedPlayer player, ServerInfo server) {
+        if (server == null) {
             return;
         }
-        this.registerPlayer(player.getName(), player.getUniqueId(), player.getServer().getInfo().getName(), player.getAddress().getAddress().getHostAddress(), player.getPendingConnection().getVirtualHost().getPort());
+        this.registerPlayer(player.getName(), player.getUniqueId(), server.getName(), player.getAddress().getAddress().getHostAddress(), player.getPendingConnection().getVirtualHost().getPort());
     }
 
     public void registerPlayer(String name, UUID uuid, String server, String hostAddress, int proxyPort) {
-        if (this.cloudAPI.getCloudPlayers().get(name) != null) {
-            return;
-        }
         CloudPlayer cloudPlayer = new CloudPlayer(
                 name,
                 uuid,

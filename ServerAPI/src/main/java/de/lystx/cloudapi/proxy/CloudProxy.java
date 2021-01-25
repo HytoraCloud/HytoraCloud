@@ -83,6 +83,14 @@ public class CloudProxy extends Plugin {
 
 
     public void updatePermissions(ProxiedPlayer player) {
-        this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> player.setPermission(s, true));
+        this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> {
+            try {
+                if (s.equalsIgnoreCase("*")) {
+                    player.setPermission("'*'", true);
+                    player.setPermission("*", true);
+                }
+                player.setPermission(s, true);
+            } catch (NullPointerException e){}
+        });
     }
 }
