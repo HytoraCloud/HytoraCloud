@@ -14,6 +14,7 @@ import de.lystx.cloudsystem.handler.services.PacketHandlerStart;
 import de.lystx.cloudsystem.handler.services.PacketHandlerStopServer;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.backup.BackupService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
@@ -42,6 +43,7 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(DatabaseService.class).getDatabase().connect();
         cloudSystem.cloudServices.add(new CloudNetworkService(cloudSystem, "CloudNetwork", CloudService.Type.NETWORK));
         cloudSystem.cloudServices.add(new ModuleService(cloudSystem, "Modules", CloudService.Type.MANAGING));
+        cloudSystem.cloudServices.add(new BackupService(cloudSystem, "Backups", CloudService.Type.MANAGING));
 
         cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.Type.NETWORK));
 

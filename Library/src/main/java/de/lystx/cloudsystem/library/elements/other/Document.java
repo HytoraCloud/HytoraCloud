@@ -287,6 +287,13 @@ public class Document implements Serializable {
         return this.getObject(this.getJsonObject(key), tClass);
     }
 
+    public <T> T getObject(String key, T def) {
+        if (!this.jsonObject.has(key)) {
+            this.append(key, def);
+        }
+        return this.getObject(key, (Class<T>) def.getClass());
+    }
+
     public static Document fromFile(File file) {
         return new Document(file);
     }

@@ -37,6 +37,9 @@ public class FileService extends CloudService {
     private final File groupsDirectory;
     private final File templatesDirectory;
 
+    private final File backupDirectory;
+    private final File backupFile;
+
     private final File globalDirectory;
     private final File pluginsDirectory;
     private final File spigotPluginsDirectory;
@@ -75,6 +78,7 @@ public class FileService extends CloudService {
         this.groupsDirectory = new File(this.cloudDirectory, "groups/");
         this.templatesDirectory = new File(this.cloudDirectory, "templates/");
 
+
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");
         this.bungeeCordPluginsDirectory = new File(this.pluginsDirectory, "bungee/");
@@ -84,6 +88,10 @@ public class FileService extends CloudService {
         this.oldSpigotVersionsDirectory = new File(this.versionsDirectory, "old/");
         this.logsDirectory = new File(this.globalDirectory, "logs/");
         this.modulesDirectory = new File(this.globalDirectory, "modules/");
+
+
+        this.backupDirectory = new File(this.globalDirectory, "backup/");
+        this.backupFile = new File(this.backupDirectory, "backup.json");
 
         this.check();
     }
@@ -122,6 +130,8 @@ public class FileService extends CloudService {
         this.oldSpigotVersionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
         this.modulesDirectory.mkdirs();
+
+        this.backupDirectory.mkdirs();
 
         try {
             for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {
