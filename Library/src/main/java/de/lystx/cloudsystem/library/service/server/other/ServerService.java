@@ -186,7 +186,8 @@ public class ServerService extends CloudService {
                 for (int i = this.getServices(serviceGroup).size(); i < serviceGroup.getMinServer(); i++) {
                     int id = idService.getFreeID(serviceGroup.getName());
                     int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-                    Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY);
+                    Service service = new Service(
+                            serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY);
                     this.startService(serviceGroup, service);
                 }
             }
