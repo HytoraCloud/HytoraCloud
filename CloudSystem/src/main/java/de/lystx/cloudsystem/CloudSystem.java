@@ -121,7 +121,8 @@ public class CloudSystem extends CloudLibrary {
                     this.getService(NPCService.class).getDocument().toString()
             ));
         } catch (NullPointerException e) {
-            this.console.getLogger().sendMessage("ERROR", "§cYou can't reload at the moment! Try again in a few seconds!");
+            this.console.getLogger().sendMessage("ERROR", "§cYou can't reload at the moment! Try again in a few seconds! §e");
+            e.printStackTrace();
         }
     }
 

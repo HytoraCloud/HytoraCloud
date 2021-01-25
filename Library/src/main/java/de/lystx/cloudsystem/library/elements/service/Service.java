@@ -13,13 +13,13 @@ public class Service implements Serializable {
 
     private final String name;
     private final UUID uniqueId;
-    private final ServiceGroup serviceGroup;
     private final int serviceID;
     private final int port;
     private final String host;
     private final int cloudPort;
     private final ServiceState serviceState;
     private String properties;
+    private ServiceGroup serviceGroup;
 
     public Service(String name, UUID uniqueId, ServiceGroup serviceGroup, int serviceID, int port, int cloudPort, ServiceState serviceState) {
         this.name = name;

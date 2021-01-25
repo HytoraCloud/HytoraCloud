@@ -56,6 +56,15 @@ public class LoggerService extends CloudService {
         }
     }
 
+    public String readLine(String s) {
+        try {
+            return this.consoleReader.readLine(s);
+        } catch (IOException | StringIndexOutOfBoundsException ex) {
+            this.logger.log(Level.SEVERE, "Something is wrong while reading Line", ex);
+            return "null";
+        }
+    }
+
     public ConsoleReader getConsoleReader() {
         return this.consoleReader;
     }

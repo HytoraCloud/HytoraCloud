@@ -24,6 +24,7 @@ public class PacketHandlerStopServer extends PacketHandlerAdapter {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }
                 this.cloudSystem.getService().stopService(this.cloudSystem.getService().getService(service.getName()));
+                this.cloudSystem.reload();
             } catch (NullPointerException ignored) {}
         }
     }

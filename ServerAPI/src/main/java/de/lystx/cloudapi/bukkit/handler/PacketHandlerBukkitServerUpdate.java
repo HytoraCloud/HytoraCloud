@@ -3,6 +3,7 @@ package de.lystx.cloudapi.bukkit.handler;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceStateChange;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInUpdateServiceGroup;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutUpdateServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
@@ -23,14 +24,11 @@ public class PacketHandlerBukkitServerUpdate extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayOutUpdateServiceGroup) {
-            PacketPlayOutUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketPlayOutUpdateServiceGroup)packet;
+        if (packet instanceof PacketPlayInUpdateServiceGroup) {
+            PacketPlayInUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketPlayInUpdateServiceGroup)packet;
             ServiceGroup group = this.cloudAPI.getService().getServiceGroup();
             ServiceGroup newGroup = packetPlayOutUpdateServiceGroup.getServiceGroup();
             if (newGroup.getName().equalsIgnoreCase(group.getName())) {
-                Document document = this.cloudAPI.getDocument();
-                document.append("serviceGroup", newGroup);
-                document.save();
                 if (newGroup.isMaintenance()) {
                     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                         if (onlinePlayer.hasPermission("cloudsystem.group.maintenance")) {

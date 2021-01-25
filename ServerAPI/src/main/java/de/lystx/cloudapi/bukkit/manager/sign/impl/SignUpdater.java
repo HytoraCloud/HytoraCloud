@@ -64,7 +64,6 @@ public class SignUpdater  {
 
                 for (ServiceGroup globalServerGroup : cloudAPI.getNetwork().getServiceGroups()) {
                     String groupName = globalServerGroup.getName();
-
                     serverMetas.clear();
                     for (Service service : this.cloudAPI.getNetwork().getServices()) {
                         if (service.getServiceGroup().getName().equalsIgnoreCase(groupName) && !service.getServiceState().equals(ServiceState.INGAME) && !service.getServiceState().equals(ServiceState.OFFLINE)) {
@@ -100,7 +99,7 @@ public class SignUpdater  {
                             this.freeSignMap.put(groupName, onlineSins);
                         }
 
-                        this.setOfflineSigns(groupName, current);
+                        this.setOfflineSigns(groupName, current, this.freeSignMap);
                         if (cloudSign != null) {
                             Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
 
@@ -108,7 +107,9 @@ public class SignUpdater  {
                                 return;
                             }
                             try {
-                                serverPinger.pingServer(current.getHost(), current.getPort(), 2500);
+                                if (cloudAPI.getNetwork().getService(current.getName()) != null) {
+                                    serverPinger.pingServer(current.getHost(), current.getPort(), 5);
+                                }
                             } catch (IOException exception) {
                                 Bukkit.getLogger().log(Level.SEVERE,"Something is wrong when pinging Server", exception);
                             }
@@ -139,18 +140,20 @@ public class SignUpdater  {
 
     public SignGroup createSignGroup(String name) {
         SignGroup signGroup = new SignGroup(name.toUpperCase());
+        HashMap<Integer, CloudSign> map = new HashMap<>();
         int count = 1;
         for (CloudSign cloudSign : CloudServer.getInstance().getSignManager().getCloudSigns()) {
             if (cloudSign.getGroup().equalsIgnoreCase(name)) {
-                signGroup.getCloudSignHashMap().put(count, cloudSign);
+                map.put(count, cloudSign);
                 count++;
             }
         }
+        signGroup.setCloudSignHashMap(map);
         return signGroup;
     }
 
-    public void setOfflineSigns(String group, Service service) {
-        this.getOfflineSigns(group).forEach(cloudSign -> {
+    public void setOfflineSigns(String group, Service service, Map<String, Map<Integer, CloudSign>> freeSigns) {
+        this.getOfflineSigns(group, freeSigns).forEach(cloudSign -> {
             Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
             if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
                 return;
@@ -179,30 +182,37 @@ public class SignUpdater  {
 
     }
 
-    public List<CloudSign> getOfflineSigns(String name) {
-
-        List<CloudSign> offlineSigns = new ArrayList<>();
-
+    public List<CloudSign> getOfflineSigns(String name, Map<String, Map<Integer, CloudSign>> freeSigns) {
 
         Set<Integer> allSigns = this.createSignGroup(name).getCloudSignHashMap().keySet();
-        Set<Integer> onlineSigns = this.freeSignMap.get(name).keySet();
+        Set<Integer> onlineSigns = freeSigns.get(name).keySet();
 
-        allSigns.removeAll(onlineSigns);
+        if (onlineSigns.size() == allSigns.size()) {
+            return new LinkedList<>();
+        } else {
 
-        for (Integer count : allSigns){
-            offlineSigns.add(this.createSignGroup(name).getCloudSignHashMap().get(count));
+            for (Integer onlineSign : onlineSigns) {
+                allSigns.remove(onlineSign);
+            }
+
+            List<CloudSign> offlineSigns = new ArrayList<>();
+            for (Integer count : allSigns) {
+                CloudSign sign = this.createSignGroup(name).getCloudSignHashMap().get(count);
+                Service s = cloudAPI.getNetwork().getService(sign.getGroup() + "-" + count);
+                if (s == null || s.getServiceState().equals(ServiceState.INGAME) || s.getServiceState().equals(ServiceState.OFFLINE)) {
+                    offlineSigns.add(sign);
+                }
+            }
+
+            return offlineSigns;
         }
-
-        return offlineSigns;
     }
 
 
     public void signUpdate(Sign sign, Service service, ServerPinger serverPinger) {
         JsonObject jsonObject;
         if (service.getServiceState().equals(ServiceState.MAINTENANCE) || service.getServiceGroup().isMaintenance()) {
-         jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
-        } else if (service.getServiceState().equals(ServiceState.LOBBY)) {
-            jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getOnlineLayOut();
+           jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
         } else if (service.getServiceState().equals(ServiceState.FULL)) {
             jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getFullLayOut();
         } else {

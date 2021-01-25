@@ -11,6 +11,7 @@ public @interface SetupPart {
     int id();
 
     String[] forbiddenAnswers() default {};
+    String[] onlyAnswers() default {};
 
     String question();
 }

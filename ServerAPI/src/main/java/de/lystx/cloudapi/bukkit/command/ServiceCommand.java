@@ -132,7 +132,7 @@ public class ServiceCommand implements CommandExecutor {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid §eServiceState§c!");
                             return false;
                         }
-                        ServiceState state = ServiceState.valueOf(name);
+                        ServiceState state = ServiceState.valueOf(name.toUpperCase());
                         CloudServer.getInstance().getManager().setServiceState(state);
                         CloudServer.getInstance().getManager().update();
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You set the ServiceState of this service to " + state.getColor() + state.name());

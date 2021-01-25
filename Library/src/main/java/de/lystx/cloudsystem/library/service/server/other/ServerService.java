@@ -14,6 +14,8 @@ import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
+import de.lystx.cloudsystem.library.service.screen.CloudScreen;
+import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.manager.IDService;
 import de.lystx.cloudsystem.library.service.server.other.manager.PortService;
@@ -24,6 +26,7 @@ import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.File;
 import java.util.*;
 
 
@@ -65,9 +68,17 @@ public class ServerService extends CloudService {
     }
 
     public void updateGroup(ServiceGroup group, ServiceGroup newGroup) {
-        List<Service> list = this.getServices(group);
+        List<Service> list = this.getServices(this.getGroup(group.getName()));
         this.services.remove(this.getGroup(group.getName()));
         this.services.put(newGroup, list);
+
+        for (Service service : this.getServices(this.getGroup(group.getName()))) {
+            service.setServiceGroup(newGroup);
+            CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getScreenByName(service.getName());
+            Document document = new Document(new File(screen.getServerDir(), "CLOUD/connection.json"));
+            document.appendAll(service);
+            document.save();
+        }
     }
 
     public void notifyStart(Service service) {

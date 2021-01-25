@@ -4,6 +4,7 @@ package de.lystx.cloudsystem.library.service.console;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 public class CloudConsole extends Thread {
 
@@ -21,11 +22,12 @@ public class CloudConsole extends Thread {
     public void run() {
         while (!this.isInterrupted()) {
             try {
+                String s = this.logger.colorString("§9Cloud§b@§7" + this.buffer.replace('-', ' ') + " §f» §7 ");
                 this.logger.getConsoleReader().setPrompt("");
                 this.logger.getConsoleReader().resetPromptLine("", "", 0);
                 String line;
                 try {
-                    if ((line = this.logger.getConsoleReader().readLine(this.logger.colorString("§9Cloud§b@§7" + this.buffer.replace('-', ' ') + " §f» §7 "))) != null) {
+                    if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
                         if (!line.trim().isEmpty()) {
                             this.logger.getConsoleReader().setPrompt("");
                             this.commandManager.execute(line, this);

@@ -3,52 +3,53 @@ package de.lystx.cloudsystem.library.service.file;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.URL;
 import java.util.Objects;
 
-@Getter
+@Getter @Setter
 public class FileService extends CloudService {
 
-    private final File startSh;
-    private final File startBat;
+    private File startSh;
+    private File startBat;
 
-    private final File cloudDirectory;
-    private final File configFile;
-    private final File permissionsFile;
+    private File cloudDirectory;
+    private File configFile;
+    private File permissionsFile;
 
-    private final File npcDirectory;
-    private final File npcFile;
+    private File npcDirectory;
+    private File npcFile;
 
-    private final File signDirectory;
-    private final File signLayoutFile;
-    private final File signsFile;
+    private File signDirectory;
+    private File signLayoutFile;
+    private File signsFile;
 
-    private final File serverDirectory;
-    private final File staticServerDirectory;
-    private final File dynamicServerDirectory;
+    private File serverDirectory;
+    private File staticServerDirectory;
+    private File dynamicServerDirectory;
 
-    private final File databaseDirectory;
-    private final File cloudPlayerDirectory;
-    private final File logsDirectory;
+    private File databaseDirectory;
+    private File cloudPlayerDirectory;
+    private File logsDirectory;
 
-    private final File groupsDirectory;
-    private final File templatesDirectory;
+    private File groupsDirectory;
+    private File templatesDirectory;
 
-    private final File backupDirectory;
-    private final File backupFile;
+    private File backupDirectory;
+    private File backupFile;
 
-    private final File globalDirectory;
-    private final File pluginsDirectory;
-    private final File spigotPluginsDirectory;
-    private final File bungeeCordPluginsDirectory;
-    private final File modulesDirectory;
-    private final File statsFile;
-    private final File versionsDirectory;
-    private final File spigotVersionsDirectory;
-    private final File oldSpigotVersionsDirectory;
+    private File globalDirectory;
+    private File pluginsDirectory;
+    private File spigotPluginsDirectory;
+    private File bungeeCordPluginsDirectory;
+    private File modulesDirectory;
+    private File statsFile;
+    private File versionsDirectory;
+    private File spigotVersionsDirectory;
+    private File oldSpigotVersionsDirectory;
 
     public FileService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);

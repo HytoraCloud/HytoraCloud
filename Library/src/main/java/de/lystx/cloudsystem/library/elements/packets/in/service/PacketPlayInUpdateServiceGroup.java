@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.elements.packets.in.service;
 
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunication;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;
@@ -7,12 +8,12 @@ import lombok.Getter;
 import java.io.Serializable;
 
 @Getter
-public class PacketPlayInUpdateServiceGroup extends Packet implements Serializable {
+public class PacketPlayInUpdateServiceGroup extends PacketCommunication implements Serializable {
 
     private final ServiceGroup serviceGroup;
 
     public PacketPlayInUpdateServiceGroup(ServiceGroup serviceGroup) {
-        super();
+        super(PacketPlayInUpdateServiceGroup.class);
         this.serviceGroup = serviceGroup;
     }
 }

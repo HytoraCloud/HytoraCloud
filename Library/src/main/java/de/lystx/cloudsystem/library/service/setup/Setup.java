@@ -4,6 +4,7 @@ package de.lystx.cloudsystem.library.service.setup;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -31,7 +32,7 @@ public abstract class Setup {
         this.cloudConsole.getLogger().sendMessage("SETUP", (this.currentPart.getValue()).question() + " §7(§a" + (this.currentPart.getKey()).getType().getSimpleName() + "§7)");
         while (this.current < this.setupParts.size() + 1) {
             String line = scanner.getLogger().readLine();
-            next(line);
+            this.next(line);
         }
         this.consumer.accept(this);
     }
@@ -40,16 +41,20 @@ public abstract class Setup {
         return this.wasCancelled;
     }
 
-    public boolean hasNext() {
-        return (this.setupParts.size() > this.current);
-    }
-
     public void next(String lastAnswer) {
         if (this.currentPart != null) {
+            if (lastAnswer.trim().isEmpty()) {
+                this.cloudConsole.getLogger().sendMessage("ERROR","§cPlease enter a value!");
+                return;
+            }
             if (lastAnswer.equalsIgnoreCase("cancel")) {
                 this.cloudConsole.getLogger().sendMessage("SETUP", "§cThe current §esetup §cwas cancelled!");
                 this.wasCancelled = true;
                 this.current = (current + 10000);
+                return;
+            }
+            if (!isAnswerAllowed(this.currentPart.getValue(), lastAnswer)) {
+                this.cloudConsole.getLogger().sendMessage("ERROR", "§cPossible answers §e" + (Arrays.toString(this.currentPart.getValue().onlyAnswers())).replace("]", "").replace("[", ""));
                 return;
             }
             if (isAnswerForbidden(this.currentPart.getValue(), lastAnswer)) {
@@ -100,6 +105,19 @@ public abstract class Setup {
                     return true;
             }
         return false;
+    }
+
+    public boolean isAnswerAllowed(SetupPart setupPart, String answer) {
+        if ((setupPart.onlyAnswers()).length > 0) {
+            for (String forbiddenAnswer : setupPart.onlyAnswers()) {
+                if (forbiddenAnswer.equalsIgnoreCase(answer)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public Map.Entry<Field, SetupPart> getEntry(int id) {

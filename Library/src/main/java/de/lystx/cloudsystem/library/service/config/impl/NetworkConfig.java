@@ -93,21 +93,10 @@ public class NetworkConfig implements Serializable {
                         "%prefix%§cAn error occured§8: §e%error%"
                         ),
                 new FallbackConfig(
-                        new Fallback("Lobby", null),
+                        new Fallback(1, "Lobby", null),
                         new ArrayList<>()
                 )
         );
     }
 
-    @Override
-    public String toString() {
-        return "NetworkConfig{" +
-                "host='" + host + '\'' +
-                ", port=" + port +
-                ", setupDone=" + setupDone +
-                ", proxyConfig=" + proxyConfig +
-                ", messageConfig=" + messageConfig +
-                ", fallbackConfig=" + fallbackConfig +
-                '}';
-    }
 }

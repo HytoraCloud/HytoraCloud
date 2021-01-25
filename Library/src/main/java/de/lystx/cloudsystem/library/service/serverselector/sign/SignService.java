@@ -35,6 +35,7 @@ public class SignService extends CloudService {
         this.cloudSigns = new LinkedList<>();
         if (!this.layOutFile.exists()) {
             new DefaultSignLayout().save(this.layOutFile);
+            this.signLayOut = new SignLayOut(new DefaultSignLayout());
         } else {
             this.signLayOut = new SignLayOut(new Document(this.layOutFile));
         }

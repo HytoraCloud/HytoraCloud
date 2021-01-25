@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.serverselector.sign.manager;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 
@@ -30,37 +31,38 @@ public class ServerPinger {
         inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_16BE);
 
         dataOutputStream.write(new byte[] { -2, 1 });
+        try {
+            int packetId = inputStream.read();
+            if(packetId != 255)
+                close();
 
-        int packetId = inputStream.read();
-        if(packetId != 255)
-            close();
+            int length = inputStreamReader.read();
+            if (length == -1 || length == 0)
+                close();
 
-        int length = inputStreamReader.read();
-        if (length == -1 || length == 0)
-            close();
+            final char[] chars = new char[length];
 
-        final char[] chars = new char[length];
+            if (inputStreamReader.read(chars, 0, length) != length)
+                close();
 
-        if (inputStreamReader.read(chars, 0, length) != length)
-            close();
+            final String string = new String(chars);
 
-        final String string = new String(chars);
-
-        if (string.startsWith("§")) {
-            final String[] data = string.split("\u0000");
-            motd = data[3];
-            players = Integer.parseInt(data[4]);
-            maxplayers = Integer.parseInt(data[5]);
-            online = true;
-            close();
-        } else {
-            final String[] data = string.split("§");
-            motd = data[0];
-            players = Integer.parseInt(data[1]);
-            maxplayers = Integer.parseInt(data[2]);
-            online = true;
-            close();
-        }
+            if (string.startsWith("§")) {
+                final String[] data = string.split("\u0000");
+                motd = data[3];
+                players = Integer.parseInt(data[4]);
+                maxplayers = Integer.parseInt(data[5]);
+                online = true;
+                close();
+            } else {
+                final String[] data = string.split("§");
+                motd = data[0];
+                players = Integer.parseInt(data[1]);
+                maxplayers = Integer.parseInt(data[2]);
+                online = true;
+                close();
+            }
+        } catch (SocketTimeoutException e) {}
     }
 
     private void close() throws IOException {

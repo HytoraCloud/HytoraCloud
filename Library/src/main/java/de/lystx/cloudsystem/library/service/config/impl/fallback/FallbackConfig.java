@@ -16,4 +16,13 @@ public class FallbackConfig implements Serializable {
         this.defaultFallback = defaultFallback;
         this.fallbacks = fallbacks;
     }
+
+    public Fallback getFallback(String name) {
+        for (Fallback fallback : this.fallbacks) {
+            if (fallback.getGroupName().equalsIgnoreCase(name)) {
+                return fallback;
+            }
+        }
+        return null;
+    }
 }
