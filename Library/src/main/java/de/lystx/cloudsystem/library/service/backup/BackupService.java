@@ -32,8 +32,8 @@ public class BackupService extends CloudService {
     }
 
     public void load() {
-        this.timeUnit = TimeUnit.valueOf(this.document.getString("timeUnit", TimeUnit.HOURS.name()));
-        this.interval = this.document.getInteger("interval", 5);
+        this.timeUnit = TimeUnit.valueOf(this.document.getString("timeUnit", "DAYS"));
+        this.interval = this.document.getInteger("interval", 1);
         this.enabled = this.document.getBoolean("enabled", true);
         this.lastBackup = this.document.getLong("lastBackup", new Date().getTime());
         this.document.save();
