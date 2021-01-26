@@ -167,7 +167,7 @@ public class Document implements Serializable {
         return this.jsonObject.get(key).getAsDouble();
     }
 
-    public double getDouble(String key, Double value) {
+    public double getDouble(String key, java.lang.Double value) {
         if (!this.jsonObject.has(key)) {
             this.append(key, value);
             return value;

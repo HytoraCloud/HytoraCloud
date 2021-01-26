@@ -29,14 +29,13 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
+import de.lystx.cloudsystem.library.webserver.WebServer;
 import de.lystx.cloudsystem.other.TicksPerSecond;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Getter @Setter
 public class CloudSystem extends CloudLibrary {
@@ -52,6 +51,7 @@ public class CloudSystem extends CloudLibrary {
         super();
         instance = this;
 
+
         this.ticksPerSecond = new TicksPerSecond(this);
         this.cloudServices.add(new CommandService(this, "Command", CloudService.Type.MANAGING));
         this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.Type.UTIL));
@@ -60,9 +60,15 @@ public class CloudSystem extends CloudLibrary {
         this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
         this.cloudServices.add(new FileService(this, "File", CloudService.Type.CONFIG));
+
+        this.webServer = new WebServer(this);
+        this.webServer.update("", new Document().append("info", "There's nothing to see here").append("version", Updater.getCloudVersion()));
+        this.webServer.start();
+
         this.cloudServices.add(new ConfigService(this, "Config", CloudService.Type.CONFIG));
         this.cloudServices.add(new LogService(this, "Logging", CloudService.Type.UTIL));
         this.cloudServices.add(new StatisticsService(this, "Stats", CloudService.Type.UTIL));
+
 
         this.cloudServices.add(new DatabaseService(this, "Database", CloudService.Type.MANAGING));
         this.cloudServices.add(new CloudPlayerService(this, "CloudPlayerService", CloudService.Type.MANAGING));
@@ -89,6 +95,7 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
         this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
         this.getService(CommandService.class).registerCommand(new ModulesCommand("modules", "Manages modules", "pl", "plugins"));
+        this.getService(CommandService.class).registerCommand(new DeleteCommand("delete", "Deletes stuff", "remove"));
         this.getService(CommandService.class).registerCommand(new DownloadCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             if (this.getService(ConfigService.class).getNetworkConfig().isAutoUpdater()) {
@@ -124,7 +131,6 @@ public class CloudSystem extends CloudLibrary {
                     this.getService(NPCService.class).getNPCConfig()
             ));
         } catch (NullPointerException e) {
-            this.console.getLogger().sendMessage("ERROR", "§cYou can't reload at the moment! Try again in a few seconds! §e");
             e.printStackTrace();
         }
     }

@@ -14,9 +14,12 @@ import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.event.EventService;
+import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -43,6 +46,7 @@ public class ServerService extends CloudService {
 
     private final List<Service> cloudServers;
     private final List<Service> cloudProxies;
+    private final List<Service> lobbies;
     private boolean startUp;
 
     private final IDService idService;
@@ -60,6 +64,7 @@ public class ServerService extends CloudService {
 
         this.startUp = false;
         this.cloudServers = new LinkedList<>();
+        this.lobbies = new LinkedList<>();
         this.cloudProxies = new LinkedList<>();
 
         this.idService = new IDService();
@@ -148,7 +153,12 @@ public class ServerService extends CloudService {
         }
         this.cloudServers.sort(Comparator.comparingInt(Service::getServiceID));
         this.cloudProxies.sort(Comparator.comparingInt(Service::getServiceID));
-
+        for (Service cloudServer : cloudServers) {
+            if (cloudServer.getServiceGroup().isLobby()) {
+                lobbies.add(cloudServer);
+            }
+        }
+        cloudServers.removeAll(lobbies);
         for (Service proxy : cloudProxies) {
             this.startService(proxy.getServiceGroup(), proxy);
         }
@@ -159,14 +169,14 @@ public class ServerService extends CloudService {
 
         if (startUp && !this.startUp) {
             this.startUp = true;
-            this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
+            for (Service service : this.lobbies) {
+                this.startService(service.getServiceGroup(), service);
+            }
+            getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
                 for (Service service : this.cloudServers) {
-                    this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
-                        this.startService(service.getServiceGroup(), service);
-                    }, 1L);
+                    this.startService(service.getServiceGroup(), service);
                 }
-            }, 1L);
-
+            }, 3L);
         }
     }
 
@@ -213,11 +223,21 @@ public class ServerService extends CloudService {
         if (!this.getCloudLibrary().isRunning()) {
             return;
         }
-
+        if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName()) == null) {
+            return;
+        }
+        if (!new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json").exists()) {
+            return;
+        }
+        this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutRegisterServer(service));
         if (service.getPort() <= 0) {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
             int id = this.idService.getFreeID(serviceGroup.getName());
             service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), service.getServiceState());
+        }
+        if (serviceGroup.getMaxServer() != -1 && this.getServices(serviceGroup).size() >= serviceGroup.getMaxServer()) {
+            this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
+            return;
         }
         service.setProperties((properties == null ? new Document() : properties).toString());
         this.globalServices.add(service);
@@ -246,7 +266,6 @@ public class ServerService extends CloudService {
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
         Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY);
         this.startService(serviceGroup, service, properties);
-        this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutRegisterServer(service));
     }
 
 
@@ -256,11 +275,6 @@ public class ServerService extends CloudService {
 
     public void stopService(Service service, boolean newServices) {
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStopServer(service));
-        for (CloudPlayer onlinePlayer : this.getCloudLibrary().getService(CloudPlayerService.class).getOnlinePlayers()) {
-            if (onlinePlayer.getServer().equalsIgnoreCase(service.getName())) {
-                onlinePlayer.kick(this.getCloudLibrary().getService(CloudNetworkService.class).getCloudServer(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix()));
-            }
-        }
         this.idService.removeID(service.getServiceGroup().getName(), service.getServiceID());
         this.portService.removeProxyPort(service.getPort());
         this.portService.removePort(service.getPort());
@@ -278,18 +292,19 @@ public class ServerService extends CloudService {
     }
 
     public void stopServices() {
+        List<String> already = new LinkedList<>();
         for (ServiceGroup serviceGroup : this.services.keySet()) {
             if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
                 return;
             }
-            this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The services of the group §c" + serviceGroup.getName() + " §7are now §4shutting down §7| §bServices " + this.services.get(serviceGroup).size());
+            if (!already.contains(serviceGroup.getName())) {
+                already.add(serviceGroup.getName());
+                this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The services of the group §c" + serviceGroup.getName() + " §7are now §4shutting down §7| §bServices " + this.services.get(serviceGroup).size());
+            }
         }
-        if (this.globalServices == null) {
-            this.getCloudLibrary().getConsole().getLogger().sendMessage("ERROR", "§cGlobalserver-List wasnt found!");
-            this.globalServices = new LinkedList<>();
-            return;
-        }
-        for (Service globalService : this.globalServices) {
+
+        for (Object s : (this.globalServices == null ? new LinkedList<>() : this.globalServices)) {
+            Service globalService = (Service)s;
             Service service = this.getService(globalService.getName());
             if (service == null) {
                 continue;

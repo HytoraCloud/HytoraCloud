@@ -15,6 +15,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegi
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -77,6 +78,15 @@ public class CloudServer extends JavaPlugin {
         //cloudAPI.getScheduler().runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
     }
 
+    public void shutdown() {
+        String msg = this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix());
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            CloudPlayer player = cloudAPI.getCloudPlayers().get(onlinePlayer.getName());
+            onlinePlayer.sendMessage(msg);
+            player.fallback(cloudAPI.getCloudClient());
+        }
+        cloudAPI.getScheduler().scheduleDelayedTask(Bukkit::shutdown, 3L);
+    }
 
     public void updatePermissions(Player player) {
         try {

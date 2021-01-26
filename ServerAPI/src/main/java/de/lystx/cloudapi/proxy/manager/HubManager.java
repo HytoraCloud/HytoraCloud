@@ -45,7 +45,10 @@ public class HubManager {
     }
 
     public void sendPlayerToFallback(ProxiedPlayer player) {
-        player.connect(this.getInfo(player));
+
+        player.connect(
+                this.getInfo(player)
+        );
     }
 
     public Fallback getHighestFallback(ProxiedPlayer player) {

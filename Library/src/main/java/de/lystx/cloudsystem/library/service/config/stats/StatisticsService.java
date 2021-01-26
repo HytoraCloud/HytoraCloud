@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.service.config.stats;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
@@ -28,6 +29,8 @@ public class StatisticsService extends CloudService {
         this.statistics = new Statistics();
         this.statistics.setFile(this.file);
         this.statistics.load();
+
+        this.getCloudLibrary().getWebServer().update("stats", this.statistics.toDocument());
     }
 
     public void save() {

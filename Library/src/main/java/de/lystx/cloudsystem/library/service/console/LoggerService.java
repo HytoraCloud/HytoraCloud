@@ -31,6 +31,10 @@ public class LoggerService extends CloudService {
         this.sendMessage("§7[§9" + prefix.toUpperCase() + "§7] §b" + message);
     }
 
+    public void sendMessageToPlayers(String message) {
+
+    }
+
     public void sendMessage() {
         this.sendMessage("§9");
     }

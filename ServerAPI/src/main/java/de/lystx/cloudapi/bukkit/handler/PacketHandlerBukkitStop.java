@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutSt
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -23,10 +24,7 @@ public class PacketHandlerBukkitStop extends PacketHandlerAdapter {
             PacketPlayOutStopServer packetPlayOutStopServer = (PacketPlayOutStopServer)packet;
             Service service = packetPlayOutStopServer.getService();
             if (service.getName().equalsIgnoreCase(cloudAPI.getService().getName())) {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> onlinePlayer.kickPlayer(this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix())));
-                }
-                cloudAPI.getScheduler().scheduleDelayedTask(Bukkit::shutdown, 1L);
+                CloudServer.getInstance().shutdown();
             }
         }
     }

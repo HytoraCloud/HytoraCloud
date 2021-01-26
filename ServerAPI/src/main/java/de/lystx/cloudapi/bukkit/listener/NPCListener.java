@@ -59,7 +59,7 @@ public class NPCListener implements Listener {
             return;
         }
         Player player = (Player) event.getWhoClicked();
-        Map<Integer, Service> serviceMap = this.services.get(player.getUniqueId());
+        Map<Integer, Service> serviceMap = this.services.getOrDefault(player.getUniqueId(), new HashMap<>());
         if (player.getOpenInventory() != null && !serviceMap.isEmpty()) {
             event.setCancelled(true);
             if (event.getCurrentItem().getType().equals(Material.valueOf(CloudServer.getInstance().getNpcManager().getNpcConfig().getItemType()))) {

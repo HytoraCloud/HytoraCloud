@@ -32,8 +32,9 @@ public class TemplateService extends CloudService {
         File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/" + template);
         dir.mkdirs();
         File plugins = new File(dir, "plugins/");
-        if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT)) {
-            this.getCloudLibrary().getService(FileService.class).copyFileWithURL("/implements/server.properties", new File(dir, "server.properties"));
+        File props = new File(dir, "server.properties");
+        if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT) && !props.exists()) {
+            this.getCloudLibrary().getService(FileService.class).copyFileWithURL("/implements/server.properties",props );
         }
         plugins.mkdirs();
     }
@@ -64,6 +65,13 @@ public class TemplateService extends CloudService {
 
     public void deleteTemplates(ServiceGroup serviceGroup) {
         File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/");
+        for (File file : dir.listFiles()) {
+            try {
+                FileUtils.deleteDirectory(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         dir.delete();
     }
 

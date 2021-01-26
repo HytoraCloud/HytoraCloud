@@ -15,6 +15,7 @@ import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
+import de.lystx.cloudsystem.library.webserver.WebServer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,6 +40,8 @@ public class CloudLibrary implements Serializable {
 
     @Setter
     protected boolean running;
+
+    protected WebServer webServer;
 
     protected CloudConsole console;
     protected CloudScreenPrinter screenPrinter;

@@ -1,6 +1,8 @@
 package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.elements.other.Triple;
+import de.lystx.cloudsystem.library.query.Query;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInNetworkConfig;
@@ -10,7 +12,9 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.query.QueryResult;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
+import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,9 +64,13 @@ public class CloudNetwork {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartService(service, properties.toString()));
     }
 
+    public Query<ServiceGroup, Service> queryService(ServiceGroup serviceGroup, Triple<QueryResult, Service, String> consumer, String... packets) {
+        return new Query<>(cloudAPI.getCloudClient(), serviceGroup, consumer, packets).onReady(() -> this.startService(serviceGroup));
+    }
 
     public void startService(String serviceGroup, Document properties) {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties));
+
     }
 
     public void startService(String serviceGroup) {

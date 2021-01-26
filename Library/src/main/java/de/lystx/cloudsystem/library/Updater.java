@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library;
 
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.webserver.WebServer;
 import lombok.Getter;
 
 import java.io.*;
@@ -75,4 +76,5 @@ public class Updater {
             }
         } catch (IOException e) {}
     }
+
 }

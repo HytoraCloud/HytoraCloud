@@ -23,6 +23,7 @@ import org.bukkit.event.player.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class PlayerListener implements Listener {
@@ -85,11 +86,7 @@ public class PlayerListener implements Listener {
                 return;
             }
             event.setCancelled(true);
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> onlinePlayer.kickPlayer(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", CloudAPI.getInstance().getPrefix())));
-            }
-            CloudAPI.getInstance().getNetwork().stopService(CloudAPI.getInstance().getService());
-            CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 5L);
+            CloudServer.getInstance().shutdown();
         }
         //CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
@@ -98,7 +95,9 @@ public class PlayerListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PacketReader packetReader = new PacketReader(player);
-        packetReader.inject();
+        try {
+            packetReader.inject();
+        } catch (NoSuchElementException e){}
         this.packetReaders.put(player.getUniqueId(), packetReader);
         int onlinePlayers = Bukkit.getOnlinePlayers().size();
         int onlinepercent = ((onlinePlayers / Bukkit.getMaxPlayers()) * 100);
@@ -121,6 +120,7 @@ public class PlayerListener implements Listener {
         CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
         if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+
                 PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
                 CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
             }

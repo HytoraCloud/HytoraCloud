@@ -26,32 +26,7 @@ public class PermsCommand extends Command {
     @Override
     public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
         if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("create")) {
-                PermissionGroupSetup setup = new PermissionGroupSetup();
-                cloudLibrary.getService(CommandService.class).setActive(false);
-                setup.start(console, setup1 -> {
-                    PermissionGroupSetup ps = (PermissionGroupSetup) setup1;
-                    cloudLibrary.getService(CommandService.class).setActive(true);
-                    if (setup1.wasCancelled()) {
-                        return;
-                    }
-                    PermissionGroup permissionGroup = new PermissionGroup(
-                            ps.getGroupName(),
-                            ps.getGroupId(),
-                            ps.getPrefix(),
-                            ps.getSuffix(),
-                            ps.getDisplay(),
-                            new LinkedList<>(),
-                            new LinkedList<>()
-                    );
-                    CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().getPermissionGroups().add(permissionGroup);
-                    CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
-                    CloudSystem.getInstance().getService(PermissionService.class).load();
-                    CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
-                    CloudSystem.getInstance().reload();
-                    console.getLogger().sendMessage("INFO", "§9The permissionGroup §a" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId() + " §9was created!");
-                });
-            } else if (args[0].equalsIgnoreCase("list")) {
+            if (args[0].equalsIgnoreCase("list")) {
                 console.getLogger().sendMessage("§9PermissionGroups:");
                 for (PermissionGroup permissionGroup : CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().getPermissionGroups()) {
                     console.getLogger().sendMessage("INFO", "§7> §b" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId());
@@ -170,7 +145,6 @@ public class PermsCommand extends Command {
 
     public void help(CloudConsole console) {
         console.getLogger().sendMessage("INFO", "§9Help for §bPermsService§7:");
-        console.getLogger().sendMessage("INFO", "§9perms <create> §7| Creates a new permissionGroup");
         console.getLogger().sendMessage("INFO", "§9perms <list> §7| Lists all groups");
         console.getLogger().sendMessage("INFO", "§9perms set <player> <group> <lifetime/timeSpan> §7| Adds player to a group");
         console.getLogger().sendMessage("INFO", "§9perms remove <player> <group>  §7| Removes player from a group");

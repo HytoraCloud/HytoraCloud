@@ -26,6 +26,7 @@ public class PacketHandlerStart extends PacketHandlerAdapter {
             ServiceGroup group = packetPlayInStartGroup.getServiceGroup();
             ServiceGroup get = this.cloudSystem.getService(GroupService.class).getGroup(group.getName());
             if (get == null) {
+                cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
                 return;
             }
             this.cloudSystem.getService().startService(get);
@@ -34,9 +35,10 @@ public class PacketHandlerStart extends PacketHandlerAdapter {
             ServiceGroup group = packetPlayInStartGroup.getServiceGroup();
             ServiceGroup get = this.cloudSystem.getService(GroupService.class).getGroup(group.getName());
             if (get == null) {
+                cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
                 return;
             }
-            this.cloudSystem.getService().startService(get);
+            this.cloudSystem.getService().startService(get, packetPlayInStartGroup.getProperties());
         } else if (packet instanceof PacketPlayInStartService) {
             PacketPlayInStartService packetPlayInStartService = (PacketPlayInStartService)packet;
             Service service = packetPlayInStartService.getService();

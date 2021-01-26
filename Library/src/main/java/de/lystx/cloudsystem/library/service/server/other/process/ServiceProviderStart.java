@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
+import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.util.Action;
@@ -34,6 +35,7 @@ public class ServiceProviderStart {
 
     public void autoStartService(Service service, Document propertiess) {
         try {
+            cloudLibrary.getService(TemplateService.class).createTemplate(service.getServiceGroup(), service.getServiceGroup().getTemplate());
             File templateLocation = new File(cloudLibrary.getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
             File serverLocation = new File(service.getServiceGroup().isDynamic() ? cloudLibrary.getService(FileService.class).getDynamicServerDirectory() : cloudLibrary.getService(FileService.class).getStaticServerDirectory(), service.getServiceGroup().getName() + "/" + service.getName() + "/");
             File plugins = new File(serverLocation, "plugins/");

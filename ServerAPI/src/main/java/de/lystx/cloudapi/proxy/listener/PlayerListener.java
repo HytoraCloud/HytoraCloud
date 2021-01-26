@@ -126,18 +126,20 @@ public class PlayerListener implements Listener {
     }
 
     public void registerPlayer(String name, UUID uuid, String server, String hostAddress, int proxyPort) {
-        CloudPlayer cloudPlayer = new CloudPlayer(
-                name,
-                uuid,
-                hostAddress,
-                server,
-                this.cloudAPI.getNetwork().getProxy(proxyPort).getName()
-        );
+        try {
+            CloudPlayer cloudPlayer = new CloudPlayer(
+                    name,
+                    uuid,
+                    hostAddress,
+                    server,
+                    this.cloudAPI.getNetwork().getProxy(proxyPort).getName()
+            );
 
-        this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer));
-        for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-            networkHandler.onPlayerJoin(cloudPlayer);
-        }
+            this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer));
+            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
+                networkHandler.onPlayerJoin(cloudPlayer);
+            }
+        } catch (NullPointerException e){}
     }
 
     @EventHandler

@@ -97,18 +97,20 @@ public class TablistListener implements Listener {
     }
 
     public String replace(String string, ProxiedPlayer player) {
+        try {
+            String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
 
-        String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
-
-        return string
-                .replace("&", "§")
-                .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
-                .replace("%online_players%", String.valueOf(CloudAPI.getInstance().getCloudPlayers().getAll().size()))
-                .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
-                        CloudProxy.getInstance().getProxyPort()
-                ).getName())
-                .replace("%server%", server)
-                .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance()));
+            return string
+                    .replace("&", "§")
+                    .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
+                    .replace("%online_players%", String.valueOf(CloudAPI.getInstance().getCloudPlayers().getAll().size()))
+                    .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
+                            CloudProxy.getInstance().getProxyPort()
+                    ).getName())
+                    .replace("%server%", server)
+                    .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance()));
+        } catch (NullPointerException e) {}
+        return string;
     }
 
     public void doUpdate() {

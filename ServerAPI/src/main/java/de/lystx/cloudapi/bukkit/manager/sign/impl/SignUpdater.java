@@ -107,9 +107,7 @@ public class SignUpdater  {
                                 return;
                             }
                             try {
-                                if (cloudAPI.getNetwork().getService(current.getName()) != null) {
-                                    serverPinger.pingServer(current.getHost(), current.getPort(), 5);
-                                }
+                                serverPinger.pingServer(current.getHost(), current.getPort(), 20);
                             } catch (IOException exception) {
                                 Bukkit.getLogger().log(Level.SEVERE,"Something is wrong when pinging Server", exception);
                             }
@@ -272,11 +270,13 @@ public class SignUpdater  {
         line = line.replace("%template%", group.getTemplate());
         line = line.replace("%type%", group.getServiceType().name());
         line = line.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
-        if (serverPinger != null) {
-            line = line.replace("%motd%", serverPinger.getMotd());
-            line = line.replace("%online%", serverPinger.getPlayers() + "");
-            line = line.replace("%max%", serverPinger.getMaxplayers() + "");
-        }
+        try {
+            if (serverPinger != null) {
+                line = line.replace("%motd%", serverPinger.getMotd());
+                line = line.replace("%online%", serverPinger.getPlayers() + "");
+                line = line.replace("%max%", serverPinger.getMaxplayers() + "");
+            }
+        } catch (NullPointerException e){}
         return line;
     }
 

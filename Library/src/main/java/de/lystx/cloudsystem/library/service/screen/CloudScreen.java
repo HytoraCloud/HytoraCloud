@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.screen;
 
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import lombok.Getter;
 import lombok.Setter;

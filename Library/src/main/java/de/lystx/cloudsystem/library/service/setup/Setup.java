@@ -20,6 +20,9 @@ public abstract class Setup {
 
 
     public void start(CloudConsole scanner, Consumer<Setup> consumer) {
+        scanner.getLogger().sendMessage();
+        scanner.getLogger().sendMessage();
+        scanner.getLogger().sendMessage("SETUP", "§aIf you want to §2cancel §athe setup just type §7'§2cancel§7'");
         this.consumer = consumer;
         this.cloudConsole = scanner;
         this.current = 1;
