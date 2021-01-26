@@ -1,7 +1,11 @@
 package de.lystx.cloudsystem.library;
 
+import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.AdapterHandler;
 import de.lystx.cloudsystem.library.service.network.connection.channel.base.Identifier;
 import de.lystx.cloudsystem.library.service.network.connection.channel.base.NetworkChannel;
@@ -53,6 +57,10 @@ public class CloudLibrary implements Serializable {
         this.cloudClient = new CloudClient(this.host, this.port, this.networkChannel, new AdapterHandler());
 
         this.cloudServices.add(new Scheduler(this, "Scheduler", CloudService.Type.UTIL));
+    }
+
+    public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
+        this.getService(CloudNetworkService.class).sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), type));
     }
 
     public <T> T getService(Class<T> tClass) {

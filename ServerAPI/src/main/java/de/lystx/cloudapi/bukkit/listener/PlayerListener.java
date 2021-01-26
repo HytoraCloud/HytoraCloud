@@ -91,7 +91,7 @@ public class PlayerListener implements Listener {
             CloudAPI.getInstance().getNetwork().stopService(CloudAPI.getInstance().getService());
             CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 5L);
         }
-        CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
+        //CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 
     @EventHandler

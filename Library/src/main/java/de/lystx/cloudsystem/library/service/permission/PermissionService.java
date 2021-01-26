@@ -3,7 +3,6 @@ package de.lystx.cloudsystem.library.service.permission;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
-import de.lystx.cloudsystem.library.service.database.impl.MongoDB;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
@@ -17,7 +16,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Getter @Setter
 public class PermissionService extends CloudService {
@@ -28,7 +26,7 @@ public class PermissionService extends CloudService {
     public PermissionService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
         this.file = cloudLibrary.getService(FileService.class).getPermissionsFile();
-        this.permissionPool = new PermissionPool();
+        this.permissionPool = new PermissionPool(cloudLibrary);
 
         this.load();
         this.loadEntries();

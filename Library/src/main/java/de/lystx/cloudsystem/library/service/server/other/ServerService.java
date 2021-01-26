@@ -1,6 +1,9 @@
 package de.lystx.cloudsystem.library.service.server.other;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
+import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutRegisterServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStartedServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStopServer;
@@ -10,6 +13,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
+import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -221,6 +225,7 @@ public class ServerService extends CloudService {
         services.add(service);
         this.services.put(serviceGroup, services);
         this.providerStart.autoStartService(service, properties);
+        this.getCloudLibrary().getService(EventService.class).callEvent(new ServiceStopEvent(service));
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStartedServer(service));
         Service finalService = service;
         this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
@@ -259,6 +264,8 @@ public class ServerService extends CloudService {
         this.idService.removeID(service.getServiceGroup().getName(), service.getServiceID());
         this.portService.removeProxyPort(service.getPort());
         this.portService.removePort(service.getPort());
+
+        this.getCloudLibrary().getService(EventService.class).callEvent(new ServiceStopEvent(service));
         this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
             //this.globalServices.remove(service);
             if (this.providerStop.stopService(service)) {

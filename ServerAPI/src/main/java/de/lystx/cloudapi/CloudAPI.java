@@ -54,7 +54,7 @@ public class CloudAPI {
 
         this.network = new CloudNetwork(this);
         this.cloudPlayers = new CloudPlayers(this);
-        this.permissionPool = new PermissionPool();
+        this.permissionPool = new PermissionPool(cloudLibrary);
         this.templates = new Templates(this);
         this.statistics = new Statistics();
 

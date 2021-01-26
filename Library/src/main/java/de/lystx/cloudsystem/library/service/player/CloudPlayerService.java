@@ -1,9 +1,12 @@
 package de.lystx.cloudsystem.library.service.player;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 
@@ -21,6 +24,7 @@ public class CloudPlayerService extends CloudService {
     }
 
     public boolean registerPlayer(CloudPlayer cloudPlayer) {
+        getCloudLibrary().getService(EventService.class).callEvent(new CloudPlayerJoinEvent(cloudPlayer));
         this.cloudPlayers.add(cloudPlayer);
         boolean registered = this.database.isRegistered(cloudPlayer.getUuid());
         this.database.registerPlayer(cloudPlayer);
@@ -41,6 +45,7 @@ public class CloudPlayerService extends CloudService {
             CloudPlayerData data = this.getPlayerData(cloudPlayer.getUuid());
             data.setLastLogin(new Date().getTime());
             this.setPlayerData(cloudPlayer.getUuid(), data);
+            getCloudLibrary().getService(EventService.class).callEvent(new CloudPlayerQuitEvent(cloudPlayer));
         } catch (NullPointerException e) {}
         this.cloudPlayers.remove(this.getOnlinePlayer(cloudPlayer.getName()));
     }

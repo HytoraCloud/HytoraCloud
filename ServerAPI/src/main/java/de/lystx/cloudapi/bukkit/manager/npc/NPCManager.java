@@ -6,7 +6,9 @@ import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateNPC;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInRemoveNPC;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,13 +17,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-@Getter
+@Getter @Setter
 public class NPCManager {
 
     private final Map<NPC, String> npcs;
     private final Map<NPC, String> groupNPCS;
     private final Map<Integer, Hologram> holograms;
     private Document document;
+    private NPCConfig npcConfig;
 
     public NPCManager() {
         this.npcs = new HashMap<>();

@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.booting.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.Updater;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -110,6 +111,7 @@ public class CloudSystem extends CloudLibrary {
         try {
             this.getService(PermissionService.class).loadEntries();
             this.getService(ConfigService.class).reload();
+            this.getService(NPCService.class).load();
             this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
                     this.getService().getServices(),
@@ -117,8 +119,9 @@ public class CloudSystem extends CloudLibrary {
                     this.getService(CloudPlayerService.class).getOnlinePlayers(),
                     this.getService(StatisticsService.class).getStatistics(),
                     this.getService(SignService.class).getCloudSigns(),
-                    this.getService(SignService.class).getSignLayOut().getDocument().toString(),
-                    this.getService(NPCService.class).getDocument().toString()
+                    this.getService(SignService.class).getSignLayOut().getDocument(),
+                    this.getService(NPCService.class).getDocument(),
+                    this.getService(NPCService.class).getNPCConfig()
             ));
         } catch (NullPointerException e) {
             this.console.getLogger().sendMessage("ERROR", "§cYou can't reload at the moment! Try again in a few seconds! §e");

@@ -10,11 +10,11 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +24,7 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
     private final NetworkConfig networkConfig;
     private final Map<ServiceGroup, List<Service>> services;
 
-    public PacketPlayOutGlobalInfo(NetworkConfig networkConfig, Map<ServiceGroup, List<Service>> services, PermissionPool permissionPool, List<CloudPlayer> cloudPlayers, Statistics statistics, List<CloudSign> cloudSigns, String signLayOut, String npcs) {
+    public PacketPlayOutGlobalInfo(NetworkConfig networkConfig, Map<ServiceGroup, List<Service>> services, PermissionPool permissionPool, List<CloudPlayer> cloudPlayers, Statistics statistics, List<CloudSign> cloudSigns, Document signLayOut, Document npcs, NPCConfig npcConfig) {
         this.networkConfig = networkConfig;
         this.services = services;
 
@@ -37,8 +37,9 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
         this.append("cloudSigns", cloudSigns);
         this.append("cloudPlayers", cloudPlayers);
         this.append("stats", statistics.toDocument().getJsonObject());
-        this.append("signLayOut", signLayOut);
-        this.append("npcs", npcs);
+        this.append("signLayOut", signLayOut.toString());
+        this.append("npcs", npcs.toString());
+        this.append("npcConfig", npcConfig);
 
     }
 
@@ -50,8 +51,13 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
         return this.document().getString("signLayOut");
     }
 
+    public NPCConfig getNpcConfig() {
+        return this.document().getObject("npcConfig", NPCConfig.class);
+    }
+
+
     public PermissionPool getPermissionPool() {
-        PermissionPool permissionPool = new PermissionPool();
+        PermissionPool permissionPool = new PermissionPool(null);
         permissionPool.setPermissionGroups(this.document().getDocument("permissionPool").getList("groups", PermissionGroup.class));
         permissionPool.setPlayerCache(this.document().getDocument("permissionPool").getList("cache", CloudPlayerData.class));
         return permissionPool;

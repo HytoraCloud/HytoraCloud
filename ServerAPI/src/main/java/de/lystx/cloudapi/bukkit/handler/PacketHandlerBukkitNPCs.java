@@ -21,6 +21,7 @@ public class PacketHandlerBukkitNPCs extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutGlobalInfo) {
             PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo) packet;
+            CloudServer.getInstance().getNpcManager().setNpcConfig(info.getNpcConfig());
             Bukkit.getOnlinePlayers().forEach(player -> CloudServer.getInstance().getNpcManager().updateNPCS(new Document(info.getNpcs()), player));
         }
     }

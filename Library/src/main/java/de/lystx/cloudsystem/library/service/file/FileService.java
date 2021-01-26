@@ -22,6 +22,7 @@ public class FileService extends CloudService {
 
     private File npcDirectory;
     private File npcFile;
+    private File npcLayout;
 
     private File signDirectory;
     private File signLayoutFile;
@@ -70,6 +71,7 @@ public class FileService extends CloudService {
 
         this.npcDirectory = new File(this.databaseDirectory, "npcSelector/");
         this.npcFile = new File(this.npcDirectory, "npcs.json");
+        this.npcLayout = new File(this.npcDirectory, "config.json");
 
         this.signDirectory = new File(this.databaseDirectory, "signSelector/");
         this.signsFile = new File(this.signDirectory, "signs.json");
@@ -78,7 +80,6 @@ public class FileService extends CloudService {
 
         this.groupsDirectory = new File(this.cloudDirectory, "groups/");
         this.templatesDirectory = new File(this.cloudDirectory, "templates/");
-
 
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");

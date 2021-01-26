@@ -1,7 +1,11 @@
 package de.lystx.cloudsystem.library.service.permission.impl;
 
+import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupAddEvent;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermissionPool;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.elements.other.Document;
@@ -25,8 +29,10 @@ public class PermissionPool implements Serializable {
     private List<PermissionGroup> permissionGroups;
     private List<CloudPlayerData> playerCache;
     private final SimpleDateFormat format;
+    private final CloudLibrary cloudLibrary;
 
-    public PermissionPool() {
+    public PermissionPool(CloudLibrary cloudLibrary) {
+        this.cloudLibrary = cloudLibrary;
         this.permissionGroups = new LinkedList<>();
         this.playerCache = new LinkedList<>();
         this.format = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss", Locale.GERMAN);
@@ -100,6 +106,9 @@ public class PermissionPool implements Serializable {
             permissionEntries.remove(permissionEntry);
             data.setPermissionEntries(permissionEntries);
             this.playerCache.add(data);
+            if (cloudLibrary != null) {
+                cloudLibrary.getService(EventService.class).callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
+            }
         } catch (Exception e) {}
     }
 
@@ -142,6 +151,9 @@ public class PermissionPool implements Serializable {
         }
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
+        if (cloudLibrary != null) {
+            cloudLibrary.getService(EventService.class).callEvent(new CloudPlayerPermissionGroupAddEvent(playerName, group, i, validality));
+        }
     }
 
 

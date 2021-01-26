@@ -1,29 +1,39 @@
 package de.lystx.cloudapi.bukkit.listener;
 
-import afu.org.checkerframework.checker.igj.qual.I;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.events.CloudServerNPCInteractEvent;
 import de.lystx.cloudapi.bukkit.manager.Item;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
+@Getter
 public class NPCListener implements Listener {
+
+    private final Map<UUID, Map<Integer, Service>> services;
+
+    public NPCListener() {
+        this.services = new HashMap<>();
+    }
 
     @EventHandler
     public void onInteract(CloudServerNPCInteractEvent event) {
@@ -49,67 +59,120 @@ public class NPCListener implements Listener {
             return;
         }
         Player player = (Player) event.getWhoClicked();
-        if (player.getOpenInventory() != null && player.getOpenInventory().getTitle().startsWith("§8» §7Group §8┃ §b")) {
+        Map<Integer, Service> serviceMap = this.services.get(player.getUniqueId());
+        if (player.getOpenInventory() != null && !serviceMap.isEmpty()) {
             event.setCancelled(true);
-            if (event.getCurrentItem().getType().equals(Material.STORAGE_MINECART)) {
-                String service = (event.getCurrentItem().getItemMeta().getDisplayName().split(" "))[1];
-                service = service.replace("§8» §b", "");
+            if (event.getCurrentItem().getType().equals(Material.valueOf(CloudServer.getInstance().getNpcManager().getNpcConfig().getItemType()))) {
                 CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
                 if (cloudPlayer == null) {
                     player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cCouldn't find you in global CloudPlayers!");
                     return;
                 }
-                cloudPlayer.sendMessage(CloudAPI.getInstance().getCloudClient(), CloudAPI.getInstance().getPrefix() + "§7Connecting to §b" + service);
-                cloudPlayer.sendToServer(CloudAPI.getInstance().getCloudClient(), service);
+                Service service = serviceMap.get(event.getSlot());
+                if (!CloudServer.getInstance().getNpcManager().getNpcConfig().getConnectingMessage().trim().isEmpty()) {
+                    player.sendMessage(this.replace(CloudServer.getInstance().getNpcManager().getNpcConfig().getConnectingMessage(), service, service.getServiceGroup()));
+                }
+                cloudPlayer.sendToServer(CloudAPI.getInstance().getCloudClient(), service.getName());
             }
         }
     }
 
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        this.services.remove(event.getPlayer().getUniqueId());
+    }
 
     public Inventory getInventory(Player player, String group) {
+        Map<Integer, Service> serviceMap = new HashMap<>();
+        NPCConfig config = CloudServer.getInstance().getNpcManager().getNpcConfig();
         ServiceGroup serviceGroup = CloudAPI.getInstance().getNetwork().getServiceGroup(group);
-        Inventory inventory = Bukkit.createInventory(player, 6*9, "§8» §7Group §8┃ §b" + serviceGroup.getName());
-        ItemStack glass = new Item(Material.STAINED_GLASS_PANE, (short) 7).setNoName().build();
-
-        IntStream.range(0, 8).forEach(i -> {
-            inventory.setItem(i, glass);
-        });
-
-        for (int s = 8; s < (inventory.getSize() - 9); s += 9) {
-            int lastSlot = s + 1;
-            inventory.setItem(s, glass);
-            inventory.setItem(lastSlot, glass);
-
+        if (serviceGroup == null) {
+            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThere was an error!");
+            return null;
         }
-        for (int lr = (inventory.getSize() - 9); lr < inventory.getSize(); lr++) {
-            inventory.setItem(lr, glass);
-        }
+        Inventory inventory = Bukkit.createInventory(player, (config.getInventoryRows() * 9), this.replace(config.getInventoryTitle(), null, serviceGroup));
+        if (config.isCorners()) {
+            ItemStack glass = new Item(Material.STAINED_GLASS_PANE, (short) 7).setNoName().build();
 
-        List<Service> list = CloudAPI.getInstance().getNetwork().getServices(serviceGroup);
-        inventory.setItem(4, new Item(Material.NAME_TAG).setDisplayName("§8» §3" + serviceGroup.getName())
-                .addLoreLine("§8")
-                .addLoreLine("§8§m-----------")
-                .addLoreLine("§8» §bOnline §8» §7" + list.size())
-                .addLoreLine("§8» §bType §8» §7" + serviceGroup.getServiceType())
-                .addLoreLine("§8» §bTemplate §8» §7" + serviceGroup.getTemplate())
-                .build());
-        for (Service service : list) {
-            ServerPinger serverPinger = new ServerPinger();
-            try {
-                serverPinger.pingServer(service.getHost(), service.getPort(), 5);
-                ItemStack itemStack = new Item(Material.STORAGE_MINECART).setDisplayName("§8» §b" + service.getName() + " §8[" + service.getServiceState().getColor() + service.getServiceState().name() + "§8]")
-                        .addLoreLine("§8")
-                        .addLoreLine("§8§m-----------")
-                        .addLoreLine("§8» §bOnline §8» §7" + serverPinger.getPlayers())
-                        .addLoreLine("§8» §bMaxPlayers §8» §7" + serverPinger.getMaxplayers())
-                        .addLoreLine("§8» §bMotd §8» §7" + serverPinger.getMotd())
-                        .build();
-                inventory.addItem(itemStack);
-            } catch (IOException e) {
-                e.printStackTrace();
+            IntStream.range(0, 8).forEach(i -> {
+                inventory.setItem(i, glass);
+            });
+
+            for (int s = 8; s < (inventory.getSize() - 9); s += 9) {
+                int lastSlot = s + 1;
+                inventory.setItem(s, glass);
+                inventory.setItem(lastSlot, glass);
+
+            }
+            for (int lr = (inventory.getSize() - 9); lr < inventory.getSize(); lr++) {
+                inventory.setItem(lr, glass);
             }
         }
+        List<Service> list = CloudAPI.getInstance().getNetwork().getServices(serviceGroup);
 
+        for (SerializableDocument document : config.getItems()) {
+            List<String> lore = document.get("lore", ArrayList.class);
+            for (String s : lore) {
+                lore.set(lore.indexOf(s), this.replace(s, null, serviceGroup));
+            }
+            double slot = document.get("slot", double.class);
+            inventory.setItem((int)slot, new Item(Material.valueOf(document.get("type", String.class)))
+                    .setDisplayName(this.replace(document.get("name", String.class), null, serviceGroup))
+                    .addLoreAll(lore)
+                    .build());
+        }
+
+        for (Service service : list) {
+            List<String> lore = config.getLore();
+            for (String s : lore) {
+                lore.set(lore.indexOf(s), this.replace(s, service, serviceGroup));
+            }
+            ItemStack itemStack = new Item(Material.valueOf(config.getItemType().toUpperCase()))
+                    .setDisplayName(this.replace(config.getItemName(), service, serviceGroup)).addLoreArray(lore).build();
+            inventory.addItem(itemStack);
+            serviceMap.put(this.getSlot(itemStack, inventory), service);
+        }
+        this.services.put(player.getUniqueId(), serviceMap);
         return inventory;
+    }
+
+    public int getSlot(ItemStack itemStack, Inventory inventory) {
+        for (int i = 0; i < inventory.getSize(); i++) {
+            if (inventory.getItem(i).equals(itemStack)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public String replace(String input, Service service, ServiceGroup serviceGroup) {
+        try {
+            ServerPinger serverPinger = new ServerPinger();
+            if (service != null) {
+                input = input.replace("%service%", service.getName());
+                input = input.replace("%uuid%", service.getUniqueId().toString());
+                input = input.replace("%port%", "" + service.getPort());
+                input = input.replace("%id%", "" + service.getServiceID());
+                input = input.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
+                try {
+                    serverPinger.pingServer(service.getHost(), service.getPort(), 5);
+                    input = input.replace("%motd%", serverPinger.getMotd());
+                    input = input.replace("%online%", serverPinger.getPlayers() + "");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (serviceGroup != null) {
+                input = input.replace("%group%", serviceGroup.getName());
+                input = input.replace("%template%", serviceGroup.getTemplate());
+                input = input.replace("%type%", serviceGroup.getServiceType().name());
+                input = input.replace("%newServer%", "" + serviceGroup.getNewServerPercent());
+                input = input.replace("%max%", "" + serviceGroup.getMaxPlayers());
+                input = input.replace("%online_services%", CloudAPI.getInstance().getNetwork().getServices(serviceGroup).size() + "");
+            }
+            input = input.replace("%prefix%", CloudAPI.getInstance().getPrefix());
+
+        } catch (NullPointerException e) {}
+        return input;
     }
 }
