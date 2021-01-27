@@ -16,7 +16,7 @@ import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupSetup;
 import java.util.LinkedList;
 import java.util.UUID;
 
-public class PermsCommand extends Command {
+public class    PermsCommand extends Command {
 
 
     public PermsCommand(String name, String description, String... aliases) {

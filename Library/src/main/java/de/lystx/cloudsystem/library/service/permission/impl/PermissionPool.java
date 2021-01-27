@@ -283,16 +283,9 @@ public class PermissionPool implements Serializable {
         new Thread(() -> {
             try {
                 for (File file : Objects.requireNonNull(directory.listFiles())) {
-                    if (file == null) {
-                        continue;
-                    }
                     try {
                         String uuid = file.getName().split("\\.")[0];
-                        if (uuid == null) {
-                            file.delete();
-                            continue;
-                        }
-                        if (UUIDService.getName(UUID.fromString(uuid)) == null) {
+                        if (!isUUID(uuid) || UUIDService.getName(UUID.fromString(uuid)) == null) {
                             file.delete();
                         }
                     } catch (NullPointerException e) {
@@ -302,6 +295,15 @@ public class PermissionPool implements Serializable {
             } catch (NullPointerException | IOException e) {
             }
         }, "async_uuid_clear_cache").start();
+    }
+
+    private boolean isUUID(String string) {
+        try {
+            UUID.fromString(string);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     private UUID getUUID(String name) {

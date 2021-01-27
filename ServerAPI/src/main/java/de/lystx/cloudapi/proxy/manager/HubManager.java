@@ -39,13 +39,25 @@ public class HubManager {
     }
 
     public ServerInfo getInfo(ProxiedPlayer player) {
-        Fallback fallback = this.getHighestFallback(player);
-        Service service = cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).size()));
-        return ProxyServer.getInstance().getServerInfo(service.getName());
+        try {
+            Fallback fallback = this.getHighestFallback(player);
+            Service service;
+            try {
+                service = cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).size()));
+            } catch (IllegalArgumentException e){
+                service = cloudAPI.getNetwork().getService(fallback.getGroupName() + "-1");
+            }
+            return ProxyServer.getInstance().getServerInfo(service.getName());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     public void sendPlayerToFallback(ProxiedPlayer player) {
-
+        if (this.getInfo(player) == null) {
+            player.disconnect(CloudAPI.getInstance().getPrefix() + "§cNo fallback was found!");
+            return;
+        }
         player.connect(
                 this.getInfo(player)
         );

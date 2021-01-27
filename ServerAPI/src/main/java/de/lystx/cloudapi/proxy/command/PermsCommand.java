@@ -169,7 +169,7 @@ public class PermsCommand extends Command {
 							player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 							return;
 						}
-						if (!CloudAPI.getInstance().getPermissionPool().getPermissionGroups(player.getName()).contains(group)) {
+						if (!CloudAPI.getInstance().getPermissionPool().getPermissionGroups(args[1]).contains(group)) {
 							player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cdoesn't have this rank!");
 							return;
 						}
@@ -203,7 +203,7 @@ public class PermsCommand extends Command {
 							player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 							return;
 						}
-						if (CloudAPI.getInstance().getPermissionPool().getPermissionGroups(player.getName()).contains(CloudAPI.getInstance().getPermissionPool().getPermissionGroupFromName(rang))) {
+						if (CloudAPI.getInstance().getPermissionPool().getPermissionGroups(args[1]).contains(CloudAPI.getInstance().getPermissionPool().getPermissionGroupFromName(rang))) {
 							player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §calready has this rank!");
 							return;
 						}
