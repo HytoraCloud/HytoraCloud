@@ -7,12 +7,12 @@ import de.lystx.cloudapi.bukkit.events.CloudServerNPCInteractEvent;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import net.minecraft.server.v1_8_R3.Packet;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class PacketReader {
@@ -22,12 +22,19 @@ public class PacketReader {
 
     public PacketReader(Player player) {
         this.player = player;
-        this.channel = (((CraftPlayer)player).getHandle()).playerConnection.networkManager.channel;
+        Method getHandle;
+        try {
+            getHandle = player.getClass().getMethod("getHandle", (Class<?>[]) null);
+            Object entityPlayer = getHandle.invoke(player);
+            Object connection = entityPlayer.getClass().getDeclaredField("playerConnection").get(entityPlayer);
+            Object networkManager = connection.getClass().getDeclaredField("networkManager").get(connection);
+            this.channel = (Channel) networkManager.getClass().getDeclaredField("channel").get(networkManager);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e) {}
     }
 
     public void inject() {
-        this.channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<Packet<?>>() {
-            protected void decode(ChannelHandlerContext arg0, Packet<?> packet, List<Object> arg2) throws Exception {
+        this.channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<Object>() {
+            protected void decode(ChannelHandlerContext arg0, Object packet, List<Object> arg2) throws Exception {
                 arg2.add(packet);
                 PacketReader.this.readPacket(packet);
             }
@@ -40,7 +47,7 @@ public class PacketReader {
         }
     }
 
-    public void readPacket(Packet<?> packet) {
+    public void readPacket(Object packet) {
         if (packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInUseEntity")) {
             int id = (Integer) getValue(packet, "a");
             if (getValue(packet, "action").toString().equalsIgnoreCase("INTERACT")) {

@@ -21,13 +21,16 @@ public class PacketHandlerBukkitSubChannel extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        Bukkit.getPluginManager().callEvent(new CloudServerPacketReceiveEvent(packet));
-        if (packet instanceof PacketCommunicationSubMessage) {
-            PacketCommunicationSubMessage subMessage = (PacketCommunicationSubMessage)packet;
-            if (!subMessage.getType().equals(ServiceType.SPIGOT)) {
-                return;
+        try {
+            Bukkit.getPluginManager().callEvent(new CloudServerPacketReceiveEvent(packet));
+            if (packet instanceof PacketCommunicationSubMessage) {
+                PacketCommunicationSubMessage subMessage = (PacketCommunicationSubMessage)packet;
+                if (!subMessage.getType().equals(ServiceType.SPIGOT)) {
+                    return;
+                }
+                Bukkit.getPluginManager().callEvent(new CloudServerSubChannelMessageEvent(subMessage.getChannel(), subMessage.getChannel(), subMessage.getDocument()));
+
             }
-            Bukkit.getPluginManager().callEvent(new CloudServerSubChannelMessageEvent(subMessage.getChannel(), subMessage.getChannel(), subMessage.getDocument()));
-        }
+        } catch (IllegalStateException e){}
     }
 }

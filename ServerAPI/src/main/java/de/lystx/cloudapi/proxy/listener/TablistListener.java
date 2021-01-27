@@ -8,8 +8,10 @@ import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.result.packets.ResultPacketCloudPlayers;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -86,7 +88,6 @@ public class TablistListener implements Listener {
         if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
             return;
         }
-
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
             player.setTabHeader(
                     new TextComponent(this.replace(tabList.getHeader(), player)),
@@ -97,27 +98,28 @@ public class TablistListener implements Listener {
     }
 
     public String replace(String string, ProxiedPlayer player) {
-        try {
-            String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
-
-            return string
-                    .replace("&", "§")
-                    .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
-                    .replace("%online_players%", String.valueOf(CloudAPI.getInstance().getCloudPlayers().getAll().size()))
-                    .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
-                            CloudProxy.getInstance().getProxyPort()
-                    ).getName())
-                    .replace("%server%", server)
-                    .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance()));
-        } catch (NullPointerException e) {}
-        return string;
+        Value<String> stringValue = new Value<>(string);
+        CloudAPI.getInstance().sendQuery(new ResultPacketCloudPlayers()).onDocumentSet(document -> {
+            try {
+                String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
+                stringValue.set(string
+                        .replace("&", "§")
+                        .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
+                        .replace("%online_players%", String.valueOf(document.getList("players", CloudPlayer.class).size()))
+                        .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
+                                CloudProxy.getInstance().getProxyPort()
+                        ).getName())
+                        .replace("%server%", server)
+                        .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance())));
+            } catch (NullPointerException e) {}
+        });
+        return stringValue.get();
     }
 
     public void doUpdate() {
         this.updateTab();
         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
     }
-
 
 
     @EventHandler

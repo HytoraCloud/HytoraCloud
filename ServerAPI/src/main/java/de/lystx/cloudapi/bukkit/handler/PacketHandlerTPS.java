@@ -1,14 +1,13 @@
 package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.bukkit.manager.Reflections;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
-import org.bukkit.Bukkit;
 
 import java.text.DecimalFormat;
 
@@ -24,7 +23,7 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
             Service service = ((PacketPlayOutTPS) packet).getService();
             if (((PacketPlayOutTPS) packet).getTps() == null && (service == null || service.getName().equalsIgnoreCase(cloudAPI.getService().getName()))) {
                 String tps;
-                double[] arrayOfDouble = (MinecraftServer.getServer()).recentTps;
+                double[] arrayOfDouble = (double[]) Reflections.getField("recentTps","MinecraftServer","getServer");
                 DecimalFormat decimalFormat = new DecimalFormat("##.#");
                 int i = arrayOfDouble.length;
                 byte b = 0;

@@ -12,18 +12,11 @@ import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
 import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudapi.proxy.manager.CloudManager;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 @Getter
 public class CloudServer extends JavaPlugin {
@@ -45,8 +38,14 @@ public class CloudServer extends JavaPlugin {
         this.manager = new CloudManager(this.cloudAPI);
         this.signManager = new SignManager(this);
         this.nametagManager = new NametagManager();
-        this.npcManager = new NPCManager();
-        this.labyMod = new LabyMod(this.cloudAPI);
+        try {
+            Class.forName("net.minecraft.server.v1_8_R3.Packet");
+            this.npcManager = new NPCManager();
+        } catch (Exception e){}
+        try {
+            Class.forName("net.labymod.serverapi.bukkit.LabyModPlugin");
+            this.labyMod = new LabyMod(this.cloudAPI);
+        } catch (Exception e) {}
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
@@ -75,7 +74,6 @@ public class CloudServer extends JavaPlugin {
 
     public void executeCommand(String command) {
         Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
-        //cloudAPI.getScheduler().runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
     }
 
     public void shutdown() {
@@ -93,10 +91,12 @@ public class CloudServer extends JavaPlugin {
             player.setOp(false);
             if (this.cloudAPI.getCloudPlayers().get(player.getName()) != null) {
                 this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> {
-                    if (s.equalsIgnoreCase("*")) {
-                        player.setOp(true);
-                    }
-                    player.addAttachment(this, s, true);
+                    try {
+                        if (s.equalsIgnoreCase("*")) {
+                            player.setOp(true);
+                        }
+                        player.addAttachment(this, s, true);
+                    } catch (IllegalStateException e) {}
                 });
             } else {
                 this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);

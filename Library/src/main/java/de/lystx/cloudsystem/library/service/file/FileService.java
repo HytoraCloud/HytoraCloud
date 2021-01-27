@@ -145,10 +145,6 @@ public class FileService extends CloudService {
             }
 
         } catch (IOException e) {}
-        this.copyFileWithURL("/implements/versions/spigot/spigot.jar", new File(this.versionsDirectory, "spigot.jar"));
-        this.copyFileWithURL("/implements/versions/bungeecord/bungeeCord.jar", new File(this.versionsDirectory, "bungeeCord.jar"));
-        this.copyFileWithURL("/implements/server-icon.png", new File(this.globalDirectory, "server-icon.png"));
-        this.copyFileWithURL("/implements/plugins/LabyModAPI.jar", new File(this.spigotPluginsDirectory, "LabyModAPI.jar"));
     }
 
     public void copyFileWithURL(String filename, File location) {

@@ -24,7 +24,11 @@ public enum Spigot {
     V1_15("https://cdn.getbukkit.org/spigot/spigot-1.15.jar", "spigot-1.15.jar", 21),
     V1_15_1("https://cdn.getbukkit.org/spigot/spigot-1.15.1.jar", "spigot-1.15.1.jar", 22),
     V1_15_2("https://cdn.getbukkit.org/spigot/spigot-1.15.2.jar", "spigot-1.15.2.jar", 23),
-    V1_16_1("https://cdn.getbukkit.org/spigot/spigot-1.16.1.jar", "spigot-1.16.1.jar", 24);
+    V1_16_1("https://cdn.getbukkit.org/spigot/spigot-1.16.1.jar", "spigot-1.16.1.jar", 24),
+    V1_16_2("https://cdn.getbukkit.org/spigot/spigot-1.16.2.jar", "spigot-1.16.2.jar", 25),
+    V1_16_3("https://cdn.getbukkit.org/spigot/spigot-1.16.3.jar", "spigot-1.16.3.jar", 26),
+    V1_16_4("https://cdn.getbukkit.org/spigot/spigot-1.16.4.jar", "spigot-1.16.4.jar", 27),
+    V1_16_5("https://cdn.getbukkit.org/spigot/spigot-1.16.5.jar", "spigot-1.16.5.jar", 28);
 
     private final String url;
     private final String jarName;

@@ -12,10 +12,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegis
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerStillOnline;
 import de.lystx.cloudsystem.library.result.Result;
-import de.lystx.cloudsystem.library.result.packets.ResultPacketCloudPlayerData;
-import de.lystx.cloudsystem.library.result.packets.ResultPacketCloudPlayerLoginVerify;
-import de.lystx.cloudsystem.library.result.packets.ResultPacketPlayerConnection;
-import de.lystx.cloudsystem.library.result.packets.ResultPacketServices;
+import de.lystx.cloudsystem.library.result.packets.*;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -33,6 +30,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -49,8 +47,7 @@ public class PlayerListener implements Listener {
     public void onLogin(LoginEvent event) {
         try {
             String name = this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId());
-            Document document = this.cloudAPI.sendQuery(new ResultPacketCloudPlayerLoginVerify(name)).getResult();
-            if (!document.getBoolean("allow")) {
+            if (this.online(name)) {
                 CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
                 ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
                 if (failEvent.isCancelled()) {
@@ -91,6 +88,16 @@ public class PlayerListener implements Listener {
             }
 
         } catch (Exception ignored) {}
+    }
+
+    private boolean online(String name) {
+        List<CloudPlayer> cloudPlayers = this.cloudAPI.sendQuery(new ResultPacketCloudPlayers()).getResult().getList("players", CloudPlayer.class);
+        for (CloudPlayer cloudPlayer : cloudPlayers) {
+            if (cloudPlayer.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @EventHandler

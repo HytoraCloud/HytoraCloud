@@ -1,10 +1,12 @@
 package de.lystx.cloudapi.bukkit.manager.npc.impl;
 
+import de.lystx.cloudapi.bukkit.manager.Reflections;
 import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.EntityArmorStand;
+import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -88,26 +90,26 @@ public class Hologram {
     }
 
     private void sendToPlayer(Player player) {
-        if (isPlayerLoaded(player))
-            return;
-        this.loadedPlayers.add(player);
-        double locX = this.location.getX();
-        double locY = this.location.getY();
-        double locZ = this.location.getZ();
-        PlayerConnection playerConnection = (((CraftPlayer)player).getHandle()).playerConnection;
-        for (HoloLine holoLine : this.lines) {
-            Location spawnLocation = new Location(this.location.getWorld(), locX, locY, locZ);
-            Packet[] spawnPackets;
-            for (int length = (spawnPackets = holoLine.getSpawnPackets(spawnLocation)).length, i = 0; i < length; i++) {
-                Packet packet = spawnPackets[i];
-                playerConnection.sendPacket(packet);
+            if (isPlayerLoaded(player))
+                return;
+            this.loadedPlayers.add(player);
+            double locX = this.location.getX();
+            double locY = this.location.getY();
+            double locZ = this.location.getZ();
+
+            for (HoloLine holoLine : this.lines) {
+                Location spawnLocation = new Location(this.location.getWorld(), locX, locY, locZ);
+                Object[] spawnPackets;
+                for (int length = (spawnPackets = holoLine.getSpawnPackets(spawnLocation)).length, i = 0; i < length; i++) {
+                    Object packet = spawnPackets[i];
+                    Reflections.sendPacket(player, packet);
+                }
+                if (holoLine instanceof ItemLine) {
+                    locY--;
+                    continue;
+                }
+                locY -= 0.3D;
             }
-            if (holoLine instanceof ItemLine) {
-                locY--;
-                continue;
-            }
-            locY -= 0.3D;
-        }
     }
 
     private void removeFromPlayer(Player player) {
@@ -115,11 +117,10 @@ public class Hologram {
         if (!isPlayerLoaded(player))
             return;
         for (HoloLine holoLine : this.lines) {
-            PlayerConnection playerConnection = (((CraftPlayer)player).getHandle()).playerConnection;
-            Packet[] despawnPackets;
+            Object[] despawnPackets;
             for (int length = (despawnPackets = holoLine.getDespawnPackets()).length, i = 0; i < length; i++) {
-                Packet packet = despawnPackets[i];
-                playerConnection.sendPacket(packet);
+                Object packet = despawnPackets[i];
+                Reflections.sendPacket(player, packet);
             }
         }
         this.loadedPlayers.remove(player);
@@ -164,20 +165,20 @@ public class Hologram {
             this.entityID = entityID;
         }
 
-        public Packet[] getSpawnPackets(Location location) {
-            Packet<?> spawnPacket = packetHelper.spawnArmorStand(location, this.text, this.entityID);
-            return new Packet[]{spawnPacket};
+        public Object[] getSpawnPackets(Location location) {
+            Object spawnPacket = packetHelper.spawnArmorStand(location, this.text, this.entityID);
+            return new Object[]{spawnPacket};
         }
 
-        public Packet[] getDespawnPackets() {
-            return new Packet[]{packetHelper.destroyEntity(this.entityID)};
+        public Object[] getDespawnPackets() {
+            return new Object[]{packetHelper.destroyEntity(this.entityID)};
         }
     }
 
-    public class PacketHelper {
-        public Packet<?> spawnArmorStand(Location location, String name, int entityID) {
-            EntityArmorStand entityArmorStand = new EntityArmorStand(
-                    (World)((CraftWorld)location.getWorld()).getHandle());
+    public static class PacketHelper {
+        public Object spawnArmorStand(Location location, String name, int entityID) {
+
+            EntityArmorStand entityArmorStand = new EntityArmorStand(((CraftWorld)location.getWorld()).getHandle());
             entityArmorStand.setLocation(location.getX(), location.getY(), location.getZ(), 0.0F, 0.0F);
             if (name.equals("clearline")) {
                 entityArmorStand.setCustomNameVisible(false);
@@ -191,12 +192,10 @@ public class Hologram {
                 Field field = Entity.class.getDeclaredField("id");
                 field.setAccessible(true);
                 field.setInt(entityArmorStand, entityID);
-            } catch (NoSuchFieldException e) {
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
-            } catch (IllegalAccessException e2) {
-                e2.printStackTrace();
             }
-            return (Packet<?>)new PacketPlayOutSpawnEntityLiving((EntityLiving)entityArmorStand);
+            return new PacketPlayOutSpawnEntityLiving(entityArmorStand);
         }
 
         public EntityItem createItem(Location location, ItemStack itemStack, int entityID) {
@@ -207,44 +206,40 @@ public class Hologram {
                 Field field = Entity.class.getDeclaredField("id");
                 field.setAccessible(true);
                 field.setInt(entityItem, entityID);
-            } catch (NoSuchFieldException e) {
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
-            } catch (IllegalAccessException e2) {
-                e2.printStackTrace();
             }
             return entityItem;
         }
 
-        public Packet<?> itemSpawn(EntityItem entityItem) {
-            return (Packet<?>)new PacketPlayOutSpawnEntity((Entity)entityItem, 2);
+        public Object itemSpawn(EntityItem entityItem) {
+            return new PacketPlayOutSpawnEntity(entityItem, 2);
         }
 
-        public Packet<?> itemMeta(int itemID, DataWatcher dataWatcher) {
-            return (Packet<?>)new PacketPlayOutEntityMetadata(itemID, dataWatcher, true);
+        public Object itemMeta(int itemID, DataWatcher dataWatcher) {
+            return new PacketPlayOutEntityMetadata(itemID, dataWatcher, true);
         }
 
-        public Packet<?> attachItemToArmorStand(int itemID, int armorStandID) {
+        public Object attachItemToArmorStand(int itemID, int armorStandID) {
             PacketPlayOutAttachEntity packetPlayOutAttachEntity = new PacketPlayOutAttachEntity();
             try {
                 Field unknown = PacketPlayOutAttachEntity.class.getDeclaredField("a");
                 unknown.setAccessible(true);
-                unknown.set(packetPlayOutAttachEntity, Integer.valueOf(0));
+                unknown.set(packetPlayOutAttachEntity, 0);
                 Field entityID = PacketPlayOutAttachEntity.class.getDeclaredField("b");
                 entityID.setAccessible(true);
-                entityID.set(packetPlayOutAttachEntity, Integer.valueOf(itemID));
+                entityID.set(packetPlayOutAttachEntity, itemID);
                 Field vehicleID = PacketPlayOutAttachEntity.class.getDeclaredField("c");
                 vehicleID.setAccessible(true);
-                vehicleID.set(packetPlayOutAttachEntity, Integer.valueOf(armorStandID));
-            } catch (NoSuchFieldException e) {
+                vehicleID.set(packetPlayOutAttachEntity, armorStandID);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
-            } catch (IllegalAccessException e2) {
-                e2.printStackTrace();
             }
-            return (Packet<?>)packetPlayOutAttachEntity;
+            return packetPlayOutAttachEntity;
         }
 
-        public Packet<?> destroyEntity(int entityID) {
-            return (Packet<?>)new PacketPlayOutEntityDestroy(new int[] { entityID });
+        public Object destroyEntity(int entityID) {
+            return new PacketPlayOutEntityDestroy(entityID);
         }
     }
 
@@ -263,24 +258,24 @@ public class Hologram {
         }
 
         @SuppressWarnings("rawtypes")
-        public Packet[] getSpawnPackets(Location location) {
+        public Object[] getSpawnPackets(Location location) {
             EntityItem entityItem = packetHelper.createItem(location, this.itemStack, this.itemID);
-            return new Packet[] { packetHelper.spawnArmorStand(location, "clearline", this.armorStandID), packetHelper.itemSpawn(entityItem), packetHelper.itemMeta(this.itemID, entityItem.getDataWatcher()), packetHelper.attachItemToArmorStand(this.itemID, this.armorStandID) };
+            return new Object[] { packetHelper.spawnArmorStand(location, "clearline", this.armorStandID), packetHelper.itemSpawn(entityItem), packetHelper.itemMeta(this.itemID, entityItem.getDataWatcher()), packetHelper.attachItemToArmorStand(this.itemID, this.armorStandID) };
         }
 
         @SuppressWarnings("rawtypes")
-        public Packet[] getDespawnPackets() {
-            return new Packet[] { packetHelper.destroyEntity(this.itemID), packetHelper.destroyEntity(this.armorStandID) };
+        public Object[] getDespawnPackets() {
+            return new Object[] { packetHelper.destroyEntity(this.itemID), packetHelper.destroyEntity(this.armorStandID) };
         }
     }
 
 
 
     public interface HoloLine {
-        Packet[] getSpawnPackets(Location paramLocation);
+        Object[] getSpawnPackets(Location paramLocation);
 
         @SuppressWarnings("rawtypes")
-        Packet[] getDespawnPackets();
+        Object[] getDespawnPackets();
     }
 
 

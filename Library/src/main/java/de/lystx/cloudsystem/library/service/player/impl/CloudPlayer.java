@@ -48,8 +48,4 @@ public class CloudPlayer implements Serializable {
     public void kick(CloudExecutor executor, String reason) {
         executor.sendPacket(new PacketCommunicationKick(this.name, reason));
     }
-
-    public void sendActionbar(CloudExecutor executor, String message) {
-        executor.sendPacket(new PacketCommunicationSendActionbar(this.name, message));
-    }
 }

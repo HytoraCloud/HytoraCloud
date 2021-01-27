@@ -1,5 +1,6 @@
 package de.lystx.cloudapi.proxy.command;
 
+import com.google.common.collect.ImmutableList;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInCopyTemplate;
@@ -19,10 +20,12 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class CloudCommand extends Command {
+public class CloudCommand extends Command implements TabExecutor {
 
 
     public CloudCommand() {
@@ -252,5 +255,44 @@ public class CloudCommand extends Command {
         player.sendMessage("  §8» §b/cloud tps §8┃ §7Shows tps of cloudsystem");
         player.sendMessage("  §8» §b/cloud stats §8┃ §7Shows stats of cloudsystem");
         player.sendMessage("§8§m--------------------------------------");
+    }
+
+    @Override
+    public Iterable<String> onTabComplete(CommandSender commandSender, String[] args) {
+        if (args.length == 0) {
+            return ImmutableList.of("list", "tps", "ver", "shutdown", "rl", "maintenance", "run", "stop", "stopGroup", "copy", "log", "toggle", "stats");
+        }
+        if (args[0].equalsIgnoreCase("list")) {
+            return ImmutableList.of("group", "proxy", "server", "maintenance");
+        } else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("log")) {
+            return this.getServices();
+        } else if (args[0].equalsIgnoreCase("stopGroup") || args[0].equalsIgnoreCase("run") || args[0].equalsIgnoreCase("tps")) {
+            return this.getGroups();
+        } else if (args[0].equalsIgnoreCase("maintenance")) {
+            if (args.length == 2) {
+                List<String> groups = this.getGroups();
+                groups.add("switch");
+                return groups;
+            } else if (args.length == 3) {
+                return ImmutableList.of("true", "false");
+            }
+        }
+        return ImmutableList.of();
+    }
+
+    public List<String> getServices() {
+        List<String> list = new LinkedList<>();
+        for (Service service : CloudAPI.getInstance().getNetwork().getServices()) {
+            list.add(service.getName());
+        }
+        return list;
+    }
+
+    public List<String> getGroups() {
+        List<String> list = new LinkedList<>();
+        for (ServiceGroup service : CloudAPI.getInstance().getNetwork().getServiceGroups()) {
+            list.add(service.getName());
+        }
+        return list;
     }
 }

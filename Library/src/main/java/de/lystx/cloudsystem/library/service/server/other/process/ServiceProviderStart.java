@@ -159,8 +159,7 @@ public class ServiceProviderStart {
 
             FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), jarFile), new File(serverLocation, jarFile));
 
-
-            ProcessBuilder processBuilder = new ProcessBuilder(
+            String[] proxy = new String[]{
                     "java",
                     "-XX:+UseG1GC",
                     "-XX:MaxGCPauseMillis=50",
@@ -184,7 +183,36 @@ public class ServiceProviderStart {
                     "-Xms" + service.getServiceGroup().getMinRam() + "M",
                     "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
                     "-jar",
-                    jarFile);
+                    jarFile};
+
+            String[] spigot = new String[]{
+                    "java",
+                    "-XX:+UseG1GC",
+                    "-XX:MaxGCPauseMillis=50",
+                    "-XX:+AlwaysPreTouch",
+                    "-XX:+DisableExplicitGC",
+                    "-XX:+UseG1GC",
+                    "-XX:+UnlockExperimentalVMOptions",
+                    "-XX:MaxGCPauseMillis=50",
+                    "-XX:G1HeapRegionSize=4M",
+                    "-XX:TargetSurvivorRatio=90",
+                    "-XX:G1NewSizePercent=50",
+                    "-XX:G1MaxNewSizePercent=80",
+                    "-XX:InitiatingHeapOccupancyPercent=10",
+                    "-XX:G1MixedGCLiveThresholdPercent=50",
+                    "-XX:+AggressiveOpts",
+                    "-XX:-UseAdaptiveSizePolicy",
+                    "-XX:CompileThreshold=100",
+                    "-Dio.netty.leakDetectionLevel=DISABLED",
+                    "-Djline.terminal=jline.UnsupportedTerminal",
+                    "-Dfile.encoding=UTF-8",
+                    "-Xms" + service.getServiceGroup().getMinRam() + "M",
+                    "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
+                    "-jar",
+                    jarFile,
+                    "nogui"};
+
+            ProcessBuilder processBuilder = new ProcessBuilder((service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? proxy : spigot));
             processBuilder.directory(serverLocation);
             Process process = processBuilder.start();
             CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());

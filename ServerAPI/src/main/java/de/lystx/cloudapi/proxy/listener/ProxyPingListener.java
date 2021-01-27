@@ -20,7 +20,7 @@ import net.md_5.bungee.event.EventHandler;
 public class ProxyPingListener implements Listener {
 
 
-    private CloudAPI cloudAPI;
+    private final CloudAPI cloudAPI;
 
     public ProxyPingListener() {
         this.cloudAPI = CloudAPI.getInstance();
@@ -60,7 +60,6 @@ public class ProxyPingListener implements Listener {
             ping.setDescription(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getFirstLine(), event.getConnection().getVirtualHost().getPort())) + "\n" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getSecondLine(), event.getConnection().getVirtualHost().getPort())));
 
             ping.setPlayers(players);
-
             event.setResponse(ping);
         } catch (NullPointerException e) {}
     }
@@ -68,12 +67,10 @@ public class ProxyPingListener implements Listener {
 
     public String replace(String string, int port) {
         Service service = CloudAPI.getInstance().getNetwork().getProxy(port);
-
         return string
                 .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
                 .replace("%online_players%", String.valueOf(CloudAPI.getInstance().getCloudPlayers().getAll().size()))
                 .replace("%proxy%", service == null ? "no_proxy_available" : service.getName())
-                .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance()))
-                ;
+                .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance()));
     }
 }
