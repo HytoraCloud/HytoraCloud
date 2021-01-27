@@ -43,6 +43,14 @@ public class ServiceProviderStop {
                     }
                 }
             } catch (IOException e) {}
+        } else {
+            File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
+            if (cloudAPI.exists()) {
+                try {
+                    FileUtils.deleteDirectory(cloudAPI);
+                    FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
+                } catch (Exception ignored) { }
+            }
         }
         this.service.notifyStop(service);
         this.cloudLibrary.getService(ScreenService.class).unregisterScreen(screen);
