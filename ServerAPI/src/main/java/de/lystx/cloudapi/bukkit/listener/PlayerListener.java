@@ -12,6 +12,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -139,12 +140,13 @@ public class PlayerListener implements Listener {
             String message = event.getMessage();
             PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(event.getPlayer().getName());
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                onlinePlayer.sendMessage(CloudAPI.getInstance().getChatFormat()
-                        .replace("%display%", group.getDisplay())
-                        .replace("%group%", group.getName())
+                String chatFormat = ChatColor.translateAlternateColorCodes('&', (group.getChatFormat().trim().isEmpty() ? CloudAPI.getInstance().getChatFormat() : group.getChatFormat()));
+                onlinePlayer.sendMessage(chatFormat
+                        .replace("%display%", group.getDisplay().replace("&", "§"))
+                        .replace("%group%", group.getName().replace("&", "§"))
                         .replace("%message%", message)
-                        .replace("%prefix%", group.getPrefix())
-                        .replace("%suffix%", group.getSuffix())
+                        .replace("%prefix%", group.getPrefix().replace("&", "§"))
+                        .replace("%suffix%", group.getSuffix().replace("&", "§"))
                         .replace("%player%", event.getPlayer().getName())
                         .replace("%id%", group.getId() + ""));
             }

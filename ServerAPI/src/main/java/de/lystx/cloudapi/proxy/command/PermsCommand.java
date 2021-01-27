@@ -3,6 +3,7 @@ package de.lystx.cloudapi.proxy.command;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
@@ -124,6 +125,27 @@ public class PermsCommand extends Command {
 					player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You removed the permission §b" + permission + " §7 from the player §b" + args[1] + "§8!");
 				} else {
 					help(player);
+				}
+			} else if (args[0].equalsIgnoreCase("group")) {
+				String groupname = args[1];
+				PermissionPool permissionPool = CloudAPI.getInstance().getPermissionPool();
+				PermissionGroup group = permissionPool.getPermissionGroupFromName(groupname);
+				if (group == null) {
+					player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cdoesn't exist!");
+					return;
+				}
+				if (args[2].equalsIgnoreCase("add")) {
+					String permission = args[3];
+					permissionPool.updatePermissionGroupEntry(group, permission, true);
+					permissionPool.update(CloudAPI.getInstance().getCloudClient());
+					player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You added the permission §b" + permission + " §7to the group §b" + group.getName());
+				} else if (args[2].equalsIgnoreCase("remove")) {
+					String permission = args[3];
+					permissionPool.updatePermissionGroupEntry(group, permission, false);
+					permissionPool.update(CloudAPI.getInstance().getCloudClient());
+					player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You removed the permission §b" + permission + " §7from the group §b" + group.getName());
+				} else {
+					this.help(player);
 				}
 			} else {
 				help(player);
@@ -261,6 +283,8 @@ public class PermsCommand extends Command {
 		player.sendMessage("  §8» §b/perms user <player> group remove <group> §8┃ §7Removes a player from a group");
 		player.sendMessage("  §8» §b/perms user <player> §8┃ §7Gives infos about player");
 		player.sendMessage("  §8» §b/perms group <group> §8┃ §7Gives infos about a group");
+		player.sendMessage("  §8» §b/perms group <group> add <permission> §8┃ §7Gives a permission to a group");
+		player.sendMessage("  §8» §b/perms group <group> remove <permission> §8┃ §7Removes a permission from a group");
 		player.sendMessage("  §8» §b/perms group list §8┃ §7Lists all groups");
 		player.sendMessage("§8§m--------------------------------------");
 	  }

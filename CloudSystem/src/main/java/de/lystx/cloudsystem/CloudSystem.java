@@ -116,6 +116,7 @@ public class CloudSystem extends CloudLibrary {
 
     public void reload() {
         try {
+            this.getService(PermissionService.class).load();
             this.getService(PermissionService.class).loadEntries();
             this.getService(ConfigService.class).reload();
             this.getService(NPCService.class).load();

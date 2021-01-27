@@ -12,13 +12,11 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
-import de.lystx.cloudsystem.library.service.setup.Setup;
 import de.lystx.cloudsystem.library.service.setup.impl.GroupSetup;
 import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupSetup;
 
 import java.util.LinkedList;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class CreateCommand extends Command {
 
@@ -58,6 +56,7 @@ public class CreateCommand extends Command {
                             ps.getPrefix(),
                             ps.getSuffix(),
                             ps.getDisplay(),
+                            "",
                             new LinkedList<>(),
                             new LinkedList<>()
                     );

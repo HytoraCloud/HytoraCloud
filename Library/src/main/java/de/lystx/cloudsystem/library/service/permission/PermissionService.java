@@ -51,6 +51,7 @@ public class PermissionService extends CloudService {
                     "§4Admin §8┃ §7",
                     "§7",
                     "§4",
+                    "",
                     Arrays.asList(
                         "*",
                         "cloudsystem.group.maintenance",

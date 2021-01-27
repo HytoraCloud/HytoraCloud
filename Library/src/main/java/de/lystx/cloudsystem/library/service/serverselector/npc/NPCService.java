@@ -29,7 +29,7 @@ public class NPCService extends CloudService {
         this.document = new Document(getCloudLibrary().getService(FileService.class).getNpcFile());
         this.config = new Document(getCloudLibrary().getService(FileService.class).getNpcLayout());
         if (this.config.isEmpty() || !this.config.getFile().exists()) {
-            this.config.appendAll(new NPCConfig(
+            this.config.append(new NPCConfig(
                     6,
                     "§8» §7Group §8┃ §b%group%",
                     true,

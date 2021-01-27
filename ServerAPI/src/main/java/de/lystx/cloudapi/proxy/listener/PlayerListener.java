@@ -3,13 +3,21 @@ package de.lystx.cloudapi.proxy.listener;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.CloudLoginFailEvent;
 import de.lystx.cloudapi.proxy.events.GlobalChatEvent;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerStillOnline;
+import de.lystx.cloudsystem.library.result.Result;
+import de.lystx.cloudsystem.library.result.packets.ResultPacketCloudPlayerData;
+import de.lystx.cloudsystem.library.result.packets.ResultPacketCloudPlayerLoginVerify;
+import de.lystx.cloudsystem.library.result.packets.ResultPacketPlayerConnection;
+import de.lystx.cloudsystem.library.result.packets.ResultPacketServices;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
@@ -23,9 +31,11 @@ import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class PlayerListener implements Listener {
 
@@ -35,33 +45,37 @@ public class PlayerListener implements Listener {
         this.cloudAPI = CloudAPI.getInstance();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onLogin(LoginEvent event) {
         try {
+            String name = this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId());
+            Document document = this.cloudAPI.sendQuery(new ResultPacketCloudPlayerLoginVerify(name)).getResult();
+            if (!document.getBoolean("allow")) {
+                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
+                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
+                if (failEvent.isCancelled()) {
+                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+                } else {
+                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix())));
+                }
+                event.setCancelled(true);
+                this.cloudAPI.sendPacket(new PacketPlayOutCloudPlayerStillOnline(name));
+
+            }
+
             if (this.cloudAPI.getNetwork().getServices().isEmpty() || !this.cloudAPI.isJoinable()) {
                 CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.NO_SERVICES);
                 ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
-                event.setCancelled(true);
                 if (failEvent.isCancelled()) {
                     event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
                 } else {
-                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getNetworkStillBootingMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getNetworkStillBootingMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix())));
                 }
+                event.setCancelled(true);
                 return;
             }
-            String name = this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId());
             if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
                 return;
-            }
-            if (this.cloudAPI.getCloudPlayers().get(name) != null) {
-                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
-                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
-                event.setCancelled(true);
-                if (failEvent.isCancelled()) {
-                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
-                } else {
-                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
-                }
             }
             boolean is = this.cloudAPI.getPermissionPool().hasPermission(name, "cloudsystem.network.maintenance");
             if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance() && !this.cloudAPI.getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(name) && !is) {
@@ -72,11 +86,20 @@ public class PlayerListener implements Listener {
                 if (failEvent.isCancelled()) {
                     event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
                 } else {
-                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("%prefix%", this.cloudAPI.getPrefix())));
+                    event.setCancelReason(new TextComponent(this.cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix())));
                 }
             }
 
         } catch (Exception ignored) {}
+    }
+
+    @EventHandler
+    public void handlePermissionCheck(PermissionCheckEvent e) {
+        if (cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), "*")) {
+            e.setHasPermission(true);
+        } else {
+            e.setHasPermission(cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), e.getPermission()));
+        }
     }
 
     @EventHandler
@@ -106,15 +129,9 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void on(PermissionCheckEvent event) {
-        CommandSender player = event.getSender();
-        event.setHasPermission(cloudAPI.getPermissionPool().hasPermission(player.getName(), event.getPermission()));
-    }
-
-    @EventHandler
     public void onJoin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        CloudProxy.getInstance().updatePermissions(player);
+       // CloudProxy.getInstance().updatePermissions(player);
     }
 
 

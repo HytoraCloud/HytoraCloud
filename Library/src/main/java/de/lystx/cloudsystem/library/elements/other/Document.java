@@ -90,7 +90,7 @@ public class Document implements Serializable {
     }
 
 
-    public Document appendAll(Object value) {
+    public Document append(Object value) {
         if (value == null) {
             return this;
         }

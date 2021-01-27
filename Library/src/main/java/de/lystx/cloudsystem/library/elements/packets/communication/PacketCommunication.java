@@ -11,6 +11,8 @@ public class PacketCommunication extends Packet implements Serializable {
 
     private boolean sendBack;
 
+    public PacketCommunication() {}
+
     public PacketCommunication(Class<?> clazz) {
         this(clazz, true);
     }

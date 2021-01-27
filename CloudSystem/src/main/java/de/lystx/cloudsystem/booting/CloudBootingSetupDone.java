@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.handler.managing.*;
 import de.lystx.cloudsystem.handler.other.*;
 import de.lystx.cloudsystem.handler.player.PacketHandlerCloudPlayer;
 import de.lystx.cloudsystem.handler.player.PacketHandlerCloudPlayerCommunication;
+import de.lystx.cloudsystem.handler.result.PacketHandlerResult;
 import de.lystx.cloudsystem.handler.services.PacketHandlerRegister;
 import de.lystx.cloudsystem.handler.services.PacketHandlerServiceUpdate;
 import de.lystx.cloudsystem.handler.services.PacketHandlerStart;
@@ -68,6 +69,7 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerLog(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerTPS(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudTPS(cloudSystem));
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerResult(cloudSystem));
 
         cloudSystem.getService(StatisticsService.class).getStatistics().add("bootedUp");
         cloudSystem.reload();

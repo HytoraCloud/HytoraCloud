@@ -112,6 +112,16 @@ public class PermissionPool implements Serializable {
         } catch (Exception e) {}
     }
 
+    public void updatePermissionGroupEntry(PermissionGroup permissionGroup, String permission, boolean add) {
+        PermissionGroup group = this.getPermissionGroupFromName(permissionGroup.getName());
+        if (add) {
+            group.getPermissions().add(permission);
+        } else {
+            group.getPermissions().remove(permission);
+        }
+        this.permissionGroups.set(this.permissionGroups.indexOf(group), group);
+    }
+
     public void updatePermissionGroup(String playerName, PermissionGroup group, Integer i, PermissionValidality validality) {
         CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
         if (data == null) {
@@ -273,8 +283,15 @@ public class PermissionPool implements Serializable {
         new Thread(() -> {
             try {
                 for (File file : Objects.requireNonNull(directory.listFiles())) {
+                    if (file == null) {
+                        continue;
+                    }
                     try {
                         String uuid = file.getName().split("\\.")[0];
+                        if (uuid == null) {
+                            file.delete();
+                            continue;
+                        }
                         if (UUIDService.getName(UUID.fromString(uuid)) == null) {
                             file.delete();
                         }

@@ -10,8 +10,11 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInComman
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.result.Result;
+import de.lystx.cloudsystem.library.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
@@ -20,6 +23,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +35,7 @@ import java.util.function.Consumer;
 public class CloudAPI {
 
     private static CloudAPI instance;
+    private final Map<UUID, Value<Result>> synchronizedHandlers = new HashMap<>();
 
     private NetworkConfig networkConfig;
     private PermissionPool permissionPool;
@@ -75,6 +80,39 @@ public class CloudAPI {
 
     public void disconnect() {
         this.cloudClient.disconnect();
+    }
+
+    public Result sendQuery(ResultPacket packet) {
+
+        Value<Result> result = new Value<>();
+        UUID uuid = UUID.randomUUID();
+        packet.setUniqueId(uuid);
+        this.sendPacket(packet);
+
+        this.cloudClient.registerPacketHandler(new PacketHandlerAdapter() {
+            @Override
+            public void handle(Packet packet) {
+                if (packet instanceof ResultPacket) {
+                    ResultPacket resultPacket = (ResultPacket)packet;
+                    UUID id = resultPacket.getUniqueId();
+                    if (uuid.equals(id)) {
+                        result.set(resultPacket.getResult());
+                        cloudClient.getAdapterHandler().unregisterAdapter(this);
+                    }
+                }
+            }
+        });
+
+        int i = 0;
+        while (result.get() == null && i++ < 5000) {
+            try {
+                Thread.sleep(0, 500000);
+            } catch (InterruptedException ignored) {}
+        }
+        if (i >= 4999) {
+            result.set(new Result(uuid, new Document()));
+        }
+        return result.get();
     }
 
     public void shutdown() {

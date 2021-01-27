@@ -23,7 +23,7 @@ public class ConfigService extends CloudService {
     public void reload() {
         this.document = Document.fromFile(getCloudLibrary().getService(FileService.class).getConfigFile());
         if (!getCloudLibrary().getService(FileService.class).getConfigFile().exists()) {
-            this.document.appendAll(NetworkConfig.defaultConfig());
+            this.document.append(NetworkConfig.defaultConfig());
             this.document.save();
             this.reload();
             return;
@@ -32,7 +32,7 @@ public class ConfigService extends CloudService {
     }
 
     public void save() {
-        this.document.appendAll(this.networkConfig);
+        this.document.append(this.networkConfig);
         this.document.save();
     }
 }

@@ -4,8 +4,6 @@ import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGroup;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
@@ -68,7 +66,7 @@ public class Files implements CloudDatabase {
         File file = new File(dir, uuid + ".json");
         Document document = new Document(file);
         document.clear();
-        document.appendAll(data);
+        document.append(data);
         document.save();
     }
 

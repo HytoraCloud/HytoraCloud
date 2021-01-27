@@ -1,9 +1,7 @@
 package de.lystx.cloudsystem.library.service.server.other;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
-import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutRegisterServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStartedServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStopServer;
@@ -16,10 +14,6 @@ import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.permission.PermissionService;
-import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -85,7 +79,7 @@ public class ServerService extends CloudService {
             service.setServiceGroup(newGroup);
             CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getScreenByName(service.getName());
             Document document = new Document(new File(screen.getServerDir(), "CLOUD/connection.json"));
-            document.appendAll(service);
+            document.append(service);
             document.save();
         }
     }

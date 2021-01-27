@@ -34,7 +34,7 @@ public class GroupService extends CloudService {
 
     public void createGroup(ServiceGroup serviceGroup) {
         Document document = new Document(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        document.appendAll(serviceGroup);
+        document.append(serviceGroup);
         document.save();
         this.groups.add(serviceGroup);
         this.getCloudLibrary().getService(TemplateService.class).createTemplate(serviceGroup);
@@ -53,7 +53,7 @@ public class GroupService extends CloudService {
         document.clear();
         document.getFile().delete();
         this.groups.remove(serviceGroup);
-        document.appendAll(newServiceGroup);
+        document.append(newServiceGroup);
         this.groups.add(newServiceGroup);
         document.save();
     }

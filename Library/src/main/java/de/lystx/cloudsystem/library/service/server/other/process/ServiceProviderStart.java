@@ -11,13 +11,11 @@ import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.service.util.Action;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.logging.Level;
 
 
@@ -156,7 +154,7 @@ public class ServiceProviderStart {
             File cloud = new File(serverLocation + "/CLOUD/");
             cloud.mkdirs();
             Document document = new Document();
-            document.appendAll(service);
+            document.append(service);
             document.save(new File(cloud, "connection.json"));
 
             FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), jarFile), new File(serverLocation, jarFile));

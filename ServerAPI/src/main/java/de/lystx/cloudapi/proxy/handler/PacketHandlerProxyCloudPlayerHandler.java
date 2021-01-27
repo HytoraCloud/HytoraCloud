@@ -7,7 +7,9 @@ import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommuni
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationKick;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSendMessage;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSendToServer;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCloudPlayerOnline;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerStillOnline;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutForceRegisterPlayer;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -45,6 +47,10 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
                 return;
             }
             player.connect(serverInfo);
+        } else if (packet instanceof PacketPlayOutCloudPlayerStillOnline) {
+            PacketPlayOutCloudPlayerStillOnline packetPlayOutCloudPlayerStillOnline = (PacketPlayOutCloudPlayerStillOnline) packet;
+            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetPlayOutCloudPlayerStillOnline.getPlayerName());
+            cloudAPI.sendPacket(new PacketPlayInCloudPlayerOnline(packetPlayOutCloudPlayerStillOnline.getPlayerName(), (player != null)));
         } else if (packet instanceof PacketPlayOutForceRegisterPlayer) {
             PacketPlayOutForceRegisterPlayer player = (PacketPlayOutForceRegisterPlayer)packet;
             ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(player.getUuid());

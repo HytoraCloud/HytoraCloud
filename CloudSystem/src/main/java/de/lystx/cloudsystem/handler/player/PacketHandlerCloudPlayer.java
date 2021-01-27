@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.handler.player;
 
 import de.lystx.cloudsystem.CloudSystem;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCloudPlayerOnline;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
@@ -14,6 +15,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
 
     private final CloudSystem cloudSystem;
+    private int tries;
 
     public PacketHandlerCloudPlayer(CloudSystem cloudSystem) {
         this.cloudSystem = cloudSystem;
@@ -45,7 +47,15 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             } else {
                 this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is connected on §a" + cloudPlayer.getServer() + " §7| §bProxy " + cloudPlayer.getProxy());
             }
-
+        } else if (packet instanceof PacketPlayInCloudPlayerOnline) {
+            PacketPlayInCloudPlayerOnline packetPlayInCloudPlayerOnline = (PacketPlayInCloudPlayerOnline)packet;
+            tries++;
+            if (tries == cloudSystem.getService().getCloudProxies().size()) {
+                if (!packetPlayInCloudPlayerOnline.isOnline()) {
+                    cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInCloudPlayerOnline.getPlayerName()));
+                    cloudSystem.reload();
+                }
+            }
         } else if (packet instanceof PacketPlayInPlayerExecuteCommand) {
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
             this.cloudSystem.reload();
