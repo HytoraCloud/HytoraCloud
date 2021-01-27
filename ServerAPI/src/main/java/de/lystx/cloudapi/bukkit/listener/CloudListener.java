@@ -15,42 +15,58 @@ public class CloudListener implements NetworkHandler {
 
     @Override
     public void onServerStart(Service service) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override
     public void onServerQueue(Service service) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override
     public void onServerStop(Service service) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override
     public void onServerUpdate(Service service) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override
     public void onGroupUpdate(ServiceGroup group) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override
     public void onPlayerJoin(CloudPlayer cloudPlayer) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override
     public void onServerChange(CloudPlayer cloudPlayer, String server) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override
     public void onPlayerQuit(CloudPlayer cloudPlayer) {
-        CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        try {
+            CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerNetworkUpdateEvent());
+        } catch (IllegalStateException e) {}
     }
 
     @Override

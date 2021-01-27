@@ -30,6 +30,8 @@ public class CloudServer extends JavaPlugin {
     private NametagManager nametagManager;
     private NPCManager npcManager;
     private LabyMod labyMod;
+    private boolean useLabyMod;
+    private boolean newVersion;
 
     @Override
     public void onEnable() {
@@ -41,11 +43,17 @@ public class CloudServer extends JavaPlugin {
         try {
             Class.forName("net.minecraft.server.v1_8_R3.Packet");
             this.npcManager = new NPCManager();
-        } catch (Exception e){}
+            this.newVersion = false;
+        } catch (Exception e){
+            this.newVersion = true;
+        }
         try {
             Class.forName("net.labymod.serverapi.bukkit.LabyModPlugin");
             this.labyMod = new LabyMod(this.cloudAPI);
-        } catch (Exception e) {}
+            this.useLabyMod = true;
+        } catch (Exception e) {
+            this.useLabyMod = false;
+        }
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));

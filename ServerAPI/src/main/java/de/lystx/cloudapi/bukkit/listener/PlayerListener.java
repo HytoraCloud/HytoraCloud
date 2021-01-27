@@ -95,19 +95,22 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        PacketReader packetReader = new PacketReader(player);
-        try {
-            packetReader.inject();
-        } catch (NoSuchElementException e){}
-        this.packetReaders.put(player.getUniqueId(), packetReader);
+        if (!CloudServer.getInstance().isNewVersion()) {
+            PacketReader packetReader = new PacketReader(player);
+            try {
+                packetReader.inject();
+            } catch (NoSuchElementException e){}
+            this.packetReaders.put(player.getUniqueId(), packetReader);
+        }
         int onlinePlayers = Bukkit.getOnlinePlayers().size();
         int onlinepercent = ((onlinePlayers / Bukkit.getMaxPlayers()) * 100);
 
-        if (CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
+        if (CloudServer.getInstance().isUseLabyMod() && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
             if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
                 CloudServer.getInstance().getLabyMod().disableVoiceChat(player);
             }
             Service s = CloudAPI.getInstance().getService();
+
             CloudServer.getInstance().getLabyMod().sendCurrentPlayingGamemode(player, true, CloudAPI.getInstance().getNetworkConfig().getLabyModConfig()
                     .getServerSwitchMessage().replace("&", "§").replace("%service%", s.getName())
                     .replace("%group%", s.getServiceGroup().getName())
@@ -117,13 +120,14 @@ public class PlayerListener implements Listener {
         if (onlinepercent >= onlinePlayers) {
             CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup());
         }
+        if (!CloudServer.getInstance().isNewVersion()) {
+            CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
+            if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 
-        CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
-        if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-
-                PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
-                CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
+                    PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
+                    CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
+                }
             }
         }
         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
