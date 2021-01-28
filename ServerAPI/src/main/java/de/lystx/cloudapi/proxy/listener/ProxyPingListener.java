@@ -37,11 +37,8 @@ public class ProxyPingListener implements Listener {
             if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
                 return;
             }
+            int port = event.getConnection().getVirtualHost().getPort();
             ServerPing ping = event.getResponse();
-            ServerPing.Players players = ping.getPlayers();
-
-            ping.getPlayers().setMax(this.cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers());
-
             Motd motd;
             if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance()) {
                 motd = this.cloudAPI.getNetworkConfig().getProxyConfig().getMotdMaintenance();
@@ -50,21 +47,28 @@ public class ProxyPingListener implements Listener {
             }
 
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
-                ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), event.getConnection().getVirtualHost().getPort())), 2));
+                ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), port)), 2));
             }
-
-
 
             if (motd.getProtocolString() != null && !motd.getProtocolString().trim().isEmpty()) {
-                players.setSample(new ServerPing.PlayerInfo[] { new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getProtocolString(), event.getConnection().getVirtualHost().getPort())).replace("||", "\n"), UUID.randomUUID())});
+                String[] playerInfo = (motd.getProtocolString().replace("||", "-_-")).split("-_-");
+
+                ServerPing.PlayerInfo[] playerInfos = new ServerPing.PlayerInfo[playerInfo.length];
+                for (short i = 0; i < playerInfos.length; i++) {
+                    playerInfos[i] = new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(playerInfo[i].replace("-_-", ""), port)), UUID.randomUUID());
+                }
+                ping.setPlayers(new ServerPing.Players(this.cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers(), CloudAPI.getInstance().getCloudPlayers().getAll().size(), playerInfos));
+
             }
+            ping.getPlayers().setMax(this.cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers());
 
-            ping.setDescription(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getFirstLine(), event.getConnection().getVirtualHost().getPort())) + "\n" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getSecondLine(), event.getConnection().getVirtualHost().getPort())));
+            ping.setDescription(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getFirstLine(), port)) + "\n" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getSecondLine(), port)));
 
-            ping.setPlayers(players);
             event.setResponse(ping);
         } catch (NullPointerException e) {}
     }
+
+
 
 
     public String replace(String string, int port) {

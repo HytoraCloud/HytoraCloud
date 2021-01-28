@@ -117,7 +117,6 @@ public class TablistListener implements Listener {
     }
 
     public void doUpdate() {
-        this.updateTab();
         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
     }
 

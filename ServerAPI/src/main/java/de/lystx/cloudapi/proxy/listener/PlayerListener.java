@@ -101,6 +101,15 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void handlePluginMessage(PluginMessageEvent event) {
+        /*if (event.getTag().equals("MC|BSign") || event.getTag().equals("MC|BEdit")) {
+            if (customPayloadFixer) {
+                event.setCancelled(true);
+            }
+        }*/
+    }
+
+    @EventHandler
     public void handlePermissionCheck(PermissionCheckEvent e) {
         if (cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), "*")) {
             e.setHasPermission(true);
