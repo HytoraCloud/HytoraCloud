@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.commands;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.util.Action;
@@ -10,10 +11,12 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class DownloadCommand extends Command {
+public class DownloadCommand extends Command implements TabCompletable {
 
 
     public DownloadCommand(String name, String description, String... aliases) {
@@ -117,5 +120,10 @@ public class DownloadCommand extends Command {
         console.getLogger().sendMessage("INFO", "§9spigot <activate> <id> §7| §bSwitches current spigot version");
         console.getLogger().sendMessage("INFO", "§9spigot <reactivate> <id> §7| §bReuses an old version");
         console.getLogger().sendMessage("INFO", "§9spigot <list> §7| §bLists all spigot versions");
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        return Arrays.asList("download", "activate", "reactivate", "list");
     }
 }

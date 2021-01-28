@@ -4,10 +4,14 @@ import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 
-public class RunCommand extends Command {
+import java.util.LinkedList;
+import java.util.List;
+
+public class RunCommand extends Command implements TabCompletable {
 
 
     public RunCommand(String name, String description, String... aliases) {
@@ -42,5 +46,14 @@ public class RunCommand extends Command {
         } else {
             console.getLogger().sendMessage("ERROR", "§crun <group> <number>");
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        List<String> list = new LinkedList<>();
+        for (ServiceGroup globalService : cloudLibrary.getService(GroupService.class).getGroups()) {
+            list.add(globalService.getName());
+        }
+        return list;
     }
 }

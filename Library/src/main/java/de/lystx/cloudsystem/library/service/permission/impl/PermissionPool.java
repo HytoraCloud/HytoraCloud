@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermis
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
+import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
@@ -42,7 +43,7 @@ public class PermissionPool implements Serializable {
         return (!this.permissionGroups.isEmpty() || !this.playerCache.isEmpty());
     }
 
-    public void update(CloudClient connection) {
+    public void update(CloudExecutor connection) {
         connection.sendPacket(new PacketPlayInPermissionPool(this));
     }
 
@@ -68,6 +69,16 @@ public class PermissionPool implements Serializable {
             return;
         }
         this.playerCache.set(this.playerCache.indexOf(oldData), newData);
+    }
+
+    public PermissionGroup getDefaultPermissionGroup() {
+        this.permissionGroups.sort(Comparator.comparingInt(PermissionGroup::getId));
+        try {
+            if (!this.permissionGroups.isEmpty()) {
+                return this.permissionGroups.get(this.permissionGroups.size() - 1);
+            }
+        } catch (Exception e) {}
+        return new DefaultPermissionGroup();
     }
 
     public boolean isRankValid(String playerName, PermissionGroup permissionGroup) {
@@ -166,6 +177,16 @@ public class PermissionPool implements Serializable {
         }
     }
 
+    public void checkFix(String player, CloudExecutor executor) {
+        CloudPlayerData data = this.getPlayerData(player);
+        if (data != null) {
+            if (data.getPermissionEntries().isEmpty()) {
+                data.getPermissionEntries().add(new PermissionEntry(tryUUID(player), getDefaultPermissionGroup().getName(), ""));
+                this.updatePlayerData(player, data);
+                this.update(executor);
+            }
+        }
+    }
 
     public List<PermissionGroup> getPermissionGroups(String player) {
         List<PermissionGroup> permissionGroups = new LinkedList<>();
@@ -185,7 +206,7 @@ public class PermissionPool implements Serializable {
         List<PermissionGroup> list = this.getPermissionGroups(player);
         list.sort(Comparator.comparingInt(PermissionGroup::getId));
         if (list.isEmpty()) {
-            return new DefaultPermissionGroup();
+            return this.getDefaultPermissionGroup();
         } else {
             return list.get(0);
         }

@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
@@ -11,7 +12,11 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 
-public class DeleteCommand extends Command {
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+public class DeleteCommand extends Command implements TabCompletable {
 
 
     public DeleteCommand(String name, String description, String... aliases) {
@@ -58,5 +63,26 @@ public class DeleteCommand extends Command {
     public void correctSyntax(CloudConsole console) {
         console.getLogger().sendMessage("INFO", "§9delete group <group> §7| §bRemoves a ServiceGroup");
         console.getLogger().sendMessage("INFO", "§9delete perms <group> §7| §bRemoves a PermissionGroup");
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        if (args.length == 2) {
+            return Arrays.asList("group", "perms");
+        } else if (args.length == 3) {
+            List<String> list = new LinkedList<>();
+            if (args[1].equalsIgnoreCase("perms")) {
+                for (PermissionGroup permissionGroup : cloudLibrary.getService(PermissionService.class).getPermissionPool().getPermissionGroups()) {
+                    list.add(permissionGroup.getName());
+                }
+            } else if (args[1].equalsIgnoreCase("group")) {
+                for (ServiceGroup group : cloudLibrary.getService(GroupService.class).getGroups()) {
+                    list.add(group.getName());
+                }
+            }
+            return list;
+
+        }
+        return new LinkedList<>();
     }
 }

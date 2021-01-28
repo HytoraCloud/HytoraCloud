@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.command.Command;
 import de.lystx.cloudsystem.library.service.command.CommandService;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
@@ -11,12 +12,15 @@ import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupSetup;
 
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
-public class    PermsCommand extends Command {
+public class    PermsCommand extends Command implements TabCompletable {
 
 
     public PermsCommand(String name, String description, String... aliases) {
@@ -75,7 +79,7 @@ public class    PermsCommand extends Command {
                 this.help(console);
             }
         } else if (args.length == 4) {
-            if (args[0].equalsIgnoreCase("set")) {
+            if (args[0].equalsIgnoreCase("add")) {
                 String player = args[1];
                 PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
                 UUID uuid = pool.tryUUID(player);
@@ -145,9 +149,28 @@ public class    PermsCommand extends Command {
 
     public void help(CloudConsole console) {
         console.getLogger().sendMessage("INFO", "§9Help for §bPermsService§7:");
-        console.getLogger().sendMessage("INFO", "§9perms <list> §7| Lists all groups");
-        console.getLogger().sendMessage("INFO", "§9perms set <player> <group> <lifetime/timeSpan> §7| Adds player to a group");
+        console.getLogger().sendMessage("INFO", "§9perms list §7| Lists all groups");
+        console.getLogger().sendMessage("INFO", "§9perms add <player> <group> <lifetime/timeSpan> §7| Adds player to a group");
         console.getLogger().sendMessage("INFO", "§9perms remove <player> <group>  §7| Removes player from a group");
         console.getLogger().sendMessage("INFO", "§9perms info <player> §7| Displays infos about a player");
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        List<String> list = new LinkedList<>();
+        if (args.length == 2) {
+            list.addAll(Arrays.asList("list", "add", "remove", "info"));
+        } else if (args.length == 3) {
+            if (args[1].equalsIgnoreCase("info") || args[1].equalsIgnoreCase("remove")|| args[1].equalsIgnoreCase("add")) {
+                for (CloudPlayerData data : cloudLibrary.getService(PermissionService.class).getPermissionPool().getPlayerCache()) {
+                    list.add(data.getName());
+                }
+            }
+        } else if (args.length == 4) {
+            for (PermissionGroup permissionGroup : cloudLibrary.getService(PermissionService.class).getPermissionPool().getPermissionGroups()) {
+                list.add(permissionGroup.getName());
+            }
+        }
+        return list;
     }
 }

@@ -5,10 +5,15 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
+import de.lystx.cloudsystem.library.service.server.other.ServerService;
 
-public class StopCommand extends Command {
+import java.util.LinkedList;
+import java.util.List;
+
+public class StopCommand extends Command implements TabCompletable {
 
 
     public StopCommand(String name, String description, String... aliases) {
@@ -42,5 +47,21 @@ public class StopCommand extends Command {
         } else {
             console.getLogger().sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        List<String> list = new LinkedList<>();
+        if (args.length == 2) {
+            list.add("group");
+            for (Service globalService : cloudLibrary.getService(ServerService.class).getGlobalServices()) {
+                list.add(globalService.getName());
+            }
+        } else if (args.length == 3 && args[1].equalsIgnoreCase("group")) {
+            for (ServiceGroup globalService : cloudLibrary.getService(GroupService.class).getGroups()) {
+                list.add(globalService.getName());
+            }
+        }
+        return list;
     }
 }

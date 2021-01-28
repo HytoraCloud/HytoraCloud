@@ -57,6 +57,8 @@ public class CloudSystem extends CloudLibrary {
         this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.Type.UTIL));
         this.console = new CloudConsole(this.getService(LoggerService.class), this.getService(CommandService.class), System.getProperty("user.name"));
 
+        this.console.getLogger().getConsoleReader().addCompleter(this.getService(CommandService.class));
+
         this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
         this.cloudServices.add(new FileService(this, "File", CloudService.Type.CONFIG));

@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.command.Command;
 import de.lystx.cloudsystem.library.service.command.CommandService;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
@@ -15,10 +16,12 @@ import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.setup.impl.GroupSetup;
 import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupSetup;
 
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
-public class CreateCommand extends Command {
+public class CreateCommand extends Command implements TabCompletable {
 
     public CreateCommand(String name, String description, String... aliases) {
         super(name, description, aliases);
@@ -80,5 +83,11 @@ public class CreateCommand extends Command {
     public void correctSyntax(CloudConsole console) {
         console.getLogger().sendMessage("INFO", "§9create <group> §7| §bCreates a ServiceGroup");
         console.getLogger().sendMessage("INFO", "§9create <perms> §7| §bCreates a PermissionGroup");
+    }
+
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        return Arrays.asList("group", "perms");
     }
 }

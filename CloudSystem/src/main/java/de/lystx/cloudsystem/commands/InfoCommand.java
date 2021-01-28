@@ -7,11 +7,15 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 
-public class InfoCommand extends Command {
+import java.util.Arrays;
+import java.util.List;
+
+public class InfoCommand extends Command implements TabCompletable {
 
     public InfoCommand(String name, String description, String... aliases) {
         super(name, description, aliases);
@@ -57,4 +61,8 @@ public class InfoCommand extends Command {
         }
     }
 
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        return Arrays.asList("servers", "groups", "proxys");
+    }
 }

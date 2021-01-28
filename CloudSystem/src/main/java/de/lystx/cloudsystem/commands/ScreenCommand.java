@@ -3,15 +3,21 @@ package de.lystx.cloudsystem.commands;
 
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
+import de.lystx.cloudsystem.library.service.server.other.ServerService;
 
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
+import java.util.LinkedList;
+import java.util.List;
 
-public class ScreenCommand extends Command {
+public class ScreenCommand extends Command implements TabCompletable {
 
     private final CloudScreenPrinter screenPrinter;
 
@@ -64,5 +70,14 @@ public class ScreenCommand extends Command {
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9screen <server> §7| §bJoins screen session");
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9screen <leave> §7| §bLeaves screen session");
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9screen <list> §7| §bLists screen sessions");
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        List<String> list = new LinkedList<>();
+        for (Service service : cloudLibrary.getService(ServerService.class).getGlobalServices()) {
+            list.add(service.getName());
+        }
+        return list;
     }
 }

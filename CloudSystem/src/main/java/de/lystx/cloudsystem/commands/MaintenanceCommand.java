@@ -5,15 +5,17 @@ import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNetworkConfig;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class MaintenanceCommand extends Command {
+public class MaintenanceCommand extends Command implements TabCompletable {
 
     public MaintenanceCommand(String name, String description, String... aliases) {
         super(name, description, aliases);
@@ -75,5 +77,18 @@ public class MaintenanceCommand extends Command {
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9maintenance <add> <player> §7| §bAdds player to maintenance");
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9maintenance <remove> <player> §7| §bRemoves player from maintenance");
         colouredConsoleProvider.getLogger().sendMessage("INFO", "§9maintenance <switch> §7| §bToggles maintenance");
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        List<String> list = new LinkedList<>();
+        if (args.length == 2) {
+            list.add("add");
+            list.add("remove");
+            list.add("switch");
+        } else if (args.length == 3 && args[1].equalsIgnoreCase("remove")) {
+            list.addAll(cloudLibrary.getService(ConfigService.class).getNetworkConfig().getProxyConfig().getWhitelistedPlayers());
+        }
+        return list;
     }
 }

@@ -5,10 +5,15 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutExecuteCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.service.server.other.ServerService;
 
-public class ExecuteCommand extends Command {
+import java.util.LinkedList;
+import java.util.List;
+
+public class ExecuteCommand extends Command implements TabCompletable {
 
 
     public ExecuteCommand(String name, String description, String... aliases) {
@@ -33,5 +38,17 @@ public class ExecuteCommand extends Command {
         } else {
             console.getLogger().sendMessage("COMMAND", "§cexecute <server> <command>");
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
+        if (args.length == 2) {
+            List<String> list = new LinkedList<>();
+            for (Service globalService : cloudLibrary.getService(ServerService.class).getGlobalServices()) {
+                list.add(globalService.getName());
+            }
+            return list;
+        }
+        return new LinkedList<>();
     }
 }

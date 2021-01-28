@@ -1,20 +1,21 @@
 package de.lystx.cloudsystem.library.service.command;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.other.Acceptor;
+import de.lystx.cloudsystem.library.elements.other.CollectionWrapper;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutExecuteCommand;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
+import jline.console.completer.Completer;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Getter @Setter
-public final class CommandService extends CloudService {
+public final class CommandService extends CloudService implements Completer {
 
     private final List<Command> commands;
     private Boolean active;
@@ -72,6 +73,37 @@ public final class CommandService extends CloudService {
                 return cloudCommand;
         }
         return null;
+    }
+
+    @Override
+    public int complete(String buffer, int cursor, List<CharSequence> candidates) {
+        String[] input = buffer.split(" ");
+
+        List<String> responses = new ArrayList<>();
+        List<String> commands = new LinkedList<>();
+        for (Command command : this.commands) {
+            commands.add(command.getName());
+        }
+        if (buffer.isEmpty() || buffer.indexOf(' ') == -1) {
+            responses.addAll(commands);
+        } else {
+            Command command = this.getCommand(input[0]);
+
+            if (command instanceof TabCompletable) {
+                String[] args = buffer.split(" ");
+                String testString = args[args.length - 1];
+
+                responses.addAll(CollectionWrapper.filterMany(((TabCompletable) command).onTabComplete(this.getCloudLibrary(), args),
+                        s -> s != null && (testString.isEmpty() || s.toLowerCase().contains(testString.toLowerCase()))));
+            }
+        }
+
+        Collections.sort(responses);
+
+        candidates.addAll(responses);
+        int lastSpace = buffer.lastIndexOf(' ');
+
+        return (lastSpace == -1) ? cursor - buffer.length() : cursor - (buffer.length() - lastSpace - 1);
     }
 
 }

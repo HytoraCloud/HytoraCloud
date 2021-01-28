@@ -33,6 +33,6 @@ public class AdapterHandler {
             for (PacketHandlerAdapter adapter : this.registeredadapters) {
                 adapter.handle(packet);
             }
-        } catch (ConcurrentModificationException e) {}
+        } catch (Exception e) {}
     }
 }

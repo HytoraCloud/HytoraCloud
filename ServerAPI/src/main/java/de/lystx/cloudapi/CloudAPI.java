@@ -162,6 +162,7 @@ public class CloudAPI {
     
     
     public void updatePermissions(String player, UUID uuid, String ipAddress, Consumer<String> accept) {
+        this.permissionPool.checkFix(player, this.cloudClient);
         CloudPlayerData data = this.permissionPool.getPlayerDataOrDefault(player);
         List<PermissionEntry> entries = data.getPermissionEntries();
 
@@ -172,7 +173,6 @@ public class CloudAPI {
                 if (!this.permissionPool.isRankValid(player, permissionGroup)) {
                     changed = true;
                     permissionPool.removePermissionGroup(player, permissionGroup);
-                    //entries.remove(permissionEntry);
                 }
             }
         } catch (ConcurrentModificationException e) {}

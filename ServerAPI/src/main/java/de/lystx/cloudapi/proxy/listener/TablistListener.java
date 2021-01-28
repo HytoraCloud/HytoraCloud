@@ -15,10 +15,7 @@ import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -32,29 +29,19 @@ public class TablistListener implements Listener {
         this.cloudAPI = CloudAPI.getInstance();
         this.cloudAPI.getCloudClient().registerHandler(new NetworkHandler() {
             @Override
-            public void onServerStart(Service service) {
-
-            }
+            public void onServerStart(Service service) {}
 
             @Override
-            public void onServerQueue(Service service) {
-
-            }
+            public void onServerQueue(Service service) { }
 
             @Override
-            public void onServerStop(Service service) {
-
-            }
+            public void onServerStop(Service service) {}
 
             @Override
-            public void onServerUpdate(Service service) {
-
-            }
+            public void onServerUpdate(Service service) {}
 
             @Override
-            public void onGroupUpdate(ServiceGroup group) {
-
-            }
+            public void onGroupUpdate(ServiceGroup group) { }
 
             @Override
             public void onPlayerJoin(CloudPlayer cloudPlayer) {
@@ -63,7 +50,7 @@ public class TablistListener implements Listener {
 
             @Override
             public void onServerChange(CloudPlayer cloudPlayer, String server) {
-
+                doUpdate();
             }
 
             @Override
@@ -72,14 +59,10 @@ public class TablistListener implements Listener {
             }
 
             @Override
-            public void onNetworkPing(UUID connectionUUID) {
-
-            }
+            public void onNetworkPing(UUID connectionUUID) {}
 
             @Override
-            public void onDocumentReceive(String channel, String key, Document document, ServiceType type) {
-
-            }
+            public void onDocumentReceive(String channel, String key, Document document, ServiceType type) {}
         });
     }
 
@@ -117,7 +100,8 @@ public class TablistListener implements Listener {
     }
 
     public void doUpdate() {
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
+        this.updateTab();
+        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 10L);
     }
 
 
@@ -133,6 +117,21 @@ public class TablistListener implements Listener {
 
     @EventHandler
     public void on(ServerDisconnectEvent e) {
+        this.doUpdate();
+    }
+    @EventHandler
+    public void on(LoginEvent e) {
+        this.doUpdate();
+    }
+
+    @EventHandler
+    public void on(ServerConnectedEvent e) {
+        this.doUpdate();
+    }
+
+
+    @EventHandler
+    public void on(PlayerDisconnectEvent e) {
         this.doUpdate();
     }
 

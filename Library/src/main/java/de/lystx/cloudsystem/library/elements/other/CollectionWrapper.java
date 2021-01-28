@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.elements.other;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class CollectionWrapper {
@@ -27,6 +28,17 @@ public final class CollectionWrapper {
         }
         return false;
     }
+
+    public static <E> Collection<E> filterMany(Collection<E> elements, Acceptor<E> acceptable) {
+        Collection<E> collection = new LinkedList<>();
+        for (E element : elements) {
+            if (acceptable.isAccepted(element)) {
+                collection.add(element);
+            }
+        }
+        return collection;
+    }
+
 
     public static <E> int filled(E[] array) {
         int i = 0;

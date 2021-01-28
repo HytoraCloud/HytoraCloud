@@ -126,6 +126,10 @@ public class PlayerListener implements Listener {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 
                     PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
+                    if (group == null) {
+                        CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cPlayer §e" + player.getName() + " §ccouldn't update permissionGroup");
+                        return;
+                    }
                     CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
                 }
             }
