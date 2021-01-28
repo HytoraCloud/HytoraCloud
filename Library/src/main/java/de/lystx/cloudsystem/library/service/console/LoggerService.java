@@ -31,24 +31,22 @@ public class LoggerService extends CloudService {
         this.sendMessage("§7[§9" + prefix.toUpperCase() + "§7] §b" + message);
     }
 
-    public void sendMessageToPlayers(String message) {
-
-    }
-
     public void sendMessage() {
         this.sendMessage("§9");
     }
 
     public void sendMessage(String message) {
-        message = this.colorString(message);
         try {
-            this.consoleReader.println(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + '\r' + colorString(message) + Ansi.ansi().reset().toString());
-            this.consoleReader.drawLine();
-            this.consoleReader.flush();
-        } catch (IOException exception) { }
-        try {
-            this.getCloudLibrary().getService(LogService.class).log(ConsoleColor.stripColor(message));
-        } catch (NullPointerException e) {}
+            message = this.colorString(message);
+            try {
+                this.consoleReader.println(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + '\r' + colorString(message) + Ansi.ansi().reset().toString());
+                this.consoleReader.drawLine();
+                this.consoleReader.flush();
+            } catch (IOException exception) { }
+            try {
+                this.getCloudLibrary().getService(LogService.class).log(ConsoleColor.stripColor(message));
+            } catch (NullPointerException e) {}
+        } catch (Exception e) {}
     }
 
     public String readLine() {

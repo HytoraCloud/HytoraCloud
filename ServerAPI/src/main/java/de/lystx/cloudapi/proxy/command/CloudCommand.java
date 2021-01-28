@@ -259,9 +259,6 @@ public class CloudCommand extends Command implements TabExecutor {
 
     @Override
     public Iterable<String> onTabComplete(CommandSender commandSender, String[] args) {
-        if (args.length == 0) {
-            return ImmutableList.of("list", "tps", "ver", "shutdown", "rl", "maintenance", "run", "stop", "stopGroup", "copy", "log", "toggle", "stats");
-        }
         if (args[0].equalsIgnoreCase("list")) {
             return ImmutableList.of("group", "proxy", "server", "maintenance");
         } else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("log")) {
@@ -277,7 +274,7 @@ public class CloudCommand extends Command implements TabExecutor {
                 return ImmutableList.of("true", "false");
             }
         }
-        return ImmutableList.of();
+        return ImmutableList.of("list", "tps", "ver", "shutdown", "rl", "maintenance", "run", "stop", "stopGroup", "copy", "log", "toggle", "stats");
     }
 
     public List<String> getServices() {

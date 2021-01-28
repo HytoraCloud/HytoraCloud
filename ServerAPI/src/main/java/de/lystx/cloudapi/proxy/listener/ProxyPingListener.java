@@ -53,6 +53,8 @@ public class ProxyPingListener implements Listener {
                 ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), event.getConnection().getVirtualHost().getPort())), 2));
             }
 
+
+
             if (motd.getProtocolString() != null && !motd.getProtocolString().trim().isEmpty()) {
                 players.setSample(new ServerPing.PlayerInfo[] { new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getProtocolString(), event.getConnection().getVirtualHost().getPort())).replace("||", "\n"), UUID.randomUUID())});
             }

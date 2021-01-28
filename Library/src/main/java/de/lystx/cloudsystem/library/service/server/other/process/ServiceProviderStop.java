@@ -23,37 +23,41 @@ public class ServiceProviderStop {
 
 
     public boolean stopService(Service service) {
-        String serverName = service.getName();
-        CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getScreenByName(serverName);
-        if (screen == null || screen.getServerDir() == null) {
-            return false;
-        }
-        screen.getProcess().destroy();
-        if (screen.getThread().isAlive()) {
-            screen.getThread().stop();
-        }
-
-        if (service.getServiceGroup().isDynamic()) {
-            try {
-                for (File file : Objects.requireNonNull(screen.getServerDir().listFiles())) {
-                    if (file.isDirectory()) {
-                        FileUtils.deleteDirectory(file);
-                    } else {
-                        FileUtils.forceDelete(file);
-                    }
-                }
-            } catch (IOException e) {}
-        } else {
-            File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
-            if (cloudAPI.exists()) {
-                try {
-                    FileUtils.deleteDirectory(cloudAPI);
-                    FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
-                } catch (Exception ignored) { }
+        try {
+            String serverName = service.getName();
+            CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getScreenByName(serverName);
+            if (screen == null || screen.getServerDir() == null) {
+                return false;
             }
+            screen.getProcess().destroy();
+            if (screen.getThread().isAlive()) {
+                screen.getThread().stop();
+            }
+
+            if (service.getServiceGroup().isDynamic()) {
+                try {
+                    for (File file : Objects.requireNonNull(screen.getServerDir().listFiles())) {
+                        if (file.isDirectory()) {
+                            FileUtils.deleteDirectory(file);
+                        } else {
+                            FileUtils.forceDelete(file);
+                        }
+                    }
+                } catch (IOException e) {}
+            } else {
+                File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
+                if (cloudAPI.exists()) {
+                    try {
+                        FileUtils.deleteDirectory(cloudAPI);
+                        FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
+                    } catch (Exception ignored) { }
+                }
+            }
+            this.service.notifyStop(service);
+            this.cloudLibrary.getService(ScreenService.class).unregisterScreen(screen);
+            return true;
+        } catch (Exception e) {
+            return true;
         }
-        this.service.notifyStop(service);
-        this.cloudLibrary.getService(ScreenService.class).unregisterScreen(screen);
-        return true;
     }
 }

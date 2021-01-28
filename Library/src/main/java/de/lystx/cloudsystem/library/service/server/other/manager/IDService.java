@@ -20,8 +20,8 @@ public class IDService {
             this.serverIdList.put(group, ids);
             return 1;
         } else {
-            for (int i = 1; i < 2000;) {
-                if ((this.serverIdList.get(group)).contains(String.valueOf(i))) {
+            for (int i = 1; i < 20000;) {
+                if (this.serverIdList.get(group).contains(String.valueOf(i))) {
                     i++;
                     continue;
                 }

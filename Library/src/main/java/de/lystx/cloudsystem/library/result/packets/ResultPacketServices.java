@@ -12,9 +12,6 @@ public class ResultPacketServices extends ResultPacket {
     @Override
     public Document read(CloudLibrary cloudLibrary) {
         Document doc = new Document();
-        for (Service cloudProxy : cloudLibrary.getService(ServerService.class).getCloudProxies()) {
-            doc.append(cloudProxy.getName(), cloudProxy.getPort());
-        }
         return new Document()
                 .append("services", cloudLibrary.getService(ServerService.class).getServices())
                 .append("proxies", doc);
