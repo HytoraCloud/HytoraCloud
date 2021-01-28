@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStop
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -24,7 +25,7 @@ public class PacketHandlerStopServer extends PacketHandlerAdapter {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }
                 this.cloudSystem.getService().stopService(this.cloudSystem.getService().getService(service.getName()));
-                this.cloudSystem.reload();
+                this.cloudSystem.getService(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 2L);
             } catch (NullPointerException ignored) {}
         }
     }

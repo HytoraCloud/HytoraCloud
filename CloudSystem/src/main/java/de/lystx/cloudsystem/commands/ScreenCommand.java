@@ -76,6 +76,9 @@ public class ScreenCommand extends Command implements TabCompletable {
     public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
         List<String> list = new LinkedList<>();
         for (Service service : cloudLibrary.getService(ServerService.class).getGlobalServices()) {
+            if (cloudLibrary.getService(ServerService.class).getService(service.getName()) == null) {
+                continue;
+            }
             list.add(service.getName());
         }
         return list;

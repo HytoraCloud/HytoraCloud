@@ -123,6 +123,9 @@ public class CloudSystem extends CloudLibrary {
             this.getService(PermissionService.class).loadEntries();
             this.getService(ConfigService.class).reload();
             this.getService(NPCService.class).load();
+            this.getService(SignService.class).load();
+            this.getService(SignService.class).loadSigns();
+
             this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
                     this.getService().getServices(),

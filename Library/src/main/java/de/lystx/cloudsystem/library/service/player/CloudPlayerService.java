@@ -57,6 +57,13 @@ public class CloudPlayerService extends CloudService {
         this.cloudPlayers.remove(this.getOnlinePlayer(cloudPlayer.getName()));
     }
 
+
+    public void update(String name, CloudPlayer newPlayer) {
+        CloudPlayer cloudPlayer = this.getOnlinePlayer(name);
+        this.cloudPlayers.remove(cloudPlayer);
+        this.cloudPlayers.add(newPlayer);
+    }
+
     public CloudPlayer getOnlinePlayer(String name) {
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
             if (cloudPlayer.getName().equalsIgnoreCase(name)) {

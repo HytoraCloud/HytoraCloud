@@ -9,12 +9,15 @@
         <outputRelativeToContentRoot value="true" />
         <module name="CloudSystem" />
         <module name="ServerAPI" />
+        <module name="DiscordIntegration" />
         <module name="Library" />
         <module name="CloudNetwork" />
+        <module name="Modules" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="API" target="8" />
+      <module name="DiscordModule" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

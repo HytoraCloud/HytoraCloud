@@ -49,9 +49,7 @@ public class TablistListener implements Listener {
             }
 
             @Override
-            public void onServerChange(CloudPlayer cloudPlayer, String server) {
-                doUpdate();
-            }
+            public void onServerChange(CloudPlayer cloudPlayer, String server) {}
 
             @Override
             public void onPlayerQuit(CloudPlayer cloudPlayer) {
@@ -82,46 +80,24 @@ public class TablistListener implements Listener {
 
     public String replace(String string, ProxiedPlayer player) {
         Value<String> stringValue = new Value<>(string);
-        CloudAPI.getInstance().sendQuery(new ResultPacketCloudPlayers()).onDocumentSet(document -> {
-            try {
-                String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
-                stringValue.set(string
-                        .replace("&", "§")
-                        .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
-                        .replace("%online_players%", String.valueOf(document.getList("players", CloudPlayer.class).size()))
-                        .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
-                                CloudProxy.getInstance().getProxyPort()
-                        ).getName())
-                        .replace("%server%", server)
-                        .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance())));
-            } catch (NullPointerException e) {}
-        });
+        int i = CloudAPI.getInstance().getCloudPlayers().getAll().size();
+        try {
+            String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
+            stringValue.set(string
+                    .replace("&", "§")
+                    .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
+                    .replace("%online_players%", String.valueOf(i))
+                    .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
+                            CloudProxy.getInstance().getProxyPort()
+                    ).getName())
+                    .replace("%server%", server)
+                    .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance())));
+        } catch (NullPointerException e) {}
         return stringValue.get();
     }
 
     public void doUpdate() {
-        this.updateTab();
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 10L);
-    }
-
-
-    @EventHandler
-    public void on(ServerConnectEvent e) {
-        this.doUpdate();
-    }
-
-    @EventHandler
-    public void on(ServerSwitchEvent e) {
-        this.doUpdate();
-    }
-
-    @EventHandler
-    public void on(ServerDisconnectEvent e) {
-        this.doUpdate();
-    }
-    @EventHandler
-    public void on(LoginEvent e) {
-        this.doUpdate();
+        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
     }
 
     @EventHandler
@@ -132,11 +108,6 @@ public class TablistListener implements Listener {
 
     @EventHandler
     public void on(PlayerDisconnectEvent e) {
-        this.doUpdate();
-    }
-
-    @EventHandler
-    public void on(PostLoginEvent event) {
         this.doUpdate();
     }
 

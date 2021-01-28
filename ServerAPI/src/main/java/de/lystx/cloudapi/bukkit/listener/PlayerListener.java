@@ -5,6 +5,9 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.events.CloudServerSubChannelMessageEvent;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
+import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutForceRegisterPlayer;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -94,7 +97,11 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        CloudServer.getInstance().setWaitingForPlayer(false);
         Player player = event.getPlayer();
+        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
+        CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInCloudPlayerServerChange(cloudPlayer, CloudAPI.getInstance().getService().getName()));
+
         if (!CloudServer.getInstance().isNewVersion()) {
             PacketReader packetReader = new PacketReader(player);
             try {
@@ -117,8 +124,9 @@ public class PlayerListener implements Listener {
                     .replace("%online_players%", Bukkit.getOnlinePlayers().size() + " ")
                     .replace("%max_players%", Bukkit.getMaxPlayers() + " "));
         }
-        if (onlinepercent >= onlinePlayers) {
-            CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup());
+        int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
+        if (percent <= 100 && onlinepercent >= percent) {
+            CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new Document().append("waitingForPlayers", true));
         }
         if (!CloudServer.getInstance().isNewVersion()) {
             CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);

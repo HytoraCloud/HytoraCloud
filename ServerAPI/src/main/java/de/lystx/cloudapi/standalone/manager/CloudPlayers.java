@@ -53,6 +53,11 @@ public class CloudPlayers {
         }
     }
 
+    public void update(String name, CloudPlayer newPlayer) {
+        CloudPlayer cloudPlayer = this.get(name);
+        this.cloudPlayers.set(this.cloudPlayers.indexOf(cloudPlayer), newPlayer);
+    }
+
     public CloudPlayer get(String name) {
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
             if (cloudPlayer.getName().equalsIgnoreCase(name)) {

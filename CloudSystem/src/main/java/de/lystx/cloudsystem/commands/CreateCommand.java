@@ -43,6 +43,7 @@ public class CreateCommand extends Command implements TabCompletable {
                     CloudSystem.getInstance().getService(CommandService.class).setActive(true);
                     colouredConsoleProvider.getLogger().sendMessage("INFO", "§2Created ServiceGroup §a" + serviceGroup.getName() + " §7| §bMaxMB " + serviceGroup.getMaxRam() + " §7| §bMinMB " + serviceGroup.getMinRam() + " §7| §bMinServer " + serviceGroup.getMinServer() + " §7| §bMaxServer" + serviceGroup.getMaxServer());
                     CloudSystem.getInstance().getService().needServices(serviceGroup);
+                    CloudSystem.getInstance().reload();
                 });
             } else if (args[0].equalsIgnoreCase("perms")) {
                 PermissionGroupSetup setup = new PermissionGroupSetup();

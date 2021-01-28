@@ -45,6 +45,9 @@ public class ExecuteCommand extends Command implements TabCompletable {
         if (args.length == 2) {
             List<String> list = new LinkedList<>();
             for (Service globalService : cloudLibrary.getService(ServerService.class).getGlobalServices()) {
+                if (cloudLibrary.getService(ServerService.class).getService(globalService.getName()) == null) {
+                    continue;
+                }
                 list.add(globalService.getName());
             }
             return list;

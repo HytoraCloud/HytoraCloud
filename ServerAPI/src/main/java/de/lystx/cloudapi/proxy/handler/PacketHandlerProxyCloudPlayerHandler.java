@@ -9,6 +9,8 @@ import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommuni
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSendToServer;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCloudPlayerOnline;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerJoin;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerQuit;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerStillOnline;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutForceRegisterPlayer;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
@@ -52,7 +54,7 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetPlayOutCloudPlayerStillOnline.getPlayerName());
             cloudAPI.sendPacket(new PacketPlayInCloudPlayerOnline(packetPlayOutCloudPlayerStillOnline.getPlayerName(), (player != null)));
         } else if (packet instanceof PacketPlayOutForceRegisterPlayer) {
-            PacketPlayOutForceRegisterPlayer player = (PacketPlayOutForceRegisterPlayer)packet;
+            PacketPlayOutForceRegisterPlayer player = (PacketPlayOutForceRegisterPlayer) packet;
             ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(player.getUuid());
             if (this.cloudAPI.getCloudPlayers().get(player.getUuid()) != null) {
                 return;
@@ -68,6 +70,16 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
             this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer));
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onPlayerJoin(cloudPlayer);
+            }
+        } else if (packet instanceof PacketPlayOutCloudPlayerJoin) {
+            PacketPlayOutCloudPlayerJoin packetPlayOutCloudPlayerJoin = (PacketPlayOutCloudPlayerJoin)packet;
+            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
+                networkHandler.onPlayerJoin(packetPlayOutCloudPlayerJoin.getCloudPlayer());
+            }
+        } else if (packet instanceof PacketPlayOutCloudPlayerQuit) {
+            PacketPlayOutCloudPlayerQuit packetPlayOutCloudPlayerJoin = (PacketPlayOutCloudPlayerQuit)packet;
+            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
+                networkHandler.onPlayerQuit(packetPlayOutCloudPlayerJoin.getCloudPlayer());
             }
         } else if (packet instanceof PacketCommunicationKick) {
             PacketCommunicationKick kick = (PacketCommunicationKick)packet;

@@ -52,6 +52,7 @@ public class ServiceProviderStart {
                         FileUtils.copyFile(file, new File(plugins, file.getName()));
                     }
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -151,41 +152,17 @@ public class ServiceProviderStart {
                     exception.printStackTrace();
                 }
             }
+            File jar = new File(serverLocation, jarFile);
+            if (!jar.exists()) {
+                FileUtils.copyFile( new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), jarFile), jar);
+            }
             File cloud = new File(serverLocation + "/CLOUD/");
             cloud.mkdirs();
             Document document = new Document();
             document.append(service);
             document.save(new File(cloud, "connection.json"));
 
-            FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), jarFile), new File(serverLocation, jarFile));
-
-            String[] proxy = new String[]{
-                    "java",
-                    "-XX:+UseG1GC",
-                    "-XX:MaxGCPauseMillis=50",
-                    "-XX:+AlwaysPreTouch",
-                    "-XX:+DisableExplicitGC",
-                    "-XX:+UseG1GC",
-                    "-XX:+UnlockExperimentalVMOptions",
-                    "-XX:MaxGCPauseMillis=50",
-                    "-XX:G1HeapRegionSize=4M",
-                    "-XX:TargetSurvivorRatio=90",
-                    "-XX:G1NewSizePercent=50",
-                    "-XX:G1MaxNewSizePercent=80",
-                    "-XX:InitiatingHeapOccupancyPercent=10",
-                    "-XX:G1MixedGCLiveThresholdPercent=50",
-                    "-XX:+AggressiveOpts",
-                    "-XX:-UseAdaptiveSizePolicy",
-                    "-XX:CompileThreshold=100",
-                    "-Dio.netty.leakDetectionLevel=DISABLED",
-                    "-Djline.terminal=jline.UnsupportedTerminal",
-                    "-Dfile.encoding=UTF-8",
-                    "-Xms" + service.getServiceGroup().getMinRam() + "M",
-                    "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
-                    "-jar",
-                    jarFile};
-
-            String[] spigot = new String[]{
+            ProcessBuilder processBuilder = new ProcessBuilder(
                     "java",
                     "-XX:+UseG1GC",
                     "-XX:MaxGCPauseMillis=50",
@@ -210,9 +187,7 @@ public class ServiceProviderStart {
                     "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
                     "-jar",
                     jarFile,
-                    "nogui"};
-
-            ProcessBuilder processBuilder = new ProcessBuilder((service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? proxy : spigot));
+                    service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT) ? "nogui" : "");
             processBuilder.directory(serverLocation);
             Process process = processBuilder.start();
             CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());

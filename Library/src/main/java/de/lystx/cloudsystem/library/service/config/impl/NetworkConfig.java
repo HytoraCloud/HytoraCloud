@@ -74,7 +74,7 @@ public class NetworkConfig implements Serializable {
                         )
                 ),
                 new LabyModConfig(
-                        true,
+                        false,
                         "§8» §7HytoraCloud §8× §b%service%",
                         true
                 ),

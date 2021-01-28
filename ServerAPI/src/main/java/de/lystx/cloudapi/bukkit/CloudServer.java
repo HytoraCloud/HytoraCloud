@@ -14,11 +14,12 @@ import de.lystx.cloudapi.proxy.manager.CloudManager;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-@Getter
+@Getter @Setter
 public class CloudServer extends JavaPlugin {
 
     @Getter
@@ -32,6 +33,7 @@ public class CloudServer extends JavaPlugin {
     private LabyMod labyMod;
     private boolean useLabyMod;
     private boolean newVersion;
+    private boolean waitingForPlayer;
 
     @Override
     public void onEnable() {
@@ -69,6 +71,14 @@ public class CloudServer extends JavaPlugin {
         this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
 
         this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));
+        if (this.cloudAPI.getProperties().has("waitingForPlayers")) {
+            this.waitingForPlayer = true;
+            Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+                if (waitingForPlayer) {
+                    Bukkit.shutdown();
+                }
+            }, 1500L);
+        }
     }
 
     @Override

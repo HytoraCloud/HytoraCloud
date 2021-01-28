@@ -6,7 +6,11 @@ import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloud
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerJoin;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerQuit;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
+import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
@@ -37,7 +41,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             if (!cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
                 this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
             }
-
+            this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerJoin(cloudPlayer));
             this.cloudSystem.reload();
             if (!cloudSystem.isRunning() || (this.cloudSystem.getScreenPrinter().getScreen() != null && this.cloudSystem.getScreenPrinter().isInScreen())) {
                 return;
@@ -66,6 +70,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
                     .getService(CloudPlayerService.class)
                     .getOnlinePlayer(packetPlayInUnregisterCloudPlayer.getName());
             if (cloudPlayer != null) {
+                this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerQuit(cloudPlayer));
                 this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
                 this.cloudSystem.reload();
 
@@ -84,6 +89,10 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             try {
                 CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInCloudPlayerServerChange.getCloudPlayer().getName());
                 if (cloudPlayer != null) {
+                    this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerServerChange(cloudPlayer, packetPlayInCloudPlayerServerChange.getNewServer()));
+                    //cloudPlayer.setServer(packetPlayInCloudPlayerServerChange.getNewServer());
+                    //this.cloudSystem.getService(CloudPlayerService.class).update(cloudPlayer.getName(), cloudPlayer);
+                    //this.cloudSystem.reload(); //Update players for all services*/
                     CloudPlayer newCloudPlayer = new CloudPlayer(
                             cloudPlayer.getName(),
                             cloudPlayer.getUuid(),

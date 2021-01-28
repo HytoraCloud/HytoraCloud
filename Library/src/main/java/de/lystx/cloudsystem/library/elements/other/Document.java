@@ -82,10 +82,12 @@ public class Document implements Serializable {
     }
 
     public Document append(String key, Object value) {
-        if (value == null) {
-            return this;
-        }
-        this.jsonObject.add(key, gson.toJsonTree(value));
+        try {
+            if (value == null) {
+                return this;
+            }
+            this.jsonObject.add(key, gson.toJsonTree(value));
+        } catch (NullPointerException e){}
         return this;
     }
 

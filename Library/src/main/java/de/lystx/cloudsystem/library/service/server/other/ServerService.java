@@ -270,6 +270,12 @@ public class ServerService extends CloudService {
             this.portService.removeProxyPort(service.getPort());
             this.portService.removePort(service.getPort());
 
+            List<Service> services = this.services.get(this.getGroup(service.getServiceGroup().getName()));
+            Service remove = this.getService(service.getName());
+            if (services == null) services = new LinkedList<>();
+            services.remove(remove);
+            this.services.put(this.getGroup(service.getServiceGroup().getName()), services);
+
             if (!this.getCloudLibrary().getService(EventService.class).callEvent(new ServiceStopEvent(service))) {
                 this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
                     //this.globalServices.remove(service);

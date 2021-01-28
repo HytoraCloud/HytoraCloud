@@ -55,10 +55,16 @@ public class StopCommand extends Command implements TabCompletable {
         if (args.length == 2) {
             list.add("group");
             for (Service globalService : cloudLibrary.getService(ServerService.class).getGlobalServices()) {
+                if (cloudLibrary.getService(ServerService.class).getService(globalService.getName()) == null) {
+                    continue;
+                }
                 list.add(globalService.getName());
             }
         } else if (args.length == 3 && args[1].equalsIgnoreCase("group")) {
             for (ServiceGroup globalService : cloudLibrary.getService(GroupService.class).getGroups()) {
+                if (cloudLibrary.getService(ServerService.class).getService(globalService.getName()) == null) {
+                    continue;
+                }
                 list.add(globalService.getName());
             }
         }

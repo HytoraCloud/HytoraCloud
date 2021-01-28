@@ -101,7 +101,7 @@ public class SignUpdater  {
 
                         this.setOfflineSigns(groupName, current, this.freeSignMap);
                         if (cloudSign != null) {
-                            Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
+                            Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()), cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
 
                             if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
                                 return;
@@ -109,7 +109,7 @@ public class SignUpdater  {
                             try {
                                 serverPinger.pingServer(current.getHost(), current.getPort(), 20);
                             } catch (IOException exception) {
-                                Bukkit.getLogger().log(Level.SEVERE,"Something is wrong when pinging Server", exception);
+                                Bukkit.getLogger().log(Level.SEVERE, "Something is wrong when pinging Server", exception);
                             }
                             Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
                             if (!blockAt.getType().equals(Material.WALL_SIGN)) {
@@ -128,7 +128,9 @@ public class SignUpdater  {
                 }
 
                 this.animationsTick++;
-            } catch (IllegalPluginAccessException e) {}
+            } catch (IllegalPluginAccessException e) {
+                e.printStackTrace();
+            }
         }, 0, repeat);
     }
 
@@ -141,6 +143,7 @@ public class SignUpdater  {
         HashMap<Integer, CloudSign> map = new HashMap<>();
         int count = 1;
         for (CloudSign cloudSign : CloudServer.getInstance().getSignManager().getCloudSigns()) {
+            System.out.println("LOOL");
             if (cloudSign.getGroup().equalsIgnoreCase(name)) {
                 map.put(count, cloudSign);
                 count++;
@@ -209,18 +212,22 @@ public class SignUpdater  {
 
     public void signUpdate(Sign sign, Service service, ServerPinger serverPinger) {
         JsonObject jsonObject;
+        ServiceState state ;
         if (service.getServiceState().equals(ServiceState.MAINTENANCE) || service.getServiceGroup().isMaintenance()) {
-           jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
-        } else if (service.getServiceState().equals(ServiceState.FULL)) {
+            jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
+            state = ServiceState.MAINTENANCE;
+        } else if (service.getServiceState().equals(ServiceState.FULL) || serverPinger.getPlayers() >= serverPinger.getMaxplayers()) {
             jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getFullLayOut();
+            state = ServiceState.FULL;
         } else {
             jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getOnlineLayOut();
+            state = ServiceState.LOBBY;
         }
         for (int i = 0; i != 4; i++) {
             sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).getAsString(), service, serverPinger));
         }
         sign.update(true);
-        Bukkit.getScheduler().runTask(CloudServer.getInstance(), () ->  this.setBlock(sign.getLocation(), service.getServiceState()));
+        Bukkit.getScheduler().runTask(CloudServer.getInstance(), () ->  this.setBlock(sign.getLocation(), state));
     }
 
 

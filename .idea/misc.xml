@@ -5,11 +5,13 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/Modules/DiscordIntegration/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/API/pom.xml" />
+        <option value="$PROJECT_DIR$/DiscordModule/pom.xml" />
       </set>
     </option>
   </component>

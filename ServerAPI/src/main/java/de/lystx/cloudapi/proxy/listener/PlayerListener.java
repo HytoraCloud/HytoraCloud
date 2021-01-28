@@ -148,6 +148,7 @@ public class PlayerListener implements Listener {
         }
     }
 
+
     @EventHandler
     public void onJoin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
@@ -173,21 +174,13 @@ public class PlayerListener implements Listener {
             );
 
             this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer));
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onPlayerJoin(cloudPlayer);
-            }
+
         } catch (NullPointerException e){}
     }
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        CloudPlayer cloudPlayer = this.cloudAPI.getCloudPlayers().get(player.getName());
-        if (cloudPlayer != null) {
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onPlayerQuit(cloudPlayer);
-            }
-        }
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInUnregisterCloudPlayer(player.getName()));
     }
 
