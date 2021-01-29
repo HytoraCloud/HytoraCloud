@@ -102,13 +102,13 @@ public class CloudSystem extends CloudLibrary {
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             if (this.getService(ConfigService.class).getNetworkConfig().isAutoUpdater()) {
-                /*this.getService(CommandService.class).setActive(false);
+                this.getService(CommandService.class).setActive(false);
                 if (!Updater.check(this.console)) {
-                    this.console.getLogger().sendMessage("INFO", "§2Succesfully downloaded Version §a" + Updater.getSpigotVersion() + "§2!");
+                    this.console.getLogger().sendMessage("INFO", "§2Succesfully downloaded Version §a" + Updater.getNewVersion() + "§2!");
                     System.exit(0);
                 } else {
                     console.getLogger().sendMessage("INFO", "§2CloudSystem is §anewest version§2!");
-                }*/
+                }
             }
             this.getService(CommandService.class).setActive(true);
             new CloudBootingSetupDone(this);

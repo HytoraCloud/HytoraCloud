@@ -73,7 +73,7 @@ public class LoggerService extends CloudService {
 
     public String colorString(String text) {
         for (ConsoleColor consoleColour : ConsoleColor.values()) {
-            text = text.replace("§" + consoleColour.getIndex(),consoleColour.getAnsiCode());
+            text = text.replace("§" + consoleColour.getIndex(), consoleColour.getAnsiCode());
         }
         return text;
     }
