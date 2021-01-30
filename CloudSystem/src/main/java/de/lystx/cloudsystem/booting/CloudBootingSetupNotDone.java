@@ -44,7 +44,7 @@ public class CloudBootingSetupNotDone {
         cloudSystem.getService(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
         cloudSetup.start(cloudSystem.getConsole(), setup -> {
-            if (setup.wasCancelled()) {
+            if (setup.isCancelled()) {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cYou are §enot §callowed to §4cancel §ccloudSystem setup! Restart the cloud!");
                 System.exit(0);
             }

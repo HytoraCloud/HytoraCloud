@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.handler.services;
 
 import de.lystx.cloudsystem.CloudSystem;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroup;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartGroupWithProperties;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartService;
@@ -38,12 +39,12 @@ public class PacketHandlerStart extends PacketHandlerAdapter {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
                 return;
             }
-            this.cloudSystem.getService().startService(get, packetPlayInStartGroup.getProperties());
+            this.cloudSystem.getService().startService(get, SerializableDocument.fromDocument(packetPlayInStartGroup.getProperties()));
         } else if (packet instanceof PacketPlayInStartService) {
             PacketPlayInStartService packetPlayInStartService = (PacketPlayInStartService)packet;
             Service service = packetPlayInStartService.getService();
             Document properties = packetPlayInStartService.getProperties();
-            this.cloudSystem.getService().startService(service.getServiceGroup(), service, properties);
+            this.cloudSystem.getService().startService(service.getServiceGroup(), service, SerializableDocument.fromDocument(properties));
         }
     }
 }

@@ -28,11 +28,14 @@ public class Result implements Serializable {
         return this.getResult().getObject(this.getResult().getJsonObject(), tClass);
     }
 
-    public void onDocumentSet(Consumer<Document> consumer) {
+    public Result onDocumentSet(Consumer<Document> consumer) {
         consumer.accept(this.getResult());
+        return this;
     }
 
-    public void onResultSet(Consumer<Result> consumer) {
+    public Result onResultSet(Consumer<Result> consumer) {
         consumer.accept(this);
+        return this;
     }
+
 }

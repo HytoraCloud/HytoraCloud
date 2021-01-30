@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInUpda
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.result.packets.ResultPacketStartService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -79,8 +80,16 @@ public class CloudCommand extends Command implements TabExecutor {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cseems not to exist!");
                             return;
                         }
-                        CloudAPI.getInstance().getNetwork().startService(group);
+
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start a new service of group §a" + group.getName() + "§8...");
+                        CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname)).onDocumentSet(document -> {
+                            String message = document.getString("message");
+                            if (!document.getBoolean("sucess", false)) {
+                                player.sendMessage(CloudAPI.getInstance().getPrefix() + message);
+                            }
+                        });
+
+                       // CloudAPI.getInstance().getNetwork().startService(group);
 
                     } else if (args[0].equalsIgnoreCase("log")) {
                         String s = args[1];

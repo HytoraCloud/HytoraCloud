@@ -25,7 +25,7 @@ public class CloudSetup extends Setup {
     @SetupPart(question = "Enable ProxyProtocol? If you don't know what this is just type false!", id = 6, onlyAnswers = {"true", "false"})
     private boolean proxyProtocol;
 
-    @SetupPart(question = "What Datbase do you want to use? (MYSQL but it's not working at the moment, MONGODB, FILES) You will have to enter your date in the next step!", id = 7, onlyAnswers = {"MONGODB", "FILES"})
+    @SetupPart(question = "What Datbase do you want to use? (MYSQL, MONGODB, FILES) You will have to enter your date in the next step!", id = 7, onlyAnswers = {"MONGODB", "MYSQL", "FILES"})
     private String database;
 
 }

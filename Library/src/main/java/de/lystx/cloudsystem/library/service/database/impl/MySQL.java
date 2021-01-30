@@ -1,7 +1,9 @@
 package de.lystx.cloudsystem.library.service.database.impl;
 
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
+import de.lystx.cloudsystem.library.service.database.impl.mysqlapi.MySQLConnection;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
@@ -15,7 +17,7 @@ public class MySQL implements CloudDatabase {
 
     private final DatabaseService databaseService;
 
-    private Connection connection;
+    private MySQLConnection mySQLConnection;
 
     public MySQL(DatabaseService databaseService) {
         this.databaseService = databaseService;
@@ -23,55 +25,44 @@ public class MySQL implements CloudDatabase {
 
     @Override
     public void connect() {
-        String url = "jdbc:mysql://localhost:" + databaseService.getPort() + "/" + databaseService.getDefaultDatabase();
-        try (Connection connection = DriverManager.getConnection(url, databaseService.getUsername(), databaseService.getPassword())) {
-            this.connection = connection;
-            try {
-                PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + databaseService.getCollectionOrTable() + "(id INT AUTO_INCREMENT PRIMARY KEY NOT NULL, " +
-                        "name VARCHAR(64), " +
-                        "uuid VARCHAR(64), " +
-                        "permissionEntries ANY(64), " +
-                        "permissions VARCHAR(21844), " +
-                        "ipAddress VARCHAR(64)" +
-                        "notifyServerStart BOOL, " +
-                        "firstLogin LONG, " +
-                        "lastLogin LONG)");
-                ps.executeUpdate();
-                ps.close();
-            } catch (SQLException exception) {}
-        } catch (SQLException e) {
-            databaseService.getCloudLibrary().getConsole().getLogger().sendMessage("ERROR", "§cCouldn't connect to §eMySQL Database§c!");
-        }
 
+        this.mySQLConnection = new MySQLConnection();
+        mySQLConnection.setHost(databaseService.getHost());
+        mySQLConnection.setUser(databaseService.getUsername());
+        mySQLConnection.setPassword(databaseService.getPassword());
+        mySQLConnection.setDb(databaseService.getDefaultDatabase());
+        mySQLConnection.setPort(databaseService.getPort());
+
+        if (!mySQLConnection.connect()) {
+            databaseService.getCloudLibrary().getConsole().getLogger().sendMessage("ERROR", "§cCouldn't connect to §eMySQL Database§c!");
+        } else {
+            mySQLConnection.createTable(databaseService.getCollectionOrTable(), "uuid VARCHAR(36), jsonData VARCHAR(13489)");
+            this.databaseService.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§9Connected to §bMySQL Database§9!");
+        }
     }
 
     @Override
     public void disconnect() {
-
+        this.mySQLConnection.close();
     }
 
     @Override
     public boolean isRegistered(UUID uuid) {
         try {
-            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + databaseService.getCollectionOrTable() + " WHERE uuid = ?");
-            ps.setString(1, uuid.toString());
+            PreparedStatement ps = this.mySQLConnection.getCon().prepareStatement("SELECT * FROM " + this.databaseService.getCollectionOrTable() + " WHERE uuid = '" + uuid.toString() + "'");
             ResultSet rs = ps.executeQuery();
             boolean var = rs.next();
             rs.close();
             ps.close();
             return var;
-        } catch (SQLException | NullPointerException exception) {
+        } catch (SQLException exception) {
             return false;
         }
     }
 
     @Override
     public boolean isConnected() {
-        try {
-            return !this.connection.isClosed();
-        } catch (SQLException throwables) {
-            return false;
-        }
+        return this.mySQLConnection.isConnected();
     }
 
 
@@ -89,25 +80,22 @@ public class MySQL implements CloudDatabase {
 
     @Override
     public CloudPlayerData getPlayerData(UUID uuid) {
+        String data = null;
         try {
-            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM " + this.databaseService.getCollectionOrTable() + " WHERE uuid = ?");
+            PreparedStatement ps = this.mySQLConnection.getCon().prepareStatement("SELECT * FROM " + this.databaseService.getCollectionOrTable() + " WHERE uuid = ?");
             ps.setString(1, uuid.toString());
-            ResultSet rs = ps.getResultSet();
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                data = result.getString(2);
+            }
 
-            CloudPlayerData cloudPlayerData = new CloudPlayerData(
-                    uuid,
-                    rs.getString("name"),
-                    rs.getObject("permissionEntries", ArrayList.class),
-                    this.fromMySQLString(rs.getString("permissions")),
-                    rs.getString("ipAddress"),
-                    rs.getBoolean("notifyServerStart"),
-                    rs.getLong("firstLogin"),
-                    rs.getLong("lastLogin")
-            );
-            rs.close();
-            ps.close();
-            return cloudPlayerData;
-        } catch (SQLException e) {
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        try {
+            Document document = new Document(data);
+            return document.getObject(document.getJsonObject(), CloudPlayerData.class);
+        } catch (NullPointerException e) {
             return null;
         }
     }
@@ -115,52 +103,38 @@ public class MySQL implements CloudDatabase {
     @Override
     public void setPlayerData(UUID uuid, CloudPlayerData data) {
         try {
-            PreparedStatement ps = this.connection.prepareStatement("INSERT INTO " + databaseService.getCollectionOrTable() + "(name,uuid,permissionEntries,permissions,ipAddress,notifyServerStart,firstLogin,lastLogin) VALUES (?,?,?,?,?,?,?)");
-            ps.setString(1, data.getName());
-            ps.setString(2, data.getUuid().toString());
-            ps.setObject(3, data.getPermissionEntries());
-            ps.setString(4, this.toMySQLString(data.getPermissions()));
-            ps.setString(5, data.getIpAddress());
-            ps.setBoolean(6, data.isNotifyServerStart());
-            ps.setLong(7, data.getFirstLogin());
-            ps.setLong(8, data.getLastLogin());
-            ps.executeUpdate();
-            ps.close();
-        } catch (SQLException exception) {}
+            if (this.isRegistered(uuid)) {
+                PreparedStatement statement = this.mySQLConnection.getCon().prepareStatement("UPDATE " + this.databaseService.getCollectionOrTable() + " SET jsonData = ? WHERE uuid = '" + uuid.toString() + "';");
+                statement.setString(1, new Document().append(data).toString());
+                statement.executeUpdate();
+                statement.close();
+            } else {
+                PreparedStatement statement = this.mySQLConnection.getCon().prepareStatement("INSERT INTO " + this.databaseService.getCollectionOrTable() + " (uuid, jsonData) VALUES(?, ?)");
+                statement.setString(1, uuid.toString());
+                statement.setString(2, new Document().append(data).toString());
+                statement.executeUpdate();
+                statement.close();
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     @Override
     public List<CloudPlayerData> loadEntries() {
-        return new LinkedList<>();
-    }
-
-    public void update(UUID uuid, String key, Object value) {
+        List<CloudPlayerData> list = new LinkedList<>();
         try {
-            PreparedStatement ps = this.connection.prepareStatement("UPDATE " + databaseService.getCollectionOrTable() + " SET " + key + " = ? WHERE uuid = ?");
-            ps.setObject(1, value);
-            ps.setString(2, uuid.toString());
-            ps.executeUpdate();
-            ps.close();
-        } catch (SQLException exception) { }
-    }
-
-
-    /**
-     * INTERNAL
-     */
-
-
-
-    public List<String> fromMySQLString(String input) {
-        return new LinkedList<>(Arrays.asList(input.split(",")));
-    }
-
-    public String toMySQLString(List<String> input) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String s : input) {
-            stringBuilder.append(s).append(",");
-        }
-        return stringBuilder.toString();
+            PreparedStatement statement = this.mySQLConnection.getCon().prepareStatement("SELECT * FROM " + this.databaseService.getCollectionOrTable());
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                String data = result.getString(2);
+                Document document = new Document(data);
+                CloudPlayerData cloudPlayerData = document.getAs(CloudPlayerData.class);
+                list.add(cloudPlayerData);
+            }
+        } catch (SQLException e) {}
+        return list;
     }
 
 }

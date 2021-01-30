@@ -58,8 +58,6 @@ public class Document implements Serializable {
     }
 
 
-
-
     public Document append(String key, String value) {
         this.jsonObject.addProperty(key, value);
         return this;
@@ -283,6 +281,10 @@ public class Document implements Serializable {
             return null;
         }
         return (T)gson.fromJson(jsonObject, tClass);
+    }
+
+    public <T> T getAs(Class<T> tClass) {
+        return this.getObject(this.getJsonObject(), tClass);
     }
 
     public <T> T getObject(String key, Class<T> tClass) {

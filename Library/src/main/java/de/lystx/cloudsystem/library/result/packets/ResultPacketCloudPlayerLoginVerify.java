@@ -4,22 +4,25 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
+import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 
 @Getter
 public class ResultPacketCloudPlayerLoginVerify extends ResultPacket {
 
-    private final String playerName;
+    private final CloudConnection connection;
 
-    public ResultPacketCloudPlayerLoginVerify(String playerName) {
-        this.playerName = playerName;
+    public ResultPacketCloudPlayerLoginVerify(CloudConnection connection) {
+        this.connection = connection;
     }
 
     @Override
     public Document read(CloudLibrary cloudLibrary) {
-        boolean onNetwork = (cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.playerName) != null);
-        return new Document()
-                .append("allow", !onNetwork)
-                .append("reason", onNetwork ? "Already on network" : "");
+        Document document = new Document();
+        document.append("cloudPlayer", cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName()));
+        document.append("allow", document.get("cloudPlayer") == null);
+        document.append("reason", "");
+        return document;
     }
 }

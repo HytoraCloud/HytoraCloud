@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.server.other;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutRegisterServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStartedServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStopServer;
@@ -212,15 +213,22 @@ public class ServerService extends CloudService {
         }, 10L);
     }
 
-    public void startService(ServiceGroup serviceGroup, Service service, Document properties) {
+    public Document startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
+        Document document = new Document();
         if (!this.getCloudLibrary().isRunning()) {
-            return;
+            document.append("message", "§cCloudLibrary isn't running anymore!");
+            document.append("sucess", false);
+            return document;
         }
         if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName()) == null) {
-            return;
+            document.append("message", "§cServiceGroup for §e" + serviceGroup.getName() + " §cwasn't found!");
+            document.append("sucess", false);
+            return document;
         }
         if (!new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json").exists()) {
-            return;
+            document.append("message", "§cGroup was removed meanwhile!");
+            document.append("sucess", false);
+            return document;
         }
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutRegisterServer(service));
         if (service.getPort() <= 0) {
@@ -229,10 +237,12 @@ public class ServerService extends CloudService {
             service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), service.getServiceState());
         }
         if (serviceGroup.getMaxServer() != -1 && this.getServices(serviceGroup).size() >= serviceGroup.getMaxServer()) {
+            document.append("message", "§cCouldn't start any services of §e" + serviceGroup.getName() + " §cbecause the maximum of services of this group is §e" + serviceGroup.getMaxServer() + "§c!");
+            document.append("sucess", true);
             this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
-            return;
+            return document;
         }
-        service.setProperties((properties == null ? new Document() : properties).toString());
+        service.setProperties((properties == null ? new SerializableDocument() : properties));
         this.globalServices.add(service);
         List<Service> services = this.getServices(serviceGroup);
         services.add(service);
@@ -242,20 +252,24 @@ public class ServerService extends CloudService {
         this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutStartedServer(service));
         this.actions.put(service.getName(), new Action());
 
+        document.append("message", "§aSuccess!");
+        document.append("service", service);
+        document.append("sucess", true);
+        return document;
     }
     public void startService(ServiceGroup serviceGroup, Service service) {
         this.startService(serviceGroup, service, null);
     }
 
-    public void startService(ServiceGroup serviceGroup) {
-        this.startService(serviceGroup, (Document)null);
+    public Document startService(ServiceGroup serviceGroup) {
+        return this.startService(serviceGroup, (SerializableDocument) null);
     }
 
-    public void startService(ServiceGroup serviceGroup, Document properties) {
+    public Document startService(ServiceGroup serviceGroup, SerializableDocument properties) {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
         Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY);
-        this.startService(serviceGroup, service, properties);
+        return this.startService(serviceGroup, service, properties);
     }
 
 
@@ -293,12 +307,14 @@ public class ServerService extends CloudService {
     public void stopServices() {
         List<String> already = new LinkedList<>();
         for (ServiceGroup serviceGroup : this.services.keySet()) {
-            if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
-                return;
+            if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName()) == null) {
+                continue;
             }
             if (!already.contains(serviceGroup.getName())) {
                 already.add(serviceGroup.getName());
-                this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The services of the group §c" + serviceGroup.getName() + " §7are now §4shutting down §7| §bServices " + this.services.get(serviceGroup).size());
+                if (this.getCloudLibrary().getScreenPrinter().getScreen() == null && !this.getCloudLibrary().getScreenPrinter().isInScreen()) {
+                    this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The services of the group §c" + serviceGroup.getName() + " §7are now §4shutting down §7| §bServices " + this.services.get(serviceGroup).size());
+                }
             }
         }
 

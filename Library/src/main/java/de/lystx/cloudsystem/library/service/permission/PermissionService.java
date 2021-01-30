@@ -33,10 +33,10 @@ public class PermissionService extends CloudService {
     }
 
     public void loadEntries() {
-        List<CloudPlayerData> list = this.getCloudLibrary().getService(DatabaseService.class).getDatabase().loadEntries();
-        this.permissionPool
-                .getPlayerCache()
-                .addAll(list);
+        try {
+            List<CloudPlayerData> list = this.getCloudLibrary().getService(DatabaseService.class).getDatabase().loadEntries();
+            this.permissionPool.getPlayerCache().addAll(list);
+        } catch (NullPointerException e) {}
     }
 
     public void load() {

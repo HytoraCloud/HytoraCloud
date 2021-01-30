@@ -2,13 +2,11 @@ package de.lystx.cloudsystem.receiver;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketReceiverRegister;
-import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.console.LoggerService;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.setup.impl.ReceiverSetup;
 import de.lystx.cloudsystem.receiver.elements.ReceiverClient;
@@ -65,7 +63,7 @@ public class Receiver extends CloudLibrary {
             this.commandService.setActive(false);
             ReceiverSetup receiverSetup = new ReceiverSetup();
             receiverSetup.start(this.console, setup -> {
-                if (setup.wasCancelled()) {
+                if (setup.isCancelled()) {
                     this.console.getLogger().sendMessage("ERROR", "§cYou are §enot §callowed to §4cancel §creceiver setup! Restart the Receiver!");
                     System.exit(0);
                 }

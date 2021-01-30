@@ -17,6 +17,7 @@ public class CloudPlayer implements Serializable {
     private String server;
     private String proxy;
 
+
     public CloudPlayer(String name, UUID uuid, String ipAddress, String server, String proxy) {
         this.name = name;
         this.uuid = uuid;

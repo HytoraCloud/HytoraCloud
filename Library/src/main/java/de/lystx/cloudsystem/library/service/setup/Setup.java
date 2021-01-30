@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.setup;
 
 
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import lombok.Getter;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -9,12 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+@Getter
 public abstract class Setup {
 
     private Map<Field, SetupPart> setupParts = new HashMap<>();
     private int current = 43084380;
     private CloudConsole cloudConsole;
-    private Boolean wasCancelled;
+    private boolean cancelled;
+    private boolean skipped;
     private Map.Entry<Field, SetupPart> currentPart;
     private Consumer<Setup> consumer;
 
@@ -26,7 +29,8 @@ public abstract class Setup {
         this.consumer = consumer;
         this.cloudConsole = scanner;
         this.current = 1;
-        this.wasCancelled = false;
+        this.cancelled = false;
+        this.skipped = false;
         for (Field field : getClass().getDeclaredFields()) {
             if (field.getAnnotation(SetupPart.class) != null)
                 this.setupParts.put(field, field.getAnnotation(SetupPart.class));
@@ -40,9 +44,6 @@ public abstract class Setup {
         this.consumer.accept(this);
     }
 
-    public Boolean wasCancelled() {
-        return this.wasCancelled;
-    }
 
     public void next(String lastAnswer) {
         if (this.currentPart != null) {
@@ -52,7 +53,7 @@ public abstract class Setup {
             }
             if (lastAnswer.equalsIgnoreCase("cancel")) {
                 this.cloudConsole.getLogger().sendMessage("SETUP", "§cThe current §esetup §cwas cancelled!");
-                this.wasCancelled = true;
+                this.cancelled = true;
                 this.current = (current + 10000);
                 return;
             }
@@ -74,6 +75,11 @@ public abstract class Setup {
                 (this.currentPart.getKey()).set(this, value);
             } catch (Exception ex) {
                 this.cloudConsole.getLogger().sendMessage("ERROR", "§cPlease enter a valid format");
+                return;
+            }
+            if (isAnswerExit(this.currentPart.getValue(), lastAnswer)) {
+                this.current = (current + 10000);
+                this.skipped = true;
                 return;
             }
         }
@@ -122,6 +128,19 @@ public abstract class Setup {
             return true;
         }
     }
+
+    public boolean isAnswerExit(SetupPart setupPart, String answer) {
+        if ((setupPart.exitAfterAnswer()).length > 0) {
+            for (String forbiddenAnswer : setupPart.exitAfterAnswer()) {
+                if (forbiddenAnswer.equalsIgnoreCase(answer)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
 
     public Map.Entry<Field, SetupPart> getEntry(int id) {
         Map.Entry<Field, SetupPart> entry = null;

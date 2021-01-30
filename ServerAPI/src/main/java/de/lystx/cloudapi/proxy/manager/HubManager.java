@@ -44,7 +44,7 @@ public class HubManager {
             Service service;
             try {
                 service = cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).size()));
-            } catch (IllegalArgumentException e){
+            } catch (Exception e){
                 service = cloudAPI.getNetwork().getService(fallback.getGroupName() + "-1");
             }
             return ProxyServer.getInstance().getServerInfo(service.getName());
@@ -58,16 +58,13 @@ public class HubManager {
             player.disconnect(CloudAPI.getInstance().getPrefix() + "§cNo fallback was found!");
             return;
         }
-        player.connect(
-                this.getInfo(player)
-        );
+        player.connect(this.getInfo(player));
     }
 
     public Fallback getHighestFallback(ProxiedPlayer player) {
         List<Fallback> list = this.getFallbacks(player);
         list.sort(Comparator.comparingInt(Fallback::getPriority));
-
-        return list.get(0);
+        return list.get(list.size() - 1) == null ? cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback() : list.get(list.size() - 1);
     }
 
     public boolean isFallback(ProxiedPlayer player) {
@@ -84,7 +81,7 @@ public class HubManager {
         List<Fallback> list = new LinkedList<>();
         list.add(cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback());
         for (Fallback fallback : cloudAPI.getNetworkConfig().getFallbackConfig().getFallbacks()) {
-            if (player.hasPermission(fallback.getPermission()) || fallback.getPermission().trim().isEmpty() || fallback.getPermission() == null) {
+            if (cloudAPI.getPermissionPool().hasPermission(player.getName(), fallback.getPermission()) || fallback.getPermission().trim().isEmpty() || fallback.getPermission() == null) {
                 list.add(fallback);
             }
         }

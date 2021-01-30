@@ -1,7 +1,6 @@
 package de.lystx.cloudsystem.library.service.command;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.Acceptor;
 import de.lystx.cloudsystem.library.elements.other.CollectionWrapper;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutExecuteCommand;
 import de.lystx.cloudsystem.library.service.CloudService;
@@ -17,19 +16,19 @@ import java.util.*;
 @Getter @Setter
 public final class CommandService extends CloudService implements Completer {
 
-    private final List<Command> commands;
+    private final List<CloudCommand> cloudCommands;
     private Boolean active;
 
     public CommandService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
         this.active = true;
-        this.commands = new LinkedList<>();
+        this.cloudCommands = new LinkedList<>();
     }
 
-    public void registerCommand(Command cloudCommand) {
-        if (this.commands.contains(cloudCommand))
+    public void registerCommand(CloudCommand cloudCommand) {
+        if (this.cloudCommands.contains(cloudCommand))
             return;
-        this.commands.add(cloudCommand);
+        this.cloudCommands.add(cloudCommand);
     }
 
     public void execute(String line, CloudConsole cloudConsole) {
@@ -54,21 +53,21 @@ public final class CommandService extends CloudService implements Completer {
         } catch (NullPointerException ignored) {}
         String commandText = line.split(" ")[0];
         String[] split = line.substring(commandText.length()).split(" ");
-        Command command = this.getCommand(commandText);
-        if (command != null) {
+        CloudCommand cloudCommand = this.getCommand(commandText);
+        if (cloudCommand != null) {
             List<String> args = new LinkedList<>();
             for (String argument : split) {
                 if (!argument.equalsIgnoreCase("") && !argument.equalsIgnoreCase(" "))
                     args.add(argument);
             }
-            command.execute(this.getCloudLibrary(), cloudConsole, line, args.toArray(new String[0]));
+            cloudCommand.execute(this.getCloudLibrary(), cloudConsole, line, args.toArray(new String[0]));
             return;
         }
         cloudConsole.getLogger().sendMessage("ERROR", "§cThe command '§e" + commandText + "§c' doesn't exist!");
     }
 
-    public Command getCommand(String commandName) {
-        for (Command cloudCommand : this.commands) {
+    public CloudCommand getCommand(String commandName) {
+        for (CloudCommand cloudCommand : this.cloudCommands) {
             if (cloudCommand.getName().equalsIgnoreCase(commandName) || Arrays.<String>asList(cloudCommand.getAliases()).contains(commandName))
                 return cloudCommand;
         }
@@ -81,19 +80,19 @@ public final class CommandService extends CloudService implements Completer {
 
         List<String> responses = new ArrayList<>();
         List<String> commands = new LinkedList<>();
-        for (Command command : this.commands) {
-            commands.add(command.getName());
+        for (CloudCommand cloudCommand : this.cloudCommands) {
+            commands.add(cloudCommand.getName());
         }
         if (buffer.isEmpty() || buffer.indexOf(' ') == -1) {
             responses.addAll(commands);
         } else {
-            Command command = this.getCommand(input[0]);
+            CloudCommand cloudCommand = this.getCommand(input[0]);
 
-            if (command instanceof TabCompletable) {
+            if (cloudCommand instanceof TabCompletable) {
                 String[] args = buffer.split(" ");
                 String testString = args[args.length - 1];
 
-                responses.addAll(CollectionWrapper.filterMany(((TabCompletable) command).onTabComplete(this.getCloudLibrary(), args),
+                responses.addAll(CollectionWrapper.filterMany(((TabCompletable) cloudCommand).onTabComplete(this.getCloudLibrary(), args),
                         s -> s != null && (testString.isEmpty() || s.toLowerCase().contains(testString.toLowerCase()))));
             }
         }

@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,9 @@ public class Service implements Serializable {
     private final String host;
     private final int cloudPort;
     private final ServiceState serviceState;
-    private String properties;
+    private SerializableDocument properties;
     private ServiceGroup serviceGroup;
+
 
     public Service(String name, UUID uniqueId, ServiceGroup serviceGroup, int serviceID, int port, int cloudPort, ServiceState serviceState) {
         this.name = name;
@@ -33,7 +35,4 @@ public class Service implements Serializable {
 
     }
 
-    public Document getProperties() {
-        return new Document(this.properties);
-    }
 }

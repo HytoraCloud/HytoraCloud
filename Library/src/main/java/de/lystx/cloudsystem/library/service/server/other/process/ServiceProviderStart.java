@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.service.server.other.process;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
@@ -31,7 +32,7 @@ public class ServiceProviderStart {
 
 
 
-    public void autoStartService(Service service, Document propertiess) {
+    public void autoStartService(Service service, SerializableDocument propertiess) {
         try {
             cloudLibrary.getService(TemplateService.class).createTemplate(service.getServiceGroup(), service.getServiceGroup().getTemplate());
             File templateLocation = new File(cloudLibrary.getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
@@ -58,7 +59,7 @@ public class ServiceProviderStart {
             }
             cloudLibrary.getService(FileService.class).copyFileWithURL("/implements/plugins/CloudAPI.jar", new File(plugins, "CloudAPI.jar"));
 
-            service.setProperties((propertiess == null ? new Document() : propertiess).toString());
+            service.setProperties((propertiess == null ? new SerializableDocument() : propertiess));
             if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                 jarFile = "bungeeCord.jar";
                 FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getGlobalDirectory(), "server-icon.png"), new File(serverLocation, "server-icon.png"));

@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.library.service.module;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.service.command.Command;
+import de.lystx.cloudsystem.library.service.command.CloudCommand;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
@@ -28,8 +28,8 @@ public abstract class Module {
 
     public abstract void onLoadConfig(CloudLibrary cloudLibrary);
 
-    public void registerCommand(Command command) {
-        this.commandService.registerCommand(command);
+    public void registerCommand(CloudCommand cloudCommand) {
+        this.commandService.registerCommand(cloudCommand);
     }
 
     public void callEvent(Event event) {

@@ -37,8 +37,8 @@ public class CloudLoginFailEvent extends Event implements Cancellable {
 
 
     public enum Reason {
-        NO_SERVICES,
         ALREADY_ON_NETWORK,
+        NETWORK_FULL,
         MAINTENANCE
     }
 }

@@ -143,7 +143,6 @@ public class SignUpdater  {
         HashMap<Integer, CloudSign> map = new HashMap<>();
         int count = 1;
         for (CloudSign cloudSign : CloudServer.getInstance().getSignManager().getCloudSigns()) {
-            System.out.println("LOOL");
             if (cloudSign.getGroup().equalsIgnoreCase(name)) {
                 map.put(count, cloudSign);
                 count++;
@@ -165,6 +164,11 @@ public class SignUpdater  {
             if (blockAt.getType().equals(Material.AIR)) return;
 
             Sign sign = (Sign) blockAt.getState();
+            if (cloudAPI.getNetwork().getServiceGroup(group) != null && cloudAPI.getNetwork().getServiceGroup(group).isMaintenance()) {
+                servicesCloudSign.put(cloudSign, service);
+                this.signUpdate(sign, service, null);
+                return;
+            }
             JsonArray array = CloudServer.getInstance().getSignManager().getSignLayOut().getOfflineLayOut();
             JsonObject jsonObject;
 

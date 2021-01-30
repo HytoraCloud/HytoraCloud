@@ -10,7 +10,7 @@ import de.lystx.cloudapi.bukkit.manager.labymod.LabyMod;
 import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
 import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
 import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
-import de.lystx.cloudapi.proxy.manager.CloudManager;
+import de.lystx.cloudapi.bukkit.manager.CloudManager;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;

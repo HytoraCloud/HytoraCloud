@@ -245,14 +245,14 @@ public class PermissionPool implements Serializable {
         boolean is = false;
         CloudPlayerData data = this.getPlayerData(playerName);
         if (data != null) {
-            if (data.getPermissions().contains(permission)) {
+            if (data.getPermissions().contains(permission) || data.getPermissions().contains("*")) {
                 is = true;
             }
             for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
                 PermissionGroup permissionGroup = this.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
                 if (permissionGroup != null) {
                     for (String p : permissionGroup.getPermissions()) {
-                        if (p.equalsIgnoreCase(permission)) {
+                        if (p.equalsIgnoreCase(permission) || p.equalsIgnoreCase("*")) {
                             is = true;
                             break;
                         }
@@ -261,7 +261,7 @@ public class PermissionPool implements Serializable {
                         PermissionGroup inheritance = this.getPermissionGroupFromName(i);
                         if (inheritance != null) {
                             for (String p : inheritance.getPermissions()) {
-                                if (p.equalsIgnoreCase(permission)) {
+                                if (p.equalsIgnoreCase(permission) || p.equalsIgnoreCase("*")) {
                                     is = true;
                                     break;
                                 }

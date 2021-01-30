@@ -21,6 +21,7 @@ public class ServerConnectListener implements Listener {
                 event.setCancelled(false);
             } else {
                 String message = CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudAPI.getInstance().getPrefix());
+
                 player.sendMessage(new TextComponent(message));
                 event.setCancelled(true);
             }

@@ -11,6 +11,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedList;
+import java.util.List;
 
 @Getter
 public class Updater {
@@ -39,6 +41,14 @@ public class Updater {
             console.getLogger().sendMessage("INFO", "§2As you enabled §aAutoUpdate §2the CloudSystem will be stopped and the new version will be downloaded!");
             console.getLogger().sendMessage("INFO", "§cDo not kill this process! If you enter anything there might be some errors!");
             console.getLogger().sendMessage("INFO", "§cThat doesn't matter. Just wait until the process exits it's self!");
+            if (!getChangeLog().isEmpty()) {
+                console.getLogger().sendMessage("§9-----------------------------------------");
+                console.getLogger().sendMessage();
+                for (String s : getChangeLog()) {
+                    console.getLogger().sendMessage("CHANGELOG", "§b" + s);
+                }
+            }
+            console.getLogger().sendMessage("§9-----------------------------------------");
             console.getLogger().sendMessage();
             String download = document.getString("download");
             File cloud = new File("./CloudSystem.jar");
@@ -52,7 +62,12 @@ public class Updater {
     }
 
     public static String getCloudVersion() {
-        return "BETA-1.2";
+        return "BETA-1.3";
+    }
+
+    public static List<String> getChangeLog() {
+        List<String> list = document.getList("changelog");
+        return list == null ? new LinkedList<>() : list;
     }
 
     public static String getText(String urrl) {
