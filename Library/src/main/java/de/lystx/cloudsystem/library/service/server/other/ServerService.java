@@ -238,7 +238,7 @@ public class ServerService extends CloudService {
         }
         if (serviceGroup.getMaxServer() != -1 && this.getServices(serviceGroup).size() >= serviceGroup.getMaxServer()) {
             document.append("message", "§cCouldn't start any services of §e" + serviceGroup.getName() + " §cbecause the maximum of services of this group is §e" + serviceGroup.getMaxServer() + "§c!");
-            document.append("sucess", true);
+            document.append("sucess", false);
             this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
             return document;
         }

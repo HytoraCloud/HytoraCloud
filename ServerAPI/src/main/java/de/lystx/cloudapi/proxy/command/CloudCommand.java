@@ -167,7 +167,12 @@ public class CloudCommand extends Command implements TabExecutor {
                             }
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start §b" + id + " §7new services of group §a" + group.getName() + "§8...");
                             for (int i = 0; i < id; i++) {
-                                CloudAPI.getInstance().getNetwork().startService(group);
+                                CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname)).onDocumentSet(document -> {
+                                    String message = document.getString("message");
+                                    if (!document.getBoolean("sucess", false)) {
+                                        player.sendMessage(CloudAPI.getInstance().getPrefix() + message);
+                                    }
+                                });
                             }
                         } catch (NumberFormatException e) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid number!");

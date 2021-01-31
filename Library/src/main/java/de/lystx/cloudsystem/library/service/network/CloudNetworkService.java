@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.network;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInRemoveNPC;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
@@ -29,7 +30,7 @@ public class CloudNetworkService extends CloudService {
 
     public void start() {
         this.cloudServer.registerPacket((byte) 0, PacketPlayInRemoveNPC.class);
-        this.cloudServer.connect();
+        this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
     }
 
     public void shutdown() {

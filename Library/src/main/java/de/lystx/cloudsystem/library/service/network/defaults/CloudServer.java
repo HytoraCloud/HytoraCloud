@@ -33,7 +33,11 @@ public class CloudServer implements CloudExecutor {
     }
 
     public void connect() {
-        this.server = new ConnectionServer(this.adapterHandler, this.networkChannel, this.port);
+        this.connect(this.host, this.port);
+    }
+
+    public void connect(String host, int port) {
+        this.server = new ConnectionServer(this.adapterHandler, this.networkChannel, port);
     }
 
     public void disconnect() {

@@ -42,7 +42,11 @@ public class CloudClient implements CloudExecutor {
     }
 
     public void connect() {
-        this.connectionClient = new ConnectionClient(this.adapterHandler, this.networkChannel, this.host, this.port, 5000);
+        this.connect(this.host, this.port);
+    }
+
+    public void connect(String host, int port) {
+        this.connectionClient = new ConnectionClient(this.adapterHandler, this.networkChannel, host, port, 5000);
     }
 
     public boolean isConnected() {

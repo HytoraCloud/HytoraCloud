@@ -76,7 +76,7 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerCommunication(this));
 
-        this.cloudClient.connect();
+        this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
 
     }
