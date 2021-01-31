@@ -20,8 +20,9 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutTPS) {
-            Service service = ((PacketPlayOutTPS) packet).getService();
-            if (((PacketPlayOutTPS) packet).getTps() == null && (service == null || service.getName().equalsIgnoreCase(cloudAPI.getService().getName()))) {
+            PacketPlayOutTPS packetPlayOutTPS = (PacketPlayOutTPS)packet;
+            Service service = packetPlayOutTPS.getService();
+            if (packetPlayOutTPS.getTps() == null && service.getServiceGroup().getName().equalsIgnoreCase(cloudAPI.getService().getServiceGroup().getName())) {
                 String tps;
                 double[] arrayOfDouble = (double[]) Reflections.getField("recentTps","MinecraftServer","getServer");
                 DecimalFormat decimalFormat = new DecimalFormat("##.#");
@@ -30,13 +31,15 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
                 if (b < i) {
                     double t = arrayOfDouble[b];
                     tps = decimalFormat.format(t);
-                    if (tps.contains("20") || tps.contains("19") || tps.contains("18")) {
-                        tps = (tps.contains("20") ? " *" : "") + "§a" + tps;
-                    } else if (tps.contains("17") || tps.contains("16") || tps.contains("15")) {
+                    if (t >= 20) {
+                        tps = "§2*" + tps;
+                    } else if (t < 20 && t > 18) {
+                        tps = "§a" + tps;
+                    } else if (t < 18 && t > 15) {
                         tps = "§e" + tps;
-                    } else if (tps.contains("14") || tps.contains("13") || tps.contains("12")) {
+                    } else if (t < 15 && t > 12) {
                         tps = "§6" + tps;
-                    } else if (tps.contains("11") || tps.contains("10") || tps.contains("9")) {
+                    } else if (t < 12 && t > 10) {
                         tps = "§c" + tps;
                     } else {
                         tps = "§4" + tps;
@@ -44,7 +47,9 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
                 } else {
                     tps = "§cError";
                 }
-                cloudAPI.sendPacket(new PacketPlayOutTPS(((PacketPlayOutTPS) packet).getPlayer(), cloudAPI.getService(), tps));
+                PacketPlayOutTPS tps1 = new PacketPlayOutTPS(packetPlayOutTPS.getPlayer(), cloudAPI.getService(), tps);
+                tps1.setSendBack(false);
+                cloudAPI.sendPacket(tps1);
             }
         }
     }

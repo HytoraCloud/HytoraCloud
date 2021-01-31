@@ -5,9 +5,7 @@ import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommuni
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.in.service.*;
-import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.elements.service.*;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
@@ -98,6 +96,14 @@ public class CloudNetwork {
         return null;
     }
 
+    public ServiceInfo getServiceInfo(String name) {
+        return ServiceInfo.fromService(this.getService(name), this.cloudAPI.getCloudPlayers().getAll());
+    }
+
+    public GroupInfo getGroupInfo(String name) {
+        return GroupInfo.fromGroup(this.getServiceGroup(name), this.cloudAPI.getCloudPlayers().getAll(), this.getServices());
+    }
+
     public void updateNetworkConfig(NetworkConfig networkConfig) {
         this.cloudAPI.sendPacket(new PacketPlayInNetworkConfig(networkConfig));
     }
@@ -122,6 +128,6 @@ public class CloudNetwork {
 
     public void sendTPS(ServiceGroup group, CloudPlayer cloudPlayer) {
         cloudPlayer.sendMessage(this.cloudAPI.getCloudClient(), this.cloudAPI.getPrefix() + "§7TPS of group §b" + group.getName() + "§8:");
-        this.cloudAPI.sendPacket(new PacketPlayOutTPS(cloudPlayer.getName(), null, null));
+        this.cloudAPI.sendPacket(new PacketPlayOutTPS(cloudPlayer.getName(), this.getServices(group).get(0), null));
     }
 }

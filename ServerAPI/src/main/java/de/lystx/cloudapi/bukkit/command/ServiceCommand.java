@@ -10,6 +10,7 @@ import de.lystx.cloudsystem.library.result.Result;
 import de.lystx.cloudsystem.library.result.packets.ResultPacketPlayerConnection;
 import de.lystx.cloudsystem.library.result.packets.ResultPacketServices;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -177,7 +178,6 @@ public class ServiceCommand implements CommandExecutor {
     }
 
     public void help(Player player) {
-
         player.sendMessage("§bCloudService §7Help§8:");
         player.sendMessage("§8§m--------------------------------------");
         player.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
@@ -187,7 +187,6 @@ public class ServiceCommand implements CommandExecutor {
         player.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
         player.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
         player.sendMessage("§8§m--------------------------------------");
-
     }
 
 

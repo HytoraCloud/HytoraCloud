@@ -9,6 +9,8 @@ import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
+import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerJoin;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutForceRegisterPlayer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
@@ -100,7 +102,9 @@ public class PlayerListener implements Listener {
         CloudServer.getInstance().setWaitingForPlayer(false);
         Player player = event.getPlayer();
         CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
-        CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInCloudPlayerServerChange(cloudPlayer, CloudAPI.getInstance().getService().getName()));
+        if (cloudPlayer != null) {
+            CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInCloudPlayerServerChange(cloudPlayer, CloudAPI.getInstance().getService().getName()));
+        }
 
         if (!CloudServer.getInstance().isNewVersion()) {
             PacketReader packetReader = new PacketReader(player);
@@ -127,6 +131,9 @@ public class PlayerListener implements Listener {
         int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
         if (percent <= 100 && onlinepercent >= percent) {
             CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new Document().append("waitingForPlayers", true));
+        }
+        if (cloudPlayer != null) {
+            CloudAPI.getInstance().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer).setSendMessage(true));
         }
         if (!CloudServer.getInstance().isNewVersion()) {
             CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);

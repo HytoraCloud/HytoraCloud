@@ -26,27 +26,43 @@ public class CloudPlayer implements Serializable {
         this.proxy = proxy;
     }
 
+    public String getGroup() {
+        return this.server.split("-")[0];
+    }
+
     public void sendMessage(CloudExecutor executor, String message) {
-        executor.sendPacket(new PacketCommunicationSendMessage(this.uuid, message));
+        PacketCommunicationSendMessage sendMessage = new PacketCommunicationSendMessage(this.uuid, message);
+        //sendMessage.setSendBack(false);
+        executor.sendPacket(sendMessage);
     }
 
     public void playSound(CloudExecutor executor, String sound, float v1, float v2) {
-        executor.sendPacket(new PacketCommunicationPlaySound(this.name, sound, v1, v2));
+        PacketCommunicationPlaySound playSound = new PacketCommunicationPlaySound(this.name, sound, v1, v2);
+        //playSound.setSendBack(false);
+        executor.sendPacket(playSound);
     }
 
     public void sendTitle(CloudExecutor executor, String title, String subtitle) {
-        executor.sendPacket(new PacketCommunicationSendTitle(this.name, title, subtitle));
+        PacketCommunicationSendTitle sendTitle = new PacketCommunicationSendTitle(this.name, title, subtitle);
+        //sendTitle.setSendBack(false);
+        executor.sendPacket(sendTitle);
     }
 
     public void fallback(CloudExecutor executor) {
-        executor.sendPacket(new PacketCommunicationFallback(this.name));
+        PacketCommunicationFallback fallback = new PacketCommunicationFallback(this.name);
+       // fallback.setSendBack(false);
+        executor.sendPacket(fallback);
     }
 
     public void sendToServer(CloudExecutor executor, String server) {
-        executor.sendPacket(new PacketCommunicationSendToServer(this.name, server));
+        PacketCommunicationSendToServer sendToServer = new PacketCommunicationSendToServer(this.name, server);
+       // sendToServer.setSendBack(false);
+        executor.sendPacket(sendToServer);
     }
 
     public void kick(CloudExecutor executor, String reason) {
-        executor.sendPacket(new PacketCommunicationKick(this.name, reason));
+        PacketCommunicationKick kick = new PacketCommunicationKick(this.name, reason);
+       // kick.setSendBack(false);
+        executor.sendPacket(kick);
     }
 }

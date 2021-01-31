@@ -62,7 +62,7 @@ public class Updater {
     }
 
     public static String getCloudVersion() {
-        return "BETA-1.3";
+        return "BETA-1.4";
     }
 
     public static List<String> getChangeLog() {
@@ -88,8 +88,8 @@ public class Updater {
 
 
     public static void download(String search, File location)  {
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+        InputStream inputStream;
+        OutputStream outputStream;
 
         try {
             ProgressBarStyle style;
