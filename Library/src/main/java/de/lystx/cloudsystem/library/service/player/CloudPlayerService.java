@@ -8,19 +8,25 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.event.EventService;
+import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import lombok.Getter;
 
+import java.io.File;
 import java.util.*;
 
+@Getter
 public class CloudPlayerService extends CloudService {
 
     private final List<CloudPlayer> cloudPlayers;
+    private final Document properties;
     private final CloudDatabase database;
 
     public CloudPlayerService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
         this.cloudPlayers = new LinkedList<>();
+        this.properties = new Document(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "cloudPlayerProperties.json"));
         this.database = this.getCloudLibrary().getService(DatabaseService.class).getDatabase();
         cloudLibrary.getWebServer().update("players", this.toDocument());
     }
@@ -42,6 +48,18 @@ public class CloudPlayerService extends CloudService {
         return this.database.getPlayerData(uuid);
     }
 
+    public Document getProperties(UUID uuid) {
+        Document document = this.properties.getDocument(uuid.toString());
+        if (document == null) {
+            document = new Document();
+            this.properties.append(uuid.toString(), document);
+            this.properties.save();
+        }
+        return document;
+    }
+
+
+
     public void setPlayerData(UUID uuid, CloudPlayerData data) {
         this.database.setPlayerData(uuid, data);
     }
@@ -61,6 +79,9 @@ public class CloudPlayerService extends CloudService {
     public void update(String name, CloudPlayer newPlayer) {
         CloudPlayer cloudPlayer = this.getOnlinePlayer(name);
         this.cloudPlayers.set(this.cloudPlayers.indexOf(cloudPlayer), newPlayer);
+
+        this.properties.append(newPlayer.getUuid().toString(), newPlayer.getProperties());
+        this.properties.save();
     }
 
     public CloudPlayer getOnlinePlayer(String name) {

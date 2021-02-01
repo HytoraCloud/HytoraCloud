@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,5 +1,7 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
+import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.communication.*;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import lombok.Getter;
@@ -16,7 +18,8 @@ public class CloudPlayer implements Serializable {
     private final String ipAddress;
     private String server;
     private String proxy;
-
+    private CloudPlayerData cloudPlayerData;
+    private SerializableDocument properties;
 
     public CloudPlayer(String name, UUID uuid, String ipAddress, String server, String proxy) {
         this.name = name;
@@ -24,6 +27,20 @@ public class CloudPlayer implements Serializable {
         this.ipAddress = ipAddress;
         this.server = server;
         this.proxy = proxy;
+        this.cloudPlayerData = new DefaultCloudPlayerData(uuid, name);
+        this.cloudPlayerData.setDefault(true);
+    }
+
+    public PropertyCallback getProperty(String key) {
+        return new PropertyCallback(this, key);
+    }
+
+    public void saveProperty(String key, SerializableDocument document) {
+        this.properties.append(key, document);
+    }
+
+    public void update(CloudExecutor cloudExecutor) {
+        cloudExecutor.sendPacket(new PacketCommunicationUpdateCloudPlayer(this.name, this));
     }
 
     public String getGroup() {

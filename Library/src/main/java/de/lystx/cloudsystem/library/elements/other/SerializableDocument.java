@@ -2,8 +2,8 @@ package de.lystx.cloudsystem.library.elements.other;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.*;
@@ -20,6 +20,11 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
         return this;
     }
 
+    public SerializableDocument getDocument(String key) {
+        SerializableDocument serializableDocument = new SerializableDocument();
+        serializableDocument.append(this.get(key));
+        return serializableDocument;
+    }
 
     public SerializableDocument append(Object value) {
         this.clear();
@@ -29,11 +34,38 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
         });
         return this;
     }
-
-    public <T> T get(String key, Class<T> t) {
-        return (T) this.get(key);
+    public SerializableDocument increase(String key) {
+        this.append(key, (this.getInteger(key) + 1));
+        return this;
     }
 
+    public <T> T get(String key, Class<T> t) {
+        return this.toDocument().getObject(key, t);
+    }
+
+    public Integer getInteger(String key) {
+        return ((JsonPrimitive) this.get(key)).getAsInt();
+    }
+
+    public Boolean getBoolean(String key) {
+        return ((JsonPrimitive) this.get(key)).getAsBoolean();
+    }
+
+    public String getString(String key) {
+        return ((JsonPrimitive) this.get(key)).getAsString();
+    }
+
+    public java.lang.Double getDouble(String key) {
+        return ((JsonPrimitive) this.get(key)).getAsDouble();
+    }
+
+    public Short getShort(String key) {
+        return ((JsonPrimitive) this.get(key)).getAsShort();
+    }
+
+    public Long getLong(String key) {
+        return ((JsonPrimitive) this.get(key)).getAsLong();
+    }
 
     public boolean has(String key) {
         return this.containsKey(key);

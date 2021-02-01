@@ -13,9 +13,7 @@
         <module>CloudSystem</module>
         <module>ServerAPI</module>
         <module>CloudNetwork</module>
-        <module>DiscordModule</module>
         <module>Modules</module>
-        <module>DiscordIntegration</module>
     </modules>
 
     <properties>

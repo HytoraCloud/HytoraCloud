@@ -22,6 +22,8 @@ public class PacketCommunication extends Packet implements Serializable {
         this.sendBack = sendBack;
     }
 
-
-
+    public PacketCommunication setSendBack(boolean sendBack) {
+        this.sendBack = sendBack;
+        return this;
+    }
 }

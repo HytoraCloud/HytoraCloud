@@ -7,6 +7,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
@@ -18,7 +19,6 @@ import org.bson.Document;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 @Getter
 public class MongoDB implements CloudDatabase {
@@ -75,8 +75,7 @@ public class MongoDB implements CloudDatabase {
                     document.getString("ipAddress"),
                     document.getBoolean("notifyServerStart"),
                     document.get("firstLogin", Long.class),
-                    document.get("lastLogin", Long.class)
-            );
+                    document.get("lastLogin", Long.class));
         } catch (NullPointerException e) {
             return null;
         }
