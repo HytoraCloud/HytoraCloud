@@ -46,7 +46,7 @@ public class BackhandedClient {
         }
     }
 
-    public void start() {
+    public void start() throws IOException, ConnectException {
         this.stopped = false;
         login();
         startListening();
@@ -60,34 +60,23 @@ public class BackhandedClient {
         System.exit(0);
     }
 
-    protected void login() {
+    protected void login() throws IOException, ConnectException {
         if (this.stopped)
             return;
-        try {
-            if (this.loginSocket != null && this.loginSocket.isConnected())
-                throw new AlreadyConnectedException();
-            if (this.secureMode) {
-                this
-                        .loginSocket = SSLSocketFactory.getDefault().createSocket(this.address.getAddress(), this.address.getPort());
-            } else {
-                this.loginSocket = new Socket();
-                this.loginSocket.connect(this.address, this.timeout);
-            }
-            try {
-                ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(this.loginSocket.getOutputStream()));
-                Channel loginPackage = new Channel("_INTERNAL_LOGIN_", new Object[] { this.id, this.group });
-                loginPackage.sign(this.id, this.group);
-                out.writeObject(loginPackage);
-                out.flush();
-            } catch (IOException ex) {
-                System.exit(0);
-            }
-        } catch (ConnectException e) {
-            System.exit(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(0);
+        if (this.loginSocket != null && this.loginSocket.isConnected())
+            throw new AlreadyConnectedException();
+        if (this.secureMode) {
+            this.loginSocket = SSLSocketFactory.getDefault().createSocket(this.address.getAddress(), this.address.getPort());
+        } else {
+            this.loginSocket = new Socket();
+            this.loginSocket.connect(this.address, this.timeout);
         }
+        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(this.loginSocket.getOutputStream()));
+        Channel loginPackage = new Channel("_INTERNAL_LOGIN_", this.id, this.group);
+        loginPackage.sign(this.id, this.group);
+        out.writeObject(loginPackage);
+        out.flush();
+
     }
 
     protected void startListening() {

@@ -36,6 +36,7 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
         this.append("npcs", npcs.toString());
         this.append("npcConfig", npcConfig);
         this.append("permissionPool", new Document()
+                .append("enabled", permissionPool.isEnabled())
                 .append("cache", permissionPool.getPlayerCache())
                 .append("groups", permissionPool.getPermissionGroups())
                 .getJsonObject()
@@ -58,6 +59,7 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
 
     public PermissionPool getPermissionPool() {
         PermissionPool permissionPool = new PermissionPool(null);
+        permissionPool.setEnabled(this.document().getDocument("permissionPool").getBoolean("enabled"));
         permissionPool.setPermissionGroups(this.document().getDocument("permissionPool").getList("groups", PermissionGroup.class));
         permissionPool.setPlayerCache(this.document().getDocument("permissionPool").getList("cache", CloudPlayerData.class));
         return permissionPool;

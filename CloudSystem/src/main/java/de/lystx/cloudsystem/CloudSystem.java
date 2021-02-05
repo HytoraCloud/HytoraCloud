@@ -7,9 +7,12 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
+import de.lystx.cloudsystem.library.elements.packets.wrapper.WrapperPacketGlobalInfo;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.event.EventService;
+import de.lystx.cloudsystem.library.service.key.AuthManager;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
@@ -35,7 +38,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 @Getter @Setter
 public class CloudSystem extends CloudLibrary {
@@ -45,10 +51,11 @@ public class CloudSystem extends CloudLibrary {
 
     private final CloudScreenPrinter screenPrinter;
     private final TicksPerSecond ticksPerSecond;
+    private final AuthManager authManager;
     public ServerService service;
 
     public CloudSystem() {
-        super();
+        super(Type.CLOUDSYSTEM);
         instance = this;
 
 
@@ -117,16 +124,24 @@ public class CloudSystem extends CloudLibrary {
         } else {
             new CloudBootingSetupNotDone(this);
         }
+        this.authManager = new AuthManager(new File("wrapper.cloudkey"));
+        this.authManager.createKey(this.console);
     }
 
     public void reload() {
         try {
+            this.getService().setServiceGroups(this.getService(GroupService.class).getGroups());
             this.getService(PermissionService.class).load();
             this.getService(PermissionService.class).loadEntries();
             this.getService(ConfigService.class).reload();
             this.getService(NPCService.class).load();
             this.getService(SignService.class).load();
             this.getService(SignService.class).loadSigns();
+
+            List<Service> services = new LinkedList<>();
+            for (List<Service> value : this.getService().getServices().values()) {
+                services.addAll(value);
+            }
 
             this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
@@ -139,6 +154,14 @@ public class CloudSystem extends CloudLibrary {
                     this.getService(NPCService.class).getDocument(),
                     this.getService(NPCService.class).getNPCConfig()
             ));
+            if (this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+                this.getService(CloudNetworkService.class).sendPacket(new WrapperPacketGlobalInfo(
+                        this.getService(ConfigService.class).getNetworkConfig(),
+                        this.getService(GroupService.class).getGroups(),
+                        this.getService(CloudPlayerService.class).getCloudPlayers(),
+                        services));
+            }
+
         } catch (NullPointerException e) {
             e.printStackTrace();
         }

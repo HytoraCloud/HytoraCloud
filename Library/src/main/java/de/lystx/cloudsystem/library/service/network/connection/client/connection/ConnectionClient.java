@@ -6,9 +6,12 @@ import de.lystx.cloudsystem.library.service.network.connection.channel.base.Netw
 import de.lystx.cloudsystem.library.service.network.connection.client.backend.BackhandedClient;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 
+import java.io.IOException;
+import java.net.ConnectException;
+
 public class ConnectionClient extends BackhandedClient {
 
-    public ConnectionClient(final AdapterHandler adapterHandler, final NetworkChannel networkChannel, String hostname, int port, int timeout) {
+    public ConnectionClient(final AdapterHandler adapterHandler, final NetworkChannel networkChannel, String hostname, int port, int timeout) throws IOException, ConnectException  {
         super(hostname, port, timeout);
         registerMethod(networkChannel.getChannelID(), (pack, socket) -> {
             Packet packet = (Packet)pack.get(1);

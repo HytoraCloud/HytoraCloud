@@ -10,7 +10,6 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
-import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import org.apache.commons.io.FileUtils;
 
@@ -23,20 +22,25 @@ import java.util.logging.Level;
 public class ServiceProviderStart {
 
     private final CloudLibrary cloudLibrary;
-    private final ServerService service;
+    private final File template, dynamic, staticDir, spigotPlugins, bungeePlugins, global, version;
 
-    public ServiceProviderStart(CloudLibrary cloudLibrary, ServerService service) {
+    public ServiceProviderStart(CloudLibrary cloudLibrary, File template, File dynamic, File staticDir, File spigotPlugins, File bungeePlugins, File global, File version) {
         this.cloudLibrary = cloudLibrary;
-        this.service = service;
+        this.template = template;
+        this.dynamic = dynamic;
+        this.staticDir = staticDir;
+        this.version = version;
+        this.bungeePlugins = bungeePlugins;
+        this.spigotPlugins = spigotPlugins;
+        this.global = global;
     }
 
 
-
-    public void autoStartService(Service service, SerializableDocument propertiess) {
+    public boolean autoStartService(Service service, SerializableDocument propertiess) {
         try {
-            cloudLibrary.getService(TemplateService.class).createTemplate(service.getServiceGroup(), service.getServiceGroup().getTemplate());
-            File templateLocation = new File(cloudLibrary.getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
-            File serverLocation = new File(service.getServiceGroup().isDynamic() ? cloudLibrary.getService(FileService.class).getDynamicServerDirectory() : cloudLibrary.getService(FileService.class).getStaticServerDirectory(), service.getServiceGroup().getName() + "/" + service.getName() + "/");
+            cloudLibrary.getService(TemplateService.class).createTemplate(new File(template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate()), service.getServiceGroup());
+            File templateLocation = new File(this.template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
+            File serverLocation = new File(service.getServiceGroup().isDynamic() ? this.dynamic : this.staticDir, service.getServiceGroup().getName() + "/" + service.getName() + "/");
             File plugins = new File(serverLocation, "plugins/");
             String jarFile;
 
@@ -45,7 +49,7 @@ public class ServiceProviderStart {
 
             try {
                 FileUtils.copyDirectory(templateLocation, serverLocation);
-                File folder = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? cloudLibrary.getService(FileService.class).getBungeeCordPluginsDirectory() : cloudLibrary.getService(FileService.class).getSpigotPluginsDirectory();
+                File folder = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? bungeePlugins : spigotPlugins;
                 for (File file : Objects.requireNonNull(folder.listFiles())) {
                     if (file.isDirectory()) {
                         FileUtils.copyDirectory(file, new File(plugins, file.getName()));
@@ -62,7 +66,7 @@ public class ServiceProviderStart {
             service.setProperties((propertiess == null ? new SerializableDocument() : propertiess));
             if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                 jarFile = "bungeeCord.jar";
-                FileUtils.copyFile(new File(cloudLibrary.getService(FileService.class).getGlobalDirectory(), "server-icon.png"), new File(serverLocation, "server-icon.png"));
+                FileUtils.copyFile(new File(global, "server-icon.png"), new File(serverLocation, "server-icon.png"));
                 FileWriter writer = new FileWriter(serverLocation + "/config.yml");
                 writer.write("player_limit: 550\n" +
                         "permissions:\n" +
@@ -155,7 +159,7 @@ public class ServiceProviderStart {
             }
             File jar = new File(serverLocation, jarFile);
             if (!jar.exists()) {
-                FileUtils.copyFile( new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), jarFile), jar);
+                FileUtils.copyFile( new File(version, jarFile), jar);
             }
             File cloud = new File(serverLocation + "/CLOUD/");
             cloud.mkdirs();
@@ -196,9 +200,10 @@ public class ServiceProviderStart {
                 this.cloudLibrary.getService(ScreenService.class).registerScreen(cloudScreen, service.getName());
                 cloudScreen.start();
             }, 5L);
-            this.service.notifyStart(service);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

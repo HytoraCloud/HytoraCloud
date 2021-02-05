@@ -9,6 +9,8 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,11 +43,11 @@ public class CloudClient implements CloudExecutor {
         return connectionClient;
     }
 
-    public void connect() {
+    public void connect() throws IOException, ConnectException {
         this.connect(this.host, this.port);
     }
 
-    public void connect(String host, int port) {
+    public void connect(String host, int port) throws IOException, ConnectException {
         this.connectionClient = new ConnectionClient(this.adapterHandler, this.networkChannel, host, port, 5000);
     }
 

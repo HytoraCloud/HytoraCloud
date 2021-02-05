@@ -17,7 +17,7 @@ public class GroupSetup extends Setup {
     @SetupPart(id = 3, question = "How much RAM does this group have to use (in MB) ?", forbiddenAnswers = {"0"})
     private int minMem;
 
-    @SetupPart(id = 4, question = "Should this group be dynamic? true | false", onlyAnswers = {"true", "false"})
+    @SetupPart(id = 4, question = "Should this group be dynamic? true | false", onlyAnswers = {"true", "false"}, changeAnswers = {"yes->true", "no->false"})
     private boolean dynamic;
 
     @SetupPart(id = 5, question = "How many servers should always be online?", forbiddenAnswers = {"0"})
@@ -29,10 +29,10 @@ public class GroupSetup extends Setup {
     @SetupPart(id = 7, question = "How many players must be online to start a new service (in percent)")
     private int newPlayersInPercent;
 
-    @SetupPart(id = 8, question = "What type is this group (SPIGOT / PROXY)", onlyAnswers = {"spigot", "proxy"}, exitAfterAnswer = {"proxy"})
+    @SetupPart(id = 8, question = "What type is this group (SPIGOT / PROXY)", onlyAnswers = {"spigot", "proxy"}, exitAfterAnswer = {"proxy"}, changeAnswers = {"PROXY->proxy"})
     private String type;
 
-    @SetupPart(id = 9, question = "Is this is a lobbyServer?", onlyAnswers = {"true", "false"})
+    @SetupPart(id = 9, question = "Is this is a lobbyServer?", onlyAnswers = {"true", "false"}, changeAnswers = {"yes->true", "no->false"})
     private boolean lobby;
 
     @SetupPart(id = 10, question = "How many players may be online at maximum ?", forbiddenAnswers = {"0"})

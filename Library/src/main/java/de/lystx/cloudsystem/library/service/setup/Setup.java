@@ -57,6 +57,9 @@ public abstract class Setup {
                 this.current = (current + 10000);
                 return;
             }
+            if (isChangeAnswer(this.currentPart.getValue(), lastAnswer) != null) {
+                lastAnswer = isChangeAnswer(this.currentPart.getValue(), lastAnswer);
+            }
             if (!isAnswerAllowed(this.currentPart.getValue(), lastAnswer)) {
                 this.cloudConsole.getLogger().sendMessage("ERROR", "§cPossible answers §e" + (Arrays.toString(this.currentPart.getValue().onlyAnswers())).replace("]", "").replace("[", ""));
                 return;
@@ -86,7 +89,7 @@ public abstract class Setup {
         this.current++;
         this.currentPart = getEntry(this.current);
         if (this.currentPart != null)
-            this.cloudConsole.getLogger().sendMessage("SETUP",  (this.currentPart.getValue()).question() + " §7(§a" + ((Field)this.currentPart.getKey()).getType().getSimpleName() + "§7)");
+            this.cloudConsole.getLogger().sendMessage("SETUP",  (this.currentPart.getValue()).question() + " §7(§a" + this.currentPart.getKey().getType().getSimpleName() + "§7)");
     }
 
     public Object parse(Field field, String s) {
@@ -127,6 +130,18 @@ public abstract class Setup {
         } else {
             return true;
         }
+    }
+
+    public String isChangeAnswer(SetupPart setupPart, String answer) {
+        if ((setupPart.onlyAnswers()).length > 0) {
+            for (String forbiddenAnswer : setupPart.changeAnswers()) {
+                String change = forbiddenAnswer.split("->")[0];
+                if (change.equalsIgnoreCase(answer)) {
+                    return forbiddenAnswer.split("->")[1];
+                }
+            }
+        }
+        return null;
     }
 
     public boolean isAnswerExit(SetupPart setupPart, String answer) {

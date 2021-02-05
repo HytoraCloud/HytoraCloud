@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.server.other.process;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
@@ -45,13 +46,15 @@ public class ServiceProviderStop {
                     }
                 } catch (IOException e) {}
             } else {
-                File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
-                if (cloudAPI.exists()) {
-                    try {
-                        FileUtils.deleteDirectory(cloudAPI);
-                        FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
-                    } catch (Exception ignored) { }
-                }
+                this.cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> {
+                    File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
+                    if (cloudAPI.exists()) {
+                        try {
+                            FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
+                            FileUtils.forceDelete(cloudAPI);
+                        } catch (Exception e) {}
+                    }
+                }, 5L);
             }
             this.service.notifyStop(service);
             this.cloudLibrary.getService(ScreenService.class).unregisterScreen(screen);

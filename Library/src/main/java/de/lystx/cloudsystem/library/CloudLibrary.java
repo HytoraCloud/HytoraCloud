@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommuni
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.AdapterHandler;
 import de.lystx.cloudsystem.library.service.network.connection.channel.base.Identifier;
@@ -45,9 +46,10 @@ public class CloudLibrary implements Serializable {
 
     protected CloudConsole console;
     protected CloudScreenPrinter screenPrinter;
+    protected final Type type;
 
-
-    public CloudLibrary() {
+    public CloudLibrary(Type type) {
+        this.type = type;
         this.cloudServices = new LinkedList<>();
         this.host = "127.0.0.1";
         this.port = 2131;
@@ -60,6 +62,7 @@ public class CloudLibrary implements Serializable {
         this.cloudClient = new CloudClient(this.host, this.port, this.networkChannel, new AdapterHandler());
 
         this.cloudServices.add(new Scheduler(this, "Scheduler", CloudService.Type.UTIL));
+        this.cloudServices.add(new EventService(this, "Evemt", CloudService.Type.MANAGING));
     }
 
     public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
@@ -73,6 +76,14 @@ public class CloudLibrary implements Serializable {
             }
         }
         return null;
+    }
+
+    public static enum Type {
+
+        WRAPPER,
+        CLOUDSYSTEM,
+        LIBRARY,
+        CLOUDAPI
     }
 
 }

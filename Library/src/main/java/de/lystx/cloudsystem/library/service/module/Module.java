@@ -22,11 +22,12 @@ public abstract class Module {
     private Document config;
     private File moduleDirectory;
 
+    public abstract void onLoadConfig(CloudLibrary cloudLibrary);
+
     public abstract void onEnable(CloudLibrary cloudLibrary);
 
     public abstract void onDisable(CloudLibrary cloudLibrary);
 
-    public abstract void onLoadConfig(CloudLibrary cloudLibrary);
 
     public void registerCommand(CloudCommand cloudCommand) {
         this.commandService.registerCommand(cloudCommand);

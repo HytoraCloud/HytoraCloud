@@ -59,7 +59,11 @@ public class GroupService extends CloudService {
     }
 
     public ServiceGroup getGroup(String name) {
-        for (ServiceGroup group : this.groups) {
+        return this.getGroup(name, this.groups);
+    }
+
+    public ServiceGroup getGroup(String name, List<ServiceGroup> groups) {
+        for (ServiceGroup group : groups) {
             if (group.getName().equals(name)) {
                 return group;
             }

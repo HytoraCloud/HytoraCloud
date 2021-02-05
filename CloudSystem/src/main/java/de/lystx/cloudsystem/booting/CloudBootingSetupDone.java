@@ -13,13 +13,17 @@ import de.lystx.cloudsystem.handler.services.PacketHandlerRegister;
 import de.lystx.cloudsystem.handler.services.PacketHandlerServiceUpdate;
 import de.lystx.cloudsystem.handler.services.PacketHandlerStart;
 import de.lystx.cloudsystem.handler.services.PacketHandlerStopServer;
+import de.lystx.cloudsystem.handler.wrapper.PacketHandlerWrapperLogin;
+import de.lystx.cloudsystem.handler.wrapper.PacketHandlerWrapperPassOn;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.backup.BackupService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
+import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 
 public class CloudBootingSetupDone {
@@ -46,7 +50,9 @@ public class CloudBootingSetupDone {
         cloudSystem.cloudServices.add(new ModuleService(cloudSystem, "Modules", CloudService.Type.MANAGING));
         cloudSystem.cloudServices.add(new BackupService(cloudSystem, "Backups", CloudService.Type.MANAGING));
 
-        cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.Type.NETWORK));
+        FileService fs = cloudSystem.getService(FileService.class);
+        cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.Type.NETWORK, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory(), cloudSystem.getService(GroupService.class).getGroups()));
+
 
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerRegister(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerStopServer(cloudSystem));
@@ -70,6 +76,9 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerTPS(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudTPS(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerResult(cloudSystem));
+
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerWrapperLogin(cloudSystem));
+        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerWrapperPassOn(cloudSystem));
 
         cloudSystem.getService(StatisticsService.class).getStatistics().add("bootedUp");
         cloudSystem.reload();

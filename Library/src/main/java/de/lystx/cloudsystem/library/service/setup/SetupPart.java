@@ -12,6 +12,7 @@ public @interface SetupPart {
 
     String[] forbiddenAnswers() default {};
     String[] onlyAnswers() default {};
+    String[] changeAnswers() default {};
 
     String[] exitAfterAnswer() default {};
 

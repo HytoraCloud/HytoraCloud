@@ -19,10 +19,10 @@ public class CloudSetup extends Setup {
     @SetupPart(question = "What's the name of the first Admin?", id = 4)
     private String firstAdmin;
 
-    @SetupPart(question = "Do you want the cloud to update it's self?", id = 5, onlyAnswers = {"true", "false"})
+    @SetupPart(question = "Do you want the cloud to update it's self?", id = 5, onlyAnswers = {"true", "false"}, changeAnswers = {"yes->true", "no->false"})
     private boolean autoUpdater;
 
-    @SetupPart(question = "Enable ProxyProtocol? If you don't know what this is just type false!", id = 6, onlyAnswers = {"true", "false"})
+    @SetupPart(question = "Enable ProxyProtocol? If you don't know what this is just type false!", id = 6, onlyAnswers = {"true", "false"}, changeAnswers = {"yes->true", "no->false"})
     private boolean proxyProtocol;
 
     @SetupPart(question = "What Datbase do you want to use? (MYSQL, MONGODB, FILES) You will have to enter your date in the next step!", id = 7, onlyAnswers = {"MONGODB", "MYSQL", "FILES"})

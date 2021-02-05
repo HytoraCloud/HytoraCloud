@@ -102,6 +102,9 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void handlePermissionCheck(PermissionCheckEvent e) {
+        if (!cloudAPI.getPermissionPool().isEnabled()) {
+            return;
+        }
         if (cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), "*")) {
             e.setHasPermission(true);
         } else {
@@ -139,7 +142,7 @@ public class PlayerListener implements Listener {
             }
             if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
                 ServiceGroup serviceGroup = cloudAPI.getNetwork().getServiceGroup(event.getTarget().getName().split("-")[0]);
-                if (serviceGroup.isMaintenance() && !cloudAPI.getPermissionPool().hasPermission(player.getName(), "cloudsystem.group.maintenance")) {
+                if (serviceGroup.isMaintenance() && (!cloudAPI.getPermissionPool().hasPermission(player.getName(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
                     player.disconnect(cloudAPI.getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", cloudAPI.getPrefix()));
                     event.setCancelled(true);
                     return;

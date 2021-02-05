@@ -105,6 +105,9 @@ public class CloudServer extends JavaPlugin {
     }
 
     public void updatePermissions(Player player) {
+        if (!cloudAPI.getPermissionPool().isEnabled()) {
+            return;
+        }
         try {
             player.setOp(false);
             if (this.cloudAPI.getCloudPlayers().get(player.getName()) != null) {

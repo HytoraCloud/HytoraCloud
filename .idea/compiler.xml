@@ -7,17 +7,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="Wrapper" />
+        <module name="DiscordIntegration" />
+        <module name="Modules" />
         <module name="CloudSystem" />
         <module name="ServerAPI" />
-        <module name="DiscordIntegration" />
         <module name="Library" />
-        <module name="CloudNetwork" />
-        <module name="Modules" />
+        <module name="WebInterface" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="API" target="8" />
+      <module name="CloudNetwork" target="8" />
       <module name="DiscordModule" target="8" />
+      <module name="Launcher" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

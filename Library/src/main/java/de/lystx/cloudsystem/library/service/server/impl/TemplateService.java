@@ -30,6 +30,9 @@ public class TemplateService extends CloudService {
     }
     public void createTemplate(ServiceGroup serviceGroup, String template) {
         File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/" + template);
+       this.createTemplate(dir, serviceGroup);
+    }
+    public void createTemplate(File dir, ServiceGroup serviceGroup) {
         dir.mkdirs();
         File plugins = new File(dir, "plugins/");
         File props = new File(dir, "server.properties");

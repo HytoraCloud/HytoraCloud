@@ -18,6 +18,7 @@ public class NetworkConfig implements Serializable {
 
     private String host;
     private Integer port;
+    private boolean useWrapper;
     private boolean setupDone;
     private boolean autoUpdater;
     private boolean proxyProtocol;
@@ -27,9 +28,10 @@ public class NetworkConfig implements Serializable {
     private MessageConfig messageConfig;
     private FallbackConfig fallbackConfig;
 
-    public NetworkConfig(String host, Integer port, boolean setupDone, boolean autoUpdater, boolean proxyProtocol, ProxyConfig proxyConfig, LabyModConfig labyModConfig, MessageConfig messageConfig, FallbackConfig fallbackConfig) {
+    public NetworkConfig(String host, Integer port, boolean useWrapper, boolean setupDone, boolean autoUpdater, boolean proxyProtocol, ProxyConfig proxyConfig, LabyModConfig labyModConfig, MessageConfig messageConfig, FallbackConfig fallbackConfig) {
         this.host = host;
         this.port = port;
+        this.useWrapper = useWrapper;
         this.setupDone = setupDone;
         this.autoUpdater = autoUpdater;
         this.proxyProtocol = proxyProtocol;
@@ -44,6 +46,7 @@ public class NetworkConfig implements Serializable {
         return new NetworkConfig(
                 "127.0.0.1",
                 2131,
+                false,
                 false,
                 true,
                 true,

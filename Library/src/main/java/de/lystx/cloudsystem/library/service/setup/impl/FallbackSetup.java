@@ -13,7 +13,7 @@ public class FallbackSetup extends Setup {
     @SetupPart(id = 2, question = "What's the priority of this fallback?")
     private int id;
 
-    @SetupPart(id = 3, question = "Do you need a permission for this fallback?", onlyAnswers = {"true", "false"}, exitAfterAnswer = {"false"})
+    @SetupPart(id = 3, question = "Do you need a permission for this fallback?", onlyAnswers = {"true", "false"}, exitAfterAnswer = {"false"}, changeAnswers = {"yes->true", "no->false"})
     private boolean permissionNeeded;
 
     @SetupPart(id = 4, question = "What's the permission for this fallback?")

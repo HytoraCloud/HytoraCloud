@@ -22,6 +22,7 @@ public class PermissionService extends CloudService {
 
     private final File file;
     private PermissionPool permissionPool;
+    private boolean enabled;
 
     public PermissionService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
@@ -36,6 +37,7 @@ public class PermissionService extends CloudService {
         try {
             List<CloudPlayerData> list = this.getCloudLibrary().getService(DatabaseService.class).getDatabase().loadEntries();
             this.permissionPool.getPlayerCache().addAll(list);
+            this.permissionPool.setEnabled(this.enabled);
         } catch (NullPointerException e) {}
     }
 
@@ -74,9 +76,16 @@ public class PermissionService extends CloudService {
             document.append(defaultGroup.getName(), defaultGroup);
             document.append(adminGroup.getName(), adminGroup);
             document.save(this.file);
+            this.load();
+            return;
         }
         Document document = new Document(file);
         for (String key : document.keys()) {
+            if (key.equalsIgnoreCase("enabled")) {
+                enabled = document.getBoolean(key);
+                this.permissionPool.setEnabled(enabled);
+                continue;
+            }
             PermissionGroup group = document.getObject(key, PermissionGroup.class);
             this.permissionPool.getPermissionGroups().add(group);
         }

@@ -30,6 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -56,7 +57,7 @@ public class CloudAPI {
 
     public CloudAPI() {
         instance = this;
-        this.cloudLibrary = new CloudLibrary();
+        this.cloudLibrary = new CloudLibrary(CloudLibrary.Type.CLOUDAPI);
         this.cloudClient =  this.cloudLibrary.getCloudClient();
 
         this.network = new CloudNetwork(this);
@@ -76,7 +77,12 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerCommunication(this));
 
-        this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
+        try {
+            this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
+        } catch (IOException e) {
+            System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
+            System.exit(0);
+        }
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
 
     }

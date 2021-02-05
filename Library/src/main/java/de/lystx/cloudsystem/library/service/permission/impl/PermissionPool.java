@@ -31,9 +31,11 @@ public class PermissionPool implements Serializable {
     private List<CloudPlayerData> playerCache;
     private final SimpleDateFormat format;
     private final CloudLibrary cloudLibrary;
+    private boolean enabled;
 
     public PermissionPool(CloudLibrary cloudLibrary) {
         this.cloudLibrary = cloudLibrary;
+        this.enabled = false;
         this.permissionGroups = new LinkedList<>();
         this.playerCache = new LinkedList<>();
         this.format = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss", Locale.GERMAN);
@@ -242,6 +244,9 @@ public class PermissionPool implements Serializable {
     }
     
     public boolean hasPermission(String playerName, String permission) {
+        if (!this.enabled) {
+            return true;
+        }
         boolean is = false;
         CloudPlayerData data = this.getPlayerData(playerName);
         if (data != null) {
