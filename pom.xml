@@ -12,10 +12,7 @@
         <module>Library</module>
         <module>CloudSystem</module>
         <module>ServerAPI</module>
-        <module>CloudNetwork</module>
         <module>Modules</module>
-        <module>WebInterface</module>
-        <module>Launcher</module>
         <module>Wrapper</module>
     </modules>
 

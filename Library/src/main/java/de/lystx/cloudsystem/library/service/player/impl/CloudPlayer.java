@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
+import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.communication.*;
@@ -50,6 +51,11 @@ public class CloudPlayer implements Serializable {
     public void sendMessage(CloudExecutor executor, String message) {
         PacketCommunicationSendMessage sendMessage = new PacketCommunicationSendMessage(this.uuid, message);
         //sendMessage.setSendBack(false);
+        executor.sendPacket(sendMessage);
+    }
+
+    public void sendComponent(CloudExecutor executor, CloudComponent cloudComponent) {
+        PacketCommunicationSendComponent sendMessage = new PacketCommunicationSendComponent(this.uuid, cloudComponent);
         executor.sendPacket(sendMessage);
     }
 

@@ -27,6 +27,7 @@ public class PermissionService extends CloudService {
     public PermissionService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
         this.file = cloudLibrary.getService(FileService.class).getPermissionsFile();
+        this.enabled = true;
         this.permissionPool = new PermissionPool(cloudLibrary);
 
         this.load();

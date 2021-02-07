@@ -35,7 +35,7 @@ public class PermissionPool implements Serializable {
 
     public PermissionPool(CloudLibrary cloudLibrary) {
         this.cloudLibrary = cloudLibrary;
-        this.enabled = false;
+        this.enabled = true;
         this.permissionGroups = new LinkedList<>();
         this.playerCache = new LinkedList<>();
         this.format = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss", Locale.GERMAN);
