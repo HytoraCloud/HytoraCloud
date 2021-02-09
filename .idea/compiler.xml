@@ -8,20 +8,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Wrapper" />
-        <module name="DiscordIntegration" />
-        <module name="Modules" />
         <module name="CloudSystem" />
+        <module name="Wrapper" />
         <module name="ServerAPI" />
         <module name="Library" />
-        <module name="WebInterface" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="API" target="8" />
       <module name="CloudNetwork" target="8" />
+      <module name="DiscordIntegration" target="8" />
       <module name="DiscordModule" target="8" />
       <module name="Launcher" target="8" />
+      <module name="Modules" target="8" />
+      <module name="WebInterface" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

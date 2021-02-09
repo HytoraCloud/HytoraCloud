@@ -213,7 +213,7 @@ public class ServerService extends CloudService {
                     this.startService(serviceGroup, service);
                 }
             }
-        }, 10L);
+        }, 3L);
     }
 
     public Document startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
@@ -306,9 +306,11 @@ public class ServerService extends CloudService {
                         }
                         this.needServices(service.getServiceGroup());
                     }
-                }, 2L);
+                }, 3L);
             }
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     public void stopServices() {
@@ -357,6 +359,16 @@ public class ServerService extends CloudService {
         if (list == null) list = new LinkedList<>();
 
         return list;
+    }
+
+    public List<Service> getRealOnlineServices() {
+        List<Service> services = new LinkedList<>();
+        for (Service globalService : this.globalServices) {
+            if (this.getService(globalService.getName()) != null) {
+                services.add(globalService);
+            }
+        }
+        return services;
     }
 
     public Service getService(String name) {

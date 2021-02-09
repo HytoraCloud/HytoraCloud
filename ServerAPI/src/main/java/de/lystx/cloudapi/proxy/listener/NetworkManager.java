@@ -12,7 +12,7 @@ public class NetworkManager {
     public void switchMaintenance(Boolean to) {
         if (to) {
             for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-                if (CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance() && !CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(player.getName()) && !player.hasPermission("cloudsystem.network.maintenance")) {
+                if (CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance() && !CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(player.getName()) && !CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), "cloudsystem.network.maintenance") ) {
                     player.disconnect(
                             new TextComponent(
                                     CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().

@@ -35,12 +35,14 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
         this.append("signLayOut", signLayOut.toString());
         this.append("npcs", npcs.toString());
         this.append("npcConfig", npcConfig);
-        this.append("permissionPool", new Document()
-                .append("enabled", permissionPool.isEnabled())
-                .append("cache", permissionPool.getPlayerCache())
-                .append("groups", permissionPool.getPermissionGroups())
-                .getJsonObject()
-        );
+        try {
+            this.append("permissionPool", new Document()
+                    .append("enabled", permissionPool.isEnabled())
+                    .append("cache", permissionPool.getPlayerCache())
+                    .append("groups", permissionPool.getPermissionGroups())
+                    .getJsonObject()
+            );
+        } catch (Exception e) {}
 
     }
 

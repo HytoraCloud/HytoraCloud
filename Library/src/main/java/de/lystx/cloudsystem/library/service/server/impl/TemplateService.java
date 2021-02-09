@@ -33,11 +33,14 @@ public class TemplateService extends CloudService {
        this.createTemplate(dir, serviceGroup);
     }
     public void createTemplate(File dir, ServiceGroup serviceGroup) {
+        if (dir.exists()) {
+            return;
+        }
         dir.mkdirs();
         File plugins = new File(dir, "plugins/");
         File props = new File(dir, "server.properties");
         if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT) && !props.exists()) {
-            this.getCloudLibrary().getService(FileService.class).copyFileWithURL("/implements/server.properties",props );
+            this.getCloudLibrary().getService(FileService.class).copyFileWithURL("/implements/server.properties", props);
         }
         plugins.mkdirs();
     }

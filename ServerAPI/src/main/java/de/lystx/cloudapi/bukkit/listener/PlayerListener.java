@@ -44,32 +44,25 @@ public class PlayerListener implements Listener {
         this.packetReaders = new HashMap<>();
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handleAsyncPlayerLogin(AsyncPlayerPreLoginEvent event) {
+        for (Player all : Bukkit.getOnlinePlayers()) {
+            if (all.getUniqueId().equals(event.getUniqueId())) {
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.translateAlternateColorCodes('&', "&cAlready on this service!"));
+                return;
+            }
+        }
+
+    }
+
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        boolean allow = false;
-        for (Integer value : CloudAPI.getInstance().getNetwork().getProxies().keySet()) {
-            Service service = CloudAPI.getInstance().getNetwork().getProxy(value);
-            if (service == null) {
-                continue;
-            }
-            if (event.getRealAddress().getHostAddress().equalsIgnoreCase(service.getHost() + ":" + service.getPort()) || event.getHostname().length() > 32) {
-                allow = true;
-            }
-        }
+    public void handleSyncPlayerLoginEvent(PlayerLoginEvent event) {
         if (CloudAPI.getInstance().getNetwork().getServices().isEmpty()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cTry again in a few seconds! §8[§bServices§8]");
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cThere was a massive error! Please report it to an Administrator!");
             return;
         }
-        if (CloudAPI.getInstance().getNetwork().getServiceGroups().isEmpty()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cTry again in a few seconds! §8[§bGroups§8]");
-            return;
-        }
-        if (!CloudAPI.getInstance().getPermissionPool().isAvailable()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cTry again in a few seconds! §8[§bPermissionPool§8]");
-            return;
-        }
-        if (!allow || !CloudAPI.getInstance().isJoinable()) {
+        if (!CloudAPI.getInstance().isJoinable()) {
             try {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cPlease join only via the given §eproxies§c!");
             } catch (NullPointerException e) {
@@ -98,66 +91,57 @@ public class PlayerListener implements Listener {
             event.setCancelled(true);
             CloudServer.getInstance().shutdown();
         }
-        //CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
+        CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
-        CloudServer.getInstance().setWaitingForPlayer(false);
+        CloudServer.getInstance().setWaitingForPlayer(false); //Disables stopping server in 1 minute if nobody joined
         Player player = event.getPlayer();
         CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
         if (cloudPlayer != null) {
-            CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInCloudPlayerServerChange(cloudPlayer, CloudAPI.getInstance().getService().getName()));
+            CloudAPI.getInstance().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer).setSendMessage(true));
+            CloudAPI.getInstance().sendPacket(new PacketPlayInCloudPlayerServerChange(cloudPlayer, CloudAPI.getInstance().getService().getName()));
         }
-
-        if (!CloudServer.getInstance().isNewVersion()) {
-            PacketReader packetReader = new PacketReader(player);
-            try {
-                packetReader.inject();
-            } catch (NoSuchElementException e){}
-            this.packetReaders.put(player.getUniqueId(), packetReader);
-        }
-        int onlinePlayers = Bukkit.getOnlinePlayers().size();
-        int onlinepercent = ((onlinePlayers / Bukkit.getMaxPlayers()) * 100);
 
         if (CloudServer.getInstance().isUseLabyMod() && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
             if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
                 CloudServer.getInstance().getLabyMod().disableVoiceChat(player);
             }
-            Service s = CloudAPI.getInstance().getService();
 
             CloudServer.getInstance().getLabyMod().sendCurrentPlayingGamemode(player, true, CloudAPI.getInstance().getNetworkConfig().getLabyModConfig()
-                    .getServerSwitchMessage().replace("&", "§").replace("%service%", s.getName())
-                    .replace("%group%", s.getServiceGroup().getName())
+                    .getServerSwitchMessage().replace("&", "§").replace("%service%", CloudAPI.getInstance().getService().getName())
+                    .replace("%group%", CloudAPI.getInstance().getService().getServiceGroup().getName())
                     .replace("%online_players%", Bukkit.getOnlinePlayers().size() + " ")
                     .replace("%max_players%", Bukkit.getMaxPlayers() + " "));
         }
         int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
-        if (percent <= 100 && onlinepercent >= percent) {
+        if (percent <= 100 && ((Bukkit.getOnlinePlayers().size() / Bukkit.getMaxPlayers()) * 100) >= percent) {
             CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new Document().append("waitingForPlayers", true));
         }
-        if (cloudPlayer != null) {
-            CloudAPI.getInstance().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer).setSendMessage(true));
-        }
-        if (!CloudServer.getInstance().isNewVersion()) {
-            CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
-            if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 
-                    PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
-                    if (group == null) {
-                        CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cPlayer §e" + player.getName() + " §ccouldn't update permissionGroup");
-                        return;
+        //NPCs injecting for InteractEvent
+        if (!CloudServer.getInstance().isNewVersion()) {
+            PacketReader packetReader = new PacketReader(player);
+            try {
+                packetReader.inject();
+                this.packetReaders.put(player.getUniqueId(), packetReader);
+                CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
+                if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
+                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+
+                        PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
+                        if (group == null) {
+                            CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cPlayer §e" + player.getName() + " §ccouldn't update permissionGroup");
+                            return;
+                        }
+                        CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
                     }
-                    CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
                 }
+            } catch (NoSuchElementException e){
+                e.printStackTrace();
             }
         }
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
-            if (CloudAPI.getInstance().getCloudPlayers().get(player.getName()) == null) {
-                CloudAPI.getInstance().sendPacket(new PacketPlayOutForceRegisterPlayer(player.getName()));
-            }
-        }, 4L);
 
     }
 

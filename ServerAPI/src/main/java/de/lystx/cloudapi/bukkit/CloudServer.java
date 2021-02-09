@@ -19,6 +19,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @Getter @Setter
 public class CloudServer extends JavaPlugin {
 
@@ -74,9 +77,7 @@ public class CloudServer extends JavaPlugin {
         if (this.cloudAPI.getProperties().has("waitingForPlayers")) {
             this.waitingForPlayer = true;
             Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-                if (waitingForPlayer) {
-                    Bukkit.shutdown();
-                }
+                if (waitingForPlayer) Bukkit.shutdown();
             }, 1500L);
         }
     }
@@ -96,12 +97,16 @@ public class CloudServer extends JavaPlugin {
 
     public void shutdown() {
         String msg = this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix());
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+        List<Player> list = new LinkedList<>(Bukkit.getOnlinePlayers());
+        for (Player onlinePlayer : list) {
             CloudPlayer player = cloudAPI.getCloudPlayers().get(onlinePlayer.getName());
             onlinePlayer.sendMessage(msg);
             player.fallback(cloudAPI.getCloudClient());
+            list.remove(onlinePlayer);
+            if (list.isEmpty()) {
+                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 3L);
+            }
         }
-        cloudAPI.getScheduler().scheduleDelayedTask(Bukkit::shutdown, 3L);
     }
 
     public void updatePermissions(Player player) {
@@ -117,7 +122,9 @@ public class CloudServer extends JavaPlugin {
                             player.setOp(true);
                         }
                         player.addAttachment(this, s, true);
-                    } catch (IllegalStateException e) {}
+                    } catch (IllegalStateException e) {
+                        System.out.println("[CLOUDAPI] Something went wrong while updating permissions for " + player.getName());
+                    }
                 });
             } else {
                 this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);

@@ -63,12 +63,7 @@ public class CloudClient implements CloudExecutor {
         this.connectionClient.sendPacket(this.networkChannel, packet);
     }
 
-
-    public void registerPacketHandler(Class<? extends Packet> packetClass, PacketHandlerAdapter packetHandlerAdapter) {
-        this.adapterHandler.registerAdapter(packetHandlerAdapter);
-    }
-
-    public void registerPacketHandler(PacketHandlerAdapter packetHandlerAdapter) {
+    public void registerPacketHandler(Object packetHandlerAdapter) {
         this.adapterHandler.registerAdapter(packetHandlerAdapter);
     }
 

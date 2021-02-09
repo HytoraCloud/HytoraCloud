@@ -37,6 +37,15 @@ public class ServiceProviderStart {
 
 
     public boolean autoStartService(Service service, SerializableDocument propertiess) {
+
+        /*NetworkInfo networkInfo = new NetworkInfo();
+        int maxCPU = 0;
+        int memory = networkInfo.getUsedMemory(cloudLibrary.getService(ServerService.class).getRealOnlineServices());
+
+        if (networkInfo.getCPUUsage() >= memory + service.getServiceGroup().getMaxRam()) {
+            cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cThere is no more CPU available to start a new service! Max: §e" + maxCPU + " §c, Current: §e" + networkInfo.getCPUUsage());
+            return false;
+        }*/
         try {
             cloudLibrary.getService(TemplateService.class).createTemplate(new File(template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate()), service.getServiceGroup());
             File templateLocation = new File(this.template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
@@ -135,6 +144,7 @@ public class ServiceProviderStart {
                     }
                 }
 
+                cloudLibrary.getService(FileService.class).copyFileWithURL("/implements/spigot.yml", new File(serverLocation, "spigot.yml"));
 
                 File pp = new File(serverLocation, "server.properties");
                 if (!pp.exists()) {
@@ -153,6 +163,7 @@ public class ServiceProviderStart {
                     properties.save(fileOutputStream, "Edit by Cloud");
                     fileOutputStream.close();
                     stream.close();
+
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -199,7 +210,7 @@ public class ServiceProviderStart {
             this.cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> {
                 this.cloudLibrary.getService(ScreenService.class).registerScreen(cloudScreen, service.getName());
                 cloudScreen.start();
-            }, 5L);
+            }, 3L);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
