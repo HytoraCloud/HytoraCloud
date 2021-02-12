@@ -77,7 +77,7 @@ public class NettyServer extends Thread{
                     }
                 });
 
-                System.out.println("[NettyServer] Initialized NettyClient > " + socketChannel);
+                //System.out.println("[NettyServer] Initialized NettyClient > " + socketChannel);
                 registeredChannels.add(socketChannel);
             }
         });

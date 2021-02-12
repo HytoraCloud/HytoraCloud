@@ -7,14 +7,9 @@
       <option name="url" value="https://repo.maven.apache.org/maven2" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="jcenter" />
-      <option name="name" value="jcenter-bintray" />
-      <option name="url" value="https://jcenter.bintray.com" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="spigot-repo" />
-      <option name="name" value="spigot-repo" />
-      <option name="url" value="https://hub.spigotmc.org/nexus/content/repositories/snapshots/" />
+      <option name="id" value="minecraft-repo" />
+      <option name="name" value="minecraft-repo" />
+      <option name="url" value="https://www.your-repo.net" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
@@ -30,6 +25,11 @@
       <option name="id" value="bungee-repo" />
       <option name="name" value="bungee-repo" />
       <option name="url" value="https://oss.sonatype.org/content/groups/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Repository Switchboard" />
+      <option name="url" value="http://repo1.maven.org/maven2" />
     </remote-repository>
   </component>
 </project>

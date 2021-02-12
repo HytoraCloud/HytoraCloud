@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="LabyModAPI">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/CloudSystem/src/main/resources/implements/plugins/LabyModAPI.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

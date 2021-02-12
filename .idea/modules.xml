@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/CloudSystem/CloudSystem.iml" filepath="$PROJECT_DIR$/CloudSystem/CloudSystem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/HytoraCloud.iml" filepath="$PROJECT_DIR$/.idea/HytoraCloud.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Library/Library.iml" filepath="$PROJECT_DIR$/Library/Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Modules/Modules.iml" filepath="$PROJECT_DIR$/Modules/Modules.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ServerAPI/ServerAPI.iml" filepath="$PROJECT_DIR$/ServerAPI/ServerAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Wrapper/Wrapper.iml" filepath="$PROJECT_DIR$/Wrapper/Wrapper.iml" />
+    </modules>
+  </component>
+</project>
