@@ -3,7 +3,6 @@ package de.lystx.cloudsystem.handler.player;
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationUpdateCloudPlayer;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationUpdateProperties;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCloudPlayerOnline;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
@@ -14,7 +13,6 @@ import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutClo
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
@@ -23,6 +21,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 
 import java.util.LinkedList;
 import java.util.List;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
 

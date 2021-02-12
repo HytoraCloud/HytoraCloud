@@ -5,9 +5,9 @@ import de.lystx.cloudsystem.library.elements.events.SubChannelMessageEvent;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 @AllArgsConstructor
 public class PacketHandlerSubChannel extends PacketHandlerAdapter {

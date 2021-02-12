@@ -24,12 +24,11 @@ public class CloudNetworkService extends CloudService {
         this.cloudServer.sendPacket(packet);
     }
 
-    public void registerHandler(PacketHandlerAdapter packetHandlerAdapter) {
+    public void registerHandler(Object packetHandlerAdapter) {
         this.cloudServer.registerPacketHandler(packetHandlerAdapter);
     }
 
     public void start() {
-        this.cloudServer.registerPacket((byte) 0, PacketPlayInRemoveNPC.class);
         this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
     }
 

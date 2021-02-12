@@ -4,15 +4,13 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.manager.Reflections;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.ChatColor;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
-import java.text.DecimalFormat;
-
-@Getter
-@AllArgsConstructor
+@Getter @AllArgsConstructor
 public class PacketHandlerTPS extends PacketHandlerAdapter {
 
     private final CloudAPI cloudAPI;
@@ -25,25 +23,10 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
             if (packetPlayOutTPS.getTps() == null && service.getServiceGroup().getName().equalsIgnoreCase(cloudAPI.getService().getServiceGroup().getName())) {
                 String tps;
                 double[] arrayOfDouble = (double[]) Reflections.getField("recentTps","MinecraftServer","getServer");
-                DecimalFormat decimalFormat = new DecimalFormat("##.#");
-                int i = arrayOfDouble.length;
+                if (arrayOfDouble == null) return;
                 byte b = 0;
-                if (b < i) {
-                    double t = arrayOfDouble[b];
-                    tps = decimalFormat.format(t);
-                    if (t >= 20) {
-                        tps = "§2*" + tps;
-                    } else if (t < 20 && t > 18) {
-                        tps = "§a" + tps;
-                    } else if (t < 18 && t > 15) {
-                        tps = "§e" + tps;
-                    } else if (t < 15 && t > 12) {
-                        tps = "§6" + tps;
-                    } else if (t < 12 && t > 10) {
-                        tps = "§c" + tps;
-                    } else {
-                        tps = "§4" + tps;
-                    }
+                if (b < arrayOfDouble.length) {
+                    tps = this.format(arrayOfDouble[b]);
                 } else {
                     tps = "§cError";
                 }
@@ -52,5 +35,9 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
                 cloudAPI.sendPacket(tps1);
             }
         }
+    }
+
+    String format(double tps) {
+        return (tps > 50.0D ? ChatColor.GREEN : (tps > 30.0D ? ChatColor.YELLOW : ChatColor.RED)).toString() + (tps > 60.0D ? "*" : "") + Math.min((double)Math.round(tps * 100.0D) / 100.0D, 60.0D);
     }
 }

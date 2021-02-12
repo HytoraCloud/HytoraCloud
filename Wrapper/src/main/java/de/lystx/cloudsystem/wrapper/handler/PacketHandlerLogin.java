@@ -1,9 +1,9 @@
 package de.lystx.cloudsystem.wrapper.handler;
 
 import de.lystx.cloudsystem.library.elements.packets.wrapper.WrapperPacketLoginResult;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.wrapper.Wrapper;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 public class PacketHandlerLogin extends PacketHandlerAdapter {
 

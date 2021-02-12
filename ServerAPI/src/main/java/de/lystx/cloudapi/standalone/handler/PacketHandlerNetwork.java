@@ -9,8 +9,8 @@ import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutSt
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStopServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutUpdateServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 public class PacketHandlerNetwork extends PacketHandlerAdapter {
 

@@ -7,10 +7,10 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStar
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStartService;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 public class PacketHandlerStart extends PacketHandlerAdapter {
 

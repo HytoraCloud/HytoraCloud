@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
+import de.lystx.cloudsystem.library.service.util.ZipHelper;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 
@@ -64,21 +65,13 @@ public class BackupService extends CloudService {
     }
 
     public void createBackup(String name) {
-        getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§7Now creating new Backup with UUID §b" + name + "§7!");
-        getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§aNext Backup will be created in §a" + this.interval + " " + this.timeUnit.name());
+        this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§7Now creating new Backup with UUID §b" + name + "§7!");
+        this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§aNext Backup will be created in §a" + this.interval + " " + this.timeUnit.name());
         this.lastBackup = new Date().getTime();
-        File directory = new File(getCloudLibrary().getService(FileService.class).getBackupDirectory(), name + "/");
-        directory.mkdirs();
-        for (File file : getCloudLibrary().getService(FileService.class).getCloudDirectory().listFiles()) {
-            try {
-                if (!file.isDirectory()) {
-                    FileUtils.copyFile(file, new File(directory, file.getName()));
-                } else {
-                    FileUtils.copyDirectory(file, new File(directory, file.getName()));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
+        File src = this.getCloudLibrary().getService(FileService.class).getCloudDirectory();
+        ZipHelper zipHelper = new ZipHelper(new File(src.toString() + ".zip"),  new File(getCloudLibrary().getService(FileService.class).getBackupDirectory(), name + "/"));
+        zipHelper.zip();
+
     }
 }

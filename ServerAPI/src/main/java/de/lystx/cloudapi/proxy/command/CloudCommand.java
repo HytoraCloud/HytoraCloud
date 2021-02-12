@@ -68,7 +68,7 @@ public class CloudCommand extends Command implements TabExecutor {
                         for (ProxiedPlayer proxiedPlayer : ProxyServer.getInstance().getPlayers()) {
                             proxiedPlayer.disconnect(new TextComponent(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!"));
                         }
-                        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> CloudAPI.getInstance().getNetwork().shutdownCloud(), 60L);
+                        CloudAPI.getInstance().getNetwork().shutdownCloud();
                     } else {
                         this.help(player);
                     }
@@ -180,7 +180,7 @@ public class CloudCommand extends Command implements TabExecutor {
                     } else if (args[0].equalsIgnoreCase("maintenance")) {
                         String groupname = args[1];
                         if (groupname.equalsIgnoreCase("switch")) {
-                            Boolean maintenance = Boolean.valueOf(args[2]);
+                            boolean maintenance = Boolean.parseBoolean(args[2]);
                             NetworkConfig networkConfig = CloudAPI.getInstance().getNetworkConfig();
                             ProxyConfig proxyConfig = networkConfig.getProxyConfig();
                             proxyConfig.setMaintenance(maintenance);
@@ -203,7 +203,7 @@ public class CloudCommand extends Command implements TabExecutor {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + playername + " §7was added to maintenance§8!");
                         } else if (groupname.equalsIgnoreCase("remove")) {
                             String playername = args[2];
-                            if (CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(playername)) {
+                            if (!CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(playername)) {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + playername + " §cis not added to maintenance§8!");
                                 return;
                             }

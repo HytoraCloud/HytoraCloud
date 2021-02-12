@@ -4,11 +4,9 @@ import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
-import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import lombok.Getter;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 @Getter
 public class PacketHandlerRegister extends PacketHandlerAdapter {

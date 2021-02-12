@@ -1,10 +1,9 @@
 package de.lystx.cloudsystem.handler.other;
 
 import de.lystx.cloudsystem.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
-import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
+import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 
 

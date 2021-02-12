@@ -2,20 +2,15 @@ package de.lystx.cloudsystem.wrapper;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.Updater;
-import de.lystx.cloudsystem.library.elements.packets.wrapper.WrapperPacketGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.wrapper.WrapperPacketLogOut;
 import de.lystx.cloudsystem.library.elements.packets.wrapper.WrapperPacketLoginRequest;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.console.LoggerService;
-import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.key.AuthManager;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
-import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.setup.impl.WrapperSetup;
 import de.lystx.cloudsystem.wrapper.handler.*;
 import de.lystx.cloudsystem.wrapper.manager.ConfigManager;
@@ -58,7 +53,7 @@ public class Wrapper extends CloudLibrary {
         this.cloudServices.add(this.templateService);
 
         this.console = new CloudConsole(this.loggerService, this.commandService, System.getProperty("user.name"));
-        this.wrapperClient = new WrapperClient(this.configManager.getHost(), this.configManager.getPort(), this.getNetworkChannel());
+        this.wrapperClient = new WrapperClient(this.configManager.getHost(), this.configManager.getPort());
         this.authManager = new AuthManager(new File("wrapper.cloudkey"));
         this.serverManager = new ServerManager(this);
 

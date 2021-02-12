@@ -108,6 +108,8 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new DownloadCloudCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
         this.getService(CommandService.class).registerCommand(new UpdateCloudCommand("update", "Updates the cloud"));
         this.getService(CommandService.class).registerCommand(new LogCloudCommand("log", "Logs a server or all"));
+        this.getService(CommandService.class).registerCommand(new BackupCommand("backup", "Creates a backup of the current cloud"));
+        this.getService(CommandService.class).registerCommand(new TpsCommand("backup", "Creates a backup of the current cloud"));
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             if (this.getService(ConfigService.class).getNetworkConfig().isAutoUpdater()) {

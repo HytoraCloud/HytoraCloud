@@ -52,9 +52,7 @@ public class PlayerListener implements Listener {
                 return;
             }
         }
-
     }
-
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleSyncPlayerLoginEvent(PlayerLoginEvent event) {
@@ -64,7 +62,7 @@ public class PlayerListener implements Listener {
         }
         if (!CloudAPI.getInstance().isJoinable()) {
             try {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cPlease join only via the given §eproxies§c!");
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cThis serviec ist not joinable yet§c!");
             } catch (NullPointerException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§cThere was an error§c! Try again!");
             }
@@ -142,6 +140,11 @@ public class PlayerListener implements Listener {
                 e.printStackTrace();
             }
         }
+        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
+            if (CloudAPI.getInstance().getCloudPlayers().get(player.getName()) == null) {
+                CloudAPI.getInstance().sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), CloudAPI.getInstance().getService().getName(), "No Proxy Found")));
+            }
+        }, 5L);
 
     }
 

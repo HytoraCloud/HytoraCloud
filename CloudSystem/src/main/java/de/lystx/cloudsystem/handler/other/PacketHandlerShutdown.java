@@ -2,8 +2,8 @@ package de.lystx.cloudsystem.handler.other;
 
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInShutdown;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 
 public class PacketHandlerShutdown extends PacketHandlerAdapter {

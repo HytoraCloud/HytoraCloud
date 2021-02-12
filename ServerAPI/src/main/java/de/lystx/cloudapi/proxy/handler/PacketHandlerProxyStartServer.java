@@ -4,7 +4,6 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutRegisterServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStartedServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import net.md_5.bungee.api.ProxyServer;
@@ -12,6 +11,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 public class PacketHandlerProxyStartServer extends PacketHandlerAdapter {
 

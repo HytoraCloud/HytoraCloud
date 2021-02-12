@@ -3,11 +3,11 @@ package de.lystx.cloudsystem.handler.services;
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 
 @AllArgsConstructor @Getter

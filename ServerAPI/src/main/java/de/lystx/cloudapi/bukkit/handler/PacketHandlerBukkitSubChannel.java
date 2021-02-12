@@ -5,10 +5,10 @@ import de.lystx.cloudapi.bukkit.events.CloudServerPacketReceiveEvent;
 import de.lystx.cloudapi.bukkit.events.CloudServerSubChannelMessageEvent;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 @Getter
 public class PacketHandlerBukkitSubChannel extends PacketHandlerAdapter {

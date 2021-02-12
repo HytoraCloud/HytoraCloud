@@ -6,7 +6,6 @@ import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
@@ -24,7 +23,6 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.service.util.Action;
 import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Getter;
 import lombok.Setter;
@@ -109,7 +107,7 @@ public class CloudAPI {
                         Result result1 = resultPacket.getResult();
                         result1.setAction(System.currentTimeMillis() - start);
                         result.set(result1);
-                        cloudClient.getAdapterHandler().unregisterAdapter(this);
+                        cloudClient.getPacketAdapter().unregisterAdapter(this);
                     }
                 }
             }

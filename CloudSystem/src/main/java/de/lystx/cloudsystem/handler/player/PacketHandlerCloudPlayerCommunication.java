@@ -3,9 +3,9 @@ package de.lystx.cloudsystem.handler.player;
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunication;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 @AllArgsConstructor
 public class PacketHandlerCloudPlayerCommunication extends PacketHandlerAdapter {

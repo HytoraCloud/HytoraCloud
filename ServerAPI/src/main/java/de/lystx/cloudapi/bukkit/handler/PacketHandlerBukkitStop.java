@@ -4,11 +4,8 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 public class PacketHandlerBukkitStop extends PacketHandlerAdapter {
 

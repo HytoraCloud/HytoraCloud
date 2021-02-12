@@ -308,8 +308,8 @@ public class ServerService extends CloudService {
                     }
                 }, 3L);
             }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
+        } catch (NullPointerException ignored) {
+            //Hier ist etwas schief gegangen
         }
     }
 

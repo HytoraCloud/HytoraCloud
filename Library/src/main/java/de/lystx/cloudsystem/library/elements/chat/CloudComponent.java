@@ -13,7 +13,7 @@ public class CloudComponent implements Serializable {
 
     private final String message;
     private final List<CloudComponent> cloudComponents;
-    private Map<CloudComponentAction, Object[]> actions;
+    private final Map<CloudComponentAction, Object[]> actions;
 
     public CloudComponent(String message) {
         this.message = message;

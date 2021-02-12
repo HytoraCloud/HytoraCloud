@@ -2,11 +2,10 @@ package de.lystx.cloudsystem.handler.other;
 
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
 
 
-public class PacketHandlerReload extends PacketHandlerAdapter {
+public class PacketHandlerReload  {
 
     private final CloudSystem cloudSystem;
 
@@ -14,10 +13,10 @@ public class PacketHandlerReload extends PacketHandlerAdapter {
         this.cloudSystem = cloudSystem;
     }
 
-    @Override
-    public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInReload) {
-            this.cloudSystem.reload();
-        }
+
+    @PacketHandler
+    public void handleReload(PacketPlayInReload reload) {
+        this.cloudSystem.reload();
     }
+
 }

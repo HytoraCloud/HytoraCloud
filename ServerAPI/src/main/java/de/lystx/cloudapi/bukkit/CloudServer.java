@@ -100,11 +100,16 @@ public class CloudServer extends JavaPlugin {
         List<Player> list = new LinkedList<>(Bukkit.getOnlinePlayers());
         for (Player onlinePlayer : list) {
             CloudPlayer player = cloudAPI.getCloudPlayers().get(onlinePlayer.getName());
-            onlinePlayer.sendMessage(msg);
-            player.fallback(cloudAPI.getCloudClient());
+            if (player != null) {
+                onlinePlayer.sendMessage(msg);
+                player.fallback(cloudAPI.getCloudClient());
+            } else {
+                onlinePlayer.kickPlayer(msg);
+            }
+
             list.remove(onlinePlayer);
             if (list.isEmpty()) {
-                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 3L);
+                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 5L);
             }
         }
     }
@@ -120,6 +125,11 @@ public class CloudServer extends JavaPlugin {
                     try {
                         if (s.equalsIgnoreCase("*")) {
                             player.setOp(true);
+
+                            player.getEffectivePermissions().forEach(permissionAttachmentInfo -> {
+                                player.addAttachment(this, permissionAttachmentInfo.getPermission(), true);
+                            });
+
                         }
                         player.addAttachment(this, s, true);
                     } catch (IllegalStateException e) {

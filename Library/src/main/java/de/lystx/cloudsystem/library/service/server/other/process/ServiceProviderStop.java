@@ -32,7 +32,9 @@ public class ServiceProviderStop {
             }
             screen.getProcess().destroy();
             if (screen.getThread().isAlive()) {
-                screen.getThread().stop();
+                try {
+                    screen.getThread().stop();
+                } catch (NullPointerException ignored) {}
             }
 
             if (service.getServiceGroup().isDynamic()) {

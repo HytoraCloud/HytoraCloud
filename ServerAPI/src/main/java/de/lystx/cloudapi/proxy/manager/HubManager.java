@@ -22,20 +22,17 @@ public class HubManager {
         this.cloudAPI = CloudAPI.getInstance();
     }
 
-    public void send(ProxiedPlayer player) {
-        HubCommandExecuteEvent.Result result;
+    public boolean send(ProxiedPlayer player) {
         if (isFallback(player)) {
-            result = HubCommandExecuteEvent.Result.ALREADY_ON_LOBBY;
             String message = this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix());
-            if (message.trim().isEmpty()) {
-                return;
+            if (!message.trim().isEmpty()) {
+                player.sendMessage(new TextComponent(message));
             }
-            player.sendMessage(new TextComponent(message));
+            return false;
         } else {
-            result = HubCommandExecuteEvent.Result.SUCCESS;
             this.sendPlayerToFallback(player);
+            return true;
         }
-        ProxyServer.getInstance().getPluginManager().callEvent(new HubCommandExecuteEvent(player, result));
     }
 
     public ServerInfo getInfo(ProxiedPlayer player) {

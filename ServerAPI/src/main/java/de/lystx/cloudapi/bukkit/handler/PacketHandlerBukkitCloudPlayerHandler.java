@@ -3,12 +3,12 @@ package de.lystx.cloudapi.bukkit.handler;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlaySound;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSendTitle;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 @Getter
 public class PacketHandlerBukkitCloudPlayerHandler extends PacketHandlerAdapter {

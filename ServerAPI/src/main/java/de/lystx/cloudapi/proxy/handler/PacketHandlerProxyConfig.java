@@ -4,13 +4,9 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.HubCommand;
 import de.lystx.cloudapi.proxy.events.ProxyPacketReceiveEvent;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
-import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNetworkConfig;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutServices;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -18,6 +14,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
 
