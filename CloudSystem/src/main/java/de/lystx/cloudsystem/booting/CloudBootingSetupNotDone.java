@@ -39,8 +39,8 @@ public class CloudBootingSetupNotDone {
         cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cConsole prefix shown up twice (Only in Setup)");
         cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cSetup crashes if trying to use history (arrow keys)");
         cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
-        cloudSystem.getConsole().getLogger().sendMessage();
-        cloudSystem.getConsole().getLogger().sendMessage();
+        cloudSystem.getConsole().getLogger().sendMessage("§9");
+        cloudSystem.getConsole().getLogger().sendMessage("§9");
         cloudSystem.getService(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
         cloudSetup.start(cloudSystem.getConsole(), setup -> {
@@ -103,8 +103,8 @@ public class CloudBootingSetupNotDone {
             ));
             if (!sp.getDatabase().equalsIgnoreCase("FILES")) {
                 cloudSystem.getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");
-                cloudSystem.getConsole().getLogger().sendMessage();
-                cloudSystem.getConsole().getLogger().sendMessage();
+                cloudSystem.getConsole().getLogger().sendMessage("§9");
+                cloudSystem.getConsole().getLogger().sendMessage("§9");
                 DatabaseSetup databaseSetup = new DatabaseSetup();
                 databaseSetup.start(cloudSystem.getConsole(), s -> {
                     DatabaseSetup ds = (DatabaseSetup)s;

@@ -2,7 +2,7 @@ package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.CloudLoginFailEvent;
-import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;

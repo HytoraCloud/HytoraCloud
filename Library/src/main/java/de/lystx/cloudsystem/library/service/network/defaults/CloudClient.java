@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.service.network.defaults;
 
-import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.service.network.netty.NettyClient;
 import lombok.Getter;
 import lombok.Setter;

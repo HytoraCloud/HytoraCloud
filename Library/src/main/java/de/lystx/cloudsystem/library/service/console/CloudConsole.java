@@ -2,10 +2,13 @@ package de.lystx.cloudsystem.library.service.console;
 
 
 import de.lystx.cloudsystem.library.service.command.CommandService;
+import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
+import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
+import lombok.Getter;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
+@Getter
 public class CloudConsole extends Thread {
 
     private final LoggerService logger;
@@ -16,25 +19,24 @@ public class CloudConsole extends Thread {
         this.logger = logger;
         this.buffer = buffer;
         this.commandManager = commandManager;
-        start();
+        this.start();
     }
 
     public void run() {
         while (!this.isInterrupted()) {
             try {
-                String s = this.logger.colorString("§9Cloud§b@§7" + this.buffer.replace('-', ' ') + " §f» §7 ");
-                this.logger.getConsoleReader().setPrompt("");
-                this.logger.getConsoleReader().resetPromptLine("", "", 0);
+                String s = ConsoleColor.formatColorString(this.getPrefix());
                 String line;
-                try {
-                    if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
-                        if (!line.trim().isEmpty()) {
-                            this.logger.getConsoleReader().setPrompt("");
-                            this.commandManager.execute(line, this);
-                        }
+                if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
+                    if (line.trim().isEmpty()) {
+                        continue;
                     }
-                } catch (Exception e) {}
-            } catch (IOException throwable) {}
+                    this.logger.getConsoleReader().setPrompt("");
+                    this.commandManager.execute(line, this);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -45,11 +47,8 @@ public class CloudConsole extends Thread {
         }
     }
 
-    public String getBuffer() {
-        return buffer;
+    public String getPrefix() {
+        return "§9Cloud§b@§7" + this.buffer.replace('-', ' ') + " §f» §7 ";
     }
 
-    public LoggerService getLogger() {
-        return this.logger;
-    }
 }

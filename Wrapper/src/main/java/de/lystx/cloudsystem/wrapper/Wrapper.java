@@ -7,8 +7,8 @@ import de.lystx.cloudsystem.library.elements.packets.wrapper.WrapperPacketLoginR
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
-import de.lystx.cloudsystem.library.service.console.LoggerService;
-import de.lystx.cloudsystem.library.service.key.AuthManager;
+import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
+import de.lystx.cloudsystem.library.service.util.AuthManager;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.setup.impl.WrapperSetup;
@@ -73,8 +73,8 @@ public class Wrapper extends CloudLibrary {
             this.console.getLogger().sendMessage("SETUP", "  §7» §cConsole prefix shown up twice (Only in Setup)");
             this.console.getLogger().sendMessage("SETUP", "  §7» §cSetup crashes if trying to use history (arrow keys)");
             this.console.getLogger().sendMessage("SETUP", "  §7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
-            this.console.getLogger().sendMessage();
-            this.console.getLogger().sendMessage();
+            this.console.getLogger().sendMessage("§9");
+            this.console.getLogger().sendMessage("§9");
             this.commandService.setActive(false);
             new WrapperSetup().start(this.console, setup -> {
 

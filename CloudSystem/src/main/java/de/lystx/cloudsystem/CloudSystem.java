@@ -12,7 +12,7 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.key.AuthManager;
+import de.lystx.cloudsystem.library.service.util.AuthManager;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
@@ -27,7 +27,7 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
-import de.lystx.cloudsystem.library.service.console.LoggerService;
+import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
@@ -127,7 +127,7 @@ public class CloudSystem extends CloudLibrary {
             new CloudBootingSetupNotDone(this);
         }
         this.authManager = new AuthManager(new File("wrapper.cloudkey"));
-        this.authManager.createKey(this.console);
+        this.authManager.createKey();
     }
 
     public void reload() {

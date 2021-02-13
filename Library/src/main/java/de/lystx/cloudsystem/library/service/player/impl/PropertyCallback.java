@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
-import de.lystx.cloudsystem.library.elements.other.ValueConsumer;
+import de.lystx.cloudsystem.library.elements.interfaces.ValueConsumer;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import lombok.Getter;
 

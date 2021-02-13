@@ -11,7 +11,6 @@ import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.SignGroup;
-import de.lystx.cloudsystem.library.service.serverselector.sign.layout.SignLayOut;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -26,6 +25,11 @@ import org.bukkit.plugin.IllegalPluginAccessException;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
+
+/**
+ * Code contains soruces of CryCodes from LiptonCloud 1.7
+ * Link: https://www.spigotmc.org/resources/lipton-cloudsystem-new-generation-cloud.81503/
+ */
 
 @Getter
 public class SignUpdater  {

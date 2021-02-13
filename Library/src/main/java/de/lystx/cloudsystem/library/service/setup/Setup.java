@@ -1,9 +1,11 @@
 package de.lystx.cloudsystem.library.service.setup;
 
 
+import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import lombok.Getter;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,7 +15,7 @@ import java.util.function.Consumer;
 @Getter
 public abstract class Setup {
 
-    private Map<Field, SetupPart> setupParts = new HashMap<>();
+    private final Map<Field, SetupPart> setupParts = new HashMap<>();
     private int current = 43084380;
     private CloudConsole cloudConsole;
     private boolean cancelled;
@@ -23,8 +25,8 @@ public abstract class Setup {
 
 
     public void start(CloudConsole scanner, Consumer<Setup> consumer) {
-        scanner.getLogger().sendMessage();
-        scanner.getLogger().sendMessage();
+        scanner.getLogger().sendMessage("§9");
+        scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("SETUP", "§aIf you want to §2cancel §athe setup just type §7'§2cancel§7'");
         this.consumer = consumer;
         this.cloudConsole = scanner;
@@ -38,8 +40,12 @@ public abstract class Setup {
         this.currentPart = getEntry(1);
         this.cloudConsole.getLogger().sendMessage("SETUP", (this.currentPart.getValue()).question() + " §7(§a" + (this.currentPart.getKey()).getType().getSimpleName() + "§7)");
         while (this.current < this.setupParts.size() + 1) {
-            String line = scanner.getLogger().readLine();
-            this.next(line);
+            try {
+                String line = cloudConsole.getLogger().getConsoleReader().readLine(ConsoleColor.formatColorString(cloudConsole.getPrefix()));
+                this.next(line);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         this.consumer.accept(this);
     }
@@ -166,7 +172,4 @@ public abstract class Setup {
         return entry;
     }
 
-    public Map<Field, SetupPart> getSetupParts() {
-        return new HashMap<>(this.setupParts);
-    }
 }

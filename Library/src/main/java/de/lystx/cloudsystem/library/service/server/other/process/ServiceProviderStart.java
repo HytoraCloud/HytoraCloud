@@ -133,7 +133,7 @@ public class ServiceProviderStart {
                     eula.flush();
                     eula.close();
                 } catch (IOException exception) {
-                    this.cloudLibrary.getConsole().getLogger().getLogger().log(Level.SEVERE, "Something went wrong while closing Stream", exception);
+
                 } finally {
                     if (eula != null) {
                         try {

@@ -25,7 +25,7 @@ public class Updater {
 
     public static boolean check(CloudConsole console) {
         if (!isUpToDate()) {
-            console.getLogger().sendMessage();
+            console.getLogger().sendMessage("§9");
             console.getLogger().sendMessage("§9-----------------------------------------");
             console.getLogger().sendMessage("§b\n" +
                     "  _    _           _       _            \n" +
@@ -43,13 +43,13 @@ public class Updater {
             console.getLogger().sendMessage("INFO", "§cThat doesn't matter. Just wait until the process exits it's self!");
             if (!getChangeLog().isEmpty()) {
                 console.getLogger().sendMessage("§9-----------------------------------------");
-                console.getLogger().sendMessage();
+                console.getLogger().sendMessage("§9");
                 for (String s : getChangeLog()) {
                     console.getLogger().sendMessage("CHANGELOG", "§b" + s);
                 }
             }
             console.getLogger().sendMessage("§9-----------------------------------------");
-            console.getLogger().sendMessage();
+            console.getLogger().sendMessage("§9");
             String download = document.getString("download");
             File cloud = new File("./CloudSystem.jar");
             download(download, cloud);
@@ -62,7 +62,7 @@ public class Updater {
     }
 
     public static String getCloudVersion() {
-        return "BETA-1.4.8";
+        return "BETA-1.5";
     }
 
     public static List<String> getChangeLog() {

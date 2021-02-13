@@ -1,7 +1,7 @@
 package de.lystx.cloudapi.standalone.handler;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceStateChange;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceUpdate;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutRegisterServer;

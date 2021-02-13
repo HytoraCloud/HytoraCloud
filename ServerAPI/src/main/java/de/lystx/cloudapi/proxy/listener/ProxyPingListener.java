@@ -4,13 +4,11 @@ package de.lystx.cloudapi.proxy.listener;
 import java.util.UUID;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudapi.proxy.CloudProxy;
-import de.lystx.cloudsystem.library.elements.other.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.Motd;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;

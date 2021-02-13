@@ -51,7 +51,7 @@ public class CloudLibrary implements Serializable {
         this.cloudClient = new CloudClient(this.host, this.port);
 
         this.cloudServices.add(new Scheduler(this, "Scheduler", CloudService.Type.UTIL));
-        this.cloudServices.add(new EventService(this, "Evemt", CloudService.Type.MANAGING));
+        this.cloudServices.add(new EventService(this, "Event", CloudService.Type.MANAGING));
     }
 
     public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
@@ -67,7 +67,7 @@ public class CloudLibrary implements Serializable {
         return null;
     }
 
-    public static enum Type {
+    public enum Type {
 
         WRAPPER,
         CLOUDSYSTEM,

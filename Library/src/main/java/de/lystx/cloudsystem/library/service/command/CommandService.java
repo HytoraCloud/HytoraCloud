@@ -1,7 +1,6 @@
 package de.lystx.cloudsystem.library.service.command;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.CollectionWrapper;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutExecuteCommand;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
@@ -92,8 +91,15 @@ public final class CommandService extends CloudService implements Completer {
                 String[] args = buffer.split(" ");
                 String testString = args[args.length - 1];
 
-                responses.addAll(CollectionWrapper.filterMany(((TabCompletable) cloudCommand).onTabComplete(this.getCloudLibrary(), args),
-                        s -> s != null && (testString.isEmpty() || s.toLowerCase().contains(testString.toLowerCase()))));
+                List<String> list = ((TabCompletable) cloudCommand).onTabComplete(this.getCloudLibrary(), args);
+                List<String> retu = new LinkedList<>();
+                for (String s : list) {
+                    if (s != null && (testString.isEmpty() || s.toLowerCase().contains(testString.toLowerCase()))) {
+                        retu.add(s);
+                    }
+                }
+
+                responses.addAll(retu);
             }
         }
 
