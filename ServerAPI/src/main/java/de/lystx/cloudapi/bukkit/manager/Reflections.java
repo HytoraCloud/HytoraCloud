@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 public class Reflections {
 
@@ -19,6 +21,58 @@ public class Reflections {
             field.setAccessible(false);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void invoke(Object invoke, String methodName, Object... args) {
+        Class<?>[] clazz = new Class[args.length];
+        for (int i = 0; i < args.length; i++) {
+            clazz[i] = args[i].getClass();
+        }
+        try {
+            invoke.getClass().getMethod(methodName, clazz).invoke(invoke, args);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static <T> void invokeUnsafe(Object invoke, String methodName, Class<?>[] classes, Class<T> tClass, Object... args) {
+        int max = classes.length;
+        Class[] cl = new Class[classes.length + 1];
+        for (int i = 0; i < classes.length; i++) {
+            cl[i] = classes[i];
+        }
+        cl[max] = tClass;
+        try {
+            invoke.getClass().getMethod(methodName, cl).invoke(invoke, args);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Enum<?> getEnum(Class<?> clazz, int classID, int enumID) {
+        Class<?> enumClass;
+        try {
+            enumClass = clazz.getDeclaredClasses()[classID];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            enumClass = clazz.getDeclaredClasses()[0];
+            //System.out.println("[Reflections] IndexOutOfBound : " + classID + " but max for class " + clazz.getSimpleName() + " is " + clazz.getDeclaredClasses().length + "!");
+        }
+        Enum<?>[] enumConstants = (Enum<?>[]) enumClass.getEnumConstants();
+
+        return enumConstants[enumID];
+    }
+
+    public static Class<?> getClass(Class<?> clazz, int classID) {
+        return clazz.getDeclaredClasses()[classID];
+    }
+
+    public static Object[] fromIChatMessage(String input) {
+        try {
+            Method method = Reflections.getCustomClass("org.bukkit.craftbukkit.%d%.util.CraftChatMessage").getMethod("fromString", String.class);
+            return (Object[]) method.invoke(null, input);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            return null;
         }
     }
 
@@ -39,6 +93,14 @@ public class Reflections {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static String getVersion() {
+        return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    }
+
+    public static Class<?> getCraftBukkitClass(String name) {
+        return getCustomClass("org.bukkit.craftbukkit.%d%." + name);
     }
 
     public static Object getField(String fieldname, String clazz, String instanceMethod) {
@@ -73,6 +135,24 @@ public class Reflections {
         return null;
     }
 
+
+    public static void setValue(Object obj, String name, Object value) {
+        try {
+            Field field = obj.getClass().getDeclaredField(name);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {}
+    }
+
+    public static Object getValue(Object obj, String name) {
+        try {
+            Field field = obj.getClass().getDeclaredField(name);
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (Exception e) {}
+        return null;
+    }
+
     public Object getPacket() {
         return new Object();
     }
@@ -87,6 +167,10 @@ public class Reflections {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void sendPacket(Object packet) {
+        Bukkit.getOnlinePlayers().forEach(player -> sendPacket(player, packet));
     }
 
     public static void sendPacket(Player to, Object packet) {

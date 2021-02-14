@@ -11,11 +11,10 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.result.Query;
-import de.lystx.cloudsystem.library.result.Result;
 import de.lystx.cloudsystem.library.result.ResultPacket;
+import de.lystx.cloudsystem.library.result.packets.ResultPacketStats;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
@@ -24,17 +23,14 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Getter @Setter
@@ -44,13 +40,13 @@ public class CloudAPI {
 
     private NetworkConfig networkConfig;
     private PermissionPool permissionPool;
-    private Statistics statistics;
 
     private final CloudLibrary cloudLibrary;
     private final CloudClient cloudClient;
     private final CloudNetwork network;
     private final Templates templates;
     private final CloudPlayers cloudPlayers;
+    private final ExecutorService executorService;
 
     private boolean nametags;
     private boolean useChat;
@@ -61,12 +57,12 @@ public class CloudAPI {
         instance = this;
         this.cloudLibrary = new CloudLibrary(CloudLibrary.Type.CLOUDAPI);
         this.cloudClient =  this.cloudLibrary.getCloudClient();
+        this.executorService = Executors.newCachedThreadPool();
 
         this.network = new CloudNetwork(this);
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool(cloudLibrary);
         this.templates = new Templates(this);
-        this.statistics = new Statistics();
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
         this.useChat = false;
@@ -94,10 +90,8 @@ public class CloudAPI {
         this.cloudClient.disconnect();
     }
 
-    private ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
     public Query sendQuery(ResultPacket packet) {
-       return new Query(packet, this.cloudClient).startQuery();
+       return new Query(packet, this.cloudClient);
     }
 
     public void shutdown() {
@@ -144,8 +138,15 @@ public class CloudAPI {
     public Scheduler getScheduler() {
         return this.cloudLibrary.getService(Scheduler.class);
     }
-    
-    
+
+    public void getStatistics(Consumer<Statistics> consumer) {
+        this.sendQuery(new ResultPacketStats()).onDocumentSet(document -> {
+            Statistics statistics = new Statistics();
+            statistics.load(document);
+            consumer.accept(statistics);
+        });
+    }
+
     public void updatePermissions(String player, UUID uuid, String ipAddress, Consumer<String> accept) {
         this.permissionPool.checkFix(player, this.cloudClient);
         CloudPlayerData data = this.permissionPool.getPlayerDataOrDefault(player);

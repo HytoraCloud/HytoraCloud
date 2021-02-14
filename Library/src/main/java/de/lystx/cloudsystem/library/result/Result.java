@@ -21,12 +21,12 @@ public class Result implements Serializable {
         this.error = false;
     }
 
-    public Document getResult() {
+    public Document getDocument() {
         return new Document(this.result);
     }
 
     public <T> T getResultAs(Class<T> tClass) {
-        return this.getResult().getObject(this.getResult().getJsonObject(), tClass);
+        return this.getDocument().getObject(this.getDocument().getJsonObject(), tClass);
     }
 
     public Result onError(Runnable runnable) {
@@ -37,7 +37,7 @@ public class Result implements Serializable {
     }
 
     public Result onDocumentSet(Consumer<Document> consumer) {
-        consumer.accept(this.getResult());
+        consumer.accept(this.getDocument());
         return this;
     }
 

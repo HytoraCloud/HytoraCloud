@@ -90,26 +90,26 @@ public class Hologram {
     }
 
     private void sendToPlayer(Player player) {
-            if (isPlayerLoaded(player))
-                return;
-            this.loadedPlayers.add(player);
-            double locX = this.location.getX();
-            double locY = this.location.getY();
-            double locZ = this.location.getZ();
+        if (isPlayerLoaded(player))
+            return;
+        this.loadedPlayers.add(player);
+        double locX = this.location.getX();
+        double locY = this.location.getY();
+        double locZ = this.location.getZ();
 
-            for (HoloLine holoLine : this.lines) {
-                Location spawnLocation = new Location(this.location.getWorld(), locX, locY, locZ);
-                Object[] spawnPackets;
-                for (int length = (spawnPackets = holoLine.getSpawnPackets(spawnLocation)).length, i = 0; i < length; i++) {
-                    Object packet = spawnPackets[i];
-                    Reflections.sendPacket(player, packet);
-                }
-                if (holoLine instanceof ItemLine) {
-                    locY--;
-                    continue;
-                }
-                locY -= 0.3D;
+        for (HoloLine holoLine : this.lines) {
+            Location spawnLocation = new Location(this.location.getWorld(), locX, locY, locZ);
+            Object[] spawnPackets;
+            for (int length = (spawnPackets = holoLine.getSpawnPackets(spawnLocation)).length, i = 0; i < length; i++) {
+                Object packet = spawnPackets[i];
+                Reflections.sendPacket(player, packet);
             }
+            if (holoLine instanceof ItemLine) {
+                locY--;
+                continue;
+            }
+            locY -= 0.3D;
+        }
     }
 
     private void removeFromPlayer(Player player) {
@@ -245,7 +245,7 @@ public class Hologram {
 
 
     public class ItemLine implements HoloLine {
-        
+
         private int armorStandID;
         private int itemID;
         private ItemStack itemStack;

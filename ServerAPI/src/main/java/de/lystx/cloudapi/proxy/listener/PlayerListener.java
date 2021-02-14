@@ -31,9 +31,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void handlePreLogin(LoginEvent event) {
         CloudConnection connection = new CloudConnection(event.getConnection().getUniqueId(), this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId()), event.getConnection().getAddress().getAddress().getHostAddress());
-
         CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(connection.getName());
-
         if (cloudPlayer == null) {
             cloudAPI.sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(connection.getName(), connection.getUuid(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName())));
 

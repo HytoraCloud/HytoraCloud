@@ -9,6 +9,7 @@ import de.lystx.cloudapi.bukkit.listener.PlayerListener;
 import de.lystx.cloudapi.bukkit.manager.labymod.LabyMod;
 import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
 import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
+import de.lystx.cloudapi.bukkit.manager.npc.impl.SkinFetcher;
 import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudapi.bukkit.manager.CloudManager;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
@@ -33,6 +34,7 @@ public class CloudServer extends JavaPlugin {
     private SignManager signManager;
     private NametagManager nametagManager;
     private NPCManager npcManager;
+    private SkinFetcher skinFetcher;
     private LabyMod labyMod;
     private boolean useLabyMod;
     private boolean newVersion;
@@ -45,6 +47,8 @@ public class CloudServer extends JavaPlugin {
         this.manager = new CloudManager(this.cloudAPI);
         this.signManager = new SignManager(this);
         this.nametagManager = new NametagManager();
+        this.skinFetcher = new SkinFetcher();
+        this.npcManager = new NPCManager();
         try {
             Class.forName("net.minecraft.server.v1_8_R3.Packet");
             this.npcManager = new NPCManager();
@@ -133,7 +137,7 @@ public class CloudServer extends JavaPlugin {
                         }
                         player.addAttachment(this, s, true);
                     } catch (IllegalStateException e) {
-                        System.out.println("[CLOUDAPI] Something went wrong while updating permissions for " + player.getName());
+                        //System.out.println("[CLOUDAPI] Something went wrong while updating permissions for " + player.getName());
                     }
                 });
             } else {

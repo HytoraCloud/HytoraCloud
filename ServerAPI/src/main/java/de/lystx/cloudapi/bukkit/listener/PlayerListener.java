@@ -6,8 +6,6 @@ import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.result.Query;
-import de.lystx.cloudsystem.library.result.Result;
 import de.lystx.cloudsystem.library.result.packets.login.ResultPacketLoginSuccess;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
@@ -112,7 +110,7 @@ public class PlayerListener implements Listener {
                 try {
                     packetReader.inject();
                     this.packetReaders.put(player.getUniqueId(), packetReader);
-                    CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
+                    CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player, true);
                     if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 

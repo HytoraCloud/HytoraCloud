@@ -24,17 +24,14 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
     private final NetworkConfig networkConfig;
     private final Map<ServiceGroup, List<Service>> services;
 
-    public PacketPlayOutGlobalInfo(NetworkConfig networkConfig, Map<ServiceGroup, List<Service>> services, PermissionPool permissionPool, List<CloudPlayer> cloudPlayers, Statistics statistics, List<CloudSign> cloudSigns, Document signLayOut, Document npcs, NPCConfig npcConfig) {
+    public PacketPlayOutGlobalInfo(NetworkConfig networkConfig, Map<ServiceGroup, List<Service>> services, PermissionPool permissionPool, List<CloudPlayer> cloudPlayers, List<CloudSign> cloudSigns, Document signLayOut) {
         this.networkConfig = networkConfig;
         this.services = services;
 
 
         this.append("cloudSigns", cloudSigns);
         this.append("cloudPlayers", cloudPlayers);
-        this.append("stats", statistics.toDocument().getJsonObject());
         this.append("signLayOut", signLayOut.toString());
-        this.append("npcs", npcs.toString());
-        this.append("npcConfig", npcConfig);
         try {
             this.append("permissionPool", new Document()
                     .append("enabled", permissionPool.isEnabled())
@@ -46,16 +43,9 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
 
     }
 
-    public String getNpcs() {
-        return this.document().getString("npcs");
-    }
 
     public String getSignLayOut() {
         return this.document().getString("signLayOut");
-    }
-
-    public NPCConfig getNpcConfig() {
-        return this.document().getObject("npcConfig", NPCConfig.class);
     }
 
 
@@ -65,12 +55,6 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
         permissionPool.setPermissionGroups(this.document().getDocument("permissionPool").getList("groups", PermissionGroup.class));
         permissionPool.setPlayerCache(this.document().getDocument("permissionPool").getList("cache", CloudPlayerData.class));
         return permissionPool;
-    }
-
-    public Statistics getStatistics() {
-        Statistics statistics = new Statistics();
-        statistics.load(this.document().getDocument("stats"));
-        return statistics;
     }
 
     public List<CloudPlayer> getCloudPlayers() {

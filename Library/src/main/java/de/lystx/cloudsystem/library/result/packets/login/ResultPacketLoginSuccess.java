@@ -37,7 +37,9 @@ public class ResultPacketLoginSuccess extends ResultPacket implements Serializab
         document.append("cloudPlayer", cloudPlayer);
         document.append("allow", cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName()) != null);
         if (!(!cloudLibrary.isRunning() || (cloudLibrary.getScreenPrinter().getScreen() != null && cloudLibrary.getScreenPrinter().isInScreen()))) {
-            cloudLibrary.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is connected on §a" + cloudPlayer.getServer() + " §7| §bProxy " + cloudPlayer.getProxy());
+            if (cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName()) == null) {
+                cloudLibrary.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is connected on §a" + cloudPlayer.getServer() + " §7| §bProxy " + cloudPlayer.getProxy());
+            }
         }
 
         return document;

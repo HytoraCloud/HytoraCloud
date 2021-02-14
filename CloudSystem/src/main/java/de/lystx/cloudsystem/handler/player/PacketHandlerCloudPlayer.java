@@ -37,6 +37,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInRegisterCloudPlayer) {
+            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
             PacketPlayInRegisterCloudPlayer packetPlayInRegisterCloudPlayer = (PacketPlayInRegisterCloudPlayer) packet;
             CloudPlayer cloudPlayer = packetPlayInRegisterCloudPlayer.getCloudPlayer();
             cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerData(cloudPlayer.getName()));
@@ -63,9 +64,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             if (!this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(cloudPlayer)) {
                 this.cloudSystem.getService(StatisticsService.class).getStatistics().add("registeredPlayers");
             }
-            if (!cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
-                this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
-            }
+
             this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerJoin(cloudPlayer));
             this.cloudSystem.reload();
         } else if (packet instanceof PacketCommunicationUpdateCloudPlayer) {
@@ -88,7 +87,6 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             }
         } else if (packet instanceof PacketPlayInPlayerExecuteCommand) {
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
-            this.cloudSystem.reload();
        } else if (packet instanceof PacketPlayInUnregisterCloudPlayer) {
             PacketPlayInUnregisterCloudPlayer packetPlayInUnregisterCloudPlayer = (PacketPlayInUnregisterCloudPlayer)packet;
             CloudPlayer cloudPlayer = this
@@ -110,7 +108,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
                 if (cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
                     //this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cPlayer §e" + cloudPlayer.getName() + " §ccouldnt be logged in!");
                 } else {
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is disconnected from §a" + cloudPlayer.getServer());
+                   // this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is disconnected from §a" + cloudPlayer.getServer());
                 }
 
             }

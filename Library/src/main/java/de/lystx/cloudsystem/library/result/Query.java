@@ -10,10 +10,10 @@ import lombok.Getter;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-@Getter
 public class Query extends Thread {
 
-    private final Value<Result> result;
+    private final Value<Result> value;
+    @Getter
     private final UUID uuid;
     private final ResultPacket resultPacket;
     private final CloudClient cloudExecutor;
@@ -24,16 +24,12 @@ public class Query extends Thread {
     public Query(ResultPacket resultPacket, CloudClient cloudExecutor) {
         this.resultPacket = resultPacket;
         this.uuid = UUID.randomUUID();
-        this.result = new Value<>();
+        this.value = new Value<>();
         this.cloudExecutor = cloudExecutor;
         this.count = 0;
-    }
-
-
-    public Query startQuery() {
         this.start();
-        return this;
     }
+
 
     @Override
     public void run() {
@@ -43,7 +39,7 @@ public class Query extends Thread {
                 if (packet instanceof ResultPacket) {
                     ResultPacket resultPacket = (ResultPacket)packet;
                     if (uuid.equals(resultPacket.getUniqueId())) {
-                        result.set(resultPacket.getResult());
+                        value.set(resultPacket.getResult());
                         cloudExecutor.getPacketAdapter().unregisterAdapter(this);
                     }
                 }
@@ -51,7 +47,7 @@ public class Query extends Thread {
         });
         this.cloudExecutor.sendPacket(this.resultPacket.uuid(uuid));
 
-        while (result.get() == null && count++ < 3000) {
+        while (value.get() == null && count++ < 3000) {
             try {
                 Thread.sleep(0, 500000);
             } catch (InterruptedException e) {
@@ -61,13 +57,13 @@ public class Query extends Thread {
         if (count >= 2999) {
             Result r = new Result(uuid, new Document());
             r.setError(true);
-            result.set(r);
+            value.set(r);
         }
         if (this.consumer != null) {
-            this.consumer.accept(result.get());
+            this.consumer.accept(value.get());
         }
         if (this.documentConsumer != null) {
-            this.documentConsumer.accept(result.get().getResult());
+            this.documentConsumer.accept(value.get().getDocument());
         }
     }
 
@@ -79,5 +75,9 @@ public class Query extends Thread {
     public Query onResultSet(Consumer<Result> consumer) {
         this.consumer = consumer;
         return this;
+    }
+
+    public Result getResult() {
+        return this.value.get();
     }
 }

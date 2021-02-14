@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
+import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
 import de.lystx.cloudsystem.library.elements.packets.wrapper.WrapperPacketGlobalInfo;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
@@ -89,25 +90,25 @@ public class CloudSystem extends CloudLibrary {
         this.cloudServices.add(new NPCService(this, "NPCs", CloudService.Type.MANAGING));
         this.cloudServices.add(new EventService(this, "Event", CloudService.Type.MANAGING));
 
-        this.getService(CommandService.class).registerCommand(new ShutdownCloudCommand("shutdown", "Stops the cloudsystem", "exit", "destroy"));
-        this.getService(CommandService.class).registerCommand(new HelpCloudCommand("help", "Shows you this message", "?", "whattodo"));
-        this.getService(CommandService.class).registerCommand(new ExecuteCloudCommand("execute", "Sends a command to a server", "cmd", "command"));
-        this.getService(CommandService.class).registerCommand(new ReloadCloudCommand("reload", "Reloads the network", "rl"));
-        this.getService(CommandService.class).registerCommand(new ClearCloudCommand("clear", "Clears the console", "cl"));
-        this.getService(CommandService.class).registerCommand(new EditCloudCommand("edit", "Edits a serverGroup"));
-        this.getService(CommandService.class).registerCommand(new StopCloudCommand("stop", "Stops a service or group"));
-        this.getService(CommandService.class).registerCommand(new MaintenanceCloudCommand("maintenance", "Manages maintenance of network", "mc"));
-        this.getService(CommandService.class).registerCommand(new InfoCloudCommand("info", "Shows information", "information"));
-        this.getService(CommandService.class).registerCommand(new CreateCloudCommand("create", "Creates cloudstuff", "add"));
-        this.getService(CommandService.class).registerCommand(new PermsCloudCommand("perms", "Manages permissions", "cperms", "permissions"));
-        this.getService(CommandService.class).registerCommand(new RunCloudCommand("run", "Starts new services", "start"));
-        this.getService(CommandService.class).registerCommand(new ScreenCloudCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
-        this.getService(CommandService.class).registerCommand(new PlayerCloudCommand("player", "Manages players on the network", "players"));
-        this.getService(CommandService.class).registerCommand(new ModulesCloudCommand("modules", "Manages modules", "pl", "plugins"));
-        this.getService(CommandService.class).registerCommand(new DeleteCloudCommand("delete", "Deletes stuff", "remove"));
-        this.getService(CommandService.class).registerCommand(new DownloadCloudCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
-        this.getService(CommandService.class).registerCommand(new UpdateCloudCommand("update", "Updates the cloud"));
-        this.getService(CommandService.class).registerCommand(new LogCloudCommand("log", "Logs a server or all"));
+        this.getService(CommandService.class).registerCommand(new ShutdownCommand("shutdown", "Stops the cloudsystem", "exit", "destroy"));
+        this.getService(CommandService.class).registerCommand(new HelpCommand("help", "Shows you this message", "?", "whattodo"));
+        this.getService(CommandService.class).registerCommand(new ExecuteCommand("execute", "Sends a command to a server", "cmd", "command"));
+        this.getService(CommandService.class).registerCommand(new ReloadCommand("reload", "Reloads the network", "rl"));
+        this.getService(CommandService.class).registerCommand(new ClearCommand("clear", "Clears the console", "cl"));
+        this.getService(CommandService.class).registerCommand(new EditCommand("edit", "Edits a serverGroup"));
+        this.getService(CommandService.class).registerCommand(new StopCommand("stop", "Stops a service or group"));
+        this.getService(CommandService.class).registerCommand(new MaintenanceCommand("maintenance", "Manages maintenance of network", "mc"));
+        this.getService(CommandService.class).registerCommand(new InfoCommand("info", "Shows information", "information"));
+        this.getService(CommandService.class).registerCommand(new CreateCommand("create", "Creates cloudstuff", "add"));
+        this.getService(CommandService.class).registerCommand(new PermsCommand("perms", "Manages permissions", "cperms", "permissions"));
+        this.getService(CommandService.class).registerCommand(new RunCommand("run", "Starts new services", "start"));
+        this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
+        this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
+        this.getService(CommandService.class).registerCommand(new ModulesCommand("modules", "Manages modules", "pl", "plugins"));
+        this.getService(CommandService.class).registerCommand(new DeleteCommand("delete", "Deletes stuff", "remove"));
+        this.getService(CommandService.class).registerCommand(new DownloadCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
+        this.getService(CommandService.class).registerCommand(new UpdateCommand("update", "Updates the cloud"));
+        this.getService(CommandService.class).registerCommand(new LogCommand("log", "Logs a server or all"));
         this.getService(CommandService.class).registerCommand(new BackupCommand("backup", "Creates a backup of the current cloud"));
         this.getService(CommandService.class).registerCommand(new TpsCommand("tps", "Lets you view the current tps of the cloud"));
 
@@ -128,6 +129,10 @@ public class CloudSystem extends CloudLibrary {
         }
         this.authManager = new AuthManager(new File("wrapper.cloudkey"));
         this.authManager.createKey();
+    }
+
+    public void reloadNPCS() {
+        this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNPCs(this.getService(NPCService.class).getNPCConfig(), this.getService(NPCService.class).getDocument()));
     }
 
     public void reload() {
@@ -151,11 +156,8 @@ public class CloudSystem extends CloudLibrary {
                     this.getService().getServices(),
                     this.getService(PermissionService.class).getPermissionPool(),
                     this.getService(CloudPlayerService.class).getOnlinePlayers(),
-                    this.getService(StatisticsService.class).getStatistics(),
                     this.getService(SignService.class).getCloudSigns(),
-                    this.getService(SignService.class).getSignLayOut().getDocument(),
-                    this.getService(NPCService.class).getDocument(),
-                    this.getService(NPCService.class).getNPCConfig()
+                    this.getService(SignService.class).getSignLayOut().getDocument()
             ));
             if (this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
                 this.getService(CloudNetworkService.class).sendPacket(new WrapperPacketGlobalInfo(

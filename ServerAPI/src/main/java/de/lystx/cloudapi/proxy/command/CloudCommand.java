@@ -2,6 +2,7 @@ package de.lystx.cloudapi.proxy.command;
 
 import com.google.common.collect.ImmutableList;
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -10,6 +11,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.result.packets.services.ResultPacketStartService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
+import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import net.md_5.bungee.api.CommandSender;
@@ -21,6 +23,7 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CloudCommand extends Command implements TabExecutor {
 
@@ -42,9 +45,9 @@ public class CloudCommand extends Command implements TabExecutor {
                         CloudAPI.getInstance().sendPacket(new PacketPlayInTPS(player.getName()));
                     } else if (args[0].equalsIgnoreCase("stats")) {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§bStatistics§8:");
-                        CloudAPI.getInstance().getStatistics().getStats().forEach((stats, i) -> {
+                        CloudAPI.getInstance().getStatistics(statistics -> statistics.getStats().forEach((stats, i) -> {
                             player.sendMessage(" §8» §b" + stats + " §8┃ §7" + i);
-                        });
+                        }));
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());
                         if (playerData == null) {
@@ -57,7 +60,8 @@ public class CloudCommand extends Command implements TabExecutor {
                         CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + (change ? "§7You will §anow receive §7Server notifications§8!" : "§7You will §cno longer receive §7Server notifications§8!"));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7CloudSystem Version §a1.0");
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7CloudSystem Version §a" + Updater.getCloudVersion());
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Your Cloud " + (Updater.isUpToDate() ? "is §aNewest version" : "§cneeds an update!"));
                     } else if (args[0].equalsIgnoreCase("shutdown")) {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Cloud will be shut down in §e3 Seconds§8...");
                         CloudAPI.getInstance().setJoinable(false);
@@ -85,7 +89,6 @@ public class CloudCommand extends Command implements TabExecutor {
                             }
                         });
 
-                       // CloudAPI.getInstance().getNetwork().startService(group);
 
                     } else if (args[0].equalsIgnoreCase("log")) {
                         String s = args[1];

@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 @Getter
@@ -30,5 +31,13 @@ public class NPCConfig implements Serializable {
         this.lore = lore;
         this.itemType = itemType;
         this.items = items;
+    }
+
+    public List<Document> getItems() {
+        List<Document> list = new LinkedList<>();
+        for (SerializableDocument item : this.items) {
+            list.add(item.toDocument());
+        }
+        return list;
     }
 }

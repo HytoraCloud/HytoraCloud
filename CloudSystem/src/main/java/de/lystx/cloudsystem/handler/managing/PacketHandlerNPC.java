@@ -1,6 +1,8 @@
 package de.lystx.cloudsystem.handler.managing;
 
 import de.lystx.cloudsystem.CloudSystem;
+import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
+import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateNPC;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInRemoveNPC;
@@ -22,12 +24,12 @@ public class PacketHandlerNPC extends PacketHandlerAdapter {
             this.cloudSystem.getService(NPCService.class).append(packetPlayInCreateNPC.getKey(), packetPlayInCreateNPC.getDocument());
             this.cloudSystem.getService(NPCService.class).save();
             this.cloudSystem.getService(NPCService.class).load();
-            this.cloudSystem.reload();
+            this.cloudSystem.reloadNPCS();
         } else if (packet instanceof PacketPlayInRemoveNPC) {
             this.cloudSystem.getService(NPCService.class).remove(((PacketPlayInRemoveNPC) packet).getKey());
             this.cloudSystem.getService(NPCService.class).save();
             this.cloudSystem.getService(NPCService.class).load();
-            this.cloudSystem.reload();
+            this.cloudSystem.reloadNPCS();
         }
     }
 }

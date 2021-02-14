@@ -27,7 +27,6 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
             this.cloudAPI.setNetworkConfig(info.getNetworkConfig());
             this.cloudAPI.setPermissionPool(info.getPermissionPool());
             this.cloudAPI.getNetwork().setServices(info.getServices());
-            this.cloudAPI.setStatistics(info.getStatistics());
             this.cloudAPI.getCloudPlayers().setCloudPlayers(info.getCloudPlayers());
 
             for (List<Service> value : info.getServices().values()) {

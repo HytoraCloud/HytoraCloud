@@ -5,7 +5,7 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.events.CloudServerNPCInteractEvent;
 import de.lystx.cloudapi.bukkit.manager.Item;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -35,11 +35,13 @@ public class NPCListener implements Listener {
         this.services = new HashMap<>();
     }
 
+
+
     @EventHandler
     public void onInteract(CloudServerNPCInteractEvent event) {
-        NPC npc = event.getNPC();
+        NPC npcV18R3V18R3 = event.getNPC();
         Player player = event.getPlayer();
-        String group = CloudServer.getInstance().getNpcManager().getGroupNPCS().get(npc);
+        String group = CloudServer.getInstance().getNpcManager().getGroupNPCS().get(npcV18R3V18R3);
         if (group == null) {
             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cCan't handle NPC because group was not found!");
             return;
@@ -77,6 +79,8 @@ public class NPCListener implements Listener {
         }
     }
 
+
+
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         this.services.remove(event.getPlayer().getUniqueId());
@@ -110,14 +114,14 @@ public class NPCListener implements Listener {
         }
         List<Service> list = CloudAPI.getInstance().getNetwork().getServices(serviceGroup);
 
-        for (SerializableDocument document : config.getItems()) {
-            List<String> lore = document.get("lore", ArrayList.class);
+        for (Document document : config.getItems()) {
+            List<String> lore = document.getList("lore", String.class);
             for (String s : lore) {
                 lore.set(lore.indexOf(s), this.replace(s, null, serviceGroup));
             }
-            double slot = document.get("slot", double.class);
-            inventory.setItem((int)slot, new Item(Material.valueOf(document.get("type", String.class)))
-                    .setDisplayName(this.replace(document.get("name", String.class), null, serviceGroup))
+            double slot = document.getDouble("slot");
+            inventory.setItem((int)slot, new Item(Material.valueOf(document.getString("type")))
+                    .setDisplayName(this.replace(document.getString("name"), null, serviceGroup))
                     .addLoreAll(lore)
                     .build());
         }

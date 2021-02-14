@@ -3,6 +3,7 @@ package de.lystx.cloudapi.bukkit.command;
 import com.sun.management.OperatingSystemMXBean;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
+import de.lystx.cloudapi.bukkit.manager.Reflections;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
@@ -75,6 +76,10 @@ public class ServiceCommand implements CommandExecutor {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return false;
                         }
+                        if (CloudServer.getInstance().isNewVersion()) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
+                            return false;
+                        }
 
                         if (!deleters.contains(player.getUniqueId())) {
                             deleters.add(player.getUniqueId());
@@ -144,9 +149,13 @@ public class ServiceCommand implements CommandExecutor {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return false;
                         }
+                        if (CloudServer.getInstance().isNewVersion()) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
+                            return false;
+                        }
                         String groupName = args[1];
-                        NPC npc = CloudServer.getInstance().getNpcManager().getNPC(player.getLocation());
-                        if (npc != null) {
+                        NPC npcV18R3V18R3 = CloudServer.getInstance().getNpcManager().getNPC(player.getLocation());
+                        if (npcV18R3V18R3 != null) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThere is already an §eNPC §cfor this location!");
                             return false;
                         }
@@ -181,7 +190,6 @@ public class ServiceCommand implements CommandExecutor {
         player.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
         player.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
         player.sendMessage("§8§m--------------------------------------");
-
     }
 
 
