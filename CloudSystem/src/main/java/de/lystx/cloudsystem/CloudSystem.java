@@ -109,7 +109,7 @@ public class CloudSystem extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new UpdateCloudCommand("update", "Updates the cloud"));
         this.getService(CommandService.class).registerCommand(new LogCloudCommand("log", "Logs a server or all"));
         this.getService(CommandService.class).registerCommand(new BackupCommand("backup", "Creates a backup of the current cloud"));
-        this.getService(CommandService.class).registerCommand(new TpsCommand("backup", "Creates a backup of the current cloud"));
+        this.getService(CommandService.class).registerCommand(new TpsCommand("tps", "Lets you view the current tps of the cloud"));
 
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             if (this.getService(ConfigService.class).getNetworkConfig().isAutoUpdater()) {
@@ -132,6 +132,7 @@ public class CloudSystem extends CloudLibrary {
 
     public void reload() {
         try {
+            this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
             this.getService().setServiceGroups(this.getService(GroupService.class).getGroups());
             this.getService(PermissionService.class).load();
             this.getService(PermissionService.class).loadEntries();

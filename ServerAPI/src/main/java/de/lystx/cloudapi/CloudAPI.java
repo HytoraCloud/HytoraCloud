@@ -10,6 +10,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInComman
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.result.Query;
 import de.lystx.cloudsystem.library.result.Result;
 import de.lystx.cloudsystem.library.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
@@ -30,13 +31,16 @@ import lombok.Setter;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudAPI {
 
     private static CloudAPI instance;
-    private final Map<UUID, Value<Result>> synchronizedHandlers = new HashMap<>();
 
     private NetworkConfig networkConfig;
     private PermissionPool permissionPool;
@@ -90,39 +94,10 @@ public class CloudAPI {
         this.cloudClient.disconnect();
     }
 
-    public Result sendQuery(ResultPacket packet) {
-        long start = System.currentTimeMillis();
-        Value<Result> result = new Value<>();
-        UUID uuid = UUID.randomUUID();
-        packet.setUniqueId(uuid);
-        this.sendPacket(packet);
+    private ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-        this.cloudClient.registerPacketHandler(new PacketHandlerAdapter() {
-            @Override
-            public void handle(Packet packet) {
-                if (packet instanceof ResultPacket) {
-                    ResultPacket resultPacket = (ResultPacket)packet;
-                    UUID id = resultPacket.getUniqueId();
-                    if (uuid.equals(id)) {
-                        Result result1 = resultPacket.getResult();
-                        result1.setAction(System.currentTimeMillis() - start);
-                        result.set(result1);
-                        cloudClient.getPacketAdapter().unregisterAdapter(this);
-                    }
-                }
-            }
-        });
-
-        int i = 0;
-        while (result.get() == null && i++ < 5000) {
-            try {
-                Thread.sleep(0, 500000);
-            } catch (InterruptedException ignored) {}
-        }
-        if (i >= 4999) {
-            result.set(new Result(uuid, new Document()));
-        }
-        return result.get();
+    public Query sendQuery(ResultPacket packet) {
+       return new Query(packet, this.cloudClient).startQuery();
     }
 
     public void shutdown() {

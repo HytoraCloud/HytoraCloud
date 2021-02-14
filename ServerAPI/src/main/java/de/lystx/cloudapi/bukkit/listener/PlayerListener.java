@@ -4,11 +4,13 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.result.Query;
+import de.lystx.cloudsystem.library.result.Result;
+import de.lystx.cloudsystem.library.result.packets.login.ResultPacketLoginSuccess;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import org.bukkit.Bukkit;
@@ -36,16 +38,6 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void handleAsyncPlayerLogin(AsyncPlayerPreLoginEvent event) {
-        for (Player all : Bukkit.getOnlinePlayers()) {
-            if (all.getUniqueId().equals(event.getUniqueId())) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.translateAlternateColorCodes('&', "&cAlready on this service!"));
-                return;
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
     public void handleSyncPlayerLoginEvent(PlayerLoginEvent event) {
         if (CloudAPI.getInstance().getNetwork().getServices().isEmpty()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cThere was a massive error! Please report it to an Administrator!");
@@ -53,7 +45,7 @@ public class PlayerListener implements Listener {
         }
         if (!CloudAPI.getInstance().isJoinable()) {
             try {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cThis serviec ist not joinable yet§c!");
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, CloudAPI.getInstance().getPrefix() + "§cThis service ist not joinable yet§c!");
             } catch (NullPointerException e) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§cThere was an error§c! Try again!");
             }
@@ -61,6 +53,8 @@ public class PlayerListener implements Listener {
             CloudServer.getInstance().updatePermissions(event.getPlayer());
         }
     }
+
+
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
@@ -85,58 +79,57 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
+
         CloudServer.getInstance().setWaitingForPlayer(false); //Disables stopping server in 1 minute if nobody joined
         Player player = event.getPlayer();
-        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
-        if (cloudPlayer != null) {
-            CloudAPI.getInstance().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer).setSendMessage(true));
-            CloudAPI.getInstance().sendPacket(new PacketPlayInCloudPlayerServerChange(cloudPlayer, CloudAPI.getInstance().getService().getName()));
-        }
 
-        if (CloudServer.getInstance().isUseLabyMod() && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
-            if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
-                CloudServer.getInstance().getLabyMod().disableVoiceChat(player);
+        CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
+
+        CloudAPI.getInstance().sendQuery(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName())).onDocumentSet(document -> {
+
+            if (!document.getBoolean("allow", true)) {
+                Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cThere was an error! It seems like you are already on the network or tried to connect twice!"));
+                return;
             }
-
-            CloudServer.getInstance().getLabyMod().sendCurrentPlayingGamemode(player, true, CloudAPI.getInstance().getNetworkConfig().getLabyModConfig()
-                    .getServerSwitchMessage().replace("&", "§").replace("%service%", CloudAPI.getInstance().getService().getName())
-                    .replace("%group%", CloudAPI.getInstance().getService().getServiceGroup().getName())
-                    .replace("%online_players%", Bukkit.getOnlinePlayers().size() + " ")
-                    .replace("%max_players%", Bukkit.getMaxPlayers() + " "));
-        }
-        int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
-        if (percent <= 100 && ((Bukkit.getOnlinePlayers().size() / Bukkit.getMaxPlayers()) * 100) >= percent) {
-            CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new Document().append("waitingForPlayers", true));
-        }
-
-        //NPCs injecting for InteractEvent
-        if (!CloudServer.getInstance().isNewVersion()) {
-            PacketReader packetReader = new PacketReader(player);
-            try {
-                packetReader.inject();
-                this.packetReaders.put(player.getUniqueId(), packetReader);
-                CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
-                if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-
-                        PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
-                        if (group == null) {
-                            CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cPlayer §e" + player.getName() + " §ccouldn't update permissionGroup");
-                            return;
-                        }
-                        CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
-                    }
+            if (CloudServer.getInstance().isUseLabyMod() && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
+                if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
+                    CloudServer.getInstance().getLabyMod().disableVoiceChat(player);
                 }
-            } catch (NoSuchElementException e){
-                e.printStackTrace();
-            }
-        }
-        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
-            if (CloudAPI.getInstance().getCloudPlayers().get(player.getName()) == null) {
-                CloudAPI.getInstance().sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), CloudAPI.getInstance().getService().getName(), "No Proxy Found")));
-            }
-        }, 5L);
 
+                CloudServer.getInstance().getLabyMod().sendCurrentPlayingGamemode(player, true, CloudAPI.getInstance().getNetworkConfig().getLabyModConfig()
+                        .getServerSwitchMessage().replace("&", "§").replace("%service%", CloudAPI.getInstance().getService().getName())
+                        .replace("%group%", CloudAPI.getInstance().getService().getServiceGroup().getName())
+                        .replace("%online_players%", Bukkit.getOnlinePlayers().size() + " ")
+                        .replace("%max_players%", Bukkit.getMaxPlayers() + " "));
+            }
+            int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
+            if (percent <= 100 && ((Bukkit.getOnlinePlayers().size() / Bukkit.getMaxPlayers()) * 100) >= percent) {
+                CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new Document().append("waitingForPlayers", true));
+            }
+
+            //NPCs injecting for InteractEvent
+            if (!CloudServer.getInstance().isNewVersion()) {
+                PacketReader packetReader = new PacketReader(player);
+                try {
+                    packetReader.inject();
+                    this.packetReaders.put(player.getUniqueId(), packetReader);
+                    CloudServer.getInstance().getNpcManager().updateNPCS(CloudServer.getInstance().getNpcManager().getDocument(), player);
+                    if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
+                        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+
+                            PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
+                            if (group == null) {
+                                CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cPlayer §e" + player.getName() + " §ccouldn't update permissionGroup");
+                                return;
+                            }
+                            CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
+                        }
+                    }
+                } catch (NoSuchElementException e){
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @EventHandler

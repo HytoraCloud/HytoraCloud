@@ -13,11 +13,12 @@ public class Result implements Serializable {
 
     private final UUID uniqueId;
     private final String result;
-    private long action;
+    private boolean error;
 
     public Result(UUID uniqueId, Document result) {
         this.uniqueId = uniqueId;
         this.result = result.toString();
+        this.error = false;
     }
 
     public Document getResult() {
@@ -26,6 +27,13 @@ public class Result implements Serializable {
 
     public <T> T getResultAs(Class<T> tClass) {
         return this.getResult().getObject(this.getResult().getJsonObject(), tClass);
+    }
+
+    public Result onError(Runnable runnable) {
+        if (this.error) {
+            runnable.run();
+        }
+        return this;
     }
 
     public Result onDocumentSet(Consumer<Document> consumer) {

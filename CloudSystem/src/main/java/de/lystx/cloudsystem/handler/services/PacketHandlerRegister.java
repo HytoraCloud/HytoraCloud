@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegi
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import lombok.Getter;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
@@ -25,7 +26,7 @@ public class PacketHandlerRegister extends PacketHandlerAdapter {
             this.cloudSystem.getService().registerService(service);
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("startedServices");
             this.cloudSystem.reload();
-            //this.cloudSystem.getService(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 10L);
+            this.cloudSystem.getService(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 5L);
         }
     }
 }

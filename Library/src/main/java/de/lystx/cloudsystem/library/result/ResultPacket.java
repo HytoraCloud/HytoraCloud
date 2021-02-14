@@ -17,4 +17,9 @@ public abstract class ResultPacket extends Packet implements Serializable {
 
     public abstract Document read(CloudLibrary cloudLibrary);
 
+
+    public ResultPacket uuid(UUID uuid) {
+        this.setUniqueId(uuid);
+        return this;
+    }
 }

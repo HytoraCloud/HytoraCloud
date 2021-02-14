@@ -9,6 +9,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegis
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.result.packets.*;
+import de.lystx.cloudsystem.library.result.packets.login.ResultPacketLogin;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudapi.proxy.CloudProxy;
@@ -32,45 +33,58 @@ public class PlayerListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void handleLoginEvent(LoginEvent event) {
+    @EventHandler
+    public void handleLogin(LoginEvent event) {
         CloudConnection connection = new CloudConnection(event.getConnection().getUniqueId(), this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId()), event.getConnection().getAddress().getAddress().getHostAddress());
-        this.cloudAPI.sendQuery(new ResultPacketCloudPlayerLoginVerify(connection)).onDocumentSet(document -> {
-            if (document.get("cloudPlayer") != null) {
-                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
-                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
-                if (failEvent.isCancelled()) {
-                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+
+        this.cloudAPI.sendQuery(new ResultPacketLogin(connection, CloudAPI.getInstance().getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName())).onDocumentSet(document -> {
+
+            if (document.getBoolean("already")) {
+                CloudLoginFailEvent cloudLoginFailEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
+                ProxyServer.getInstance().getPluginManager().callEvent(cloudLoginFailEvent);
+                if (cloudLoginFailEvent.isCancelled()) {
+                    event.setCancelled(true);
+                    event.setCancelReason(new TextComponent(cloudLoginFailEvent.getCancelReason()));
                 } else {
+                    event.setCancelled(true);
                     event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
                 }
-                event.setCancelled(true);
-                return;
-            }
-            if (!cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
-                return;
-            }
-            if (cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance() && !cloudAPI.getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(connection.getName()) && !cloudAPI.getPermissionPool().hasPermission(connection.getName(), "cloudsystem.network.maintenance")) {
-                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.MAINTENANCE);
-                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
-                event.setCancelled(true);
-                if (failEvent.isCancelled()) {
-                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
-                } else {
-                    event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
-                }
-            }
-            if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers()) {
-                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.NETWORK_FULL);
-                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
-                event.setCancelled(true);
-                if (failEvent.isCancelled()) {
-                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
-                } else {
-                    event.setCancelReason(new TextComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
-                }
-            }
+            } else {
 
+                if (!cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
+                    return;
+                }
+
+                if (cloudAPI.getNetworkConfig()
+                        .getProxyConfig().isMaintenance()
+                        &&
+                        !cloudAPI.getNetworkConfig().getProxyConfig()
+                                .getWhitelistedPlayers().contains(connection.getName())
+                        &&
+                        !cloudAPI.getPermissionPool()
+                                .hasPermission(connection.getName(), "cloudsystem.network.maintenance")) {
+
+                    CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.MAINTENANCE);
+                    ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
+                    if (failEvent.isCancelled()) {
+                        event.setCancelled(true);
+                        event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+                    } else {
+                        event.setCancelled(true);
+                        event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
+                    }
+                }
+                if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers()) {
+                    CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.NETWORK_FULL);
+                    ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
+                    event.setCancelled(true);
+                    if (failEvent.isCancelled()) {
+                        event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+                    } else {
+                        event.setCancelReason(new TextComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
+                    }
+                }
+            }
         });
     }
 
@@ -131,9 +145,6 @@ public class PlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                try {
-                    this.registerPlayer(player, event.getTarget());
-                } catch (NullPointerException e) {}
             }
         } catch (IllegalStateException e){
             e.printStackTrace();
@@ -144,31 +155,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
-       // CloudProxy.getInstance().updatePermissions(player);
-    }
-
-
-    public void registerPlayer(ProxiedPlayer player, ServerInfo server) {
-        String s = "no_server_found";
-        if (server != null) {
-            s = server.getName();
-        }
-        this.registerPlayer(player.getName(), player.getUniqueId(), s, player.getAddress().getAddress().getHostAddress(), player.getPendingConnection().getVirtualHost().getPort());
-    }
-
-    public void registerPlayer(String name, UUID uuid, String server, String hostAddress, int proxyPort) {
-        try {
-            CloudPlayer cloudPlayer = new CloudPlayer(
-                    name,
-                    uuid,
-                    hostAddress,
-                    server,
-                    this.cloudAPI.getNetwork().getProxy(proxyPort).getName()
-            );
-
-            this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInRegisterCloudPlayer(cloudPlayer));
-
-        } catch (NullPointerException e){}
     }
 
     @EventHandler

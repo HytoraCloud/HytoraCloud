@@ -104,7 +104,7 @@ public class NettyServer extends Thread{
                if (channelFuture.isSuccess()) {
                    return;
                }
-               System.out.println("COULDN'T SENT PACKET -> " + packet.getClass().getSimpleName());
+              // System.out.println("[NettyServer] Couldn't send following packet > " + packet.getClass().getSimpleName());
            });
         }
     }

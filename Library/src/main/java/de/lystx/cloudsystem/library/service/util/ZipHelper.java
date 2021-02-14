@@ -130,6 +130,9 @@ public class ZipHelper {
      */
     private void getAllFiles(File dir) {
         for (File file : Objects.requireNonNull(dir.listFiles())) {
+            if (file.toString().contains("backup")) {
+                continue;
+            }
             this.files.add(file);
             if (file.isDirectory()) {
                 this.getAllFiles(file);

@@ -122,6 +122,7 @@ public class CloudBootingSetupNotDone {
             }
             cloudSystem.getService(Scheduler.class).scheduleDelayedTask(() -> {
                 cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
+                cloudSystem.getService(DatabaseService.class).getDatabase().connect();
                 PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
                 permissionPool.removePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Player"));
                 permissionPool.updatePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1, PermissionValidality.LIFETIME);

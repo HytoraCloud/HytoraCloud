@@ -49,7 +49,14 @@ public class ServiceProviderStart {
         try {
             cloudLibrary.getService(TemplateService.class).createTemplate(new File(template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate()), service.getServiceGroup());
             File templateLocation = new File(this.template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
-            File serverLocation = new File(service.getServiceGroup().isDynamic() ? this.dynamic : this.staticDir, service.getServiceGroup().getName() + "/" + service.getName() + "/");
+            File serverLocation = new File(
+                    service.getServiceGroup().isDynamic() ?
+                            (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ?
+                                    cloudLibrary.getService(FileService.class).getDynamicProxyDirectory() :
+                                    cloudLibrary.getService(FileService.class).getDynamicBukkitDirectory()) :
+                            (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ?
+                                    cloudLibrary.getService(FileService.class).getStaticProxyDirectory() :
+                                    cloudLibrary.getService(FileService.class).getStaticBukkitDirectory()), service.getServiceGroup().getName() + "/" + service.getName() + "/");
             File plugins = new File(serverLocation, "plugins/");
             String jarFile;
 

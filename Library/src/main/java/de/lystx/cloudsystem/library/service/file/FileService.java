@@ -30,7 +30,12 @@ public class FileService extends CloudService {
 
     private File serverDirectory;
     private File staticServerDirectory;
+    private File staticProxyDirectory;
+    private File staticBukkitDirectory;
+
     private File dynamicServerDirectory;
+    private File dynamicProxyDirectory;
+    private File dynamicBukkitDirectory;
 
     private File databaseDirectory;
     private File cloudPlayerDirectory;
@@ -64,7 +69,12 @@ public class FileService extends CloudService {
 
         this.serverDirectory = new File(this.cloudDirectory, "services/");
         this.staticServerDirectory = new File(this.serverDirectory, "static/");
+        this.staticBukkitDirectory = new File(this.staticServerDirectory, "bukkit/");
+        this.staticProxyDirectory = new File(this.staticServerDirectory, "proxy/");
+
         this.dynamicServerDirectory = new File(this.serverDirectory, "dynamic/");
+        this.dynamicBukkitDirectory = new File(this.dynamicServerDirectory, "bukkit/");
+        this.dynamicProxyDirectory = new File(this.dynamicServerDirectory, "proxy");
 
         this.databaseDirectory = new File(this.cloudDirectory, "database/");
         this.cloudPlayerDirectory = new File(this.databaseDirectory, "players/");
@@ -111,9 +121,12 @@ public class FileService extends CloudService {
 
         this.serverDirectory.mkdirs();
         this.staticServerDirectory.mkdirs();
+        this.staticBukkitDirectory.mkdirs();
+        this.staticProxyDirectory.mkdirs();
+
         this.dynamicServerDirectory.mkdirs();
-        this.dynamicServerDirectory.delete();
-        this.dynamicServerDirectory.mkdirs();
+        this.dynamicProxyDirectory.delete();
+        this.dynamicBukkitDirectory.mkdirs();
 
         this.databaseDirectory.mkdirs();
         this.signDirectory.mkdirs();

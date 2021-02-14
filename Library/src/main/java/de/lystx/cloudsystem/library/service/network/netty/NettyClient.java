@@ -86,12 +86,19 @@ public class NettyClient extends Thread {
 
     public void sendPacket(Packet packet) {
         if (channel != null) {
-            channel.writeAndFlush(packet).addListener((ChannelFutureListener) channelFuture -> {
+
+            if (this.channel.eventLoop().inEventLoop()) {
+                channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+            } else {
+                this.channel.eventLoop().execute(() -> channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE));
+            }
+
+            /*channel.writeAndFlush(packet).addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {
                     return;
                 }
                 System.out.println("[NettyClient] Client was not able to send following packet: " + packet.getClass().getSimpleName());
-            });
+            });*/
         } else {
             int tries = this.tries.getOrDefault(packet.getClass(), 0);
             tries += 1;

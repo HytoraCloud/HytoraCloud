@@ -43,8 +43,11 @@ public class PacketAdapter {
         this.registeredClasses.put(adapterHandler, packetMethods);
     }
 
-    public void unregisterAdapter(PacketHandlerAdapter adapterHandler) {
-        this.registeredHandlers.remove(adapterHandler);
+    public void unregisterAdapter(Object adapterHandler) {
+        if (adapterHandler instanceof PacketHandlerAdapter) {
+            this.registeredHandlers.remove(adapterHandler);
+        }
+        registeredClasses.remove(adapterHandler);
     }
 
 

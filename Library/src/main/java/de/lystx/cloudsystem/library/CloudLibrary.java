@@ -67,6 +67,8 @@ public class CloudLibrary implements Serializable {
         return null;
     }
 
+    public void reload() {}
+
     public enum Type {
 
         WRAPPER,

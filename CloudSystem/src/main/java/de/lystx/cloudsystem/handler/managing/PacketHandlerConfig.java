@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.handler.managing;
 
 import de.lystx.cloudsystem.CloudSystem;
+import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInNetworkConfig;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
@@ -19,10 +20,14 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInNetworkConfig) {
             PacketPlayInNetworkConfig packetPlayInNetworkConfig = (PacketPlayInNetworkConfig)packet;
+            boolean mc = this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getProxyConfig().isMaintenance();
             NetworkConfig config = packetPlayInNetworkConfig.getNetworkConfig();
             this.cloudSystem.getService(ConfigService.class).setNetworkConfig(config);
             this.cloudSystem.getService(ConfigService.class).save();
             this.cloudSystem.getService(ConfigService.class).reload();
+            if (mc != config.getProxyConfig().isMaintenance()) {
+                this.cloudSystem.getService(StatisticsService.class).getStatistics().add("maintenanceSwitched");
+            }
             this.cloudSystem.reload();
         }
     }

@@ -31,6 +31,15 @@ public class NetworkInfo {
         return m;
     }
 
+    /**
+     * Code by CryCodes
+     * @param tps
+     * @return
+     */
+    public String formatTps(double tps) {
+        return (tps >= 20.0D ? "§a" : (tps > 16.0D ? "§e" : "§c")) + (tps >= 20.0D ? "*" : "") + Math.min((double)Math.round(tps * 100.0D) / 100.0D, 60.0D);
+    }
+
     public OperatingSystemMXBean getOperatingSystemMX() {
         return ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
     }

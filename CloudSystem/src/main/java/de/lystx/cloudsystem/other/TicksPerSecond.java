@@ -28,10 +28,14 @@ public class TicksPerSecond {
         if (tickCount< tickss) {
             return 20.0D;
         }
-        int target = (tickCount- 1 - tickss) % ticks.length;
-        long elapsed = System.currentTimeMillis() - ticks[target];
+        try {
+            int target = (tickCount- 1 - tickss) % ticks.length;
+            long elapsed = System.currentTimeMillis() - ticks[target];
+            return tickss / (elapsed / 1000.0D);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return tickss;
+        }
 
-        return tickss / (elapsed / 1000.0D);
     }
 
     public double getLag() {

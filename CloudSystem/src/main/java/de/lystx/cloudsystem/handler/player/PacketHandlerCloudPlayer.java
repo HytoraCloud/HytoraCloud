@@ -103,10 +103,10 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
                 if (!cloudSystem.isRunning() || (this.cloudSystem.getScreenPrinter().getScreen() != null && this.cloudSystem.getScreenPrinter().isInScreen())) {
                     return;
                 }
-                if (!list.contains(cloudPlayer.getName())) {
+                /*if (!list.contains(cloudPlayer.getName())) {
                     return;
                 }
-                list.remove(cloudPlayer.getName());
+                list.remove(cloudPlayer.getName());*/
                 if (cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
                     this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cPlayer §e" + cloudPlayer.getName() + " §ccouldnt be logged in!");
                 } else {
