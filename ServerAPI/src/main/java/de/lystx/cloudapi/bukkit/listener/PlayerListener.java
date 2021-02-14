@@ -24,16 +24,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerListener implements Listener {
 
     private final Map<UUID, PacketReader> packetReaders;
+    private final List<UUID> noJoinMessages;
 
     public PlayerListener() {
+        this.noJoinMessages = new LinkedList<>();
         this.packetReaders = new HashMap<>();
     }
 
@@ -86,8 +85,8 @@ public class PlayerListener implements Listener {
         CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
 
         CloudAPI.getInstance().sendQuery(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName())).onDocumentSet(document -> {
-
             if (!document.getBoolean("allow", true)) {
+                event.setJoinMessage(null);
                 Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cThere was an error! It seems like you are already on the network or tried to connect twice!"));
                 return;
             }

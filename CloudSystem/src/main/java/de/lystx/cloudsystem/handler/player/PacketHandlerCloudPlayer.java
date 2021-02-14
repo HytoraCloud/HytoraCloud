@@ -108,7 +108,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
                 }
                 list.remove(cloudPlayer.getName());*/
                 if (cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cPlayer §e" + cloudPlayer.getName() + " §ccouldnt be logged in!");
+                    //this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cPlayer §e" + cloudPlayer.getName() + " §ccouldnt be logged in!");
                 } else {
                     this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is disconnected from §a" + cloudPlayer.getServer());
                 }

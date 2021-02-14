@@ -41,7 +41,6 @@ public class Query extends Thread {
             @Override
             public void handle(Packet packet) {
                 if (packet instanceof ResultPacket) {
-
                     ResultPacket resultPacket = (ResultPacket)packet;
                     if (uuid.equals(resultPacket.getUniqueId())) {
                         result.set(resultPacket.getResult());
@@ -70,7 +69,6 @@ public class Query extends Thread {
         if (this.documentConsumer != null) {
             this.documentConsumer.accept(result.get().getResult());
         }
-
     }
 
     public Query onDocumentSet(Consumer<Document> consumer) {

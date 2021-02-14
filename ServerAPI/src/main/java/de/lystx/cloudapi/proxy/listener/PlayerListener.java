@@ -8,7 +8,6 @@ import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloud
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.result.packets.*;
 import de.lystx.cloudsystem.library.result.packets.login.ResultPacketLogin;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -20,9 +19,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.event.EventPriority;
-
-import java.util.UUID;
 
 public class PlayerListener implements Listener {
 
@@ -32,62 +28,66 @@ public class PlayerListener implements Listener {
         this.cloudAPI = CloudAPI.getInstance();
     }
 
-
     @EventHandler
-    public void handleLogin(LoginEvent event) {
+    public void handlePreLogin(LoginEvent event) {
         CloudConnection connection = new CloudConnection(event.getConnection().getUniqueId(), this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId()), event.getConnection().getAddress().getAddress().getHostAddress());
 
-        this.cloudAPI.sendQuery(new ResultPacketLogin(connection, CloudAPI.getInstance().getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName())).onDocumentSet(document -> {
+        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(connection.getName());
 
-            if (document.getBoolean("already")) {
-                CloudLoginFailEvent cloudLoginFailEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
-                ProxyServer.getInstance().getPluginManager().callEvent(cloudLoginFailEvent);
-                if (cloudLoginFailEvent.isCancelled()) {
+        if (cloudPlayer == null) {
+            cloudAPI.sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(connection.getName(), connection.getUuid(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName())));
+
+            if (!cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
+                return;
+            }
+
+            if (cloudAPI.getNetworkConfig()
+                    .getProxyConfig().isMaintenance()
+                    &&
+                    !cloudAPI.getNetworkConfig().getProxyConfig()
+                            .getWhitelistedPlayers().contains(connection.getName())
+                    &&
+                    !cloudAPI.getPermissionPool()
+                            .hasPermission(connection.getName(), "cloudsystem.network.maintenance")) {
+
+                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.MAINTENANCE);
+                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
+                if (failEvent.isCancelled()) {
                     event.setCancelled(true);
-                    event.setCancelReason(new TextComponent(cloudLoginFailEvent.getCancelReason()));
+                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
                 } else {
                     event.setCancelled(true);
-                    event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
-                }
-            } else {
-
-                if (!cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
-                    return;
-                }
-
-                if (cloudAPI.getNetworkConfig()
-                        .getProxyConfig().isMaintenance()
-                        &&
-                        !cloudAPI.getNetworkConfig().getProxyConfig()
-                                .getWhitelistedPlayers().contains(connection.getName())
-                        &&
-                        !cloudAPI.getPermissionPool()
-                                .hasPermission(connection.getName(), "cloudsystem.network.maintenance")) {
-
-                    CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.MAINTENANCE);
-                    ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
-                    if (failEvent.isCancelled()) {
-                        event.setCancelled(true);
-                        event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
-                    } else {
-                        event.setCancelled(true);
-                        event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
-                    }
-                }
-                if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers()) {
-                    CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.NETWORK_FULL);
-                    ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
-                    event.setCancelled(true);
-                    if (failEvent.isCancelled()) {
-                        event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
-                    } else {
-                        event.setCancelReason(new TextComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
-                    }
+                    event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
                 }
             }
-        });
+            if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers()) {
+                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.NETWORK_FULL);
+                ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
+                event.setCancelled(true);
+                if (failEvent.isCancelled()) {
+                    event.setCancelReason(new TextComponent(failEvent.getCancelReason()));
+                } else {
+                    event.setCancelReason(new TextComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
+                }
+            }
+        } else {
+            event.setCancelled(true);
+            CloudLoginFailEvent cloudLoginFailEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
+            ProxyServer.getInstance().getPluginManager().callEvent(cloudLoginFailEvent);
+            if (cloudLoginFailEvent.isCancelled()) {
+                event.setCancelReason(new TextComponent(cloudLoginFailEvent.getCancelReason()));
+            } else {
+                event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
+            }
+        }
+
     }
 
+
+    @EventHandler
+    public void handleFail(CloudLoginFailEvent event) {
+        cloudAPI.sendPacket(new PacketPlayInUnregisterCloudPlayer(event.getConnection().getName()));
+    }
 
     @EventHandler
     public void handlePluginMessage(PluginMessageEvent event) {
@@ -145,6 +145,7 @@ public class PlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+
             }
         } catch (IllegalStateException e){
             e.printStackTrace();

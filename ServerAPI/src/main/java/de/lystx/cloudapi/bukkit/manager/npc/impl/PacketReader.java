@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class PacketReader {
 
@@ -33,12 +34,14 @@ public class PacketReader {
     }
 
     public void inject() {
-        this.channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<Object>() {
-            protected void decode(ChannelHandlerContext arg0, Object packet, List<Object> arg2) throws Exception {
-                arg2.add(packet);
-                PacketReader.this.readPacket(packet);
-            }
-        });
+        try {
+            this.channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<Object>() {
+                protected void decode(ChannelHandlerContext arg0, Object packet, List<Object> arg2) throws Exception {
+                    arg2.add(packet);
+                    PacketReader.this.readPacket(packet);
+                }
+            });
+        } catch (NoSuchElementException ignored){}
     }
 
     public void uninject() {
