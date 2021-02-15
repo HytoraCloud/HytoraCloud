@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Code contains soruces of CryCodes from LiptonCloud 1.7
+ * Link: https://www.spigotmc.org/resources/lipton-cloudsystem-new-generation-cloud.81503/
+ */
 @Getter
 public abstract class Setup {
 

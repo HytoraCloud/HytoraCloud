@@ -116,7 +116,9 @@ public class CloudServer extends JavaPlugin {
 
             list.remove(onlinePlayer);
             if (list.isEmpty()) {
-                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 5L);
+
+                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> CloudAPI.getInstance().shutdown(), 5L);
+                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 7L);
             }
         }
     }
