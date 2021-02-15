@@ -10,11 +10,12 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInComman
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.result.Query;
+import de.lystx.cloudsystem.library.result.Result;
 import de.lystx.cloudsystem.library.result.ResultPacket;
-import de.lystx.cloudsystem.library.result.packets.ResultPacketStats;
+import de.lystx.cloudsystem.library.result.packets.other.ResultPacketStatistics;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
@@ -23,12 +24,14 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -75,13 +78,18 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerCommunication(this));
 
-        try {
-            this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
-        } catch (IOException e) {
-            System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
-            e.printStackTrace();
-            System.exit(0);
-        }
+        Thread cloudClient = new Thread(() -> {
+            try {
+                this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
+            } catch (IOException e) {
+                System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
+                e.printStackTrace();
+                System.exit(0);
+            }
+        }, "hytoraCloud_cloudAPI");
+
+        cloudClient.start();
+
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
 
     }
@@ -90,8 +98,44 @@ public class CloudAPI {
         this.cloudClient.disconnect();
     }
 
-    public Query sendQuery(ResultPacket packet) {
-       return new Query(packet, this.cloudClient);
+    public void executeAsyncQuery(ResultPacket resultPacket, Consumer<Result> consumer) {
+        this.executorService.execute(() -> {
+            this.sendQuery(resultPacket).onResultSet(consumer);
+        });
+    }
+
+    public Result sendQuery(ResultPacket packet) {
+        Value<Result> value = new Value<>();
+        UUID uuid = UUID.randomUUID();
+
+        this.cloudClient.registerPacketHandler(new PacketHandlerAdapter() {
+            @Override
+            public void handle(Packet packet) {
+                if (packet instanceof ResultPacket) {
+                    ResultPacket resultPacket = (ResultPacket)packet;
+                    if (uuid.equals(resultPacket.getUniqueId())) {
+                        value.set(resultPacket.getResult());
+                        cloudClient.getPacketAdapter().unregisterAdapter(this);
+                    }
+                }
+            }
+        });
+        this.cloudClient.sendPacket(packet.uuid(uuid));
+        int count = 0;
+
+        while (value.get() == null && count++ < 3000) {
+            try {
+                Thread.sleep(0, 500000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (count >= 2999) {
+            Result r = new Result(uuid, new Document());
+            r.setError(true);
+            value.set(r);
+        }
+        return value.get();
     }
 
     public void shutdown() {
@@ -139,12 +183,10 @@ public class CloudAPI {
         return this.cloudLibrary.getService(Scheduler.class);
     }
 
-    public void getStatistics(Consumer<Statistics> consumer) {
-        this.sendQuery(new ResultPacketStats()).onDocumentSet(document -> {
-            Statistics statistics = new Statistics();
-            statistics.load(document);
-            consumer.accept(statistics);
-        });
+    public Statistics getStatistics() {
+        Statistics statistics = new Statistics();
+        statistics.load(CloudAPI.getInstance().sendQuery(new ResultPacketStatistics()).getDocument());
+        return statistics;
     }
 
     public void updatePermissions(String player, UUID uuid, String ipAddress, Consumer<String> accept) {

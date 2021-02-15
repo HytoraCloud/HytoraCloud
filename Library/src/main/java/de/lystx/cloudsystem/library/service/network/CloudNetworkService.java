@@ -29,7 +29,11 @@ public class CloudNetworkService extends CloudService {
     }
 
     public void start() {
-        this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
+        Thread server = new Thread(() -> {
+            this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
+        }, "hytoraCloud_cloudNetwork");
+
+        server.start();
     }
 
     public void shutdown() {

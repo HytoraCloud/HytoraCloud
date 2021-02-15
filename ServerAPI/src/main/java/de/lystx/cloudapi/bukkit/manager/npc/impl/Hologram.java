@@ -1,6 +1,6 @@
 package de.lystx.cloudapi.bukkit.manager.npc.impl;
 
-import de.lystx.cloudapi.bukkit.manager.Reflections;
+import de.lystx.cloudapi.bukkit.utils.Reflections;
 import net.minecraft.server.v1_8_R3.*;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;

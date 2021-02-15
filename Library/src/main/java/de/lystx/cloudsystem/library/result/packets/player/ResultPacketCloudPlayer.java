@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public class ResultPacketCloudPlayer extends ResultPacket {
 
-    private String name;
-    private UUID uuid;
+    private final String name;
+    private final UUID uuid;
 
     public ResultPacketCloudPlayer(String name) {
         this.name = name;

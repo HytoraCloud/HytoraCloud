@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter @Setter
-public class NettyServer extends Thread{
+public class NettyServer {
 
     private int port;
     private String host;
@@ -42,8 +42,7 @@ public class NettyServer extends Thread{
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
     }
 
-    @Override
-    public void run() {
+    public void start() {
 
 
         EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();

@@ -88,4 +88,9 @@ public class CloudPlayer implements Serializable {
        // kick.setSendBack(false);
         executor.sendPacket(kick);
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

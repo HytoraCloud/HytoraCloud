@@ -3,7 +3,7 @@ package de.lystx.cloudapi.bukkit.listener;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.events.CloudServerNPCInteractEvent;
-import de.lystx.cloudapi.bukkit.manager.Item;
+import de.lystx.cloudapi.bukkit.utils.Item;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.service.Service;

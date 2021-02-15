@@ -11,7 +11,9 @@ import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
 import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.SkinFetcher;
 import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
-import de.lystx.cloudapi.bukkit.manager.CloudManager;
+import de.lystx.cloudapi.bukkit.manager.other.CloudManager;
+import de.lystx.cloudapi.bukkit.utils.CloudPermissibleBase;
+import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
@@ -20,6 +22,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -122,6 +125,16 @@ public class CloudServer extends JavaPlugin {
         if (!cloudAPI.getPermissionPool().isEnabled()) {
             return;
         }
+
+        try {
+            Class<?> clazz = Reflections.getCraftBukkitClass("entity.CraftHumanEntity");
+            Field field = clazz.getDeclaredField("perm");
+            field.setAccessible(true);
+            field.set(player, new CloudPermissibleBase(player));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /*
         try {
             player.setOp(false);
             if (this.cloudAPI.getCloudPlayers().get(player.getName()) != null) {
@@ -137,7 +150,7 @@ public class CloudServer extends JavaPlugin {
                         }
                         player.addAttachment(this, s, true);
                     } catch (IllegalStateException e) {
-                        //System.out.println("[CLOUDAPI] Something went wrong while updating permissions for " + player.getName());
+                        System.out.println("[CLOUDAPI] Something went wrong while updating permissions for " + player.getName());
                     }
                 });
             } else {
@@ -145,6 +158,6 @@ public class CloudServer extends JavaPlugin {
             }
         } catch (NullPointerException e) {
             this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);
-        }
+        }*/
     }
 }

@@ -99,6 +99,10 @@ public class EditCommand extends CloudCommand {
             console.getLogger().sendMessage("INFO", "§7Changed value §2" + key + " §7to §a" + value + " §7for group §b" + group.getName());
         } else {
             console.getLogger().sendMessage("ERROR", "§cedit <group> <key> <value>");
+            console.getLogger().sendMessage("ERROR", "§cValid fields: §e");
+            for (Field declaredField : ServiceGroup.class.getDeclaredFields()) {
+                console.getLogger().sendMessage("ERROR", " §c> §e" + declaredField.getName());
+            }
         }
     }
 

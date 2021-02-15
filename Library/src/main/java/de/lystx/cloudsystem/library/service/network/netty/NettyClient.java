@@ -24,7 +24,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @Getter @Setter
-public class NettyClient extends Thread {
+public class NettyClient  {
 
     private String hostname;
     private int port;
@@ -40,8 +40,7 @@ public class NettyClient extends Thread {
         this.tries = new HashMap<>();
     }
 
-    @Override
-    public void run() {
+    public void start() {
         EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         Bootstrap bootstrap = new Bootstrap()
@@ -82,7 +81,6 @@ public class NettyClient extends Thread {
         }
 
     }
-
 
     public void sendPacket(Packet packet) {
         if (channel != null) {

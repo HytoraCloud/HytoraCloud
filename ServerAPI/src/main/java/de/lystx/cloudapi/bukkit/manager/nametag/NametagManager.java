@@ -3,7 +3,7 @@ package de.lystx.cloudapi.bukkit.manager.nametag;
 import java.lang.reflect.*;
 import java.util.*;
 
-import de.lystx.cloudapi.bukkit.manager.Reflections;
+import de.lystx.cloudapi.bukkit.utils.Reflections;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

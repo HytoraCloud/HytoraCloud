@@ -3,7 +3,7 @@ package de.lystx.cloudapi.bukkit.command;
 import com.sun.management.OperatingSystemMXBean;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
-import de.lystx.cloudapi.bukkit.manager.Reflections;
+import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
@@ -190,6 +190,7 @@ public class ServiceCommand implements CommandExecutor {
         player.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
         player.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
         player.sendMessage("§8§m--------------------------------------");
+
     }
 
 

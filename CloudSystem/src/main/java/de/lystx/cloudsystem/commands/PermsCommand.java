@@ -50,10 +50,7 @@ public class PermsCommand extends CloudCommand implements TabCompletable {
                     console.getLogger().sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
                     return;
                 }
-                console.getLogger().sendMessage("INFO", "§9Infos for §b" + player + "§7:");
-                console.getLogger().sendMessage("INFO", "§aUUID §7| §b" + uuid);
-                console.getLogger().sendMessage("INFO", "§aName §7| §b" + player);
-                console.getLogger().sendMessage("INFO", "§aPermissionGroup §7| §b" + group.getName());
+                console.getLogger().sendMessage("ERROR", "§cPlease use §e<players info " + player + "> §c!");
             } else {
                 this.help(console);
             }

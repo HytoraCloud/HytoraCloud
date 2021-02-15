@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.result.packets.other.ResultPacketStatistics;
 import de.lystx.cloudsystem.library.result.packets.services.ResultPacketStartService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
@@ -45,9 +46,10 @@ public class CloudCommand extends Command implements TabExecutor {
                         CloudAPI.getInstance().sendPacket(new PacketPlayInTPS(player.getName()));
                     } else if (args[0].equalsIgnoreCase("stats")) {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§bStatistics§8:");
-                        CloudAPI.getInstance().getStatistics(statistics -> statistics.getStats().forEach((stats, i) -> {
+
+                        CloudAPI.getInstance().getStatistics().getStats().forEach((stats, i) -> {
                             player.sendMessage(" §8» §b" + stats + " §8┃ §7" + i);
-                        }));
+                        });
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());
                         if (playerData == null) {

@@ -1,8 +1,12 @@
 package de.lystx.cloudapi.proxy.command;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.result.packets.player.ResultPacketCloudPlayer;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.Utils;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -33,7 +37,10 @@ public class ListCommand extends Command {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe group §e" + group + " §cseems not to exist!");
                             return;
                         }
-                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7At the moment there are §b" + CloudAPI.getInstance().getCloudPlayers().getOnGroup(serviceGroup.getName()) + " §7players online on group §b" + serviceGroup.getName() + "§8!");
+                        String online = "§a" + Utils.toStringList(CloudAPI.getInstance().getCloudPlayers().getPlayersOnGroup(serviceGroup.getName())).toString();
+                        online = online.replace("[", "").replace("]", "");
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Players on group §b" + serviceGroup.getName() + "§8: " + online);
+
                     } else if (args[0].equalsIgnoreCase("server")) {
                         String name = args[1];
                         Service service = CloudAPI.getInstance().getNetwork().getService(name);
@@ -41,7 +48,9 @@ public class ListCommand extends Command {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe service §e" + name + " §cseems not to be online!");
                             return;
                         }
-                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7At the moment there are §b" + CloudAPI.getInstance().getCloudPlayers().getOnServer(service.getName()) + " §7players online on service §b" + service.getName() + "§8!");
+                        String online = "§a" + Utils.toStringList(CloudAPI.getInstance().getCloudPlayers().getPlayersOnServer(service.getName())).toString();
+                        online = online.replace("[", "").replace("]", "");
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Players on server §b" + service.getName() + "§8: " + online);
                     } else {
                         this.help(player);
                     }

@@ -82,8 +82,8 @@ public class PlayerListener implements Listener {
 
         CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
 
-        CloudAPI.getInstance().sendQuery(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName())).onDocumentSet(document -> {
-            if (!document.getBoolean("allow", true)) {
+        CloudAPI.getInstance().executeAsyncQuery(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName()), document -> {
+            if (!document.getDocument().getBoolean("allow", true)) {
                 event.setJoinMessage(null);
                 Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cThere was an error! It seems like you are already on the network or tried to connect twice!"));
                 return;
