@@ -29,29 +29,32 @@ public class CloudPlayers {
         this.cloudAPI.sendPacket(new PacketPlayInGetLog(service, cloudPlayer.getName()));
     }
 
+    public List<CloudPlayer> getPlayersOnGroup(String group) {
+       List<CloudPlayer> list = new LinkedList<>();
+       for (CloudPlayer cp : this.cloudPlayers) {
+           if (cp.getGroup().equalsIgnoreCase(group)) {
+              list.add(cp);
+           }
+        }
+        return list;
+    }
+
+    public List<CloudPlayer> getPlayersOnServer(String server) {
+       List<CloudPlayer> list = new LinkedList<>();
+       for (CloudPlayer cp : this.cloudPlayers) {
+           if (cp.getServer().equalsIgnoreCase(server)) {
+              list.add(cp);
+           }
+        }
+        return list;
+    }
+
     public int getOnGroup(String groupName) {
-        int count = 0;
-        try {
-            for (Service service : this.cloudAPI.getNetwork().getServices(this.cloudAPI.getNetwork().getServiceGroup(groupName))) {
-                count += this.getOnServer(service.getName());
-            }
-        } catch (NullPointerException e) {}
-        return count;
+        return this.getPlayersOnGroup(groupName).size();
     }
 
     public int getOnServer(String serverName) {
-        try {
-            Service service = this.cloudAPI.getNetwork().getService(serverName);
-            ServerPinger pinger = new ServerPinger();
-            try {
-                pinger.pingServer(service.getHost(), service.getPort(), 20);
-                return pinger.getPlayers();
-            } catch (IOException e) {
-                return 0;
-            }
-        } catch (NullPointerException e) {
-            return 0;
-        }
+         return this.getPlayersOnServer(serverName).size();
     }
 
     public void update(String name, CloudPlayer newPlayer) {
