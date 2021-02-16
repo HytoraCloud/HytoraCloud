@@ -5,6 +5,8 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
+import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateCloudSign;
+import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInDeleteCloudSign;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
@@ -66,7 +68,8 @@ public class ServiceCommand implements CommandExecutor {
                             signBlock.setLine(2, "§8» §cRemoved");
                             signBlock.setLine(3, "§8§m------");
                             signBlock.update(true);
-                            CloudServer.getInstance().getSignManager().getSignCreator().deleteSign(cloudSign);
+                            CloudServer.getInstance().getSignManager().getCloudSigns().remove(cloudSign);
+                            CloudAPI.getInstance().sendPacket(new PacketPlayInDeleteCloudSign(cloudSign));
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You removed a CloudSign for the group §b" + cloudSign.getGroup().toUpperCase());
                         } else {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
@@ -116,7 +119,8 @@ public class ServiceCommand implements CommandExecutor {
                                 signBlock.setLine(2, "RELOADING...");
                                 signBlock.setLine(3, "§8§m------");
                                 signBlock.update(true);
-                                CloudServer.getInstance().getSignManager().getSignCreator().createSign(sign);
+                                CloudServer.getInstance().getSignManager().getCloudSigns().add(sign);
+                                CloudAPI.getInstance().sendPacket(new PacketPlayInCreateCloudSign(sign));
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
                             } else {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");

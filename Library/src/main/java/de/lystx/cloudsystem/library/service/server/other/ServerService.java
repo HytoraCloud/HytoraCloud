@@ -341,16 +341,20 @@ public class ServerService extends CloudService {
     }
 
     public void stopServices(ServiceGroup serviceGroup) {
+        this.stopServices(serviceGroup, true);
+    }
+    public void stopServices(ServiceGroup serviceGroup, boolean newOnes) {
         if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
         }
         Value<Integer> count = new Value<>(this.getServices(serviceGroup).size());
         for (Service service : this.getServices(serviceGroup)) {
-                this.stopService(service, false);
-                count.set(count.get() - 1);
-                if (count.get() == 0) {
-                    this.needServices(serviceGroup);
-                }
+            this.stopService(service, false);
+            count.set(count.get() - 1);
+
+            if (count.get() == 0 && newOnes) {
+                this.needServices(serviceGroup);
+            }
         }
     }
 

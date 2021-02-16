@@ -31,7 +31,6 @@ public class ServerPinger {
         inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_16BE);
 
         dataOutputStream.write(new byte[] { -2, 1 });
-        try {
             int packetId = inputStream.read();
             if(packetId != 255)
                 close();
@@ -62,7 +61,6 @@ public class ServerPinger {
                 online = true;
                 close();
             }
-        } catch (SocketTimeoutException e) {}
     }
 
     private void close() throws IOException {

@@ -33,14 +33,9 @@ public class CloudBootingSetupNotDone {
                 "/____/\\___/\\__/\\__,_/ .___/ \n" +
                 "                   /_/      \n");
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
-        cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§cSeems like you haven't set up §eHytoraCloud§c yet§c!");
-        cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§cLet's fix cloudSystem quite quick...");
-        cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§cKnown bugs:");
-        cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cConsole prefix shown up twice (Only in Setup)");
-        cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cSetup crashes if trying to use history (arrow keys)");
-        cloudSystem.getConsole().getLogger().sendMessage("SETUP", "  §7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
-        cloudSystem.getConsole().getLogger().sendMessage("§9");
-        cloudSystem.getConsole().getLogger().sendMessage("§9");
+        cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cSetup crashes if trying to use history (arrow keys)");
+        cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
+        cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         cloudSystem.getService(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
         cloudSetup.start(cloudSystem.getConsole(), setup -> {

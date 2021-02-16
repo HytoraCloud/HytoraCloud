@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.commands;
 
 import de.lystx.cloudsystem.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.command.CloudCommand;
 import de.lystx.cloudsystem.library.service.command.TabCompletable;
@@ -36,7 +37,14 @@ public class DeleteCommand extends CloudCommand implements TabCompletable {
                     console.getLogger().sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
-                CloudSystem.getInstance().getService().stopServices(serviceGroup);
+
+                for (Service service : CloudSystem.getInstance().getService().getServices(serviceGroup)) {
+                    CloudSystem.getInstance().getService().getIdService().removeID(service.getServiceGroup().getName(), service.getServiceID());
+                    CloudSystem.getInstance().getService().getPortService().removePort(service.getPort());
+                    CloudSystem.getInstance().getService().getPortService().removeProxyPort(service.getPort());
+                }
+
+                CloudSystem.getInstance().getService().stopServices(serviceGroup, false);
                 cloudLibrary.getService(GroupService.class).deleteGroup(serviceGroup);
                 CloudSystem.getInstance().getService().getServices().remove(CloudSystem.getInstance().getService().getGroup(serviceGroup.getName()));
                 CloudSystem.getInstance().reload();

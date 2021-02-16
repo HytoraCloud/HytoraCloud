@@ -56,7 +56,7 @@ public class CreateCommand extends CloudCommand implements TabCompletable {
                             UUID.randomUUID(),
                             groupSetup.getServerName(),
                             "default",
-                            ServiceType.valueOf(groupSetup.getType()),
+                            ServiceType.valueOf(groupSetup.getType().toUpperCase()),
                             groupSetup.getMaxyServer(),
                             groupSetup.getMinServer(),
                             groupSetup.getMaxMem(),

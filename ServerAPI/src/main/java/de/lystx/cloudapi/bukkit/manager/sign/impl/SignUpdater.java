@@ -24,7 +24,6 @@ import org.bukkit.plugin.IllegalPluginAccessException;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  * Code contains soruces of CryCodes from LiptonCloud 1.7
@@ -32,14 +31,14 @@ import java.util.logging.Level;
  */
 
 @Getter
-public class SignUpdater  {
+public class SignUpdater {
 
     private final CloudAPI cloudAPI;
     private final SignManager plugin;
 
     private final ServerPinger serverPinger;
-    private final Map<String , Map<Integer, CloudSign>> freeSignMap;
-    private final Map<CloudSign, Service> servicesCloudSign;
+    private final Map<String , Map<Integer, CloudSign>> freeSigns;
+    private final Map<CloudSign, Service> cloudSigns;
 
     private int animationsTick = 0;
     private int animationScheduler;
@@ -47,13 +46,9 @@ public class SignUpdater  {
     public SignUpdater(SignManager plugin, CloudAPI cloudAPI) {
         this.cloudAPI = cloudAPI;
         this.plugin = plugin;
-        this.freeSignMap = new HashMap<>();
-        this.servicesCloudSign = new HashMap<>();
+        this.freeSigns = new HashMap<>();
+        this.cloudSigns = new HashMap<>();
         this.serverPinger = plugin.getServerPinger();
-        if (!cloudAPI.getService().getServiceGroup().isLobby()) {
-            return;
-        }
-        this.run();
     }
 
     public void run() {
@@ -61,24 +56,24 @@ public class SignUpdater  {
         animationScheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(CloudServer.getInstance(), () -> {
             try {
 
-                freeSignMap.clear();
-                servicesCloudSign.clear();
+                freeSigns.clear();
+                cloudSigns.clear();
 
-                List<Service> serverMetas = new ArrayList<>();
+                List<Service> services = new ArrayList<>();
 
                 for (ServiceGroup globalServerGroup : cloudAPI.getNetwork().getServiceGroups()) {
                     String groupName = globalServerGroup.getName();
-                    serverMetas.clear();
+                    services.clear();
                     for (Service service : this.cloudAPI.getNetwork().getServices()) {
                         if (service.getServiceGroup().getName().equalsIgnoreCase(groupName) && !service.getServiceState().equals(ServiceState.INGAME) && !service.getServiceState().equals(ServiceState.OFFLINE)) {
-                            serverMetas.add(service);
+                            services.add(service);
                         }
                     }
-                    if (serverMetas.isEmpty()) {
+                    if (services.isEmpty()) {
                         return;
                     }
 
-                    serverMetas.forEach(current -> {
+                    services.forEach(current -> {
                         if (current.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                             return;
                         }
@@ -91,19 +86,19 @@ public class SignUpdater  {
                         HashMap<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
 
                         CloudSign cloudSign = signs.get(serverId);
-                        servicesCloudSign.put(cloudSign, current);
+                        cloudSigns.put(cloudSign, current);
 
-                        if (this.freeSignMap.containsKey(groupName)) {
-                            Map<Integer, CloudSign> onlineSigns = this.freeSignMap.get(groupName);
+                        if (this.freeSigns.containsKey(groupName)) {
+                            Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(groupName);
                             onlineSigns.put(serverId, cloudSign);
-                            this.freeSignMap.replace(groupName, onlineSigns);
+                            this.freeSigns.replace(groupName, onlineSigns);
                         } else {
                             Map<Integer, CloudSign> onlineSins = new HashMap<>();
                             onlineSins.put(serverId, cloudSign);
-                            this.freeSignMap.put(groupName, onlineSins);
+                            this.freeSigns.put(groupName, onlineSins);
                         }
 
-                        this.setOfflineSigns(groupName, current, this.freeSignMap);
+                        this.setOfflineSigns(groupName, current, this.freeSigns);
                         if (cloudSign != null) {
                             Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()), cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
 
@@ -113,7 +108,7 @@ public class SignUpdater  {
                             try {
                                 serverPinger.pingServer(current.getHost(), current.getPort(), 20);
                             } catch (IOException exception) {
-                                Bukkit.getLogger().log(Level.SEVERE, "Something is wrong when pinging Server", exception);
+                                System.out.println("[CloudAPI] Connection from service " + current.getName() + " ("  + current.getHost() + ":" + current.getPort() + ") refused...");
                             }
                             Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
                             if (!blockAt.getType().equals(Material.WALL_SIGN)) {
@@ -169,7 +164,7 @@ public class SignUpdater  {
 
             Sign sign = (Sign) blockAt.getState();
             if (cloudAPI.getNetwork().getServiceGroup(group) != null && cloudAPI.getNetwork().getServiceGroup(group).isMaintenance()) {
-                servicesCloudSign.put(cloudSign, service);
+                cloudSigns.put(cloudSign, service);
                 this.signUpdate(sign, service, null);
                 return;
             }
@@ -296,7 +291,7 @@ public class SignUpdater  {
     }
 
     public Service getService(CloudSign cloudSign) {
-        return servicesCloudSign.get(cloudSign);
+        return cloudSigns.get(cloudSign);
     }
 
     public CloudSign getCloudSign(Location location) {
