@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.network.netty;
 
+import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutVerifyConnection;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import io.netty.bootstrap.Bootstrap;
@@ -18,10 +19,12 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
 @Getter @Setter
 public class NettyClient  {
@@ -32,15 +35,18 @@ public class NettyClient  {
     private final PacketAdapter packetAdapter;
     private Channel channel;
     private boolean running;
+    private Consumer<NettyClient> consumerConnection;
+    private boolean established;
 
     public NettyClient(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
         this.packetAdapter = new PacketAdapter();
         this.tries = new HashMap<>();
+        this.established = false;
     }
 
-    public void start() {
+    public void start() throws Exception {
         EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         Bootstrap bootstrap = new Bootstrap()
@@ -61,6 +67,10 @@ public class NettyClient  {
                         channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
                             @Override
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
+                                if (packet instanceof PacketPlayOutVerifyConnection && !established) {
+                                    established = true;
+                                    consumerConnection.accept(NettyClient.this);
+                                }
                                 packetAdapter.handelAdapterHandler(packet);
                             }
                         });
@@ -74,12 +84,19 @@ public class NettyClient  {
             this.running = true;
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
+            e.printStackTrace();
             this.running = false;
+            this.established = false;
         } finally {
             this.running = false;
+            this.established = false;
             workerGroup.shutdownGracefully();
         }
 
+    }
+
+    public void onConnectionEstablish(Consumer<NettyClient> consumer) {
+        this.consumerConnection = consumer;
     }
 
     public void sendPacket(Packet packet) {
@@ -88,15 +105,13 @@ public class NettyClient  {
             if (this.channel.eventLoop().inEventLoop()) {
                 channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             } else {
-                this.channel.eventLoop().execute(() -> channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE));
+                try {
+                    this.channel.eventLoop().execute(() -> channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE));
+                } catch (NullPointerException ignored) {
+
+                }
             }
 
-            /*channel.writeAndFlush(packet).addListener((ChannelFutureListener) channelFuture -> {
-                if (channelFuture.isSuccess()) {
-                    return;
-                }
-                System.out.println("[NettyClient] Client was not able to send following packet: " + packet.getClass().getSimpleName());
-            });*/
         } else {
             int tries = this.tries.getOrDefault(packet.getClass(), 0);
             tries += 1;

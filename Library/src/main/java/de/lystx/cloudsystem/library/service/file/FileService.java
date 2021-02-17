@@ -128,12 +128,14 @@ public class FileService extends CloudService {
         this.dynamicProxyDirectory.delete();
         this.dynamicBukkitDirectory.mkdirs();
 
-        this.databaseDirectory.mkdirs();
-        this.signDirectory.mkdirs();
-        this.npcDirectory.mkdirs();
-        this.cloudPlayerDirectory.mkdirs();
+        if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            this.databaseDirectory.mkdirs();
+            this.signDirectory.mkdirs();
+            this.npcDirectory.mkdirs();
+            this.cloudPlayerDirectory.mkdirs();
+            this.groupsDirectory.mkdirs();
+        }
 
-        this.groupsDirectory.mkdirs();
         this.templatesDirectory.mkdirs();
 
         this.globalDirectory.mkdirs();
@@ -144,9 +146,10 @@ public class FileService extends CloudService {
         this.spigotVersionsDirectory.mkdirs();
         this.oldSpigotVersionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
-        this.modulesDirectory.mkdirs();
-
-        this.backupDirectory.mkdirs();
+        if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            this.modulesDirectory.mkdirs();
+            this.backupDirectory.mkdirs();
+        }
 
         try {
             for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {

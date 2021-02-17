@@ -132,6 +132,9 @@ public class Document implements Serializable {
         return this.jsonObject.get(key).getAsString();
     }
 
+    public JsonElement getElement(String key) {
+        return this.jsonObject.get(key);
+    }
 
     public int getInteger(String key) {
         if (!this.jsonObject.has(key))
@@ -215,6 +218,16 @@ public class Document implements Serializable {
             return value;
         }
         return this.jsonObject.get(key).getAsShort();
+    }
+
+
+
+    public Document getDocument(String key, Document def) {
+        if (this.has(key)) {
+            return new Document(this.jsonObject.get(key).getAsJsonObject());
+        }
+        this.append(key, def.getJsonObject());
+        return def;
     }
 
     public Document append(String key, Document value) {

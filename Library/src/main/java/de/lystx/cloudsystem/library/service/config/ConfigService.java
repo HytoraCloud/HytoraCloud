@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.config;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.file.FileService;
@@ -13,6 +14,7 @@ public class ConfigService extends CloudService {
 
 
     private NetworkConfig networkConfig;
+    private ReceiverInfo receiverInfo;
     private Document document;
 
     public ConfigService(CloudLibrary cloudLibrary, String name, Type type) {
@@ -23,16 +25,30 @@ public class ConfigService extends CloudService {
     public void reload() {
         this.document = Document.fromFile(getCloudLibrary().getService(FileService.class).getConfigFile());
         if (!getCloudLibrary().getService(FileService.class).getConfigFile().exists()) {
-            this.document.append(NetworkConfig.defaultConfig());
+            if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+                this.document.append(NetworkConfig.defaultConfig());
+            } else {
+                this.document.append(new ReceiverInfo("Receiver-1", "127.0.0.1", 0, false));
+            }
             this.document.save();
             this.reload();
             return;
         }
-        this.networkConfig = document.getObject(document.getJsonObject(), NetworkConfig.class);
+        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            this.receiverInfo = null;
+            this.networkConfig = document.getAs(NetworkConfig.class);
+        } else {
+            this.receiverInfo = document.getAs(ReceiverInfo.class);
+            this.networkConfig = null;
+        }
     }
 
     public void save() {
-        this.document.append(this.networkConfig);
+        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            this.document.append(this.networkConfig);
+        } else {
+            this.document.append(this.receiverInfo);
+        }
         this.document.save();
     }
 }

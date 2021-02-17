@@ -24,15 +24,20 @@ public class GroupService extends CloudService {
     }
 
     public void loadGroups() {
-        for (File file : this.getCloudLibrary().getService(FileService.class).getGroupsDirectory().listFiles()) {
-            if (file.getName().endsWith(".json")) {
-                Document document = new Document(file);
-                this.groups.add(document.getObject(document.getJsonObject(), ServiceGroup.class));
+        if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            for (File file : this.getCloudLibrary().getService(FileService.class).getGroupsDirectory().listFiles()) {
+                if (file.getName().endsWith(".json")) {
+                    Document document = new Document(file);
+                    this.groups.add(document.getObject(document.getJsonObject(), ServiceGroup.class));
+                }
             }
         }
     }
 
     public void createGroup(ServiceGroup serviceGroup) {
+        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            return;
+        }
         Document document = new Document(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
         document.append(serviceGroup);
         document.save();
@@ -41,6 +46,9 @@ public class GroupService extends CloudService {
     }
 
     public void deleteGroup(ServiceGroup serviceGroup) {
+        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            return;
+        }
         Document document = new Document(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
         document.clear();
         document.getFile().delete();
@@ -49,6 +57,9 @@ public class GroupService extends CloudService {
     }
 
     public void updateGroup(ServiceGroup serviceGroup, ServiceGroup newServiceGroup) {
+        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            return;
+        }
         Document document = new Document(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
         document.clear();
         document.getFile().delete();

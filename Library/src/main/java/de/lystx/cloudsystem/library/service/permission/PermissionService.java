@@ -35,6 +35,9 @@ public class PermissionService extends CloudService {
     }
 
     public void loadEntries() {
+        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            return;
+        }
         try {
             List<CloudPlayerData> list = this.getCloudLibrary().getService(DatabaseService.class).getDatabase().loadEntries();
             this.permissionPool.getPlayerCache().addAll(list);
@@ -43,6 +46,9 @@ public class PermissionService extends CloudService {
     }
 
     public void load() {
+        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            return;
+        }
         this.permissionPool.getPlayerCache().clear();
         this.permissionPool.getPermissionGroups().clear();
         if (!this.file.exists()) {
@@ -93,6 +99,9 @@ public class PermissionService extends CloudService {
     }
 
     public void save() {
+        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            return;
+        }
         if (this.permissionPool == null) {
             return;
         }

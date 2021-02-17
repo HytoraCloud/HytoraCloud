@@ -30,6 +30,9 @@ public class StatisticsService extends CloudService {
         this.statistics.setFile(this.file);
         this.statistics.load();
 
+        if (this.getCloudLibrary().getWebServer() == null) {
+            return;
+        }
         this.getCloudLibrary().getWebServer().update("stats", this.statistics.toDocument());
     }
 

@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.network.netty;
 
+import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutVerifyConnection;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import io.netty.bootstrap.ServerBootstrap;
@@ -22,6 +23,8 @@ import lombok.Setter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Getter @Setter
 public class NettyServer {
@@ -75,9 +78,9 @@ public class NettyServer {
                         cause.printStackTrace();
                     }
                 });
-
-                //System.out.println("[NettyServer] Initialized NettyClient > " + socketChannel);
                 registeredChannels.add(socketChannel);
+                socketChannel.writeAndFlush(new PacketPlayOutVerifyConnection(socketChannel.localAddress().getAddress().getHostAddress(), socketChannel.localAddress().getPort()));
+                //System.out.println("[NettyServer] Initialized NettyClient > " + socketChannel);
             }
         });
 

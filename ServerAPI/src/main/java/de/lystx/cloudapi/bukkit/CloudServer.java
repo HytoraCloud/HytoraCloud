@@ -19,6 +19,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftShapedRecipe;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -42,6 +43,7 @@ public class CloudServer extends JavaPlugin {
     private boolean useLabyMod;
     private boolean newVersion;
     private boolean waitingForPlayer;
+
 
     @Override
     public void onEnable() {
@@ -87,6 +89,10 @@ public class CloudServer extends JavaPlugin {
                 if (waitingForPlayer) Bukkit.shutdown();
             }, 1500L);
         }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("[CloudAPI] Server stopping, closing connection from CloudAPI <-> (CloudSystem / Receiver)");
+            this.cloudAPI.shutdown();
+        }));
     }
 
     @Override
@@ -96,6 +102,7 @@ public class CloudServer extends JavaPlugin {
         }
         int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
         Bukkit.getScheduler().cancelTask(animationScheduler);
+
     }
 
     public void executeCommand(String command) {

@@ -53,13 +53,16 @@ public class WebServer {
     }
 
     public void remove(String web) {
-        String finalWeb = (web.startsWith("/") ? web : "/" + web);
         try {
+            String finalWeb = (web.startsWith("/") ? web : "/" + web);
             this.server.removeContext(finalWeb);
-        } catch (IllegalArgumentException e){}
+        } catch (Exception ignored) {
+
+        }
     }
 
     public void update(String web, Document document) {
+
         String finalWeb = (web.startsWith("/") ? web : "/" + web);
         this.remove(web);
         this.server.createContext(finalWeb, httpExchange -> {

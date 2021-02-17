@@ -6,7 +6,6 @@ import java.io.Serializable;
 
 public class Packet implements Serializable {
 
-    public static final long serialVersionUID = -3040096452457271695L;
     private String document = "{}";
 
     public Packet append(String key, Object value) {

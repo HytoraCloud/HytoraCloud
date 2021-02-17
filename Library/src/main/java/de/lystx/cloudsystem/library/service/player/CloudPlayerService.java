@@ -28,6 +28,9 @@ public class CloudPlayerService extends CloudService {
         this.cloudPlayers = new LinkedList<>();
         this.properties = new Document(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "cloudPlayerProperties.json"));
         this.database = this.getCloudLibrary().getService(DatabaseService.class).getDatabase();
+        if (this.getCloudLibrary().getWebServer() == null) {
+            return;
+        }
         cloudLibrary.getWebServer().update("players", this.toDocument());
     }
 
@@ -36,7 +39,9 @@ public class CloudPlayerService extends CloudService {
         this.cloudPlayers.add(cloudPlayer);
         boolean registered = this.database.isRegistered(cloudPlayer.getUuid());
         this.database.registerPlayer(cloudPlayer);
-        this.getCloudLibrary().getWebServer().update("players", this.toDocument());
+        if (this.getCloudLibrary().getWebServer() != null) {
+            this.getCloudLibrary().getWebServer().update("players", this.toDocument());
+        }
         return registered;
     }
 
@@ -70,6 +75,9 @@ public class CloudPlayerService extends CloudService {
             data.setLastLogin(new Date().getTime());
             this.setPlayerData(cloudPlayer.getUuid(), data);
             getCloudLibrary().getService(EventService.class).callEvent(new CloudPlayerQuitEvent(cloudPlayer));
+            if (this.getCloudLibrary().getWebServer() == null) {
+                return;
+            }
             this.getCloudLibrary().getWebServer().update("players", this.toDocument());
         } catch (NullPointerException e) {}
         this.cloudPlayers.remove(this.getOnlinePlayer(cloudPlayer.getName()));

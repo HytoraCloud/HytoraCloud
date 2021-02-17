@@ -9,7 +9,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="CloudSystem" />
-        <module name="Wrapper" />
         <module name="ServerAPI" />
         <module name="Library" />
         <module name="Modules" />

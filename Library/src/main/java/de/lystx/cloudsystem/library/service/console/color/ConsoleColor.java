@@ -45,6 +45,7 @@ public class ConsoleColor {
         input = input.replace("§6", construct(Ansi.Color.YELLOW, false));
         input = input.replace("§7", construct(Ansi.Color.WHITE, true));
         input = input.replace("§8", construct(Ansi.Color.BLACK, false));
+        input = input.replace("§h", construct(Ansi.Color.BLACK, true));
         input = input.replace("§9", construct(Ansi.Color.BLUE, true));
         input = input + Ansi.ansi().reset().toString();
         return input;

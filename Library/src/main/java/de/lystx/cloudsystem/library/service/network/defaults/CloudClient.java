@@ -21,11 +21,11 @@ public class CloudClient extends NettyClient implements CloudExecutor {
     }
 
 
-    public void connect() throws IOException {
+    public void connect() throws Exception {
         this.start();
     }
 
-    public void connect(String host, int port) throws IOException {
+    public void connect(String host, int port) throws Exception {
         this.setHostname(host);
         this.setPort(port);
         this.connect();

@@ -81,7 +81,7 @@ public class CloudAPI {
         Thread cloudClient = new Thread(() -> {
             try {
                 this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
                 e.printStackTrace();
                 System.exit(0);

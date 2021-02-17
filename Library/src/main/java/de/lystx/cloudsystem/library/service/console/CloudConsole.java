@@ -19,6 +19,7 @@ public class CloudConsole extends Thread {
         this.logger = logger;
         this.buffer = buffer;
         this.commandManager = commandManager;
+        this.logger.getConsoleReader().addCompleter(commandManager);
         this.start();
     }
 
