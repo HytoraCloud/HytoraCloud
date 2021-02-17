@@ -88,7 +88,7 @@ public class PlayerListener implements Listener {
                 Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cThere was an error! It seems like you are already on the network or tried to connect twice!"));
                 return;
             }
-            if (CloudServer.getInstance().isUseLabyMod() && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
+            if (CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
                 if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
                     CloudServer.getInstance().getLabyMod().disableVoiceChat(player);
                 }

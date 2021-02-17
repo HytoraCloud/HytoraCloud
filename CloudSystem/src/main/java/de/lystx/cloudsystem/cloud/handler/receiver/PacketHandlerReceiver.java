@@ -29,7 +29,7 @@ public class PacketHandlerReceiver {
             return;
         }
         cloudSystem.getReceivers().remove(cloudSystem.getReceiver(receiverInfo.getName()));
-        cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§7Receiver §e" + receiverInfo.getName() + " §cdisconnected§h!");
+        cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§7The Receiver §c" + receiverInfo.getName() + " §7has disconnected from §bHytoraCloud§h!");
     }
 
     @PacketHandler

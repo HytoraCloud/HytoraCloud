@@ -67,7 +67,7 @@ public class NettyClient  {
                         channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
                             @Override
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
-                                if (packet instanceof PacketPlayOutVerifyConnection && !established) {
+                                if (packet instanceof PacketPlayOutVerifyConnection && !established && consumerConnection != null) {
                                     established = true;
                                     consumerConnection.accept(NettyClient.this);
                                 }

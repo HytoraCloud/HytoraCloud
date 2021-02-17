@@ -2,8 +2,10 @@ package de.lystx.cloudapi.bukkit;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.command.ServiceCommand;
+import de.lystx.cloudapi.bukkit.events.BukkitEventEvent;
 import de.lystx.cloudapi.bukkit.handler.*;
 import de.lystx.cloudapi.bukkit.listener.CloudListener;
+import de.lystx.cloudapi.bukkit.listener.EmptyListener;
 import de.lystx.cloudapi.bukkit.listener.NPCListener;
 import de.lystx.cloudapi.bukkit.listener.PlayerListener;
 import de.lystx.cloudapi.bukkit.manager.labymod.LabyMod;
@@ -18,9 +20,13 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegi
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftShapedRecipe;
 import org.bukkit.entity.Player;
+import org.bukkit.event.*;
+import org.bukkit.plugin.EventExecutor;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -40,7 +46,6 @@ public class CloudServer extends JavaPlugin {
     private NPCManager npcManager;
     private SkinFetcher skinFetcher;
     private LabyMod labyMod;
-    private boolean useLabyMod;
     private boolean newVersion;
     private boolean waitingForPlayer;
 
@@ -61,13 +66,7 @@ public class CloudServer extends JavaPlugin {
         } catch (Exception e){
             this.newVersion = true;
         }
-        try {
-            Class.forName("net.labymod.serverapi.bukkit.LabyModPlugin");
-            this.labyMod = new LabyMod(this.cloudAPI);
-            this.useLabyMod = true;
-        } catch (Exception e) {
-            this.useLabyMod = false;
-        }
+        this.labyMod = new LabyMod(this.cloudAPI);
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
@@ -93,6 +92,15 @@ public class CloudServer extends JavaPlugin {
             System.out.println("[CloudAPI] Server stopping, closing connection from CloudAPI <-> (CloudSystem / Receiver)");
             this.cloudAPI.shutdown();
         }));
+
+        for (HandlerList handler : HandlerList.getHandlerLists()) {
+            handler.register(new RegisteredListener(new EmptyListener(), (listener, event) -> {
+                if (event.getClass().getSimpleName().equalsIgnoreCase(BukkitEventEvent.class.getSimpleName())) {
+                    return;
+                }
+                Bukkit.getPluginManager().callEvent(new BukkitEventEvent(event));
+            }, EventPriority.NORMAL, this, false));
+        }
     }
 
     @Override
@@ -100,6 +108,8 @@ public class CloudServer extends JavaPlugin {
         if (this.cloudAPI.getCloudClient().isConnected()) {
             this.cloudAPI.disconnect();
         }
+        this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LABYMOD");
+        this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");
         int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
         Bukkit.getScheduler().cancelTask(animationScheduler);
 

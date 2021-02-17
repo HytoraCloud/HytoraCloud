@@ -78,7 +78,7 @@ public class NetworkConfig implements Serializable {
                 ),
                 new LabyModConfig(
                         false,
-                        "§8» §7HytoraCloud §8× §b%service%",
+                        "§8» §7HytoraCloud §8× §b%service% §8[§b%online_players%§8/§b%max_player%§8]",
                         true
                 ),
                 new MessageConfig(

@@ -55,11 +55,6 @@
             <version>1.18.18</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>net.labymod</groupId>
-            <artifactId>serverapi</artifactId>
-            <version>1.1</version>
-        </dependency>
     </dependencies>
 
     <properties>

@@ -84,7 +84,6 @@ public class Receiver extends CloudInstance {
                 this.getService(FileService.class).copyFileWithURL("/implements/versions/spigot/spigot.jar", new File(this.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
                 this.getService(FileService.class).copyFileWithURL("/implements/versions/bungeecord/bungeeCord.jar", new File(this.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
                 this.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(this.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
-                this.getService(FileService.class).copyFileWithURL("/implements/plugins/LabyModAPI.jar", new File(this.getService(FileService.class).getSpigotPluginsDirectory(), "LabyModAPI.jar"));
                 ReceiverInfo receiverInfo = new ReceiverInfo(receiverSetup.getName(), receiverSetup.getHost(), receiverSetup.getPort(), true);
                 this.getService(ConfigService.class).setReceiverInfo(receiverInfo);
                 this.getService(ConfigService.class).save();

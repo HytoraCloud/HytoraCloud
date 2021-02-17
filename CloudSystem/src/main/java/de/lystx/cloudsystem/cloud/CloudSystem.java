@@ -4,15 +4,12 @@ import de.lystx.cloudsystem.cloud.booting.CloudBootingSetupDone;
 import de.lystx.cloudsystem.cloud.booting.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.cloud.commands.*;
 import de.lystx.cloudsystem.global.CloudInstance;
-import de.lystx.cloudsystem.library.Updater;
-import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.cloud.commands.PlayerCommand;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
-import de.lystx.cloudsystem.library.webserver.WebServer;
-import de.lystx.cloudsystem.receiver.Receiver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,6 +36,8 @@ public class CloudSystem extends CloudInstance {
         this.getService(CommandService.class).registerCommand(new ModulesCommand("modules", "Manages modules", "pl", "plugins"));
         this.getService(CommandService.class).registerCommand(new CreateCommand("create", "Creates cloudstuff", "add"));
         this.getService(CommandService.class).registerCommand(new DeleteCommand("delete", "Deletes stuff", "remove"));
+        this.getService(CommandService.class).registerCommand(new PermsCommand("perms", "Manages permissions", "cperms", "permissions"));
+        this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
         this.getService(CommandService.class).registerCommand(new MaintenanceCommand("maintenance", "Manages maintenance of network", "mc"));
 
         this.authManager.createKey();

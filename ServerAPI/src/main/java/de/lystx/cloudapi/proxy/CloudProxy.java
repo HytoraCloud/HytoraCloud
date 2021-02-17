@@ -73,6 +73,9 @@ public class CloudProxy extends Plugin {
         }
     }
 
+    public void executeCommand(String line) {
+        ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), line);
+    }
 
     public int getProxyPort() {
         for (ListenerInfo listener : ProxyServer.getInstance().getConfig().getListeners()) {
@@ -81,16 +84,4 @@ public class CloudProxy extends Plugin {
         return -1;
     }
 
-
-    public void updatePermissions(ProxiedPlayer player) {
-        this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> {
-            try {
-                if (s.equalsIgnoreCase("*")) {
-                    player.setPermission("'*'", true);
-                    player.setPermission("*", true);
-                }
-                player.setPermission(s, true);
-            } catch (NullPointerException e){}
-        });
-    }
 }

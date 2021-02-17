@@ -1,7 +1,6 @@
 package de.lystx.cloudsystem.global;
 
-import de.lystx.cloudsystem.cloud.booting.CloudBootingSetupDone;
-import de.lystx.cloudsystem.cloud.booting.CloudBootingSetupNotDone;
+import de.lystx.cloudsystem.cloud.commands.PermsCommand;
 import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.Updater;
@@ -20,7 +19,6 @@ import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
@@ -79,11 +77,12 @@ public class CloudInstance extends CloudLibrary {
 
         this.getService(CommandService.class).registerCommand(new StopCommand("stop", "Stops a service or group"));
         this.getService(CommandService.class).registerCommand(new InfoCommand("info", "Shows information", "information"));
-        this.getService(CommandService.class).registerCommand(new PermsCommand("perms", "Manages permissions", "cperms", "permissions"));
         this.getService(CommandService.class).registerCommand(new RunCommand("run", "Starts new services", "start"));
-        this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
-        this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
-        this.getService(CommandService.class).registerCommand(new DownloadCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
+        if (this.getType().equals(Type.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+            this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
+            this.getService(CommandService.class).registerCommand(new DownloadCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
+        }
+
         this.getService(CommandService.class).registerCommand(new UpdateCommand("update", "Updates the cloud"));
         this.getService(CommandService.class).registerCommand(new LogCommand("log", "Logs a server or all"));
         this.getService(CommandService.class).registerCommand(new BackupCommand("backup", "Creates a backup of the current cloud"));
