@@ -80,6 +80,7 @@ public class PermissionService extends CloudService {
                     ),
                     Collections.singletonList("Player")
             );
+            document.append("enabled", true);
             document.append(defaultGroup.getName(), defaultGroup);
             document.append(adminGroup.getName(), adminGroup);
             document.save(this.file);

@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class Packet implements Serializable {
 
-    private String document = "{}";
+    protected String document = "{}";
 
     public Packet append(String key, Object value) {
         Document document = this.document();

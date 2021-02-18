@@ -32,16 +32,32 @@ public class ProxyPingListener implements Listener {
                 networkHandler.onNetworkPing(event.getConnection().getUniqueId());
             }
 
-            if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
+            if (!this
+                    .cloudAPI
+                    .getNetworkConfig()
+                    .getProxyConfig()
+                    .isEnabled()) {
                 return;
             }
             int port = event.getConnection().getVirtualHost().getPort();
             ServerPing ping = event.getResponse();
             Motd motd;
-            if (this.cloudAPI.getNetworkConfig().getProxyConfig().isMaintenance()) {
-                motd = this.cloudAPI.getNetworkConfig().getProxyConfig().getMotdMaintenance();
+            if (this
+                    .cloudAPI
+                    .getNetworkConfig()
+                    .getProxyConfig()
+                    .isMaintenance()) {
+                motd = this
+                        .cloudAPI
+                        .getNetworkConfig()
+                        .getProxyConfig()
+                        .getMotdMaintenance();
             } else {
-                motd = this.cloudAPI.getNetworkConfig().getProxyConfig().getMotdNormal();
+                motd = this
+                        .cloudAPI
+                        .getNetworkConfig()
+                        .getProxyConfig()
+                        .getMotdNormal();
             }
 
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
@@ -63,7 +79,9 @@ public class ProxyPingListener implements Listener {
             ping.setDescription(ChatColor.translateAlternateColorCodes('&', this.replace(motd.getFirstLine(), port)) + "\n" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getSecondLine(), port)));
 
             event.setResponse(ping);
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
 

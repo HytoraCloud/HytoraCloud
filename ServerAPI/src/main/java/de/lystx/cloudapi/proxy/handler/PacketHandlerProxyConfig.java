@@ -30,6 +30,7 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
         ProxyServer.getInstance().getPluginManager().callEvent(new ProxyPacketReceiveEvent(packet));
         if (packet instanceof PacketPlayOutGlobalInfo) {
             PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo)packet;
+            cloudAPI.setNetworkConfig(info.getNetworkConfig());
             CloudProxy.getInstance().getNetworkManager().switchMaintenance(info.getNetworkConfig().getProxyConfig().isMaintenance());
             if (info.getNetworkConfig().getProxyConfig().isHubCommandEnabled()) {
                 CloudProxy.getInstance().getProxy().getPluginManager().registerCommand(CloudProxy.getInstance(), new HubCommand());
