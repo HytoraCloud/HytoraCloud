@@ -293,7 +293,7 @@ public class Document implements Serializable {
         if (jsonObject == null) {
             return null;
         }
-        return (T)gson.fromJson(jsonObject, tClass);
+        return gson.fromJson(jsonObject, tClass);
     }
 
     public <T> T getAs(Class<T> tClass) {

@@ -2,9 +2,11 @@ package de.lystx.cloudsystem.library;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBar;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBarStyle;
 import lombok.Getter;
+import org.fusesource.jansi.Ansi;
 
 import java.io.*;
 import java.net.URL;
@@ -13,17 +15,21 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter
 public class Updater {
 
     private static final Document document = new Document(getText("https://placelikehell.de/cloud/updater.json"));
 
+    private static CloudConsole cloudConsole;
+
     public static boolean isUpToDate() {
         return (getCloudVersion().equalsIgnoreCase(getNewVersion()));
     }
 
     public static boolean check(CloudConsole console) {
+        cloudConsole = console;
         if (!isUpToDate()) {
             console.getLogger().sendMessage("§9");
             console.getLogger().sendMessage("§9-----------------------------------------");
@@ -57,12 +63,19 @@ public class Updater {
         return isUpToDate();
     }
 
+    public static void debug(String prefix, String message) {
+        boolean debug = false;
+        if (debug) {
+            System.out.println("[" + prefix + "] " + ConsoleColor.construct(Ansi.Color.CYAN, false) + message);
+        }
+    }
+
     public static String getNewVersion() {
         return document.getString("version");
     }
 
     public static String getCloudVersion() {
-        return "BETA-1.5.6";
+        return "BETA-1.5.8";
     }
 
     public static List<String> getChangeLog() {

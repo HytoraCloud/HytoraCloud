@@ -6,7 +6,7 @@ import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.result.packets.login.ResultPacketLoginSuccess;
+import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketLoginSuccess;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -88,7 +88,7 @@ public class PlayerListener implements Listener {
                 Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cThere was an error! It seems like you are already on the network or tried to connect twice!"));
                 return;
             }
-            if (CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
+            if (CloudServer.getInstance().getLabyMod() != null && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
                 if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
                     CloudServer.getInstance().getLabyMod().disableVoiceChat(player);
                 }

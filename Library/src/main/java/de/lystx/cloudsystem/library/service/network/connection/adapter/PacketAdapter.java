@@ -1,5 +1,7 @@
 package de.lystx.cloudsystem.library.service.network.connection.adapter;
 
+import de.lystx.cloudsystem.library.Updater;
+import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
@@ -55,6 +57,11 @@ public class PacketAdapter {
         try {
             registeredClasses.forEach((object, methodList) -> {
                 for (PacketMethod em : methodList) {
+                    PacketHandler packetHandler = em.getAnnotation();
+                    if (packet instanceof CustomPacket && !packetHandler.transformTo().equals(Packet.class)) {
+                        Packet examplePacket = packet.document().getObject("packet", packetHandler.transformTo());
+                        this.handelAdapterHandler(examplePacket);
+                    }
                     if (em.getEvent().equals(packet.getClass())) {
                         try {
                             em.getMethod().invoke(em.getInstance(), packet);
@@ -67,7 +74,7 @@ public class PacketAdapter {
             for (PacketHandlerAdapter adapter : this.registeredHandlers) {
                 adapter.handle(packet);
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
 

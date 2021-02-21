@@ -6,13 +6,14 @@ import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.result.Result;
-import de.lystx.cloudsystem.library.result.ResultPacket;
-import de.lystx.cloudsystem.library.result.packets.other.ResultPacketStatistics;
+import de.lystx.cloudsystem.library.elements.packets.result.Result;
+import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
+import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
@@ -29,9 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -120,7 +119,7 @@ public class CloudAPI {
                 }
             }
         });
-        this.cloudClient.sendPacket(packet.uuid(uuid));
+        this.sendPacket(packet.uuid(uuid));
         int count = 0;
 
         while (value.get() == null && count++ < 3000) {
@@ -139,20 +138,24 @@ public class CloudAPI {
     }
 
     public void shutdown() {
-        this.cloudClient.sendPacket(new PacketPlayInStopServer(this.getService()));
+        this.sendPacket(new PacketPlayInStopServer(this.getService()));
         this.disconnect();
     }
 
     public void sendCommand(String command) {
-        this.cloudClient.sendPacket(new PacketPlayInCommand(command));
+        this.sendPacket(new PacketPlayInCommand(command));
     }
 
     public void sendPacket(Packet packet) {
-        this.cloudClient.sendPacket(packet);
+        if (packet.getClass().getName().toLowerCase().contains("de.lystx.cloudsystem.library.elements.packets")) {
+            this.cloudClient.sendPacket(packet);
+        } else {
+            this.cloudClient.sendPacket(new CustomPacket(packet));
+        }
     }
 
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
-        this.cloudClient.sendPacket(new PacketPlayInLog(prefix, message, showUpInConsole));
+        this.sendPacket(new PacketPlayInLog(prefix, message, showUpInConsole));
     }
 
     public void messageCloud(String prefix, Object message) {

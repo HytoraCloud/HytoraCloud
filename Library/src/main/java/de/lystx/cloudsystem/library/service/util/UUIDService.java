@@ -34,8 +34,10 @@ public class UUIDService {
             HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, System.currentTimeMillis() /1000)).openConnection();
             connection.setReadTimeout(5000);
             UUIDService data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDService.class);
-            uuidCache.put(name, data.id);
-            nameCache.put(data.id, data.name);
+            try {
+                uuidCache.put(name, data.id);
+                nameCache.put(data.id, data.name);
+            } catch (NullPointerException e) {}
             return data.id;
         } catch (Exception e) {
             e.printStackTrace();

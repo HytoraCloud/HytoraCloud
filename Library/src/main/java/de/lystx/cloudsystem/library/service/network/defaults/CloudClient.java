@@ -5,7 +5,6 @@ import de.lystx.cloudsystem.library.service.network.netty.NettyClient;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class CloudClient extends NettyClient implements CloudExecutor {
     }
 
     public void connect(String host, int port) throws Exception {
-        this.setHostname(host);
+        this.setHost(host);
         this.setPort(port);
         this.connect();
     }

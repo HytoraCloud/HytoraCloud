@@ -1,8 +1,8 @@
 package de.lystx.cloudsystem.cloud.handler.result;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.result.Result;
-import de.lystx.cloudsystem.library.result.ResultPacket;
+import de.lystx.cloudsystem.library.elements.packets.result.Result;
+import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;

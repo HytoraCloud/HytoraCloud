@@ -63,7 +63,6 @@ public class CloudBootingSetupNotDone {
             cloudSystem.getService(FileService.class).copyFileWithURL("/implements/versions/spigot/spigot.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
             cloudSystem.getService(FileService.class).copyFileWithURL("/implements/versions/bungeecord/bungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
             cloudSystem.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
-            cloudSystem.getService(FileService.class).copyFileWithURL("/implements/plugins/LabyModAPI.jar", new File(cloudSystem.getService(FileService.class).getSpigotPluginsDirectory(), "LabyModAPI.jar"));
             cloudSystem.getService(GroupService.class).createGroup(new ServiceGroup(
                     UUID.randomUUID(),
                     "Bungee",

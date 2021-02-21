@@ -23,8 +23,6 @@ import lombok.Setter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 @Getter @Setter
 public class NettyServer {
@@ -33,7 +31,7 @@ public class NettyServer {
     private String host;
     private final PacketAdapter packetAdapter;
     private final List<Channel> registeredChannels;
-    private Channel serverChannel;
+    private Channel channel;
     private boolean running;
 
     public NettyServer(String host, int port) {
@@ -47,7 +45,6 @@ public class NettyServer {
 
     public void start() {
 
-
         EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         EventLoopGroup bossGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
@@ -56,17 +53,16 @@ public class NettyServer {
         serverBootstrap.channel(Epoll.isAvailable() ? EpollServerSocketChannel.class : NioServerSocketChannel.class);
         serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel socketChannel) throws Exception {
+            public void initChannel(SocketChannel socketChannel) throws Exception {
                 ChannelPipeline channelPipeline = socketChannel.pipeline();
                 channelPipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2));
                 channelPipeline.addLast(new LengthFieldPrepender(2));
                 channelPipeline.addLast( new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));
 
-
                 channelPipeline.addLast(new ObjectEncoder());
                 channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
                     @Override
-                    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
+                    public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
                         packetAdapter.handelAdapterHandler(packet);
                     }
 
@@ -87,7 +83,7 @@ public class NettyServer {
 
         try {
             ChannelFuture channelFuture = serverBootstrap.bind(host, port).sync();
-            this.serverChannel = channelFuture.channel();
+            this.channel = channelFuture.channel();
             this.running = true;
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException ignored) {
@@ -102,12 +98,12 @@ public class NettyServer {
 
     public void sendPacket(Packet packet) {
         for (Channel registeredChannel : registeredChannels) {
-           registeredChannel.writeAndFlush(packet).addListener((ChannelFutureListener) channelFuture -> {
-               if (channelFuture.isSuccess()) {
-                   return;
-               }
-              // System.out.println("[NettyServer] Couldn't send following packet > " + packet.getClass().getSimpleName());
-           });
+            registeredChannel.writeAndFlush(packet).addListener((ChannelFutureListener) channelFuture -> {
+                if (channelFuture.isSuccess()) {
+                    return;
+                }
+                // System.out.println("[NettyServer] Couldn't send following packet > " + packet.getClass().getSimpleName());
+            });
         }
     }
 

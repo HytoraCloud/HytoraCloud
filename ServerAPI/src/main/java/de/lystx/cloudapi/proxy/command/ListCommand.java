@@ -1,11 +1,8 @@
 package de.lystx.cloudapi.proxy.command;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.result.packets.player.ResultPacketCloudPlayer;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Utils;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

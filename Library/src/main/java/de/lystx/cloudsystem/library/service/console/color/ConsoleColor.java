@@ -7,7 +7,7 @@ import org.fusesource.jansi.Ansi;
 public class ConsoleColor {
 
 
-    private static String construct(Ansi.Color color, boolean b) {
+    public static String construct(Ansi.Color color, boolean b) {
         Ansi ansi = Ansi.ansi().a(Ansi.Attribute.RESET).fg(color);
         if (b) {
             ansi.bold();
@@ -17,9 +17,7 @@ public class ConsoleColor {
         return ansi.toString();
     }
 
-
     public static String formatColorString(String input) {
-
         input = Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + input;
         input = input.replace("§a", construct(Ansi.Color.GREEN, false));
         input = input.replace("§b", construct(Ansi.Color.CYAN, true));

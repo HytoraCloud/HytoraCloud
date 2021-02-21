@@ -63,10 +63,10 @@ public class CloudServer extends JavaPlugin {
             Class.forName("net.minecraft.server.v1_8_R3.Packet");
             this.npcManager = new NPCManager();
             this.newVersion = false;
+            this.labyMod = new LabyMod(this.cloudAPI);
         } catch (Exception e){
             this.newVersion = true;
         }
-        this.labyMod = new LabyMod(this.cloudAPI);
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));

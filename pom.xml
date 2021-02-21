@@ -13,7 +13,6 @@
         <module>CloudSystem</module>
         <module>ServerAPI</module>
         <module>Modules</module>
-        <module>Wrapper</module>
     </modules>
 
     <properties>

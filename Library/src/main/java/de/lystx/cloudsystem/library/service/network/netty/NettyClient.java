@@ -19,7 +19,6 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -27,9 +26,9 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 
 @Getter @Setter
-public class NettyClient  {
+public class NettyClient {
 
-    private String hostname;
+    private String host;
     private int port;
     private final Map<Class<? extends Packet>, Integer> tries;
     private final PacketAdapter packetAdapter;
@@ -39,7 +38,7 @@ public class NettyClient  {
     private boolean established;
 
     public NettyClient(String hostname, int port) {
-        this.hostname = hostname;
+        this.host = hostname;
         this.port = port;
         this.packetAdapter = new PacketAdapter();
         this.tries = new HashMap<>();
@@ -57,16 +56,16 @@ public class NettyClient  {
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel socketChannel) throws Exception {
+                    public void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline channelPipeline = socketChannel.pipeline();
                         channelPipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2));
                         channelPipeline.addLast(new LengthFieldPrepender(2));
-                        channelPipeline.addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));
+                        channelPipeline.addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(NettyClient.class.getClassLoader())));
                         channelPipeline.addLast(new ObjectEncoder());
 
                         channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
                             @Override
-                            protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
+                            public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
                                 if (packet instanceof PacketPlayOutVerifyConnection && !established && consumerConnection != null) {
                                     established = true;
                                     consumerConnection.accept(NettyClient.this);
@@ -79,7 +78,7 @@ public class NettyClient  {
                 });
 
         try {
-            ChannelFuture channelFuture = bootstrap.connect(this.hostname, port).sync();
+            ChannelFuture channelFuture = bootstrap.connect(this.host, port).sync();
             this.channel = channelFuture.channel();
             this.running = true;
             channelFuture.channel().closeFuture().sync();

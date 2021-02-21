@@ -1,6 +1,5 @@
 package de.lystx.cloudsystem.library.service.network.defaults;
 
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.netty.NettyServer;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +14,11 @@ public class CloudServer extends NettyServer implements CloudExecutor {
     }
 
     public void connect() {
-        this.start();
+        try {
+            this.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void connect(String host, int port) {
@@ -25,7 +28,7 @@ public class CloudServer extends NettyServer implements CloudExecutor {
     }
 
     public void disconnect() {
-        this.getServerChannel().close();
+        this.getChannel().close();
     }
 
     public void registerPacketHandler(Object packetHandlerAdapter) {
