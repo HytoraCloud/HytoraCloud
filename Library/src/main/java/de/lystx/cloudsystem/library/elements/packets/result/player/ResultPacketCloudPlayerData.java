@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
+import io.vson.elements.object.VsonObject;
 
 public class ResultPacketCloudPlayerData extends ResultPacket {
 
@@ -14,7 +15,7 @@ public class ResultPacketCloudPlayerData extends ResultPacket {
     }
 
     @Override
-    public Document read(CloudLibrary cloudLibrary) {
-        return new Document().append(cloudLibrary.getService(PermissionService.class).getPermissionPool().getPlayerData(name));
+    public VsonObject read(CloudLibrary cloudLibrary) {
+        return new VsonObject().putAll(cloudLibrary.getService(PermissionService.class).getPermissionPool().getPlayerData(name));
     }
 }

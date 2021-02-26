@@ -5,6 +5,9 @@ import com.sun.net.httpserver.HttpServer;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.file.FileService;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.FileFormat;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
 import java.io.File;
@@ -24,22 +27,27 @@ public class WebServer {
     private CloudLibrary cloudLibrary;
     private Map<String, HttpHandler> handlers;
 
-    private final Document config;
-    private final int port;
-    private final boolean enabled;
-    private final List<String> whitelistedIps;
+    private VsonObject config;
+    private int port;
+    private boolean enabled;
+    private List<String> whitelistedIps;
 
     public WebServer(CloudLibrary cloudLibrary) {
-        this.config = new Document(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "web.json"));
-        this.port = this.config.getInteger("port", 2217);
-        this.enabled = this.config.getBoolean("enabled", true);
-        this.whitelistedIps = this.config.has("whitelistedIps") ? this.config.getList("whitelistedIps") : (this.config.append("whitelistedIps", Collections.singletonList("127.0.0.1")).getList("whitelistedIps"));
-        this.config.save();
         try {
-            this.handlers = new HashMap<>();
-            this.cloudLibrary = cloudLibrary;
-            this.server = HttpServer.create(new InetSocketAddress(this.port), 0);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> this.server.stop(0)));
+            this.config = new VsonObject(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "web.vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+
+            this.port = this.config.getInteger("port", 2217);
+            this.enabled = this.config.getBoolean("enabled", true);
+            this.whitelistedIps = this.config.has("whitelistedIps") ? this.config.getList("whitelistedIps") : (this.config.append("whitelistedIps", Collections.singletonList("127.0.0.1")).getList("whitelistedIps"));
+            this.config.save();
+            try {
+                this.handlers = new HashMap<>();
+                this.cloudLibrary = cloudLibrary;
+                this.server = HttpServer.create(new InetSocketAddress(this.port), 0);
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> this.server.stop(0)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,19 +69,19 @@ public class WebServer {
         }
     }
 
-    public void update(String web, Document document) {
+    public void update(String web, VsonObject document) {
 
         String finalWeb = (web.startsWith("/") ? web : "/" + web);
         this.remove(web);
         this.server.createContext(finalWeb, httpExchange -> {
             if (this.whitelistedIps.contains(httpExchange.getLocalAddress().getAddress().getHostAddress())) {
-                String response = document.toString();
+                String response = document.toString(FileFormat.JSON);
                 httpExchange.sendResponseHeaders(200, response.length());
                 OutputStream os = httpExchange.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
             } else {
-                String response = new Document().append("response", "Your ip is not allowed to view this content!").toString();
+                String response = new VsonObject().append("response", "Your ip is not allowed to view this content!").toString(FileFormat.JSON);
                 httpExchange.sendResponseHeaders(403, response.length());
                 OutputStream os = httpExchange.getResponseBody();
                 os.write(response.getBytes());

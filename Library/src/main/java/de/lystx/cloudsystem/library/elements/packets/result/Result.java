@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.elements.packets.result;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,21 +13,21 @@ import java.util.function.Consumer;
 public class Result implements Serializable {
 
     private final UUID uniqueId;
-    private final String result;
+    private final VsonObject result;
     private boolean error;
 
-    public Result(UUID uniqueId, Document result) {
+    public Result(UUID uniqueId, VsonObject result) {
         this.uniqueId = uniqueId;
-        this.result = result.toString();
+        this.result = result;
         this.error = false;
     }
 
-    public Document getDocument() {
-        return new Document(this.result);
+    public VsonObject getDocument() {
+        return this.result;
     }
 
     public <T> T getResultAs(Class<T> tClass) {
-        return this.getDocument().getObject(this.getDocument().getJsonObject(), tClass);
+        return this.getDocument().getAs(tClass);
     }
 
     public Result onError(Runnable runnable) {
@@ -36,7 +37,7 @@ public class Result implements Serializable {
         return this;
     }
 
-    public Result onDocumentSet(Consumer<Document> consumer) {
+    public Result onDocumentSet(Consumer<VsonObject> consumer) {
         consumer.accept(this.getDocument());
         return this;
     }

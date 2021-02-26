@@ -64,8 +64,8 @@ public class FileService extends CloudService {
         this.startSh = new File("start.sh");
 
         this.cloudDirectory = new File("./local/");
-        this.configFile = new File(this.cloudDirectory, "config.json");
-        this.permissionsFile = new File(this.cloudDirectory, "perms.json");
+        this.configFile = new File(this.cloudDirectory, "config.vson");
+        this.permissionsFile = new File(this.cloudDirectory, "perms.vson");
 
         this.serverDirectory = new File(this.cloudDirectory, "services/");
         this.staticServerDirectory = new File(this.serverDirectory, "static/");
@@ -80,13 +80,13 @@ public class FileService extends CloudService {
         this.cloudPlayerDirectory = new File(this.databaseDirectory, "players/");
 
         this.npcDirectory = new File(this.databaseDirectory, "npcSelector/");
-        this.npcFile = new File(this.npcDirectory, "npcs.json");
-        this.npcLayout = new File(this.npcDirectory, "config.json");
+        this.npcFile = new File(this.npcDirectory, "npcs.vson");
+        this.npcLayout = new File(this.npcDirectory, "config.vson");
 
         this.signDirectory = new File(this.databaseDirectory, "signSelector/");
-        this.signsFile = new File(this.signDirectory, "signs.json");
-        this.signLayoutFile = new File(this.signDirectory, "signLayouts.json");
-        this.statsFile = new File(this.databaseDirectory, "stats.json");
+        this.signsFile = new File(this.signDirectory, "signs.vson");
+        this.signLayoutFile = new File(this.signDirectory, "signLayouts.vson");
+        this.statsFile = new File(this.databaseDirectory, "stats.vson");
 
         this.groupsDirectory = new File(this.cloudDirectory, "groups/");
         this.templatesDirectory = new File(this.cloudDirectory, "templates/");
@@ -103,7 +103,7 @@ public class FileService extends CloudService {
 
 
         this.backupDirectory = new File(this.globalDirectory, "backup/");
-        this.backupFile = new File(this.backupDirectory, "backup.json");
+        this.backupFile = new File(this.backupDirectory, "backup.vson");
 
         this.check();
     }

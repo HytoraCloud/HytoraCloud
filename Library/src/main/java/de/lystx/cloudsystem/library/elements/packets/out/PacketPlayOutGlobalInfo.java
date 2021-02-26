@@ -12,6 +12,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -24,7 +25,7 @@ public class PacketPlayOutGlobalInfo extends Packet implements Serializable {
     private final NetworkConfig networkConfig;
     private final Map<ServiceGroup, List<Service>> services;
 
-    public PacketPlayOutGlobalInfo(NetworkConfig networkConfig, Map<ServiceGroup, List<Service>> services, PermissionPool permissionPool, List<CloudPlayer> cloudPlayers, List<CloudSign> cloudSigns, Document signLayOut) {
+    public PacketPlayOutGlobalInfo(NetworkConfig networkConfig, Map<ServiceGroup, List<Service>> services, PermissionPool permissionPool, List<CloudPlayer> cloudPlayers, List<CloudSign> cloudSigns, VsonObject signLayOut) {
         this.networkConfig = networkConfig;
         this.services = services;
 

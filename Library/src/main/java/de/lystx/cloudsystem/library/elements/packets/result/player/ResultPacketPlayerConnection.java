@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import io.vson.elements.object.VsonObject;
 
 
 public class ResultPacketPlayerConnection extends ResultPacket {
@@ -17,9 +18,9 @@ public class ResultPacketPlayerConnection extends ResultPacket {
     }
 
     @Override
-    public Document read(CloudLibrary cloudLibrary) {
+    public VsonObject read(CloudLibrary cloudLibrary) {
         CloudPlayerData data = cloudLibrary.getService(PermissionService.class).getPermissionPool().getPlayerData(this.name);
-        return new Document().append(new CloudConnection(
+        return new VsonObject().putAll(new CloudConnection(
                 data.getUuid(),
                 data.getName(),
                 data.getIpAddress()

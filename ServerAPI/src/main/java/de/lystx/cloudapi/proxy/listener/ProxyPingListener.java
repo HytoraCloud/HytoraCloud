@@ -19,9 +19,11 @@ public class ProxyPingListener implements Listener {
 
 
     private final CloudAPI cloudAPI;
+    private int nullPointers;
 
     public ProxyPingListener() {
         this.cloudAPI = CloudAPI.getInstance();
+        this.nullPointers = 0;
     }
 
     @EventHandler
@@ -80,7 +82,12 @@ public class ProxyPingListener implements Listener {
 
             event.setResponse(ping);
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            this.nullPointers++;
+            if (nullPointers == 5) {
+                System.out.println("[CloudProxy] Couldn't get ProxyPing information for " + this.nullPointers + " times!");
+                e.printStackTrace();
+                this.nullPointers = 0;
+            }
         }
     }
 

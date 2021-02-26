@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPla
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInRemoveNPC;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -20,18 +21,18 @@ public class NPCManager {
 
     private final Map<NPC, String> npcs;
     private final Map<NPC, String> groupNPCS;
-    private Document document;
+    private VsonObject document;
     private NPCConfig npcConfig;
 
     public NPCManager() {
         this.npcs = new HashMap<>();
         this.groupNPCS = new HashMap<>();
-        this.document = new Document();
+        this.document = new VsonObject();
     }
 
     public void createNPC(Location location, String name, String group, String skin) {
-        Document document = new Document()
-                .append("location", new Document()
+        VsonObject document = new VsonObject()
+                .append("location", new VsonObject()
                         .append("x", location.getX())
                         .append("y", location.getY())
                         .append("z", location.getZ())
@@ -41,7 +42,7 @@ public class NPCManager {
                 .append("name", name)
                 .append("skin", skin)
                 .append("group", group);
-        CloudAPI.getInstance().sendPacket(new PacketPlayInCreateNPC(name + "_" + group + UUID.randomUUID(), document.toString()));
+        CloudAPI.getInstance().sendPacket(new PacketPlayInCreateNPC(name + "_" + group + UUID.randomUUID(), document));
         this.updateNPCS();
     }
 
@@ -68,7 +69,7 @@ public class NPCManager {
         Bukkit.getOnlinePlayers().forEach(player -> this.updateNPCS(document, player, false));
     }
 
-    public void updateNPCS(Document document, Player player, boolean join) {
+    public void updateNPCS(VsonObject document, Player player, boolean join) {
         this.document = document;
         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
             return;
@@ -82,10 +83,13 @@ public class NPCManager {
             }
         }
         for (String key : document.keys()) {
-            Document doc = document.getDocument(key);
-            Document loc = doc.getDocument("location");
+            VsonObject doc = document.getVson(key);
+            VsonObject loc = doc.getVson("location", new VsonObject());
+            if (loc.isEmpty()) {
+                continue;
+            }
             if (!loc.getString("world").equalsIgnoreCase(player.getWorld().getName())) {
-                return;
+                continue;
             }
             Location location = new Location(Bukkit.getWorld(loc.getString("world")), loc.getDouble("x"), loc.getDouble("y"), loc.getDouble("z"),
                     loc.getFloat("yaw"), loc.getFloat("pitch"));

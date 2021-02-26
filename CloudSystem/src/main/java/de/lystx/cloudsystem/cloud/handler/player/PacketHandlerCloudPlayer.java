@@ -37,11 +37,10 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInRegisterCloudPlayer) {
-            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
             PacketPlayInRegisterCloudPlayer packetPlayInRegisterCloudPlayer = (PacketPlayInRegisterCloudPlayer) packet;
             CloudPlayer cloudPlayer = packetPlayInRegisterCloudPlayer.getCloudPlayer();
-            cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerData(cloudPlayer.getName()));
-            cloudPlayer.setProperties(SerializableDocument.fromDocument(cloudSystem.getService(CloudPlayerService.class).getProperties(cloudPlayer.getUuid())));
+            //cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerData(cloudPlayer.getName()));
+            //cloudPlayer.setProperties(cloudSystem.getService(CloudPlayerService.class).getProperties(cloudPlayer.getUuid()));
             if (packetPlayInRegisterCloudPlayer.isSendMessage()) {
                 if (!list.contains(cloudPlayer.getName())) {
                     list.add(cloudPlayer.getName());
@@ -65,6 +64,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
                 this.cloudSystem.getService(StatisticsService.class).getStatistics().add("registeredPlayers");
             }
 
+            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
             this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerJoin(cloudPlayer));
             this.cloudSystem.reload();
         } else if (packet instanceof PacketCommunicationUpdateCloudPlayer) {

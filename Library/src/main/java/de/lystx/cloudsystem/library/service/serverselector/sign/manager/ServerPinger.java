@@ -1,12 +1,15 @@
 package de.lystx.cloudsystem.library.service.serverselector.sign.manager;
 
+import lombok.Getter;
+
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
-
+@Getter
 public class ServerPinger {
 
     private String motd;
@@ -21,46 +24,54 @@ public class ServerPinger {
     private InputStreamReader inputStreamReader = null;
 
     public void pingServer(final String adress, final int port, final int timeout) throws IOException {
-        socket = new Socket();
-        socket.setSoTimeout(timeout);
-        socket.connect(new InetSocketAddress(adress, port), timeout);
+        this.socket = new Socket();
+        this.socket.setSoTimeout(timeout);
+        this.socket.connect(new InetSocketAddress(adress, port), timeout);
 
-        outputStream = socket.getOutputStream();
-        dataOutputStream = new DataOutputStream(outputStream);
-        inputStream = socket.getInputStream();
-        inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_16BE);
+        this.outputStream = socket.getOutputStream();
+        this.dataOutputStream = new DataOutputStream(outputStream);
+        this.inputStream = socket.getInputStream();
+        this.inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_16BE);
 
-        dataOutputStream.write(new byte[] { -2, 1 });
+        try {
+
+            dataOutputStream.write(new byte[] { -2, 1 });
             int packetId = inputStream.read();
-            if(packetId != 255)
-                close();
+            if(packetId != 255) {
+               this.close();
+            }
 
             int length = inputStreamReader.read();
-            if (length == -1 || length == 0)
-                close();
+            if (length == -1 || length == 0) {
+                this.close();
+            }
 
             final char[] chars = new char[length];
 
-            if (inputStreamReader.read(chars, 0, length) != length)
-                close();
+            if (inputStreamReader.read(chars, 0, length) != length) {
+                this.close();
+            }
 
             final String string = new String(chars);
 
+            final String[] data;
             if (string.startsWith("§")) {
-                final String[] data = string.split("\u0000");
+                data = string.split("\u0000");
                 motd = data[3];
                 players = Integer.parseInt(data[4]);
                 maxplayers = Integer.parseInt(data[5]);
-                online = true;
-                close();
             } else {
-                final String[] data = string.split("§");
+                data = string.split("§");
                 motd = data[0];
                 players = Integer.parseInt(data[1]);
                 maxplayers = Integer.parseInt(data[2]);
-                online = true;
-                close();
             }
+            this.online = true;
+            this.close();
+        } catch (SocketTimeoutException e) {
+            e.printStackTrace();
+            System.out.println("[ServerPinger] Timed out while pinging " + adress + ":" + port + " after " + timeout + "ms");
+        }
     }
 
     private void close() throws IOException {
@@ -71,19 +82,4 @@ public class ServerPinger {
         socket.close();
     }
 
-    public String getMotd() {
-        return motd;
-    }
-
-    public int getPlayers() {
-        return players;
-    }
-
-    public int getMaxplayers() {
-        return maxplayers;
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
 }

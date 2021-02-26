@@ -1,35 +1,40 @@
 package de.lystx.cloudsystem.library.service.serverselector.npc;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.VsonValue;
+import io.vson.elements.VsonArray;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 @Getter
 public class NPCService extends CloudService {
 
-    private Document document;
-    private Document config;
+    private VsonObject document;
+    private VsonObject config;
 
     public NPCService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
-
-        this.document = new Document(cloudLibrary.getService(FileService.class).getNpcFile());
-        this.config = new Document(cloudLibrary.getService(FileService.class).getNpcLayout());
-
         this.load();
     }
 
     public void load() {
-        this.document = new Document(getCloudLibrary().getService(FileService.class).getNpcFile());
-        this.config = new Document(getCloudLibrary().getService(FileService.class).getNpcLayout());
+        try {
+            this.document = new VsonObject(getCloudLibrary().getService(FileService.class).getNpcFile(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            this.config = new VsonObject(getCloudLibrary().getService(FileService.class).getNpcLayout(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (this.config.isEmpty() || !this.config.getFile().exists()) {
-            this.config.append(new NPCConfig(
+            this.config.putAll(new NPCConfig(
                     6,
                     "§8» §7Group §8┃ §b%group%",
                     true,
@@ -44,27 +49,33 @@ public class NPCService extends CloudService {
                         "§8» §bState §8» §7%state%"
                     ),
                     "MINECART",
-                    Collections.singletonList(new SerializableDocument()
-                    .append("slot", 4)
-                    .append("type", "NAME_TAG")
-                    .append("name", "§8» §3%group%")
-                    .append("lore", Arrays.asList(
-                            "§8§m-----------",
-                            "§8» §bOnline §8» §7%online_services%",
-                            "§8» §bType §8» §7%type%",
-                            "§8» §bTemplate §8» §7%template%"
-                    )).append("glow", false))
+                    Collections.singletonList(new VsonObject()
+                            .append("slot", 4)
+                            .append("type", "NAME_TAG")
+                            .append("name", "§8» §3%group%")
+                            .append("lore", Arrays.asList(
+                                    "§8§m-----------",
+                                    "§8» §bOnline §8» §7%online_services%",
+                                    "§8» §bType §8» §7%type%",
+                                    "§8» §bTemplate §8» §7%template%"
+                            )).append("glow", false))
             ));
             this.config.save();
         }
     }
 
     public NPCConfig getNPCConfig() {
-        return this.config.getObject(this.config.getJsonObject(), NPCConfig.class);
+        this.load();
+        VsonArray vsonArray = this.config.getArray("items");
+        List<VsonObject> vsonObjects = new LinkedList<>();
+        for (VsonValue value : vsonArray.values()) {
+            vsonObjects.add((VsonObject) value);
+        }
+        return new NPCConfig(this.config.getInteger("inventoryRows", 0), this.config.getString("inventoryTitle"), this.config.getBoolean("corners"), this.config.getString("connectingMessage"), this.config.getString("itemName"), this.config.getList("lore"), this.config.getString("itemType"), vsonObjects);
     }
 
-    public void append(String key, Document document) {
-        this.document.append(key, document);
+    public void append(String key, VsonObject vsonObject) {
+        this.document.append(key, vsonObject);
     }
 
     public void remove(String key) {

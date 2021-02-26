@@ -4,10 +4,12 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,9 +28,13 @@ public class GroupService extends CloudService {
     public void loadGroups() {
         if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
             for (File file : this.getCloudLibrary().getService(FileService.class).getGroupsDirectory().listFiles()) {
-                if (file.getName().endsWith(".json")) {
-                    Document document = new Document(file);
-                    this.groups.add(document.getObject(document.getJsonObject(), ServiceGroup.class));
+                if (file.getName().endsWith(".vson")) {
+                    try {
+                        VsonObject document = new VsonObject(file, VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+                        this.groups.add(document.getAs(ServiceGroup.class));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -38,35 +44,48 @@ public class GroupService extends CloudService {
         if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
             return;
         }
-        Document document = new Document(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        document.append(serviceGroup);
-        document.save();
-        this.groups.add(serviceGroup);
-        this.getCloudLibrary().getService(TemplateService.class).createTemplate(serviceGroup);
+        try {
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            document.putAll(serviceGroup);
+            document.save();
+            this.groups.add(serviceGroup);
+            this.getCloudLibrary().getService(TemplateService.class).createTemplate(serviceGroup);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteGroup(ServiceGroup serviceGroup) {
         if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
             return;
         }
-        Document document = new Document(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        document.clear();
-        document.getFile().delete();
-        this.groups.remove(this.getGroup(serviceGroup.getName()));
-        this.getCloudLibrary().getService(TemplateService.class).deleteTemplates(serviceGroup);
+        try {
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            document.clear();
+            document.getFile().delete();
+            this.groups.remove(this.getGroup(serviceGroup.getName()));
+            this.getCloudLibrary().getService(TemplateService.class).deleteTemplates(serviceGroup);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void updateGroup(ServiceGroup serviceGroup, ServiceGroup newServiceGroup) {
         if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
             return;
         }
-        Document document = new Document(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        document.clear();
-        document.getFile().delete();
-        this.groups.remove(serviceGroup);
-        document.append(newServiceGroup);
-        this.groups.add(newServiceGroup);
-        document.save();
+        try {
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            document.clear();
+            document.getFile().delete();
+            this.groups.remove(this.getGroup(serviceGroup.getName()));
+            document.putAll(newServiceGroup);
+            this.groups.add(newServiceGroup);
+            document.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public ServiceGroup getGroup(String name) {

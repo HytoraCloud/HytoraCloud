@@ -8,11 +8,12 @@ import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGro
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ public class PermissionService extends CloudService {
         this.permissionPool.getPlayerCache().clear();
         this.permissionPool.getPermissionGroups().clear();
         if (!this.file.exists()) {
-            Document document = new Document();
+            VsonObject vsonObject = new VsonObject();
             PermissionGroup defaultGroup = new DefaultPermissionGroup();
             PermissionGroup adminGroup = new PermissionGroup(
                     "Admin",
@@ -80,22 +81,26 @@ public class PermissionService extends CloudService {
                     ),
                     Collections.singletonList("Player")
             );
-            document.append("enabled", true);
-            document.append(defaultGroup.getName(), defaultGroup);
-            document.append(adminGroup.getName(), adminGroup);
-            document.save(this.file);
+            vsonObject.append("enabled", true);
+            vsonObject.append(defaultGroup.getName(), defaultGroup);
+            vsonObject.append(adminGroup.getName(), adminGroup);
+            vsonObject.save(this.file);
             this.load();
             return;
         }
-        Document document = new Document(file);
-        for (String key : document.keys()) {
-            if (key.equalsIgnoreCase("enabled")) {
-                enabled = document.getBoolean(key);
-                this.permissionPool.setEnabled(enabled);
-                continue;
+        try {
+            VsonObject vsonObject = new VsonObject(file);
+            for (String key : vsonObject.keys()) {
+                if (key.equalsIgnoreCase("enabled")) {
+                    enabled = vsonObject.getBoolean(key);
+                    this.permissionPool.setEnabled(enabled);
+                    continue;
+                }
+                PermissionGroup group = vsonObject.getObject(key, PermissionGroup.class);
+                this.permissionPool.getPermissionGroups().add(group);
             }
-            PermissionGroup group = document.getObject(key, PermissionGroup.class);
-            this.permissionPool.getPermissionGroups().add(group);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

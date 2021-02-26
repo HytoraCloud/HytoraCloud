@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,13 +55,13 @@ public class CloudNetwork {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartGroup(serviceGroup));
     }
 
-    public void startService(String name, String serviceGroup, Document properties) {
+    public void startService(String name, String serviceGroup, VsonObject properties) {
         Service service = new Service(name, UUID.randomUUID(), this.getServiceGroup(serviceGroup), -1, -1, -1, ServiceState.LOBBY);
-        this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartService(service, properties.toString()));
+        this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartService(service, properties));
     }
 
 
-    public void startService(String serviceGroup, Document properties) {
+    public void startService(String serviceGroup, VsonObject properties) {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties));
 
     }

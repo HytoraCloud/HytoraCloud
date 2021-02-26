@@ -1,11 +1,12 @@
 package de.lystx.cloudsystem.library.service.config.stats;
 
-
-import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,11 +24,17 @@ public class Statistics implements Serializable {
     }
 
     public void load() {
-        Document document = Document.fromFile(this.file);
-        this.load(document);
+        try {
+            VsonObject vsonObject = new VsonObject(this.file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+            this.load(vsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    public void load(Document document) {
+    public void load(VsonObject document) {
+        this.file = document.getFile();
         if (document.isEmpty()) {
             document.append("connections", 0);
             document.append("startedServices", 0);
@@ -39,7 +46,7 @@ public class Statistics implements Serializable {
             document.save(this.file);
         }
         for (String key : document.keys()) {
-            this.stats.put(key, document.getInteger(key));
+            this.stats.put(key, document.getInteger(key, 0));
         }
     }
 
@@ -47,15 +54,16 @@ public class Statistics implements Serializable {
         this.stats.put(key, (this.stats.getOrDefault(key, 0) + 1));
     }
 
-    public Document toDocument() {
-        Document document = new Document();
-        this.stats.forEach(document::append);
+    public VsonObject toVson() {
+        VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+        this.stats.forEach((key, i) -> {
+            document.append(key, (int)i);
+        });
         return document;
     }
 
-    public void save() {
-        Document document = Document.fromFile(this.file);
-        this.stats.forEach(document::append);
-        document.save(this.file);
+    public void save(File file) {
+        this.file = file;
+        this.toVson().save(file);
     }
 }

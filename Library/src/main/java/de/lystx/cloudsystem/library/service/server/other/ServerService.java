@@ -27,10 +27,13 @@ import de.lystx.cloudsystem.library.service.server.other.process.ServiceProvider
 import de.lystx.cloudsystem.library.service.util.Action;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.util.Value;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -83,9 +86,14 @@ public class ServerService extends CloudService {
         for (Service service : this.getServices(this.getGroup(group.getName()))) {
             service.setServiceGroup(newGroup);
             CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getScreenByName(service.getName());
-            Document document = new Document(new File(screen.getServerDir(), "CLOUD/connection.json"));
-            document.append(service);
-            document.save();
+
+            try {
+                VsonObject document = new VsonObject(new File(screen.getServerDir(), "CLOUD/connection.vson"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+                document.putAll(service);
+                document.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -216,8 +224,8 @@ public class ServerService extends CloudService {
         }, 3L);
     }
 
-    public Document startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
-        Document document = new Document();
+    public VsonObject startService(ServiceGroup serviceGroup, Service service, VsonObject properties) {
+        VsonObject document = new VsonObject();
         if (!this.getCloudLibrary().isRunning()) {
             document.append("message", "§cCloudLibrary isn't running anymore!");
             document.append("sucess", false);
@@ -244,7 +252,7 @@ public class ServerService extends CloudService {
             int id = this.idService.getFreeID(serviceGroup.getName());
             service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, ((NetworkConfig) getCloudLibrary().getCustoms().get("networkConfig")).getPort(), service.getServiceState());
         }
-        service.setProperties((properties == null ? new SerializableDocument() : properties));
+        service.setProperties((properties == null ? new VsonObject() : properties));
         this.globalServices.add(service);
         List<Service> services = this.getServices(serviceGroup);
         services.add(service);
@@ -269,11 +277,11 @@ public class ServerService extends CloudService {
         this.startService(serviceGroup, service, null);
     }
 
-    public Document startService(ServiceGroup serviceGroup) {
-        return this.startService(serviceGroup, (SerializableDocument) null);
+    public VsonObject startService(ServiceGroup serviceGroup) {
+        return this.startService(serviceGroup, (VsonObject) null);
     }
 
-    public Document startService(ServiceGroup serviceGroup, SerializableDocument properties) {
+    public VsonObject startService(ServiceGroup serviceGroup, VsonObject properties) {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
         Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), ServiceState.LOBBY);

@@ -1,13 +1,16 @@
 package de.lystx.cloudsystem.library.elements.other;
 
 import com.google.gson.*;
+import io.vson.elements.object.VsonMember;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-@Getter
+@Getter @Setter
 public class Document implements Serializable {
 
     private final Gson gson;
@@ -25,6 +28,14 @@ public class Document implements Serializable {
     }
     public Document(JsonObject object) {
         this(object, null, null);
+    }
+
+    public static Document fromVson(VsonObject vsonObject) {
+        Document document = new Document();
+        for (VsonMember vsonMember : vsonObject) {
+            document.append(vsonMember.getName(), vsonObject.getObject(vsonMember.getName()));
+        }
+        return document;
     }
 
     public Document(String input) {
@@ -313,6 +324,14 @@ public class Document implements Serializable {
 
     public static Document fromFile(File file) {
         return new Document(file);
+    }
+
+    public VsonObject toVson() {
+        VsonObject vsonObject = new VsonObject();
+        for (String key : this.keys()) {
+            vsonObject.append(key, this.get(key));
+        }
+        return vsonObject;
     }
 
     public void save() {

@@ -1,11 +1,11 @@
 package de.lystx.cloudsystem.library.service.module;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.command.CloudCommand;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +19,7 @@ public abstract class Module {
     private CloudLibrary cloudLibrary;
     private CommandService commandService;
     private EventService eventService;
-    private Document config;
+    private VsonObject config;
     private File moduleDirectory;
 
     public abstract void onLoadConfig(CloudLibrary cloudLibrary);

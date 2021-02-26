@@ -6,12 +6,12 @@ import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermission
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermissionPool;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.UUIDService;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -288,8 +288,16 @@ public class PermissionPool implements Serializable {
         return null;
     }
 
-    public Document save(File file, File directory, CloudDatabase database) {
-        Document document = new Document(file);
+    public VsonObject save(File file, File directory, CloudDatabase database) {
+        VsonObject document = null;
+        try {
+            document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (document == null) {
+            return null;
+        }
         for (PermissionGroup permissionGroup : this.permissionGroups) {
             document.append(permissionGroup.getName(), permissionGroup);
         }
@@ -299,7 +307,7 @@ public class PermissionPool implements Serializable {
             database.setPlayerData(cloudPlayerData.getUuid(), cloudPlayerData);
             //Document dataDoc = new Document();
             //dataDoc.appendAll(cloudPlayerData);
-            //dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".json"));
+            //dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".vson"));
         }
         this.clearInvalidUUIDs(directory);
         return document;

@@ -1,21 +1,23 @@
 package de.lystx.cloudsystem.library.service.database;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.database.impl.Files;
 import de.lystx.cloudsystem.library.service.database.impl.MongoDB;
 import de.lystx.cloudsystem.library.service.database.impl.MySQL;
 import de.lystx.cloudsystem.library.service.file.FileService;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
 import java.io.File;
+import java.io.IOException;
 
 @Getter
 public class DatabaseService extends CloudService {
 
     private CloudDatabase database;
-    private Document document;
+    private VsonObject document;
     private String databaseType;
     private String host;
     private String username;
@@ -27,11 +29,15 @@ public class DatabaseService extends CloudService {
     public DatabaseService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
         this.database = new Files(this);
-        this.document = new Document(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "database.json"));
-        this.reload(document);
+        try {
+            this.document = new VsonObject(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "database.vson"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+            this.reload(document);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void reload(Document document) {
+    public void reload(VsonObject document) {
         this.document = document;
         this.databaseType = document.getString("type", "FILES");
         this.host = document.getString("host", "127.0.0.1");

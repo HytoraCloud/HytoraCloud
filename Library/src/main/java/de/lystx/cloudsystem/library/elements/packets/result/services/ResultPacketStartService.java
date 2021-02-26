@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStar
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 
 @Getter
@@ -19,8 +20,8 @@ public class ResultPacketStartService extends ResultPacket {
     }
 
     @Override
-    public Document read(CloudLibrary cloudLibrary) {
+    public VsonObject read(CloudLibrary cloudLibrary) {
         cloudLibrary.sendPacket(new PacketPlayInStartGroup(cloudLibrary.getService(GroupService.class).getGroup(this.group)));
-        return cloudLibrary.getService(ServerService.class).startService(cloudLibrary.getService(ServerService.class).getGroup(this.group));
+        return (cloudLibrary.getService(ServerService.class).startService(cloudLibrary.getService(ServerService.class).getGroup(this.group)));
     }
 }

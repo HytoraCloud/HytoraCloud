@@ -15,6 +15,8 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
 import de.lystx.cloudsystem.library.service.setup.impl.DatabaseSetup;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 
 import java.io.File;
 import java.util.UUID;
@@ -49,13 +51,17 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cPlease provide a §evalid database§c!");
                 System.exit(0);
             }
-            Document document = cloudSystem.getService(ConfigService.class).getDocument();
+            VsonObject document = cloudSystem.getService(ConfigService.class).getVsonObject();
+            document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            document.getVsonSettings().add(VsonSettings.OVERRITE_VALUES);
             document.append("setupDone", true);
             document.append("host", sp.getHostname());
             document.append("port", sp.getPort());
             document.append("proxyProtocol", sp.isProxyProtocol());
             document.append("autoUpdater", sp.isAutoUpdater());
-            Document proxy = document.getDocument("proxyConfig");
+            VsonObject proxy = document.getVson("proxyConfig");
+            proxy.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            proxy.getVsonSettings().add(VsonSettings.OVERRITE_VALUES);
             proxy.append("maxPlayers", sp.getMaxPlayers());
             document.append("proxyConfig", proxy);
             document.save();
@@ -102,7 +108,7 @@ public class CloudBootingSetupNotDone {
                 DatabaseSetup databaseSetup = new DatabaseSetup();
                 databaseSetup.start(cloudSystem.getConsole(), s -> {
                     DatabaseSetup ds = (DatabaseSetup)s;
-                    Document document1 = new Document()
+                    VsonObject document1 = new VsonObject(VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST)
                             .append("type", sp.getDatabase().toUpperCase())
                             .append("host", ds.getHost())
                             .append("port", ds.getPort())
@@ -110,7 +116,7 @@ public class CloudBootingSetupNotDone {
                             .append("defaultDatabase", ds.getDefaultDatabase())
                             .append("collectionOrTable", ds.getCollectionOrTable())
                             .append("password", ds.getPassword());
-                    document1.save(new File(cloudSystem.getService(FileService.class).getDatabaseDirectory(), "database.json"));
+                    document1.save(new File(cloudSystem.getService(FileService.class).getDatabaseDirectory(), "database.vson"));
                     cloudSystem.getService(DatabaseService.class).reload(document1);
                 });
             }

@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 
 @Getter
@@ -18,8 +19,8 @@ public class ResultPacketPermissionGroup extends ResultPacket {
     }
 
     @Override
-    public Document read(CloudLibrary cloudLibrary) {
+    public VsonObject read(CloudLibrary cloudLibrary) {
         PermissionPool permissionPool = cloudLibrary.getService(PermissionService.class).getPermissionPool();
-        return new Document().append(permissionPool.getHighestPermissionGroup(cloudPlayer.getName()));
+        return new VsonObject().putAll(permissionPool.getHighestPermissionGroup(cloudPlayer.getName()));
     }
 }

@@ -26,10 +26,13 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.util.Value;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -110,6 +113,7 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerAdapter() {
             @Override
             public void handle(Packet packet) {
+                System.out.println(packet.getClass().getSimpleName());
                 if (packet instanceof ResultPacket) {
                     ResultPacket resultPacket = (ResultPacket)packet;
                     if (uuid.equals(resultPacket.getUniqueId())) {
@@ -130,7 +134,7 @@ public class CloudAPI {
             }
         }
         if (count >= 2999) {
-            Result r = new Result(uuid, new Document());
+            Result r = new Result(uuid, new VsonObject());
             r.setError(true);
             value.set(r);
         }
@@ -163,15 +167,20 @@ public class CloudAPI {
     }
 
     public Service getService() {
-        return this.getDocument().getObject(this.getDocument().getJsonObject(), Service.class);
+        return this.getDocument().getAs(Service.class);
     }
 
-    public Document getProperties() {
-        return this.getService().getProperties().toDocument();
+    public VsonObject getProperties() {
+        return this.getService().getProperties();
     }
 
-    public Document getDocument() {
-        return Document.fromFile(new File("./CLOUD/connection.json"));
+    public VsonObject getDocument() {
+        try {
+            return new VsonObject(new File("./CLOUD/connection.vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public String getPrefix() {

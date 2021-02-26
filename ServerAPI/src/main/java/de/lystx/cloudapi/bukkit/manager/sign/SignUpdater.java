@@ -12,6 +12,8 @@ import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.SignGroup;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
+import io.vson.elements.VsonArray;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -168,17 +170,17 @@ public class SignUpdater {
                 this.signUpdate(sign, service, null);
                 return;
             }
-            JsonArray array = CloudServer.getInstance().getSignManager().getSignLayOut().getOfflineLayOut();
-            JsonObject jsonObject;
+            VsonArray array = CloudServer.getInstance().getSignManager().getSignLayOut().getOfflineLayOut();
+            VsonObject jsonObject;
 
             if(animationsTick >= CloudServer.getInstance().getSignManager().getSignLayOut().getAnimationTick()) {
                 animationsTick = 0;
-                jsonObject = (JsonObject) array.get(0);
+                jsonObject = (VsonObject) array.get(0);
             } else {
-                jsonObject = (JsonObject) array.get(animationsTick);
+                jsonObject = (VsonObject) array.get(animationsTick);
             }
             for (int i = 0; i != 4; i++) {
-                sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).getAsString(), service, null));
+                sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).asString(), service, null));
             }
             sign.update(true);
             Bukkit.getScheduler().runTask(CloudServer.getInstance(), () ->  this.setBlock(sign.getLocation(), ServiceState.OFFLINE));
@@ -214,7 +216,7 @@ public class SignUpdater {
 
 
     public void signUpdate(Sign sign, Service service, ServerPinger serverPinger) {
-        JsonObject jsonObject;
+        VsonObject jsonObject;
         ServiceState state ;
         if (service.getServiceState().equals(ServiceState.MAINTENANCE) || service.getServiceGroup().isMaintenance()) {
             jsonObject = CloudServer.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
@@ -227,7 +229,7 @@ public class SignUpdater {
             state = ServiceState.LOBBY;
         }
         for (int i = 0; i != 4; i++) {
-            sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).getAsString(), service, serverPinger));
+            sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).asString(), service, serverPinger));
         }
         sign.update(true);
         Bukkit.getScheduler().runTask(CloudServer.getInstance(), () ->  this.setBlock(sign.getLocation(), state));

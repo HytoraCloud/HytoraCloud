@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 @Getter
 public class Updater {
 
-    private static final Document document = new Document(getText("https://placelikehell.de/cloud/updater.json"));
+    private static final Document document = new Document(getText("https://placelikehell.de/cloud/updater.vson"));
 
     private static CloudConsole cloudConsole;
 

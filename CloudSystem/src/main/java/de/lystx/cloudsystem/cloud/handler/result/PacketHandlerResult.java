@@ -18,7 +18,7 @@ public class PacketHandlerResult extends PacketHandlerAdapter {
         if (packet instanceof ResultPacket) {
             ResultPacket resultPacket = (ResultPacket)packet;
             resultPacket.setResult(new Result(resultPacket.getUniqueId(), resultPacket.read(cloudSystem)));
-            cloudSystem.getService(CloudNetworkService.class).sendPacket(resultPacket);
+            cloudSystem.sendPacket(resultPacket);
         }
     }
 }

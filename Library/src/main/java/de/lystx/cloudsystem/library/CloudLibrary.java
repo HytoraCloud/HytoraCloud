@@ -72,7 +72,7 @@ public class CloudLibrary implements Serializable {
         this.cloudServices.add(new Scheduler(this, "Scheduler", CloudService.Type.UTIL));
         this.cloudServices.add(new EventService(this, "Event", CloudService.Type.MANAGING));
 
-        this.authManager = new AuthManager(new File("auth.json"));
+        this.authManager = new AuthManager(new File("auth.vson"));
         this.ticksPerSecond = new TicksPerSecond(this);
     }
 

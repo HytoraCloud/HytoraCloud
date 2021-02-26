@@ -1,8 +1,7 @@
 package de.lystx.cloudsystem.library.elements.service;
 
-import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.enums.ServiceState;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +18,7 @@ public class Service implements Serializable {
     private final String host;
     private final int cloudPort;
     private final ServiceState serviceState;
-    private SerializableDocument properties;
+    private VsonObject properties;
     private ServiceGroup serviceGroup;
 
 

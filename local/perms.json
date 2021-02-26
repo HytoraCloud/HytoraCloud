@@ -1,0 +1,45 @@
+{
+  enabled: true
+  Player:
+  {
+    name: Player
+    id: 9999
+    prefix: §7
+    suffix: §7
+    display: §7
+    chatFormat: ""
+    permissions: []
+    inheritances: []
+  }
+  Admin:
+  {
+    name: Admin
+    id: 0
+    prefix: §4Admin §8┃ §7
+    suffix: §7
+    display: §4
+    chatFormat: ""
+    permissions:
+    [
+      *
+      cloudsystem.group.maintenance
+      cloudsystem.network.maintenance
+      cloudsystem.command
+      cloudsystem.perms.command
+      cloudsystem.command.service
+      cloudsystem.command.whereis
+      cloudsystem.notify
+      bungeecord.command.alert
+      bungeecord.command.end
+      bungeecord.command.ip
+      bungeecord.command.reload
+      bungeecord.command.send
+      bungeecord.command.server
+      bungeecord.command.list
+    ]
+    inheritances:
+    [
+      Player
+    ]
+  }
+}

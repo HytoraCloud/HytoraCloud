@@ -1,0 +1,8 @@
+{
+  connections: 0
+  startedServices: 0
+  bootedUp: 0
+  executedCommands: 0
+  maintenanceSwitched: 0
+  reloadedCloud: 0
+}

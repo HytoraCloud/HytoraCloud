@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
+import io.vson.elements.object.VsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,10 +28,8 @@ import java.util.*;
 public class PlayerListener implements Listener {
 
     private final Map<UUID, PacketReader> packetReaders;
-    private final List<UUID> noJoinMessages;
 
     public PlayerListener() {
-        this.noJoinMessages = new LinkedList<>();
         this.packetReaders = new HashMap<>();
     }
 
@@ -81,11 +80,10 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
-
         CloudAPI.getInstance().executeAsyncQuery(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName()), document -> {
             if (!document.getDocument().getBoolean("allow", true)) {
                 event.setJoinMessage(null);
-                Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cThere was an error! It seems like you are already on the network or tried to connect twice!"));
+                Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cIt seems like you tried to connect directly to the service and not via a BungeeCord!"));
                 return;
             }
             if (CloudServer.getInstance().getLabyMod() != null && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
@@ -101,7 +99,7 @@ public class PlayerListener implements Listener {
             }
             int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
             if (percent <= 100 && ((Bukkit.getOnlinePlayers().size() / Bukkit.getMaxPlayers()) * 100) >= percent) {
-                CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new Document().append("waitingForPlayers", true));
+                CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new VsonObject().append("waitingForPlayers", true));
             }
 
             //NPCs injecting for InteractEvent

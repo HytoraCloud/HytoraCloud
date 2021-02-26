@@ -6,9 +6,10 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 
@@ -82,8 +83,12 @@ public class TemplateService extends CloudService {
     }
 
     public void setTemplate(ServiceGroup serviceGroup, String template) {
-        Document document = Document.fromFile(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        document.append("template", template);
-        document.save();
+        try {
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            document.append("template", template);
+            document.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

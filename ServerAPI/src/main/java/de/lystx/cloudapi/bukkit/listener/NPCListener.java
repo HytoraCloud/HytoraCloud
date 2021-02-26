@@ -6,11 +6,15 @@ import de.lystx.cloudapi.bukkit.events.CloudServerNPCInteractEvent;
 import de.lystx.cloudapi.bukkit.utils.Item;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.service.GroupInfo;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.elements.service.ServiceInfo;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
+import io.vson.VsonValue;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -114,13 +118,16 @@ public class NPCListener implements Listener {
         }
         List<Service> list = CloudAPI.getInstance().getNetwork().getServices(serviceGroup);
 
-        for (Document document : config.getItems()) {
-            List<String> lore = document.getList("lore", String.class);
+        for (VsonObject document : config.getItems()) {
+            if (document.isEmpty()) {
+                continue;
+            }
+            List<String> lore = document.getList("lore");
             for (String s : lore) {
                 lore.set(lore.indexOf(s), this.replace(s, null, serviceGroup));
             }
-            double slot = document.getDouble("slot");
-            inventory.setItem((int)slot, new Item(Material.valueOf(document.getString("type")))
+            int slot = document.getInteger("slot", 0);
+            inventory.setItem(slot, new Item(Material.valueOf(document.getString("type")))
                     .setDisplayName(this.replace(document.getString("name"), null, serviceGroup))
                     .addLoreAll(lore)
                     .build());
@@ -151,28 +158,26 @@ public class NPCListener implements Listener {
 
     public String replace(String input, Service service, ServiceGroup serviceGroup) {
         try {
-            ServerPinger serverPinger = new ServerPinger();
             if (service != null) {
+                ServiceInfo serviceInfo = CloudAPI.getInstance().getNetwork().getServiceInfo(service.getName());
                 input = input.replace("%service%", service.getName());
                 input = input.replace("%uuid%", service.getUniqueId().toString());
                 input = input.replace("%port%", "" + service.getPort());
                 input = input.replace("%id%", "" + service.getServiceID());
                 input = input.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
-                try {
-                    serverPinger.pingServer(service.getHost(), service.getPort(), 5);
-                    input = input.replace("%motd%", serverPinger.getMotd());
-                    input = input.replace("%online%", serverPinger.getPlayers() + "");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                input = input.replace("%motd%", serviceInfo.getMotd());
+                input = input.replace("%max%", serviceInfo.getMaxPlayers() + "");
+                input = input.replace("%online%", serviceInfo.getOnlinePlayers().size() + "");
+
             }
             if (serviceGroup != null) {
-                input = input.replace("%group%", serviceGroup.getName());
+                GroupInfo groupInfo = CloudAPI.getInstance().getNetwork().getGroupInfo(serviceGroup.getName());
+                input = input.replace("%group%", groupInfo.getName());
                 input = input.replace("%template%", serviceGroup.getTemplate());
                 input = input.replace("%type%", serviceGroup.getServiceType().name());
                 input = input.replace("%newServer%", "" + serviceGroup.getNewServerPercent());
-                input = input.replace("%max%", "" + serviceGroup.getMaxPlayers());
-                input = input.replace("%online_services%", CloudAPI.getInstance().getNetwork().getServices(serviceGroup).size() + "");
+                input = input.replace("%online_services%", groupInfo.getOnlineServices().size() + "");
+                input = input.replace("%online_players%", groupInfo.getOnlinePlayers().size() + "");
             }
             input = input.replace("%prefix%", CloudAPI.getInstance().getPrefix());
 

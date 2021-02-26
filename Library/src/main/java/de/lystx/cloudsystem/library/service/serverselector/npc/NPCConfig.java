@@ -1,43 +1,43 @@
 package de.lystx.cloudsystem.library.service.serverselector.npc;
 
-import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-public class NPCConfig implements Serializable {
+public class NPCConfig extends VsonObject implements Serializable {
 
-    private final int inventoryRows;
-    private final String inventoryTitle;
-    private final boolean corners;
-    private final String connectingMessage;
+    private int inventoryRows;
+    private String inventoryTitle;
+    private boolean corners;
+    private String connectingMessage;
 
-    private final String itemName;
-    private final List<String> lore;
-    private final String itemType;
+    private String itemName;
+    private List<String> lore;
+    private String itemType;
 
-    private final List<SerializableDocument> items;
+    private List<VsonObject> items;
 
-    public NPCConfig(int inventoryRows, String inventoryTitle, boolean corners, String connectingMessage, String itemName, List<String> lore, String itemType, List<SerializableDocument> items) {
+    public NPCConfig(int inventoryRows, String inventoryTitle, boolean corners, String connectingMessage, String itemName, List<String> lore, String itemType, List<VsonObject> items) {
         this.inventoryRows = inventoryRows;
         this.inventoryTitle = inventoryTitle;
         this.corners = corners;
         this.connectingMessage = connectingMessage;
-        this.itemName = itemName;
-        this.lore = lore;
-        this.itemType = itemType;
         this.items = items;
+        this.lore = lore;
+        this.itemName = itemName;
+        this.itemType = itemType;
+
+        this.append("inventoryRows", inventoryRows);
+        this.append("inventoryTitle", inventoryTitle);
+        this.append("corners", corners);
+        this.append("connectingMessage", connectingMessage);
+        this.append("itemName", itemName);
+        this.append("lore", lore);
+        this.append("itemType", itemType);
+        this.append("items", items);
     }
 
-    public List<Document> getItems() {
-        List<Document> list = new LinkedList<>();
-        for (SerializableDocument item : this.items) {
-            list.add(item.toDocument());
-        }
-        return list;
-    }
 }

@@ -1,0 +1,82 @@
+{
+  host: 127.0.0.1
+  port: 2131
+  useWrapper: false
+  setupDone: false
+  autoUpdater: true
+  proxyProtocol: true
+  proxyConfig:
+  {
+    enabled: true
+    maintenance: true
+    hubCommandEnabled: true
+    maxPlayers: 100
+    whitelistedPlayers: []
+    tabList:
+    {
+      enabled: true
+      header:
+        '''
+        &8┃&8&m------------------------------------------&8┃&r
+
+        &8» &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&7! &8«
+        &7Service &8&l‴&7&l‴ &b%server% &8┃ &7Online &8&l‴&7&l‴ &b%online_players%&8/&b%max_players%
+
+        '''
+      footer:
+        '''
+
+        &8» &7Developer &8┃ &bLystx &8«
+         &8» &7Proxy &8┃ &b%proxy%&8«
+
+        &8┃&8&m------------------------------------------&8┃
+        '''
+    }
+    motdNormal:
+    {
+      enabled: true
+      firstLine: &r  &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&8! &8[&f1.8 &8- &b1.16&8]
+      secondLine: &r  &8» &7News &8× &7Now Public &8» §a%proxy%
+      protocolString: &8&m--------------------------------------------||&7||&7||&7                 &8» &bCloudSystem &8┃ &7made for &byou&8                 &8||    &8||&7                 &8➜ &bTwitter &8● &7@HytoraCloud         &8||&7                 &8➜ &bDiscord &8● &7discord.io/HytoraCloud    &8||&7                 &8➜ &bSpigotSupport &8● &71.8 &8- &71.16.1   &8||&8||&8||&8&m-------------------------------------------
+      versionString: ""
+    }
+    motdMaintenance:
+    {
+      enabled: true
+      firstLine: &r  &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&8! &8[&f1.8 &8- &b1.16&8]
+      secondLine: &r  &8» &cWe are in §emaintenance &8» §a%proxy%
+      protocolString: &8&m--------------------------------------------||&7||&7||&7                 &8» &bCloudSystem &8┃ &7made for &byou&8                 &8||    &8||&7                 &8➜ &bTwitter &8● &7@HytoraCloud         &8||&7                 &8➜ &bDiscord &8● &7discord.io/HytoraCloud    &8||&7                 &8➜ &bSpigotSupport &8● &71.8 &8- &71.16.1   &8||&8||&8||&8&m-------------------------------------------
+      versionString: &8» &c&oMaintenance
+    }
+  }
+  labyModConfig:
+  {
+    enabled: false
+    serverSwitchMessage: §8» §7HytoraCloud §8× §b%service% §8[§b%online_players%§8/§b%max_player%§8]
+    voiceChat: true
+  }
+  messageConfig:
+  {
+    prefix: §8» §bCloud §8┃ §7
+    serverStartMessage: %prefix%§7The server §a%server% §7is now starting§8...
+    serverStopMessage: %prefix%§7The server §c%server% §7is now stopping§8...
+    alreadyHubMessage: %prefix%§cYou are already on a lobbyserver!
+    noHubMessage: %prefix%§cNo lobbyserver could be found!
+    maintenanceKickMessage: %prefix%§cThe network is not available for you at this time
+    networkStillBootingMessage: %prefix%§cThe CloudSystem is still booting up! There are no servers to connect on at this time!
+    groupMaintenanceMessage: %prefix%§cThe servergroup §e%group% §cis in maintenance!
+    alreadyConnectedMessage: %prefix%§cYou are alread connected to this service!
+    alreadyOnNetworkMessage: %prefix%§cYou are alread on the network!
+    serverShutdownMessage: %prefix%§cThis server was shut down!
+    errorMessage: %prefix%§cAn error occured§8: §e%error%
+  }
+  fallbackConfig:
+  {
+    defaultFallback:
+    {
+      priority: 1
+      groupName: Lobby
+    }
+    fallbacks: []
+  }
+}

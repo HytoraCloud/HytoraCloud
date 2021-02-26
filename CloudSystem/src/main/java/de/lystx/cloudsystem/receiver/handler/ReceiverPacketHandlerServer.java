@@ -59,7 +59,7 @@ public class ReceiverPacketHandlerServer {
 
     @PacketHandler
     public void handleStart(PacketPlayInStartGroupWithProperties packet) {
-        this.receiver.getService().startService(packet.getServiceGroup(), SerializableDocument.fromDocument(packet.getProperties()));
+        this.receiver.getService().startService(packet.getServiceGroup(), packet.getProperties());
     }
 
     @PacketHandler

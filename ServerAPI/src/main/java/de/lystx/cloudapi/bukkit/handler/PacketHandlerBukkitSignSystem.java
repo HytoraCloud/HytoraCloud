@@ -7,8 +7,12 @@ import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutSt
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.SignLayOut;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
+
+import java.io.IOException;
 
 @Getter
 public class PacketHandlerBukkitSignSystem extends PacketHandlerAdapter {
@@ -23,9 +27,13 @@ public class PacketHandlerBukkitSignSystem extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayOutGlobalInfo) {
             PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo) packet;
-            CloudServer.getInstance().getSignManager().setSignLayOut(new SignLayOut(new Document(info.getSignLayOut())));
-            CloudServer.getInstance().getSignManager().setCloudSigns(info.getCloudSigns());
-            CloudServer.getInstance().getSignManager().run();
+            try {
+                CloudServer.getInstance().getSignManager().setSignLayOut(new SignLayOut(new VsonObject(info.getSignLayOut(), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES)));
+                CloudServer.getInstance().getSignManager().setCloudSigns(info.getCloudSigns());
+                CloudServer.getInstance().getSignManager().run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else if (packet instanceof PacketPlayOutStopServer) {
             CloudServer.getInstance().getSignManager().getSignUpdater().removeService(((PacketPlayOutStopServer) packet).getService().getName());
         }

@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
+import io.vson.elements.object.VsonObject;
 
 import java.util.UUID;
 
@@ -22,11 +23,11 @@ public class ResultPacketCloudPlayer extends ResultPacket {
     }
 
     @Override
-    public Document read(CloudLibrary cloudLibrary) {
+    public VsonObject read(CloudLibrary cloudLibrary) {
         if (this.uuid == null) {
-            return new Document().append(cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.name));
+            return new VsonObject().putAll(cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.name));
         } else {
-            return new Document().append(cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.uuid));
+            return new VsonObject().putAll(cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.uuid));
         }
     }
 }

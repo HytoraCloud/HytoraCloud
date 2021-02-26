@@ -1,14 +1,14 @@
 package de.lystx.cloudsystem.library.service.backup;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
 import de.lystx.cloudsystem.library.service.util.ZipHelper;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class BackupService extends CloudService {
 
-    private final Document document;
+    private final VsonObject document;
     private TimeUnit timeUnit;
     private int interval;
     private long lastBackup;
@@ -27,7 +27,13 @@ public class BackupService extends CloudService {
 
     public BackupService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
-        this.document = new Document(cloudLibrary.getService(FileService.class).getBackupFile());
+        VsonObject finalDocument = null;
+        try {
+            finalDocument = new VsonObject(cloudLibrary.getService(FileService.class).getBackupFile(), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.document = finalDocument;
         this.load();
         this.start();
     }

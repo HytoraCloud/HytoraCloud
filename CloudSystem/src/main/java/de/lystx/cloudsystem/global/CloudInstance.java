@@ -31,6 +31,7 @@ import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import de.lystx.cloudsystem.library.service.util.LogService;
 import de.lystx.cloudsystem.library.webserver.WebServer;
+import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class CloudInstance extends CloudLibrary {
 
         if (type.equals(Type.CLOUDSYSTEM)) {
             this.webServer = new WebServer(this);
-            this.webServer.update("", new Document().append("info", "There's nothing to see here").append("version", Updater.getCloudVersion()));
+            this.webServer.update("", new VsonObject().append("info", "There's nothing to see here").append("version", Updater.getCloudVersion()));
             this.webServer.start();
         }
 

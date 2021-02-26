@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import io.vson.elements.object.VsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,10 +18,10 @@ public class ResultPacketLogin extends ResultPacket {
     private final String proxy;
 
     @Override
-    public Document read(CloudLibrary cloudLibrary) {
+    public VsonObject read(CloudLibrary cloudLibrary) {
         CloudPlayer cloudPlayer = new CloudPlayer(this.connection.getName(), this.connection.getUuid(), this.connection.getAddress(), "no_server_found", this.proxy);
 
-        Document document = new Document();
+        VsonObject document = new VsonObject();
         document.append("cloudPlayer", cloudPlayer);
         document.append("already", cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName()) != null);
 

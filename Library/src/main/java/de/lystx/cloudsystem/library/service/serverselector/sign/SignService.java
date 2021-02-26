@@ -6,10 +6,12 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.DefaultSignLayout;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.SignLayOut;
-import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,12 +39,20 @@ public class SignService extends CloudService {
             new DefaultSignLayout().save(this.layOutFile);
             this.signLayOut = new SignLayOut(new DefaultSignLayout());
         } else {
-            this.signLayOut = new SignLayOut(new Document(this.layOutFile));
+            try {
+                this.signLayOut = new SignLayOut(new VsonObject(this.layOutFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        Document config = new Document(this.signFile);
-        if (!this.signFile.exists()) {
-            config.save();
+        try {
+            VsonObject config = new VsonObject(this.signFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+            if (!this.signFile.exists()) {
+                config.save();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -56,21 +66,29 @@ public class SignService extends CloudService {
 
 
     public void loadSigns() {
-        Document config = new Document(this.signFile);
-        for (String key : config.keys()) {
-            CloudSign sign = config.getObject(key, CloudSign.class);
-            this.cloudSigns.add(sign);
+        try {
+            VsonObject config = new VsonObject(this.signFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+            for (String key : config.keys()) {
+                CloudSign sign = config.getObject(key, CloudSign.class);
+                this.cloudSigns.add(sign);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public void save() {
         try {
-            Document document = new Document(this.signFile);
-            document.clear();
-            for (CloudSign cloudSign : this.cloudSigns) {
-                document.append(cloudSign.getUuid().toString(), cloudSign);
+            try {
+                VsonObject config = new VsonObject(this.signFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+                config.clear();
+                for (CloudSign cloudSign : this.cloudSigns) {
+                    config.append(cloudSign.getUuid().toString(), cloudSign);
+                }
+                config.save();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            document.save();
         } catch (NullPointerException ignored) {}
     }
 

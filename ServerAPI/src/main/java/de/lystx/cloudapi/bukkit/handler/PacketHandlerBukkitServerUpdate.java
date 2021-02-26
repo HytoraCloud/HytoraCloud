@@ -9,6 +9,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.object.VsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
@@ -45,7 +46,7 @@ public class PacketHandlerBukkitServerUpdate extends PacketHandlerAdapter {
             Service service = packetPlayInServiceStateChange.getService();
             ServiceState serviceState = packetPlayInServiceStateChange.getServiceState();
             if (cloudAPI.getService().getName().equalsIgnoreCase(service.getName())) {
-                Document document = this.cloudAPI.getDocument();
+                VsonObject document = this.cloudAPI.getDocument();
                 document.append("serviceState", serviceState);
                 document.save();
             }

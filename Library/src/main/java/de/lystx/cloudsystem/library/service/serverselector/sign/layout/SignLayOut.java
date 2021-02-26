@@ -3,17 +3,19 @@ package de.lystx.cloudsystem.library.service.serverselector.sign.layout;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import io.vson.elements.VsonArray;
+import io.vson.elements.object.VsonObject;
 
 public class SignLayOut {
 
-    private final Document document;
+    private final VsonObject document;
     private final int repeatTick;
 
     public SignLayOut() {
         this(null);
     }
 
-    public SignLayOut(Document document) {
+    public SignLayOut(VsonObject document) {
         this.document = document;
         this.repeatTick = 20;
     }
@@ -22,7 +24,7 @@ public class SignLayOut {
         return this.getOfflineLayOut().size();
     }
     
-    public Document check() {
+    public VsonObject check() {
         return this.document == null ? new DefaultSignLayout() : this.document;
     }
 
@@ -30,24 +32,23 @@ public class SignLayOut {
         return this.check().getInteger("repeatTick", this.repeatTick);
     }
 
-    public JsonObject getOnlineLayOut() {
-        return this.check().getDocument("otherLayouts").getJsonObject("ONLINE");
+    public VsonObject getOnlineLayOut() {
+        return this.check().getVson("otherLayouts").getVson("ONLINE");
     }
 
-    public JsonObject getMaintenanceLayOut() {
-        return this.check().getDocument("otherLayouts").getJsonObject("MAINTENANCE");
+    public VsonObject getMaintenanceLayOut() {
+        return this.check().getVson("otherLayouts").getVson("MAINTENANCE");
     }
 
-    public JsonObject getFullLayOut() {
-        return this.check().getDocument("otherLayouts").getJsonObject("FULL");
+    public VsonObject getFullLayOut() {
+        return this.check().getVson("otherLayouts").getVson("FULL");
     }
 
-    public JsonArray getOfflineLayOut(){
-
-        return this.check().getJsonArray("loadingLayout");
+    public VsonArray getOfflineLayOut(){
+        return this.check().getArray("loadingLayout");
     }
 
-    public Document getDocument() {
+    public VsonObject getDocument() {
         return document;
     }
 }

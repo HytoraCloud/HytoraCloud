@@ -19,7 +19,7 @@ public class PacketHandlerNPC extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInCreateNPC) {
             PacketPlayInCreateNPC packetPlayInCreateNPC = (PacketPlayInCreateNPC)packet;
-            this.cloudSystem.getService(NPCService.class).append(packetPlayInCreateNPC.getKey(), packetPlayInCreateNPC.getDocument());
+            this.cloudSystem.getService(NPCService.class).append(packetPlayInCreateNPC.getKey(), packetPlayInCreateNPC.getVsonObject());
             this.cloudSystem.getService(NPCService.class).save();
             this.cloudSystem.getService(NPCService.class).load();
             this.cloudSystem.reloadNPCS();

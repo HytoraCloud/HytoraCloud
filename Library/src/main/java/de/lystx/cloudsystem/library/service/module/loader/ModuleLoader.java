@@ -9,9 +9,12 @@ import de.lystx.cloudsystem.library.service.module.Module;
 import de.lystx.cloudsystem.library.service.module.ModuleInfo;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.util.HytoraClassLoader;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 @Getter
@@ -50,7 +53,7 @@ public class ModuleLoader {
                 for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
                     if (file.getName().endsWith(".jar")) {
                         HytoraClassLoader classLoader = new HytoraClassLoader(file);
-                        Document document = new Document(classLoader.loadJson("config.json"));
+                        VsonObject document = new VsonObject(classLoader.loadJson("config.vson").toString(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
                         if (document.isEmpty()) {
                             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
                             return;
@@ -70,8 +73,8 @@ public class ModuleLoader {
                                 File directory = new File(this.moduleService.getModuleDir(), mod.getInfo().getName());
                                 directory.mkdirs();
                                 mod.setModuleDirectory(directory);
-                                File file1 = new File(directory, "config.json");
-                                Document config = new Document(file1);
+                                File file1 = new File(directory, "config.vson");
+                                VsonObject config = new VsonObject(file1, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
                                 if (!file1.exists()) {
                                     config.save();
                                 }
@@ -89,7 +92,7 @@ public class ModuleLoader {
                     }
                 }
 
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | IOException e) {
                 e.printStackTrace();
             }
         }

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="vson-1.0-final">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../dependencies/vson-1.0-final.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

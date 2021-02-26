@@ -13,10 +13,10 @@ public class PacketHandlerReload  {
         this.cloudSystem = cloudSystem;
     }
 
-
     @PacketHandler
     public void handleReload(PacketPlayInReload reload) {
         this.cloudSystem.reload();
+        this.cloudSystem.reloadNPCS();
     }
 
 }

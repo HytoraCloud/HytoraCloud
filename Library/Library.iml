@@ -36,5 +36,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.mail:javax.mail:1.6.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Maven: edu.washington.cs.types.checker:checker-framework:1.7.0" level="project" />
+    <orderEntry type="library" name="vson-1.0-final" level="project" />
   </component>
 </module>
