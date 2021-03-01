@@ -8,6 +8,7 @@ import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
@@ -17,6 +18,7 @@ import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
+import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
@@ -157,6 +159,10 @@ public class CloudAPI {
         } else {
             this.cloudClient.sendPacket(new CustomPacket(packet));
         }
+    }
+
+    public void callEvent(Class<? extends Event> eventClass, Object... parameters) {
+        this.sendPacket(new PacketCallEvent(eventClass, parameters));
     }
 
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {

@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import io.vson.annotation.other.VsonConfigValue;
+import io.vson.annotation.other.VsonInstance;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonComment;
 import io.vson.enums.VsonSettings;

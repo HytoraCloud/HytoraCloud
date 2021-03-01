@@ -71,7 +71,7 @@ public class NPCService extends CloudService {
         for (VsonValue value : vsonArray.values()) {
             vsonObjects.add((VsonObject) value);
         }
-        return new NPCConfig(this.config.getInteger("inventoryRows", 0), this.config.getString("inventoryTitle"), this.config.getBoolean("corners"), this.config.getString("connectingMessage"), this.config.getString("itemName"), this.config.getList("lore"), this.config.getString("itemType"), vsonObjects);
+        return new NPCConfig(this.config.getInteger("inventoryRows", 0), this.config.getString("inventoryTitle"), this.config.getBoolean("corners"), this.config.getString("connectingMessage"), this.config.getString("itemName"), this.config.getList("lore", String.class), this.config.getString("itemType"), vsonObjects);
     }
 
     public void append(String key, VsonObject vsonObject) {
