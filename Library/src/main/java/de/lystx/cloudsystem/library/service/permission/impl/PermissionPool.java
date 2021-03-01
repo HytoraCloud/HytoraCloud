@@ -353,6 +353,14 @@ public class PermissionPool implements Serializable {
         return this.getUUID(name) == null ? UUIDService.getUUID(name) : this.getUUID(name);
     }
 
+    public UUID fromIP(String input) {
+        CloudPlayerData data = this.playerCache.stream().filter(cloudPlayerData -> cloudPlayerData.getIpAddress().equalsIgnoreCase(input)).findFirst().orElse(null);
+        if (data == null) {
+            return null;
+        }
+        return data.getUuid();
+    }
+
     public String tryName(UUID uuid) {
         try {
             return this.getName(uuid) == null ? UUIDService.getName(uuid) : this.getName(uuid);

@@ -1,24 +1,19 @@
 package de.lystx.cloudapi.proxy.command;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
 
 @Getter
-public class WhereIsCommand extends Command {
+public class WhereIsCommand {
 
 
-    public WhereIsCommand() {
-        super("whereis");
-    }
-
-    @Override
-    public void execute(CommandSender commandSender, String[] args) {
-        if (commandSender instanceof ProxiedPlayer) {
-            ProxiedPlayer player = (ProxiedPlayer)commandSender;
+    @Command(name = "whereis")
+    public void execute(CloudCommandSender commandSender, String[] args) {
+        if (commandSender instanceof CloudPlayer) {
+            CloudPlayer player = (CloudPlayer)commandSender;
             if (player.hasPermission("cloudsystem.command.whereis")) {
                 if (args.length == 1) {
                     CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(args[0]);

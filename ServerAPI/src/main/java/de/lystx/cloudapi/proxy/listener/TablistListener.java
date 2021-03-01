@@ -9,6 +9,7 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
+import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
@@ -56,7 +57,7 @@ public class TablistListener implements Listener {
             }
 
             @Override
-            public void onNetworkPing(UUID connectionUUID) {}
+            public void onNetworkPing(CloudConnection connectionUUID) {}
 
             @Override
             public void onDocumentReceive(String channel, String key, Document document, ServiceType type) {}

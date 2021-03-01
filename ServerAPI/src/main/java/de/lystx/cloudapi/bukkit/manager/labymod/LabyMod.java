@@ -3,7 +3,7 @@ package de.lystx.cloudapi.bukkit.manager.labymod;
 import com.google.gson.*;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
-import de.lystx.cloudapi.bukkit.events.CloudPlayerLabyModJoinEvent;
+import de.lystx.cloudapi.bukkit.events.player.CloudPlayerLabyModJoinEvent;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import org.bukkit.Bukkit;

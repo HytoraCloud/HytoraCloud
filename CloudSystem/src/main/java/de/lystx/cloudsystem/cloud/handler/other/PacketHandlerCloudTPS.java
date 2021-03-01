@@ -41,8 +41,7 @@ public class PacketHandlerCloudTPS extends PacketHandlerAdapter {
                 tps = "§4" + decimalFormat.format(d);
             }
 
-            player.sendMessage(cloudSystem.getService(CloudNetworkService.class).getCloudServer(),
-                    cloudSystem.getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix().replace("&", "§") +
+            player.sendMessage(cloudSystem.getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix().replace("&", "§") +
                     "§6TPS§8: §b" + tps);
         }
     }

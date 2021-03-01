@@ -1,9 +1,10 @@
 package de.lystx.cloudsystem.cloud.commands;
 
+import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.command.TabCompletable;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
@@ -17,74 +18,70 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class PermsCommand extends CloudCommand implements TabCompletable {
+public class PermsCommand implements TabCompletable {
 
 
-    public PermsCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
-
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+    @Command(name = "perms", description = "Manages permissions", aliases = {"cperms", "permissions"})
+    public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
-                console.getLogger().sendMessage("§9PermissionGroups:");
-                for (PermissionGroup permissionGroup : cloudLibrary.getService(PermissionService.class).getPermissionPool().getPermissionGroups()) {
-                    console.getLogger().sendMessage("INFO", "§7> §b" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId());
+                sender.sendMessage("§9PermissionGroups:");
+                for (PermissionGroup permissionGroup : CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool().getPermissionGroups()) {
+                    sender.sendMessage("INFO", "§7> §b" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId());
                 }
             } else {
-                this.help(console);
+                this.help(sender);
             }
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("info")) {
                 String player = args[1];
-                PermissionPool pool = cloudLibrary.getService(PermissionService.class).getPermissionPool();
+                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
                 PermissionGroup group = pool.getHighestPermissionGroup(player);
                 if (group == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe player §e" + player + " §cis not registered!");
+                    sender.sendMessage("ERROR", "§cThe player §e" + player + " §cis not registered!");
                     return;
                 }
                 UUID uuid = pool.tryUUID(player);
                 if (uuid == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
+                    sender.sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
                     return;
                 }
-                console.getLogger().sendMessage("ERROR", "§cPlease use §e<players info " + player + "> §c!");
+                sender.sendMessage("ERROR", "§cPlease use §e<players info " + player + "> §c!");
             } else {
-                this.help(console);
+                this.help(sender);
             }
         } else if (args.length == 3) {
             if (args[0].equalsIgnoreCase("remove")) {
-                PermissionPool pool = cloudLibrary.getService(PermissionService.class).getPermissionPool();
+                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
                 String player = args[1];
                 String group = args[2];
                 PermissionGroup permissionGroup = pool.getPermissionGroupFromName(group);
                 if (permissionGroup == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe permissionGroup §e" + group + " §cis invalid!");
+                    sender.sendMessage("ERROR", "§cThe permissionGroup §e" + group + " §cis invalid!");
                     return;
                 }
                 pool.removePermissionGroup(player, permissionGroup);
-                pool.save(cloudLibrary.getService(FileService.class).getPermissionsFile(), cloudLibrary.getService(FileService.class).getCloudPlayerDirectory(), cloudLibrary.getService(DatabaseService.class).getDatabase());
-                cloudLibrary.getService(PermissionService.class).load();
-                cloudLibrary.getService(PermissionService.class).loadEntries();
-                cloudLibrary.reload();
-                console.getLogger().sendMessage("INFO", "§7The player §b" + player + " §7was removed from group §a" + permissionGroup.getName());
+                pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
+                CloudSystem.getInstance().getService(PermissionService.class).load();
+                CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
+                CloudSystem.getInstance().reload();
+                sender.sendMessage("INFO", "§7The player §b" + player + " §7was removed from group §a" + permissionGroup.getName());
             } else {
-                this.help(console);
+                this.help(sender);
             }
         } else if (args.length == 4) {
             if (args[0].equalsIgnoreCase("add")) {
                 String player = args[1];
-                PermissionPool pool = cloudLibrary.getService(PermissionService.class).getPermissionPool();
+                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
                 UUID uuid = pool.tryUUID(player);
                 if (uuid == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
+                    sender.sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
                     return;
                 }
                 String permissionGroup = args[2];
                 PermissionGroup group = pool.getPermissionGroupFromName(permissionGroup);
                 if (group == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe permissionGroup §e" + permissionGroup + " §cis invalid!");
+                    sender.sendMessage("ERROR", "§cThe permissionGroup §e" + permissionGroup + " §cis invalid!");
                     return;
                 }
                 if (!args[3].equalsIgnoreCase("lifetime")) {
@@ -110,43 +107,43 @@ public class PermsCommand extends CloudCommand implements TabCompletable {
                         validality = PermissionValidality.MONTH;
                         format = "m";
                     } else {
-                        console.getLogger().sendMessage("ERROR", "§cPlease provide a valid timespan like §e1d §cor §e1min§c!");
+                        sender.sendMessage("ERROR", "§cPlease provide a valid timespan like §e1d §cor §e1min§c!");
                         return;
                     }
                     try {
                         Integer i = Integer.parseInt(args[3].split(format)[0]);
                         pool.updatePermissionGroup(player, group, i, validality);
-                        pool.save(cloudLibrary.getService(FileService.class).getPermissionsFile(), cloudLibrary.getService(FileService.class).getCloudPlayerDirectory(), cloudLibrary.getService(DatabaseService.class).getDatabase());
-                        cloudLibrary.getService(PermissionService.class).load();
-                        cloudLibrary.getService(PermissionService.class).loadEntries();
-                        cloudLibrary.reload();
-                        console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime " + i + " " + validality);
+                        pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
+                        CloudSystem.getInstance().getService(PermissionService.class).load();
+                        CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
+                        CloudSystem.getInstance().reload();
+                        sender.sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime " + i + " " + validality);
                     } catch (NumberFormatException e) {
-                        console.getLogger().sendMessage("ERROR", "§cPlease provide a §evalid number §cor enter §elifetime§c!");
+                        sender.sendMessage("ERROR", "§cPlease provide a §evalid number §cor enter §elifetime§c!");
                     }
                 } else {
                     pool.updatePermissionGroup(player, group, -1, PermissionValidality.DAY);
-                    pool.save(cloudLibrary.getService(FileService.class).getPermissionsFile(), cloudLibrary.getService(FileService.class).getCloudPlayerDirectory(), cloudLibrary.getService(DatabaseService.class).getDatabase());
-                    cloudLibrary.getService(PermissionService.class).load();
-                    cloudLibrary.getService(PermissionService.class).loadEntries();
-                    cloudLibrary.reload();
-                    console.getLogger().sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime Lifetime");
+                    pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
+                    CloudSystem.getInstance().getService(PermissionService.class).load();
+                    CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
+                    CloudSystem.getInstance().reload();
+                    sender.sendMessage("INFO", "§7The player §a" + player + " §7is now in group §b" + group.getName() + " §bValidalityTime Lifetime");
                 }
             } else {
-                this.help(console);
+                this.help(sender);
             }
         } else {
-            this.help(console);
+            this.help(sender);
         }
     }
 
 
-    public void help(CloudConsole console) {
-        console.getLogger().sendMessage("INFO", "§9Help for §bPermsService§7:");
-        console.getLogger().sendMessage("INFO", "§9perms list §7| Lists all groups");
-        console.getLogger().sendMessage("INFO", "§9perms add <player> <group> <lifetime/timeSpan> §7| Adds player to a group");
-        console.getLogger().sendMessage("INFO", "§9perms remove <player> <group>  §7| Removes player from a group");
-        console.getLogger().sendMessage("INFO", "§9perms info <player> §7| Displays infos about a player");
+    public void help(CloudCommandSender sender) {
+        sender.sendMessage("INFO", "§9Help for §bPermsService§7:");
+        sender.sendMessage("INFO", "§9perms list §7| Lists all groups");
+        sender.sendMessage("INFO", "§9perms add <player> <group> <lifetime/timeSpan> §7| Adds player to a group");
+        sender.sendMessage("INFO", "§9perms remove <player> <group>  §7| Removes player from a group");
+        sender.sendMessage("INFO", "§9perms info <player> §7| Displays infos about a player");
     }
 
     @Override

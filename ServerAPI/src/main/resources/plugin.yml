@@ -5,5 +5,4 @@ version: 1.0
 description: ServerAPI for HytoraCloud
 load: STARTUP
 commands:
-  service:
-    aliases: [this, cloudserver, hs]
+

@@ -1,7 +1,7 @@
 package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudapi.proxy.events.CloudLoginFailEvent;
+import de.lystx.cloudapi.proxy.events.other.ProxyServerLoginFailEvent;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
@@ -47,7 +47,7 @@ public class PlayerListener implements Listener {
                     !cloudAPI.getPermissionPool()
                             .hasPermission(connection.getName(), "cloudsystem.network.maintenance")) {
 
-                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.MAINTENANCE);
+                ProxyServerLoginFailEvent failEvent = new ProxyServerLoginFailEvent(event.getConnection(), ProxyServerLoginFailEvent.Reason.MAINTENANCE);
                 ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
                 if (failEvent.isCancelled()) {
                     event.setCancelled(true);
@@ -58,7 +58,7 @@ public class PlayerListener implements Listener {
                 }
             }
             if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers()) {
-                CloudLoginFailEvent failEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.NETWORK_FULL);
+                ProxyServerLoginFailEvent failEvent = new ProxyServerLoginFailEvent(event.getConnection(), ProxyServerLoginFailEvent.Reason.NETWORK_FULL);
                 ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
                 event.setCancelled(true);
                 if (failEvent.isCancelled()) {
@@ -69,10 +69,10 @@ public class PlayerListener implements Listener {
             }
         } else {
             event.setCancelled(true);
-            CloudLoginFailEvent cloudLoginFailEvent = new CloudLoginFailEvent(event.getConnection(), CloudLoginFailEvent.Reason.ALREADY_ON_NETWORK);
-            ProxyServer.getInstance().getPluginManager().callEvent(cloudLoginFailEvent);
-            if (cloudLoginFailEvent.isCancelled()) {
-                event.setCancelReason(new TextComponent(cloudLoginFailEvent.getCancelReason()));
+            ProxyServerLoginFailEvent proxyServerLoginFailEvent = new ProxyServerLoginFailEvent(event.getConnection(), ProxyServerLoginFailEvent.Reason.ALREADY_ON_NETWORK);
+            ProxyServer.getInstance().getPluginManager().callEvent(proxyServerLoginFailEvent);
+            if (proxyServerLoginFailEvent.isCancelled()) {
+                event.setCancelReason(new TextComponent(proxyServerLoginFailEvent.getCancelReason()));
             } else {
                 event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyOnNetworkMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
             }
@@ -82,7 +82,7 @@ public class PlayerListener implements Listener {
 
 
     @EventHandler
-    public void handleFail(CloudLoginFailEvent event) {
+    public void handleFail(ProxyServerLoginFailEvent event) {
         cloudAPI.sendPacket(new PacketPlayInUnregisterCloudPlayer(event.getConnection().getName()));
     }
 
@@ -119,7 +119,7 @@ public class PlayerListener implements Listener {
         try {
             ProxiedPlayer player = event.getPlayer();
             if (player.getServer() == null || player.getServer().getInfo() == null || player.getServer().getInfo().getName() == null) {
-                ServerInfo serverInfo = CloudProxy.getInstance().getHubManager().getInfo(player);
+                ServerInfo serverInfo = CloudProxy.getInstance().getHubManager().getInfo(CloudAPI.getInstance().getCloudPlayers().get(player.getName()));
                 if (serverInfo == null) {
                     player.disconnect(CloudAPI.getInstance().getPrefix() + "§cNo fallback-server was found!");
                     return;

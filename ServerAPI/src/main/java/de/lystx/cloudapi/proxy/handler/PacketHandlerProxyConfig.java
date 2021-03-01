@@ -2,7 +2,7 @@ package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.HubCommand;
-import de.lystx.cloudapi.proxy.events.ProxyPacketReceiveEvent;
+import de.lystx.cloudapi.proxy.events.network.ProxyServerPacketReceiveEvent;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
@@ -27,15 +27,15 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        ProxyServer.getInstance().getPluginManager().callEvent(new ProxyPacketReceiveEvent(packet));
+        ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerPacketReceiveEvent(packet));
         if (packet instanceof PacketPlayOutGlobalInfo) {
             PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo)packet;
             cloudAPI.setNetworkConfig(info.getNetworkConfig());
             CloudProxy.getInstance().getNetworkManager().switchMaintenance(info.getNetworkConfig().getProxyConfig().isMaintenance());
             if (info.getNetworkConfig().getProxyConfig().isHubCommandEnabled()) {
-                CloudProxy.getInstance().getProxy().getPluginManager().registerCommand(CloudProxy.getInstance(), new HubCommand());
+                CloudAPI.getInstance().registerCommand(new HubCommand());
             } else {
-                CloudProxy.getInstance().getProxy().getPluginManager().unregisterCommand(new HubCommand());
+                CloudAPI.getInstance().unregisterCommand(new HubCommand());
             }
             Map<ServiceGroup, List<Service>> services = info.getServices();
             for (List<Service> value : services.values()) {

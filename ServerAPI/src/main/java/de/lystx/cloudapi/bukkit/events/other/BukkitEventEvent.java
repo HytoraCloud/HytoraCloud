@@ -1,22 +1,22 @@
-package de.lystx.cloudapi.bukkit.events;
+package de.lystx.cloudapi.bukkit.events.other;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-@Getter
-public class CloudServerNetworkUpdateEvent extends Event {
-
+@Getter @AllArgsConstructor
+public class BukkitEventEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
+    private final Event event;
 
     @Override
     public HandlerList getHandlers() {
         return handlers;
     }
-    public static HandlerList getHandlerList() {
+    public static HandlerList getHandlerList(){
         return handlers;
     }
-
 }

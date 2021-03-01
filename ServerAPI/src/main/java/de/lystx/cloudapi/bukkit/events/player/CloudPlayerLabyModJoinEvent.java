@@ -1,16 +1,18 @@
-package de.lystx.cloudapi.bukkit.events;
+package de.lystx.cloudapi.bukkit.events.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-@Getter @AllArgsConstructor
-public class BukkitEventEvent extends Event {
+@AllArgsConstructor @Getter
+public class CloudPlayerLabyModJoinEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private final Event event;
+    private final Player player;
+    private final String version;
 
     @Override
     public HandlerList getHandlers() {

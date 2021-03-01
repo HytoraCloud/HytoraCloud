@@ -21,6 +21,7 @@ import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
+import de.lystx.cloudsystem.library.service.player.impl.PlayerInstance;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -70,24 +71,24 @@ public class CloudInstance extends CloudLibrary {
         this.cloudServices.add(new NPCService(this, "NPCs", CloudService.Type.MANAGING));
         this.cloudServices.add(new EventService(this, "Event", CloudService.Type.MANAGING));
 
-        this.getService(CommandService.class).registerCommand(new ShutdownCommand("shutdown", "Stops the cloudsystem", "exit", "destroy"));
-        this.getService(CommandService.class).registerCommand(new HelpCommand("help", "Shows you this message", "?", "whattodo"));
-        this.getService(CommandService.class).registerCommand(new ExecuteCommand("execute", "Sends a command to a server", "cmd", "command"));
-        this.getService(CommandService.class).registerCommand(new ReloadCommand("reload", "Reloads the network", "rl"));
-        this.getService(CommandService.class).registerCommand(new ClearCommand("clear", "Clears the console", "cl"));
+        this.getService(CommandService.class).registerCommand(new ShutdownCommand());
+        this.getService(CommandService.class).registerCommand(new HelpCommand());
+        this.getService(CommandService.class).registerCommand(new ExecuteCommand());
+        this.getService(CommandService.class).registerCommand(new ReloadCommand());
+        this.getService(CommandService.class).registerCommand(new ClearCommand());
 
-        this.getService(CommandService.class).registerCommand(new StopCommand("stop", "Stops a service or group"));
-        this.getService(CommandService.class).registerCommand(new InfoCommand("info", "Shows information", "information"));
-        this.getService(CommandService.class).registerCommand(new RunCommand("run", "Starts new services", "start"));
+        this.getService(CommandService.class).registerCommand(new StopCommand());
+        this.getService(CommandService.class).registerCommand(new InfoCommand());
+        this.getService(CommandService.class).registerCommand(new RunCommand());
         if (this.getType().equals(Type.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            this.getService(CommandService.class).registerCommand(new ScreenCommand("screen", "Shows output of services", this.screenPrinter, "sc"));
-            this.getService(CommandService.class).registerCommand(new DownloadCommand("download", "Manages spigot versions", "spigot", "bukkit", "install"));
+            this.getService(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter));
+            this.getService(CommandService.class).registerCommand(new DownloadCommand());
         }
 
-        this.getService(CommandService.class).registerCommand(new UpdateCommand("update", "Updates the cloud"));
-        this.getService(CommandService.class).registerCommand(new LogCommand("log", "Logs a server or all"));
-        this.getService(CommandService.class).registerCommand(new BackupCommand("backup", "Creates a backup of the current cloud"));
-        this.getService(CommandService.class).registerCommand(new TpsCommand("tps", "Lets you view the current tps of the cloud"));
+        this.getService(CommandService.class).registerCommand(new UpdateCommand());
+        this.getService(CommandService.class).registerCommand(new LogCommand());
+        this.getService(CommandService.class).registerCommand(new BackupCommand());
+        this.getService(CommandService.class).registerCommand(new TpsCommand());
 
     }
 

@@ -3,13 +3,12 @@ package de.lystx.cloudapi.bukkit.manager.npc.impl;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.command.ServiceCommand;
-import de.lystx.cloudapi.bukkit.events.CloudServerNPCInteractEvent;
+import de.lystx.cloudapi.bukkit.events.other.CloudServerNPCInteractEvent;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

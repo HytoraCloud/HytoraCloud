@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.service.command;
+package de.lystx.cloudsystem.library.service.command.command;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 

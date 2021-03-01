@@ -3,21 +3,15 @@ package de.lystx.cloudsystem.library.service.player;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import io.vson.elements.object.VsonMember;
 import io.vson.elements.object.VsonObject;
-import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 @Getter
@@ -39,7 +33,7 @@ public class CloudPlayerService extends CloudService {
     public boolean registerPlayer(CloudPlayer cloudPlayer) {
         this.getCloudLibrary().getService(EventService.class).callEvent(new CloudPlayerJoinEvent(cloudPlayer));
         this.cloudPlayers.add(cloudPlayer);
-        boolean registered = this.database.isRegistered(cloudPlayer.getUuid());
+        boolean registered = this.database.isRegistered(cloudPlayer.getUniqueId());
         this.database.registerPlayer(cloudPlayer);
         if (this.getCloudLibrary().getWebServer() != null) {
             this.getCloudLibrary().getWebServer().update("players", this.toDocument());
@@ -61,9 +55,9 @@ public class CloudPlayerService extends CloudService {
 
     public void removePlayer(CloudPlayer cloudPlayer) {
         try {
-            CloudPlayerData data = this.getPlayerData(cloudPlayer.getUuid());
+            CloudPlayerData data = this.getPlayerData(cloudPlayer.getUniqueId());
             data.setLastLogin(new Date().getTime());
-            this.setPlayerData(cloudPlayer.getUuid(), data);
+            this.setPlayerData(cloudPlayer.getUniqueId(), data);
             getCloudLibrary().getService(EventService.class).callEvent(new CloudPlayerQuitEvent(cloudPlayer));
             if (this.getCloudLibrary().getWebServer() == null) {
                 return;
@@ -90,7 +84,7 @@ public class CloudPlayerService extends CloudService {
 
     public CloudPlayer getOnlinePlayer(UUID uuid) {
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
-            if (cloudPlayer.getUuid().equals(uuid)) {
+            if (cloudPlayer.getUniqueId().equals(uuid)) {
                 return cloudPlayer;
             }
         }

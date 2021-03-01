@@ -24,7 +24,7 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
                 return;
             }
             CloudPlayer cloudPlayer = cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayOutTPS.getPlayer());
-            cloudPlayer.sendMessage(cloudSystem.getService(CloudNetworkService.class).getCloudServer(), "  §8» §b" + packetPlayOutTPS.getService().getName() + " §8┃ §7" + packetPlayOutTPS.getTps());
+            cloudPlayer.sendMessage("  §8» §b" + packetPlayOutTPS.getService().getName() + " §8┃ §7" + packetPlayOutTPS.getTps());
         }
     }
 }

@@ -4,13 +4,13 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.command.TabCompletable;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.FallbackConfig;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
@@ -20,21 +20,16 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DeleteCommand extends CloudCommand implements TabCompletable {
+public class DeleteCommand implements TabCompletable {
 
-
-    public DeleteCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
-
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+    @Command(name = "delete", description = "Deletes stuff", aliases = "remove")
+    public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String group = args[1];
-                ServiceGroup serviceGroup = cloudLibrary.getService(GroupService.class).getGroup(group);
+                ServiceGroup serviceGroup = CloudSystem.getInstance().getService(GroupService.class).getGroup(group);
                 if (serviceGroup == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
+                    sender.sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
 
@@ -45,57 +40,56 @@ public class DeleteCommand extends CloudCommand implements TabCompletable {
                 }
 
                 CloudSystem.getInstance().getService().stopServices(serviceGroup, false);
-                cloudLibrary.getService(GroupService.class).deleteGroup(serviceGroup);
+                CloudSystem.getInstance().getService(GroupService.class).deleteGroup(serviceGroup);
                 CloudSystem.getInstance().getService().getServices().remove(CloudSystem.getInstance().getService().getGroup(serviceGroup.getName()));
                 CloudSystem.getInstance().reload();
-                console.getLogger().sendMessage("INFO", "§9The ServiceGroup §b" + serviceGroup.getName() + " §9was deleted!");
+                sender.sendMessage("INFO", "§9The ServiceGroup §b" + serviceGroup.getName() + " §9was deleted!");
             } else if (args[0].equalsIgnoreCase("fallback")) {
                 String fallback = args[1];
 
-                NetworkConfig networkConfig = cloudLibrary.getService(ConfigService.class).getNetworkConfig();
+                NetworkConfig networkConfig = CloudSystem.getInstance().getService(ConfigService.class).getNetworkConfig();
                 FallbackConfig fallbackConfig = networkConfig.getFallbackConfig();
 
                 Fallback remove = fallbackConfig.getFallback(fallback);
 
                 if (remove == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe Fallback §e" + fallback + " §cseems not to exist!");
+                    sender.sendMessage("ERROR", "§cThe Fallback §e" + fallback + " §cseems not to exist!");
                     return;
                 }
                 List<Fallback> fallbacks = fallbackConfig.getFallbacks();
                 fallbacks.remove(remove);
                 fallbackConfig.setFallbacks(fallbacks);
                 networkConfig.setFallbackConfig(fallbackConfig);
-                cloudLibrary.getService(ConfigService.class).setNetworkConfig(networkConfig);
-                cloudLibrary.getService(ConfigService.class).save();
-                cloudLibrary.getService(ConfigService.class).reload();
-                console.getLogger().sendMessage("INFO", "§9The Fallback §b" + remove.getGroupName() + " §9was deleted!");
+                CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(networkConfig);
+                CloudSystem.getInstance().getService(ConfigService.class).save();
+                CloudSystem.getInstance().getService(ConfigService.class).reload();
+                sender.sendMessage("INFO", "§9The Fallback §b" + remove.getGroupName() + " §9was deleted!");
 
             } else if (args[0].equalsIgnoreCase("perms")) {
                 String group = args[1];
-                PermissionPool pool = cloudLibrary.getService(PermissionService.class).getPermissionPool();
+                PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
                 PermissionGroup permissionGroup = pool.getPermissionGroupFromName(group);
                 if (permissionGroup == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe PermissionGroup §e" + group + " §cseems not to exist!");
+                    sender.sendMessage("ERROR", "§cThe PermissionGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
                 pool.getPermissionGroups().remove(permissionGroup);
-                cloudLibrary.getService(PermissionService.class).setPermissionPool(pool);
-                cloudLibrary.getService(PermissionService.class).save();
+                CloudSystem.getInstance().getService(PermissionService.class).setPermissionPool(pool);
+                CloudSystem.getInstance().getService(PermissionService.class).save();
                 CloudSystem.getInstance().reload();
-                console.getLogger().sendMessage("INFO", "§9The PermissionGroup §b" + permissionGroup.getName() + " §9was deleted!");
+                sender.sendMessage("INFO", "§9The PermissionGroup §b" + permissionGroup.getName() + " §9was deleted!");
             } else {
-                correctSyntax(console);
+                correctSyntax(sender);
             }
         } else {
-            correctSyntax(console);
+            correctSyntax(sender);
         }
     }
 
-    @Override
-    public void correctSyntax(CloudConsole console) {
-        console.getLogger().sendMessage("INFO", "§9delete group <group> §7| §bRemoves a ServiceGroup");
-        console.getLogger().sendMessage("INFO", "§9delete perms <group> §7| §bRemoves a PermissionGroup");
-        console.getLogger().sendMessage("INFO", "§9delete fallback <fallback> §7| §bRemoves a Fallback");
+    public void correctSyntax(CloudCommandSender sender) {
+        sender.sendMessage("INFO", "§9delete group <group> §7| §bRemoves a ServiceGroup");
+        sender.sendMessage("INFO", "§9delete perms <group> §7| §bRemoves a PermissionGroup");
+        sender.sendMessage("INFO", "§9delete fallback <fallback> §7| §bRemoves a Fallback");
     }
 
     @Override

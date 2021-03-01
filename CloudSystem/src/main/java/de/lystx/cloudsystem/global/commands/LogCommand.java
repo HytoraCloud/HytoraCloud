@@ -4,9 +4,9 @@ package de.lystx.cloudsystem.global.commands;
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.command.TabCompletable;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
@@ -21,14 +21,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
-public class LogCommand extends CloudCommand implements TabCompletable {
+public class LogCommand implements TabCompletable {
 
-    public LogCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
 
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+    @Command(name = "log", description = "Logs a server or all")
+    public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 2) {
             String type = args[1];
             String fileName = args[0].equals("all") ? "log_all" : "log_" + args[0];
@@ -36,22 +33,22 @@ public class LogCommand extends CloudCommand implements TabCompletable {
             String finalText;
             if (args[0].equalsIgnoreCase("all")) {
                 StringBuilder sb = new StringBuilder();
-                for (List<Service> value : cloudLibrary.getService(ServerService.class).getServices().values()) {
+                for (List<Service> value : CloudSystem.getInstance().getService(ServerService.class).getServices().values()) {
                     for (Service service : value) {
                         sb.append("================ LOG OF " + service.getName() + " ================").append("\n").append("\n").append("\n");
-                        sb.append(this.getLog(service, cloudLibrary));
+                        sb.append(this.getLog(service, CloudSystem.getInstance()));
                         sb.append("================ END OF LOG FOR " + service.getName() + " ================").append("\n").append("\n").append("\n");
                     }
                 }
                 finalText = sb.toString();
             } else {
                 String s = args[0];
-                Service service = cloudLibrary.getService().getService(s);
+                Service service = CloudSystem.getInstance().getService().getService(s);
                 if (service == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
+                    sender.sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
                     return;
                 }
-                finalText = this.getLog(service, cloudLibrary);
+                finalText = this.getLog(service, CloudSystem.getInstance());
             }
             try {
                 String realLink = this.post(finalText, type,false, file);
@@ -60,13 +57,13 @@ public class LogCommand extends CloudCommand implements TabCompletable {
                 } else {
                     Desktop.getDesktop().browse(new URI(realLink));
                 }
-                console.getLogger().sendMessage("INFO", "§2Opening §aLog....");
+                sender.sendMessage("INFO", "§2Opening §aLog....");
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         } else {
-            console.getLogger().sendMessage("ERROR", "§clog <all/serverName> <file/web>");
-            console.getLogger().sendMessage("INFO", "§cWebsite logging only works on Windows as you can not copy anything from command on linux!");
+            sender.sendMessage("ERROR", "§clog <all/serverName> <file/web>");
+            sender.sendMessage("INFO", "§cWebsite logging only works on Windows as you can not copy anything from command on linux!");
         }
     }
 

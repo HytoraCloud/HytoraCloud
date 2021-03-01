@@ -37,11 +37,11 @@ public class CloudProxy extends Plugin {
     @Override
     public void onEnable() {
         instance = this;
+
         this.cloudAPI = new CloudAPI();
         this.hubManager = new HubManager();
         this.networkManager = new NetworkManager();
         this.services = new LinkedList<>();
-
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStartServer(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStopServer(this.cloudAPI));
@@ -49,21 +49,22 @@ public class CloudProxy extends Plugin {
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyCloudPlayerHandler(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyChatEvent(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
 
         this.getProxy().getPluginManager().registerListener(this, new ProxyPingListener());
         this.getProxy().getPluginManager().registerListener(this, new TablistListener());
+        this.getProxy().getPluginManager().registerListener(this, new CommandListener());
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerConnectListener());
 
-        this.getProxy().getPluginManager().registerCommand(this, new PermsCommand());
-        this.getProxy().getPluginManager().registerCommand(this, new CloudCommand());
-        this.getProxy().getPluginManager().registerCommand(this, new ListCommand());
-        this.getProxy().getPluginManager().registerCommand(this, new WhereIsCommand());
-        this.getProxy().getPluginManager().registerCommand(this, new WhereAmICommand());
+        this.cloudAPI.registerCommand(new CloudCommand());
+        this.cloudAPI.registerCommand(new HubCommand());
+        this.cloudAPI.registerCommand(new ListCommand());
+        this.cloudAPI.registerCommand(new WhereAmICommand());
+        this.cloudAPI.registerCommand(new WhereIsCommand());
+        this.cloudAPI.registerCommand(new PermsCommand());
 
-
-        this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));
     }
 
     @Override

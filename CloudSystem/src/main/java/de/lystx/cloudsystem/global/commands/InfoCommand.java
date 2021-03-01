@@ -7,10 +7,10 @@ import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.command.TabCompletable;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;
 
@@ -18,62 +18,59 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
-public class InfoCommand extends CloudCommand implements TabCompletable {
+public class InfoCommand implements TabCompletable {
 
-    public InfoCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
-
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+    @Command(name = "info", description = "Shows information", aliases = "information")
+    public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1) {
             switch (args[0]) {
                 case "servers":
-                    console.getLogger().sendMessage("INFO", "SERVERS (ONLINE) : ");
-                    for (Service serverMeta : cloudLibrary.getService().getGlobalServices()) {
-                        if (cloudLibrary.getService().getService(serverMeta.getName()) == null) {
+                    sender.sendMessage("INFO", "SERVERS (ONLINE) : ");
+                    for (Service serverMeta : CloudSystem.getInstance().getService().getGlobalServices()) {
+                        if (CloudSystem.getInstance().getService().getService(serverMeta.getName()) == null) {
                             continue;
                         }
                         if (serverMeta.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                             continue;
                         }
-                        console.getLogger().sendMessage("INFO", "NAME: " + serverMeta.getName() + " | GROUP: " + serverMeta.getServiceGroup().getName() + " | TEMPLATE: " + serverMeta.getServiceGroup().getTemplate());
+                        sender.sendMessage("INFO", "NAME: " + serverMeta.getName() + " | GROUP: " + serverMeta.getServiceGroup().getName() + " | TEMPLATE: " + serverMeta.getServiceGroup().getTemplate());
                     }
                     return;
                 case "groups":
-                    console.getLogger().sendMessage("INFO", "GROUPS: ");
-                    for (ServiceGroup serverGroupMeta : cloudLibrary.getService(GroupService.class).getGroups())
-                        console.getLogger().sendMessage("INFO", "NAME: " + serverGroupMeta.getName() + " | TEMPLATE: " + serverGroupMeta.getTemplate());
+                    sender.sendMessage("INFO", "GROUPS: ");
+                    for (ServiceGroup serverGroupMeta : CloudSystem.getInstance().getService(GroupService.class).getGroups())
+                        sender.sendMessage("INFO", "NAME: " + serverGroupMeta.getName() + " | TEMPLATE: " + serverGroupMeta.getTemplate());
                     return;
                 case "proxys":
-                    console.getLogger().sendMessage("INFO", "PROXYS: ");
-                    for (Service serverMeta : cloudLibrary.getService().getGlobalServices()) {
-                        if (cloudLibrary.getService().getService(serverMeta.getName()) == null) {
+                    sender.sendMessage("INFO", "PROXYS: ");
+                    for (Service serverMeta : CloudSystem.getInstance().getService().getGlobalServices()) {
+                        if (CloudSystem.getInstance().getService().getService(serverMeta.getName()) == null) {
                             continue;
                         }
                         if (serverMeta.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
                             continue;
                         }
-                        console.getLogger().sendMessage("INFO", "NAME: " + serverMeta.getName() + " | GROUP: " + serverMeta.getServiceGroup().getName() + " | TEMPLATE: " + serverMeta.getServiceGroup().getTemplate());
+                        sender.sendMessage("INFO", "NAME: " + serverMeta.getName() + " | GROUP: " + serverMeta.getServiceGroup().getName() + " | TEMPLATE: " + serverMeta.getServiceGroup().getTemplate());
                     }
             }
         } else {
             NetworkInfo networkInfo = new NetworkInfo();
             DecimalFormat format = new DecimalFormat("##.#");
-            console.getLogger().sendMessage("INFO", "§7----------------------------------");
-            console.getLogger().sendMessage("INFO", "§bNewest version §a: §f" + (Updater.isUpToDate() ? "§aYes": "§cNo"));
-            console.getLogger().sendMessage("INFO", "§bVersion §a: §f" + Updater.getCloudVersion());
-            console.getLogger().sendMessage("INFO", "§bCPU-Usage §a: §f" + format.format(networkInfo.getCPUUsage()) + "%");
-            console.getLogger().sendMessage("INFO", "§bSystem Memory §a: §f" + format.format(networkInfo.getSystemMemory()) + "/?");
-            console.getLogger().sendMessage("INFO", "§bInternal CPU-Usage §a: §f" + format.format(networkInfo.getInternalCPUUsage()) + "%");
-            console.getLogger().sendMessage("INFO", "§bMX OS §a: §f" + networkInfo.getOperatingSystemMX().getName());
-            console.getLogger().sendMessage("INFO", "§bTPS §a: §f" + networkInfo.formatTps(cloudLibrary.getTicksPerSecond().getTPS()));
-            console.getLogger().sendMessage("INFO", "§bCloud-Host §a: §f" + cloudLibrary.getService(ConfigService.class).getNetworkConfig().getHost());
-            console.getLogger().sendMessage("INFO", "§bCloud-Port §a: §f" + cloudLibrary.getService(ConfigService.class).getNetworkConfig().getPort());
-            console.getLogger().sendMessage("INFO", "§7----------------------------------");
-            console.getLogger().sendMessage("INFO", "§9info <servers> §7| §bLists all servers");
-            console.getLogger().sendMessage("INFO", "§9info <groups> §7| §bLists all groups");
-            console.getLogger().sendMessage("INFO", "§9info <proxys> §7| §bLists all proxys");
-            console.getLogger().sendMessage("INFO", "§9info §7| §bLists all infos");
+            sender.sendMessage("INFO", "§7----------------------------------");
+            sender.sendMessage("INFO", "§bNewest version §a: §f" + (Updater.isUpToDate() ? "§aYes": "§cNo"));
+            sender.sendMessage("INFO", "§bVersion §a: §f" + Updater.getCloudVersion());
+            sender.sendMessage("INFO", "§bCPU-Usage §a: §f" + format.format(networkInfo.getCPUUsage()) + "%");
+            sender.sendMessage("INFO", "§bSystem Memory §a: §f" + format.format(networkInfo.getSystemMemory()) + "/?");
+            sender.sendMessage("INFO", "§bInternal CPU-Usage §a: §f" + format.format(networkInfo.getInternalCPUUsage()) + "%");
+            sender.sendMessage("INFO", "§bMX OS §a: §f" + networkInfo.getOperatingSystemMX().getName());
+            sender.sendMessage("INFO", "§bTPS §a: §f" + networkInfo.formatTps(CloudSystem.getInstance().getTicksPerSecond().getTPS()));
+            sender.sendMessage("INFO", "§bCloud-Host §a: §f" + CloudSystem.getInstance().getService(ConfigService.class).getNetworkConfig().getHost());
+            sender.sendMessage("INFO", "§bCloud-Port §a: §f" + CloudSystem.getInstance().getService(ConfigService.class).getNetworkConfig().getPort());
+            sender.sendMessage("INFO", "§7----------------------------------");
+            sender.sendMessage("INFO", "§9info <servers> §7| §bLists all servers");
+            sender.sendMessage("INFO", "§9info <groups> §7| §bLists all groups");
+            sender.sendMessage("INFO", "§9info <proxys> §7| §bLists all proxys");
+            sender.sendMessage("INFO", "§9info §7| §bLists all infos");
         }
     }
 

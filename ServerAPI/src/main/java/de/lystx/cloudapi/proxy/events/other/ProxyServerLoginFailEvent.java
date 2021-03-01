@@ -1,4 +1,4 @@
-package de.lystx.cloudapi.proxy.events;
+package de.lystx.cloudapi.proxy.events.other;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,14 +7,14 @@ import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
 
 @Getter @Setter
-public class CloudLoginFailEvent extends Event implements Cancellable {
+public class ProxyServerLoginFailEvent extends Event implements Cancellable {
 
     private final PendingConnection connection;
     private final Reason reason;
     private String cancelReason;
     private boolean cancelled;
 
-    public CloudLoginFailEvent(PendingConnection connection, Reason reason) {
+    public ProxyServerLoginFailEvent(PendingConnection connection, Reason reason) {
         this.connection = connection;
         this.reason = reason;
         this.cancelled = false;

@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.player.impl.PlayerInstance;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import java.util.List;
@@ -32,6 +33,8 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
             this.cloudAPI.setPermissionPool(info.getPermissionPool());
             this.cloudAPI.getNetwork().setServices(info.getServices());
             this.cloudAPI.getCloudPlayers().setCloudPlayers(info.getCloudPlayers());
+
+            PlayerInstance.PERMISSION_POOL = this.cloudAPI.getPermissionPool();
 
             for (List<Service> value : info.getServices().values()) {
                 for (Service service : value) {

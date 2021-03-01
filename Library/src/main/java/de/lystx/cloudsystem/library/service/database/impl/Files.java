@@ -44,13 +44,13 @@ public class Files implements CloudDatabase {
 
     @Override
     public void registerPlayer(CloudPlayer cloudPlayer) {
-        if (!this.isRegistered(cloudPlayer.getUuid())) {
-            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName());
-            this.setPlayerData(cloudPlayer.getUuid(), data);
+        if (!this.isRegistered(cloudPlayer.getUniqueId())) {
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUniqueId(), cloudPlayer.getName());
+            this.setPlayerData(cloudPlayer.getUniqueId(), data);
         } else {
-            CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUuid());
-            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUuid(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
-            this.setPlayerData(cloudPlayer.getUuid(), newData);
+            CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUniqueId());
+            CloudPlayerData newData = new CloudPlayerData(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayerData.getPermissionEntries(), cloudPlayerData.getPermissions(), cloudPlayer.getIpAddress(), cloudPlayerData.isNotifyServerStart(), cloudPlayerData.getFirstLogin(), cloudPlayerData.getLastLogin());
+            this.setPlayerData(cloudPlayer.getUniqueId(), newData);
         }
     }
 

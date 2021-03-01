@@ -4,29 +4,29 @@ import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 
-import java.util.UUID;
 
 public interface NetworkHandler {
 
-    void onServerStart(Service service);
+    default void onServerStart(Service service) {}
 
-    void onServerQueue(Service service);
+    default void onServerQueue(Service service) {}
 
-    void onServerStop(Service service);
+    default void onServerStop(Service service) {}
 
-    void onServerUpdate(Service service);
+    default void onServerUpdate(Service service) {}
 
-    void onGroupUpdate(ServiceGroup group);
+    default void onGroupUpdate(ServiceGroup group) {}
 
-    void onPlayerJoin(CloudPlayer cloudPlayer);
+    default void onPlayerJoin(CloudPlayer cloudPlayer) {}
 
-    void onServerChange(CloudPlayer cloudPlayer, String server);
+    default void onServerChange(CloudPlayer cloudPlayer, String server) {}
 
-    void onPlayerQuit(CloudPlayer cloudPlayer);
+    default void onPlayerQuit(CloudPlayer cloudPlayer) {}
 
-    void onNetworkPing(UUID connectionUUID);
+    default void onNetworkPing(CloudConnection connectionUUID) {}
 
-    void onDocumentReceive(String channel, String key, Document document, ServiceType type);
+    default void onDocumentReceive(String channel, String key, Document document, ServiceType type) {}
 }

@@ -2,18 +2,15 @@ package de.lystx.cloudapi.bukkit.listener;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
-import de.lystx.cloudapi.bukkit.events.CloudServerNPCInteractEvent;
+import de.lystx.cloudapi.bukkit.events.other.CloudServerNPCInteractEvent;
 import de.lystx.cloudapi.bukkit.utils.Item;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.service.GroupInfo;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceInfo;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
-import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
-import io.vson.VsonValue;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -26,7 +23,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -78,7 +74,7 @@ public class NPCListener implements Listener {
                 if (!CloudServer.getInstance().getNpcManager().getNpcConfig().getConnectingMessage().trim().isEmpty()) {
                     player.sendMessage(this.replace(CloudServer.getInstance().getNpcManager().getNpcConfig().getConnectingMessage(), service, service.getServiceGroup()));
                 }
-                cloudPlayer.sendToServer(CloudAPI.getInstance().getCloudClient(), service.getName());
+                cloudPlayer.connect(service.getName());
             }
         }
     }

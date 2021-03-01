@@ -1,5 +1,6 @@
 package de.lystx.cloudapi.proxy.listener;
 
+import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -18,9 +19,11 @@ public class ServerKickListener implements Listener {
                 return;
             }
             event.setCancelled(true);
-            CloudProxy.getInstance().getHubManager().sendPlayerToFallback(player);
+            CloudAPI.getInstance().getCloudPlayers().get(player.getName()).fallback();
+         //   CloudProxy.getInstance().getHubManager().sendPlayerToFallback(player);
         } catch (NullPointerException e) {
-            CloudProxy.getInstance().getHubManager().sendPlayerToFallback(player);
+            CloudAPI.getInstance().getCloudPlayers().get(player.getName()).fallback();
+            //CloudProxy.getInstance().getHubManager().sendPlayerToFallback(player);
         }
         event.setCancelled(false);
     }

@@ -2,6 +2,7 @@ package de.lystx.cloudapi.proxy.command;
 
 import com.google.common.collect.ImmutableList;
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
@@ -9,31 +10,26 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacketStartService;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class CloudCommand extends Command implements TabExecutor {
+public class CloudCommand implements TabCompletable {
 
-
-    public CloudCommand() {
-        super("cloud", null, "hytoracloud", "hcloud", "cloudsystem", "klaud");
-    }
-
-    @Override
-    public void execute(CommandSender commandSender, String[] args) {
-        if (commandSender instanceof ProxiedPlayer) {
-            ProxiedPlayer player = (ProxiedPlayer)commandSender;
+    @Command(name = "cloud", description = "Cloud Proy Command", aliases = {"hytoracloud", "hcloud", "cloudsystem", "klaud"})
+    public void execute(CloudCommandSender commandSender, String[] args) {
+        if (commandSender instanceof CloudPlayer) {
+            CloudPlayer player = (CloudPlayer)commandSender;
             if (player.hasPermission("cloudsystem.command")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("rl") || args[0].equalsIgnoreCase("reload")) {
@@ -247,7 +243,7 @@ public class CloudCommand extends Command implements TabExecutor {
         }
     }
 
-    public void help(ProxiedPlayer player) {
+    public void help(CloudPlayer player) {
         player.sendMessage("§bHytoraCloud §7Help§8:");
         player.sendMessage("§8§m--------------------------------------");
         player.sendMessage("  §8» §b/cloud list <group/proxy/server/maintenance> §8┃ §7Lists network specified things");
@@ -269,8 +265,25 @@ public class CloudCommand extends Command implements TabExecutor {
         player.sendMessage("§8§m--------------------------------------");
     }
 
+
+    public List<String> getServices() {
+        List<String> list = new LinkedList<>();
+        for (Service service : CloudAPI.getInstance().getNetwork().getServices()) {
+            list.add(service.getName());
+        }
+        return list;
+    }
+
+    public List<String> getGroups() {
+        List<String> list = new LinkedList<>();
+        for (ServiceGroup service : CloudAPI.getInstance().getNetwork().getServiceGroups()) {
+            list.add(service.getName());
+        }
+        return list;
+    }
+
     @Override
-    public Iterable<String> onTabComplete(CommandSender commandSender, String[] args) {
+    public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {
         if (args[0].equalsIgnoreCase("list")) {
             return ImmutableList.of("group", "proxy", "server", "maintenance");
         } else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("log")) {
@@ -287,21 +300,5 @@ public class CloudCommand extends Command implements TabExecutor {
             }
         }
         return ImmutableList.of("list", "tps", "ver", "shutdown", "rl", "maintenance", "run", "stop", "stopGroup", "copy", "log", "toggle", "stats");
-    }
-
-    public List<String> getServices() {
-        List<String> list = new LinkedList<>();
-        for (Service service : CloudAPI.getInstance().getNetwork().getServices()) {
-            list.add(service.getName());
-        }
-        return list;
-    }
-
-    public List<String> getGroups() {
-        List<String> list = new LinkedList<>();
-        for (ServiceGroup service : CloudAPI.getInstance().getNetwork().getServiceGroups()) {
-            list.add(service.getName());
-        }
-        return list;
     }
 }

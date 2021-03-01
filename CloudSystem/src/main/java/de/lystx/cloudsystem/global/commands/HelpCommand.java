@@ -1,23 +1,20 @@
 package de.lystx.cloudsystem.global.commands;
 
-import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
+import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.library.service.command.command.CommandInfo;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.command.CommandService;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
 
 import java.util.Arrays;
 
-public class HelpCommand extends CloudCommand {
+public class HelpCommand {
 
 
-    public HelpCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
-
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
-        for (CloudCommand cloudCommand1 : cloudLibrary.getService(CommandService.class).getCloudCommands()) {
-            console.getLogger().sendMessage("COMMAND", "§b" + cloudCommand1.getName() + " §7| §a" + cloudCommand1.getDescription() + " §7| §2" + Arrays.toString(cloudCommand1.getAliases()));
+    @Command(name = "help", description = "Shows you this message", aliases = {"?", "whattodo"})
+    public void execute(CloudCommandSender sender, String[] args) {
+        for (CommandInfo commandInfo1 : CloudSystem.getInstance().getService(CommandService.class).getCommandInfos()) {
+            sender.sendMessage("COMMAND", "§b" + commandInfo1.getName() + " §7| §a" + commandInfo1.getDescription() + " §7| §2" + Arrays.toString(commandInfo1.getAliases()));
         }
     }
 }

@@ -5,39 +5,33 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
-import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
-import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
+import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
+import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateCloudSign;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInDeleteCloudSign;
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class ServiceCommand implements CommandExecutor {
+public class ServiceCommand {
 
     public static final List<UUID> deleters = new LinkedList<>();
 
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
 
-        if (commandSender instanceof Player) {
-            Player player = (Player)commandSender;
+    @Command(name = "service", description = "Bukkit server command", aliases = {"hs", "cloudserver"})
+    public void execute(CloudCommandSender sender, String[] args) {
+        if (sender instanceof CloudPlayer) {
+            CloudPlayer player = (CloudPlayer) sender;
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("info")) {
@@ -57,16 +51,16 @@ public class ServiceCommand implements CommandExecutor {
                     } else if (args[0].equalsIgnoreCase("removeSign")) {
                         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
-                            return false;
+                            return;
                         }
                         Set<Material> materials = new HashSet<>();
                         materials.add(Material.AIR);
-                        Location loc = player.getTargetBlock(materials, 5).getLocation();
+                        Location loc = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
                         if (loc.getBlock().getType().equals(Material.WALL_SIGN)) {
                             CloudSign cloudSign = CloudServer.getInstance().getSignManager().getSignUpdater().getCloudSign(loc);
                             if (cloudSign == null) {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis §eCloudSign §cseems not to be registered!");
-                                return false;
+                                return;
                             }
                             Block block = Bukkit.getWorld(cloudSign.getWorld()).getBlockAt(cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
                             Sign signBlock = (Sign) block.getState();
@@ -84,11 +78,11 @@ public class ServiceCommand implements CommandExecutor {
                     } else if (args[0].equalsIgnoreCase("removeNPC")) {
                         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
-                            return false;
+                            return;
                         }
                         if (CloudServer.getInstance().isNewVersion()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
-                            return false;
+                            return;
                         }
 
                         if (!deleters.contains(player.getUniqueId())) {
@@ -105,19 +99,19 @@ public class ServiceCommand implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("createSign")) {
                         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
-                            return false;
+                            return;
                         }
                         String serverGroup = args[1];
                         ServiceGroup group = CloudAPI.getInstance().getNetwork().getServiceGroup(serverGroup);
                         if (group != null) {
                             Set<Material> materials = new HashSet<>();
                             materials.add(Material.AIR);
-                            Location loc = player.getTargetBlock(materials, 5).getLocation();
+                            Location loc = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
                             if (loc.getBlock().getType().equals(Material.WALL_SIGN)) {
                                 CloudSign sign = new CloudSign((int) loc.getX(), (int) loc.getY(), (int) loc.getZ(), group.getName(), loc.getWorld().getName());
                                 if (CloudServer.getInstance().getSignManager().getSignUpdater().getCloudSign(loc) != null) {
                                     player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe §eCloudSign §calready exists!");
-                                    return false;
+                                    return;
                                 }
                                 Block block = Bukkit.getWorld(sign.getWorld()).getBlockAt(sign.getX(), sign.getY(), sign.getZ());
                                 Sign signBlock = (Sign) block.getState();
@@ -145,7 +139,7 @@ public class ServiceCommand implements CommandExecutor {
                         }
                         if (!cont) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid §eServiceState§c!");
-                            return false;
+                            return;
                         }
                         ServiceState state = ServiceState.valueOf(name.toUpperCase());
                         CloudServer.getInstance().getManager().setServiceState(state);
@@ -158,21 +152,21 @@ public class ServiceCommand implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("createNPC")) {
                         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
-                            return false;
+                            return;
                         }
                         if (CloudServer.getInstance().isNewVersion()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
-                            return false;
+                            return;
                         }
                         String groupName = args[1];
-                        NPC npcV18R3V18R3 = CloudServer.getInstance().getNpcManager().getNPC(player.getLocation());
+                        NPC npcV18R3V18R3 = CloudServer.getInstance().getNpcManager().getNPC(Bukkit.getPlayer(player.getName()).getLocation());
                         if (npcV18R3V18R3 != null) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThere is already an §eNPC §cfor this location!");
-                            return false;
+                            return;
                         }
                         ServiceGroup group = CloudAPI.getInstance().getNetwork().getServiceGroup(groupName);
                         if (group != null) {
-                            CloudServer.getInstance().getNpcManager().createNPC(player.getLocation(), ChatColor.translateAlternateColorCodes('&',
+                            CloudServer.getInstance().getNpcManager().createNPC(Bukkit.getPlayer(player.getName()).getLocation(), ChatColor.translateAlternateColorCodes('&',
                                     args[2].replace("_", " ")), group.getName(), args[3]);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You created an NPC for the group §b" + group.getName() + " §7with skin §b" + args[3] + "§8!");
                         } else {
@@ -188,10 +182,9 @@ public class ServiceCommand implements CommandExecutor {
                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");
             }
         }
-        return false;
     }
 
-    public void help(Player player) {
+    public void help(CloudPlayer player) {
         player.sendMessage("§bCloudService §7Help§8:");
         player.sendMessage("§8§m--------------------------------------");
         player.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");

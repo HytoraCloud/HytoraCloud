@@ -2,12 +2,9 @@ package de.lystx.cloudapi.bukkit;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.command.ServiceCommand;
-import de.lystx.cloudapi.bukkit.events.BukkitEventEvent;
+import de.lystx.cloudapi.bukkit.events.other.BukkitEventEvent;
 import de.lystx.cloudapi.bukkit.handler.*;
-import de.lystx.cloudapi.bukkit.listener.CloudListener;
-import de.lystx.cloudapi.bukkit.listener.EmptyListener;
-import de.lystx.cloudapi.bukkit.listener.NPCListener;
-import de.lystx.cloudapi.bukkit.listener.PlayerListener;
+import de.lystx.cloudapi.bukkit.listener.*;
 import de.lystx.cloudapi.bukkit.manager.labymod.LabyMod;
 import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
 import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
@@ -16,16 +13,12 @@ import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudapi.bukkit.manager.other.CloudManager;
 import de.lystx.cloudapi.bukkit.utils.CloudPermissibleBase;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftShapedRecipe;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -53,12 +46,16 @@ public class CloudServer extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        //Initializing Objects
         this.cloudAPI = new CloudAPI();
         this.manager = new CloudManager(this.cloudAPI);
         this.signManager = new SignManager(this);
         this.nametagManager = new NametagManager();
         this.skinFetcher = new SkinFetcher();
         this.npcManager = new NPCManager();
+
+        // Version check to enable an disable LabyMod and NPCs
         try {
             Class.forName("net.minecraft.server.v1_8_R3.Packet");
             this.npcManager = new NPCManager();
@@ -68,6 +65,7 @@ public class CloudServer extends JavaPlugin {
             this.newVersion = true;
         }
 
+        // Registering PacketHandlers
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitServerUpdate(this.cloudAPI));
@@ -76,23 +74,27 @@ public class CloudServer extends JavaPlugin {
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerTPS(this.cloudAPI));
 
-        this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        this.getServer().getPluginManager().registerEvents(new NPCListener(), this);
-        this.getCommand("service").setExecutor(new ServiceCommand());
+        // Connecting to cloud and managing cloud stuff
         this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
 
-        this.cloudAPI.sendPacket(new PacketPlayInRegister(this.cloudAPI.getService()));
         if (this.cloudAPI.getProperties().has("waitingForPlayers")) {
             this.waitingForPlayer = true;
-            Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-                if (waitingForPlayer) Bukkit.shutdown();
+            this.cloudAPI.getScheduler().scheduleDelayedTask(() -> {
+                if (waitingForPlayer) {
+                    this.shutdown();
+                }
             }, 1500L);
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("[CloudAPI] Server stopping, closing connection from CloudAPI <-> (CloudSystem / Receiver)");
-            this.cloudAPI.shutdown();
-        }));
 
+        //Registering Events
+        this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        this.getServer().getPluginManager().registerEvents(new NPCListener(), this);
+        this.getServer().getPluginManager().registerEvents(new CommandListener(), this);
+
+        // Registering commands
+        this.cloudAPI.registerCommand(new ServiceCommand());
+
+        //Checking for fired events
         for (HandlerList handler : HandlerList.getHandlerLists()) {
             handler.register(new RegisteredListener(new EmptyListener(), (listener, event) -> {
                 if (event.getClass().getSimpleName().equalsIgnoreCase(BukkitEventEvent.class.getSimpleName())) {
@@ -126,7 +128,7 @@ public class CloudServer extends JavaPlugin {
             CloudPlayer player = cloudAPI.getCloudPlayers().get(onlinePlayer.getName());
             if (player != null) {
                 onlinePlayer.sendMessage(msg);
-                player.fallback(cloudAPI.getCloudClient());
+                player.fallback();
             } else {
                 onlinePlayer.kickPlayer(msg);
             }
@@ -144,7 +146,6 @@ public class CloudServer extends JavaPlugin {
         if (!cloudAPI.getPermissionPool().isEnabled()) {
             return;
         }
-
         try {
             Class<?> clazz = Reflections.getCraftBukkitClass("entity.CraftHumanEntity");
             Field field = clazz.getDeclaredField("perm");
@@ -153,30 +154,6 @@ public class CloudServer extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        /*
-        try {
-            player.setOp(false);
-            if (this.cloudAPI.getCloudPlayers().get(player.getName()) != null) {
-                this.cloudAPI.updatePermissions(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), s -> {
-                    try {
-                        if (s.equalsIgnoreCase("*")) {
-                            player.setOp(true);
-
-                            player.getEffectivePermissions().forEach(permissionAttachmentInfo -> {
-                                player.addAttachment(this, permissionAttachmentInfo.getPermission(), true);
-                            });
-
-                        }
-                        player.addAttachment(this, s, true);
-                    } catch (IllegalStateException e) {
-                        System.out.println("[CLOUDAPI] Something went wrong while updating permissions for " + player.getName());
-                    }
-                });
-            } else {
-                this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);
-            }
-        } catch (NullPointerException e) {
-            this.cloudAPI.getScheduler().scheduleDelayedTask(() -> this.updatePermissions(player), 5L);
-        }*/
     }
+
 }

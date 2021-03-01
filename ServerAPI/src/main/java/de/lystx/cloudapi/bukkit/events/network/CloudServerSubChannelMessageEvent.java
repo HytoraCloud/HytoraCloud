@@ -1,4 +1,4 @@
-package de.lystx.cloudapi.bukkit.events;
+package de.lystx.cloudapi.bukkit.events.network;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
 import org.bukkit.event.Event;

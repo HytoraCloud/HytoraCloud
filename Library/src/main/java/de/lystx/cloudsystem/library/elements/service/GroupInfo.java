@@ -17,7 +17,7 @@ public class GroupInfo extends ServiceGroup {
         this.onlinePlayers = onlinePlayers;
         this.onlineServices = onlineServices;
 
-        this.onlinePlayers.removeIf(onlinePlayer -> !onlinePlayer.getGroup().equalsIgnoreCase(name));
+        this.onlinePlayers.removeIf(onlinePlayer -> !onlinePlayer.getServerGroup().equalsIgnoreCase(name));
         this.onlineServices.removeIf(onlineService -> !onlineService.getServiceGroup().getName().equalsIgnoreCase(name));
     }
 

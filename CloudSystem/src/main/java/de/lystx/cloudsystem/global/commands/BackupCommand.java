@@ -1,27 +1,23 @@
 package de.lystx.cloudsystem.global.commands;
 
-import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.backup.BackupService;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
 
 import java.util.UUID;
 
-public class BackupCommand extends CloudCommand {
+public class BackupCommand {
 
 
-    public BackupCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
-
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+    @Command(name = "backup", description = "Makes a backup of your cloud")
+    public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("confirm")) {
-            console.getLogger().sendMessage("INFO", "§7Creating §bBackup §7this could take some time...");
-            cloudLibrary.getService(BackupService.class).createBackup(UUID.randomUUID().toString());
-            console.getLogger().sendMessage("INFO", "§aDone!");
+            sender.sendMessage("INFO", "§7Creating §bBackup §7this could take some time...");
+            CloudSystem.getInstance().getService(BackupService.class).createBackup(UUID.randomUUID().toString());
+            sender.sendMessage("INFO", "§aDone!");
         } else {
-            console.getLogger().sendMessage("ERROR", "§cbackup <§econfirm§c>");
+            sender.sendMessage("ERROR", "§cbackup <§econfirm§c>");
         }
     }
 }

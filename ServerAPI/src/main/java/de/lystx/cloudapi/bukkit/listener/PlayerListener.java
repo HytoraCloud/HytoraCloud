@@ -3,7 +3,6 @@ package de.lystx.cloudapi.bukkit.listener;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -12,7 +11,6 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
-import io.vson.elements.object.VsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -50,8 +48,6 @@ public class PlayerListener implements Listener {
             CloudServer.getInstance().updatePermissions(event.getPlayer());
         }
     }
-
-
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
@@ -181,7 +177,7 @@ public class PlayerListener implements Listener {
                 player.sendMessage(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("&", "§").replace("%prefix%", CloudAPI.getInstance().getPrefix()));
                 return;
             }
-            cloudPlayer.sendToServer(CloudAPI.getInstance().getCloudClient(), meta.getName());
+            cloudPlayer.connect(meta.getName());
         }
     }
 

@@ -1,19 +1,15 @@
 package de.lystx.cloudsystem.global.commands;
 
 
-import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
 
-public class ClearCommand extends CloudCommand {
+public class ClearCommand  {
 
-    public ClearCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
-
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
-        console.clearScreen();
+    @Command(name = "reload", description = "Clears screen of the console", aliases = {"cl"})
+    public void execute(CloudCommandSender sender, String[] args) {
+        CloudSystem.getInstance().getConsole().clearScreen();
     }
 
 }

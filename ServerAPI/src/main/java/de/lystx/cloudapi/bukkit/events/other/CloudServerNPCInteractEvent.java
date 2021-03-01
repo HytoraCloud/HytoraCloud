@@ -1,4 +1,4 @@
-package de.lystx.cloudapi.bukkit.events;
+package de.lystx.cloudapi.bukkit.events.other;
 
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import org.bukkit.entity.Player;

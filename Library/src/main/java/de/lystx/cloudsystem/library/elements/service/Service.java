@@ -5,11 +5,12 @@ import de.lystx.cloudsystem.library.enums.ServiceState;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@Getter @Setter
+@Getter @Setter @ToString
 public class Service implements Serializable {
 
     private final String name;

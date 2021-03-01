@@ -4,48 +4,44 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.command.TabCompletable;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class StopCommand extends CloudCommand implements TabCompletable {
+public class StopCommand implements TabCompletable {
 
 
-    public StopCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
-
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+    @Command(name = "stop", description = "Stops a service or group")
+    public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1) {
             String s = args[0];
-            Service service = cloudLibrary.getService().getService(s);
+            Service service = CloudSystem.getInstance().getService().getService(s);
             if (service == null) {
-                console.getLogger().sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
+                sender.sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
                 return;
             }
-            cloudLibrary.getService().stopService(service);
-            //console.getLogger().sendMessage("COMMAND", "§7The service §a" + service.getName() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7was stopped§8!");
+            CloudSystem.getInstance().getService().stopService(service);
+            //sender.sendMessage("COMMAND", "§7The service §a" + service.getName() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7was stopped§8!");
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String groupName = args[1];
-                ServiceGroup group = cloudLibrary.getService(GroupService.class).getGroup(groupName);
+                ServiceGroup group = CloudSystem.getInstance().getService(GroupService.class).getGroup(groupName);
                 if (group == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe group §e" + groupName + " §cseems not to exist!");
+                    sender.sendMessage("ERROR", "§cThe group §e" + groupName + " §cseems not to exist!");
                     return;
                 }
-                console.getLogger().sendMessage("COMMAND", "§7The group §a" + group.getName() + " §7was stopped§8!");
-                cloudLibrary.getService().stopServices(group);
+                sender.sendMessage("COMMAND", "§7The group §a" + group.getName() + " §7was stopped§8!");
+                CloudSystem.getInstance().getService().stopServices(group);
             } else {
-                console.getLogger().sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
+                sender.sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
             }
         } else {
-            console.getLogger().sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
+            sender.sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
         }
     }
 

@@ -1,4 +1,4 @@
-package de.lystx.cloudapi.proxy.events;
+package de.lystx.cloudapi.proxy.events.network;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
 import net.md_5.bungee.api.plugin.Event;

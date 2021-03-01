@@ -38,7 +38,7 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
             ProxyServer.getInstance().getPlayer(packetPlayOutSendMessage.getUuid()).sendMessage(packetPlayOutSendMessage.getMessage());
         } else if (packet instanceof PacketCommunicationFallback) {
             PacketCommunicationFallback fallback = (PacketCommunicationFallback) packet;
-            CloudProxy.getInstance().getHubManager().sendPlayerToFallback(ProxyServer.getInstance().getPlayer(fallback.getName()));
+            CloudAPI.getInstance().getCloudPlayers().get(fallback.getName()).fallback();
         } else if (packet instanceof PacketCommunicationSendComponent) {
             PacketCommunicationSendComponent packetCommunicationSendComponent = (PacketCommunicationSendComponent)packet;
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetCommunicationSendComponent.getUuid());

@@ -35,13 +35,13 @@ public class CloudSystem extends CloudInstance {
 
         this.receivers = new LinkedList<>();
 
-        this.getService(CommandService.class).registerCommand(new EditCommand("edit", "Edits a serverGroup"));
-        this.getService(CommandService.class).registerCommand(new ModulesCommand("modules", "Manages modules", "pl", "plugins"));
-        this.getService(CommandService.class).registerCommand(new CreateCommand("create", "Creates cloudstuff", "add"));
-        this.getService(CommandService.class).registerCommand(new DeleteCommand("delete", "Deletes stuff", "remove"));
-        this.getService(CommandService.class).registerCommand(new PermsCommand("perms", "Manages permissions", "cperms", "permissions"));
-        this.getService(CommandService.class).registerCommand(new PlayerCommand("player", "Manages players on the network", "players"));
-        this.getService(CommandService.class).registerCommand(new MaintenanceCommand("maintenance", "Manages maintenance of network", "mc"));
+        this.getService(CommandService.class).registerCommand(new EditCommand());
+        this.getService(CommandService.class).registerCommand(new ModulesCommand());
+        this.getService(CommandService.class).registerCommand(new CreateCommand());
+        this.getService(CommandService.class).registerCommand(new DeleteCommand());
+        this.getService(CommandService.class).registerCommand(new PermsCommand());
+        this.getService(CommandService.class).registerCommand(new PlayerCommand());
+        this.getService(CommandService.class).registerCommand(new MaintenanceCommand());
 
         this.authManager.createKey();
 

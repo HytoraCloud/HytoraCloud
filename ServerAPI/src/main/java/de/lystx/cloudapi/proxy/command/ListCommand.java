@@ -3,22 +3,18 @@ package de.lystx.cloudapi.proxy.command;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Utils;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
 
-public class ListCommand extends Command {
+public class ListCommand{
 
 
-    public ListCommand() {
-        super("list", null, "glist", "globallist");
-    }
-
-    @Override
-    public void execute(CommandSender commandSender, String[] args) {
-        if (commandSender instanceof ProxiedPlayer) {
-            ProxiedPlayer player = (ProxiedPlayer)commandSender;
+    @Command(name = "list", description = "Lists network stuff", aliases = {"glist", "globallist"})
+    public void execute(CloudCommandSender commandSender, String[] args) {
+        if (commandSender instanceof CloudPlayer) {
+            CloudPlayer player = (CloudPlayer)commandSender;
             if (player.hasPermission("cloudsystem.list.command") || player.hasPermission("*")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("global")) {
@@ -61,7 +57,7 @@ public class ListCommand extends Command {
     }
 
 
-    public void help(ProxiedPlayer player) {
+    public void help(CloudPlayer player) {
         player.sendMessage("§bListCommand §7Help§8:");
         player.sendMessage("§8§m--------------------------------------");
         player.sendMessage("  §8» §b/list <global> §8┃ §7Shows global players");

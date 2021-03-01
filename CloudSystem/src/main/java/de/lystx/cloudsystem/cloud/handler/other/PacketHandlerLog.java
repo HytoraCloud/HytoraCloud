@@ -44,7 +44,7 @@ public class PacketHandlerLog extends PacketHandlerAdapter {
             }
             CloudScreen screen = cloudSystem.getService(ScreenService.class).getScreenByName(service.getName());
             if (screen == null) {
-                cloudPlayer.sendMessage(this.cloudSystem.getService(CloudNetworkService.class).getCloudServer(), this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + "§cThe screen for this §eserver §ccouldn't be found!");
+                cloudPlayer.sendMessage(this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + "§cThe screen for this §eserver §ccouldn't be found!");
                 return;
             }
             StringBuilder sb = new StringBuilder();
@@ -54,7 +54,7 @@ public class PacketHandlerLog extends PacketHandlerAdapter {
             try {
                 String realLink = this.post(sb.toString(), false);
                 String link = "§7The §blog for §7service §b" + service.getName() + " §7was uploaded to §a" + realLink + " §8!";
-                cloudPlayer.sendMessage(this.cloudSystem.getService(CloudNetworkService.class).getCloudServer(), this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + link);
+                cloudPlayer.sendMessage(this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + link);
             } catch (IOException e) {
                 e.printStackTrace();
             }

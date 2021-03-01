@@ -7,12 +7,14 @@ import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketC
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 
 @Setter
-public class CloudPlayers {
+public class CloudPlayers implements Iterable<CloudPlayer> {
 
     private final CloudAPI cloudAPI;
     private List<CloudPlayer> cloudPlayers;
@@ -30,7 +32,7 @@ public class CloudPlayers {
     public List<CloudPlayer> getPlayersOnGroup(String group) {
        List<CloudPlayer> list = new LinkedList<>();
        for (CloudPlayer cp : this.cloudPlayers) {
-           if (cp.getGroup().equalsIgnoreCase(group)) {
+           if (cp.getServerGroup().equalsIgnoreCase(group)) {
               list.add(cp);
            }
         }
@@ -61,22 +63,12 @@ public class CloudPlayers {
     }
 
     public CloudPlayer get(String name) {
-        for (CloudPlayer cloudPlayer : this.cloudPlayers) {
-            if (cloudPlayer.getName().equalsIgnoreCase(name)) {
-                return cloudPlayer;
-            }
-        }
-        return null;
+        return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
 
     public CloudPlayer get(UUID uuid) {
-        for (CloudPlayer cloudPlayer : this.cloudPlayers) {
-            if (cloudPlayer.getUuid() == uuid) {
-                return cloudPlayer;
-            }
-        }
-        return null;
+        return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getUniqueId().equals(uuid)).findFirst().orElse(null);
     }
 
     public CloudPlayer getByQuery(String name) {
@@ -97,5 +89,23 @@ public class CloudPlayers {
 
     public List<CloudPlayer> getAll() {
         return cloudPlayers;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<CloudPlayer> iterator() {
+        return this.getAll().iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super CloudPlayer> action) {
+        for (CloudPlayer cloudPlayer : this.getAll()) {
+            action.accept(cloudPlayer);
+        }
+    }
+
+    @Override
+    public Spliterator<CloudPlayer> spliterator() {
+        return this.getAll().spliterator();
     }
 }

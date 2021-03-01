@@ -1,60 +1,56 @@
 package de.lystx.cloudsystem.cloud.commands;
 
-import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.service.command.CloudCommand;
-import de.lystx.cloudsystem.library.service.console.CloudConsole;
+import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.module.Module;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 
-public class ModulesCommand extends CloudCommand {
+public class ModulesCommand {
 
-    public ModulesCommand(String name, String description, String... aliases) {
-        super(name, description, aliases);
-    }
 
-    @Override
-    public void execute(CloudLibrary cloudLibrary, CloudConsole console, String command, String[] args) {
+    @Command(name = "modules", description = "Manages modules", aliases = {"pl", "plugins"})
+    public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
-                if (cloudLibrary.getService(ModuleService.class).getModules().isEmpty()) {
-                    console.getLogger().sendMessage("ERROR", "§cThere are no modules at the moment!");
+                if (CloudSystem.getInstance().getService(ModuleService.class).getModules().isEmpty()) {
+                    sender.sendMessage("ERROR", "§cThere are no modules at the moment!");
                     return;
                 }
-                console.getLogger().sendMessage("INFO", "§bModules§7:");
-                for (Module module : cloudLibrary.getService(ModuleService.class).getModules()) {
-                    console.getLogger().sendMessage("INFO", "§9" + module.getInfo().getName() + " §7| §bVersion " + module.getInfo().getVersion() + " §7| §bAuthor " + module.getInfo().getAuthor());
+                sender.sendMessage("INFO", "§bModules§7:");
+                for (Module module : CloudSystem.getInstance().getService(ModuleService.class).getModules()) {
+                    sender.sendMessage("INFO", "§9" + module.getInfo().getName() + " §7| §bVersion " + module.getInfo().getVersion() + " §7| §bAuthor " + module.getInfo().getAuthor());
                 }
             } else if (args[0].equalsIgnoreCase("rl")) {
-                cloudLibrary.getService(ModuleService.class).shutdown();
-                cloudLibrary.getService(ModuleService.class).load();
-                console.getLogger().sendMessage("INFO", "§aThe modules were §2reloaded§a!");
+                CloudSystem.getInstance().getService(ModuleService.class).shutdown();
+                CloudSystem.getInstance().getService(ModuleService.class).load();
+                sender.sendMessage("INFO", "§aThe modules were §2reloaded§a!");
             } else {
-                this.correctSyntax(console);
+                this.correctSyntax(sender);
             }
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("rl")) {
                 String module = args[1];
-                Module finalModule = cloudLibrary.getService(ModuleService.class).getModule(module);
+                Module finalModule = CloudSystem.getInstance().getService(ModuleService.class).getModule(module);
                 if (finalModule == null) {
-                    console.getLogger().sendMessage("ERROR", "§cThe module §e" + module + " §cseems not to exist!");
+                    sender.sendMessage("ERROR", "§cThe module §e" + module + " §cseems not to exist!");
                     return;
                 }
-                finalModule.onDisable(cloudLibrary);
-                cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> finalModule.onEnable(cloudLibrary), 5L);
-                console.getLogger().sendMessage("INFO", "§aThe module §2" + finalModule.getInfo().getName() + " §awas §2reloaded§a!");
+                finalModule.onDisable(CloudSystem.getInstance());
+                CloudSystem.getInstance().getService(Scheduler.class).scheduleDelayedTask(() -> finalModule.onEnable(CloudSystem.getInstance()), 5L);
+                sender.sendMessage("INFO", "§aThe module §2" + finalModule.getInfo().getName() + " §awas §2reloaded§a!");
             } else {
-                this.correctSyntax(console);
+                this.correctSyntax(sender);
             }
         } else {
-            this.correctSyntax(console);
+            this.correctSyntax(sender);
         }
     }
 
-    @Override
-    public void correctSyntax(CloudConsole console) {
-        console.getLogger().sendMessage("INFO", "§9Help for §bModules§7:");
-        console.getLogger().sendMessage("INFO", "§9modules <list> §7| Lists all modules");
-        console.getLogger().sendMessage("INFO", "§9players rl (module) §7| Reloads all modules");
+    public void correctSyntax(CloudCommandSender sender) {
+        sender.sendMessage("INFO", "§9Help for §bModules§7:");
+        sender.sendMessage("INFO", "§9modules <list> §7| Lists all modules");
+        sender.sendMessage("INFO", "§9players rl (module) §7| Reloads all modules");
     }
 }

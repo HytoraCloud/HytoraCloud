@@ -1,4 +1,4 @@
-package de.lystx.cloudapi.bukkit.events;
+package de.lystx.cloudapi.bukkit.events.network;
 
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;

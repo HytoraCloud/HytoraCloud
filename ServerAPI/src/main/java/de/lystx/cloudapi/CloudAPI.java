@@ -11,23 +11,27 @@ import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.Result;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
+import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
+import de.lystx.cloudsystem.library.service.network.netty.NettyClient;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.player.impl.PlayerInstance;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -55,6 +59,7 @@ public class CloudAPI {
     private final Templates templates;
     private final CloudPlayers cloudPlayers;
     private final ExecutorService executorService;
+    private final CommandService commandService;
 
     private boolean nametags;
     private boolean useChat;
@@ -67,10 +72,15 @@ public class CloudAPI {
         this.cloudClient =  this.cloudLibrary.getCloudClient();
         this.executorService = Executors.newCachedThreadPool();
 
+
         this.network = new CloudNetwork(this);
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool(cloudLibrary);
         this.templates = new Templates(this);
+        this.commandService = new CommandService(this.cloudLibrary, "Command", CloudService.Type.MANAGING);
+
+        PlayerInstance.EXECUTOR = this.cloudClient;
+        PlayerInstance.PERMISSION_POOL = this.permissionPool;
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
         this.useChat = false;
@@ -85,6 +95,12 @@ public class CloudAPI {
 
         Thread cloudClient = new Thread(() -> {
             try {
+                this.cloudClient.onConnectionEstablish(new Consumer<NettyClient>() {
+                    @Override
+                    public void accept(NettyClient nettyClient) {
+                        nettyClient.sendPacket(new PacketPlayInRegister(getService()));
+                    }
+                });
                 this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
             } catch (Exception e) {
                 System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
@@ -96,7 +112,14 @@ public class CloudAPI {
         cloudClient.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
+    }
 
+    public void registerCommand(Object commandObject) {
+        this.commandService.registerCommand(commandObject);
+    }
+
+    public void unregisterCommand(Object commandObject) {
+        this.commandService.unregisterCommand(commandObject);
     }
 
     public void disconnect() {
@@ -116,7 +139,6 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerAdapter() {
             @Override
             public void handle(Packet packet) {
-                System.out.println(packet.getClass().getSimpleName());
                 if (packet instanceof ResultPacket) {
                     ResultPacket resultPacket = (ResultPacket)packet;
                     if (uuid.equals(resultPacket.getUniqueId())) {

@@ -1,11 +1,9 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
-import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.communication.*;
-import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
-import io.vson.elements.object.VsonObject;
+import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,68 +11,84 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Getter @Setter
-public class CloudPlayer implements Serializable {
+public class CloudPlayer implements Serializable, CloudCommandSender {
 
     private final String name;
-    private final UUID uuid;
+    private final UUID uniqueId;
     private final String ipAddress;
     private String server;
     private String proxy;
     private CloudPlayerData cloudPlayerData;
 
-    public CloudPlayer(String name, UUID uuid, String ipAddress, String server, String proxy) {
+    public CloudPlayer(String name, UUID uniqueId, String ipAddress, String server, String proxy) {
         this.name = name;
-        this.uuid = uuid;
+        this.uniqueId = uniqueId;
         this.ipAddress = ipAddress;
         this.server = server;
         this.proxy = proxy;
     }
 
-    public void update(CloudExecutor cloudExecutor) {
-        cloudExecutor.sendPacket(new PacketCommunicationUpdateCloudPlayer(this.name, this));
+    @Override
+    public void update() {
+        PlayerInstance.EXECUTOR.sendPacket(new PacketCommunicationUpdateCloudPlayer(this.name, this));
     }
 
-    public String getGroup() {
+    public PermissionGroup getPermissionGroup() {
+        return PlayerInstance.PERMISSION_POOL.getHighestPermissionGroup(this.name);
+    }
+
+    public String getServerGroup() {
         return this.server.split("-")[0];
     }
 
-    public void sendMessage(CloudExecutor executor, String message) {
-        PacketCommunicationSendMessage sendMessage = new PacketCommunicationSendMessage(this.uuid, message);
-        executor.sendPacket(sendMessage);
-    }
-
-    public void sendComponent(CloudExecutor executor, CloudComponent cloudComponent) {
-        PacketCommunicationSendComponent sendMessage = new PacketCommunicationSendComponent(this.uuid, cloudComponent);
-        executor.sendPacket(sendMessage);
-    }
-
-    public void playSound(CloudExecutor executor, String sound, float v1, float v2) {
-        PacketCommunicationPlaySound playSound = new PacketCommunicationPlaySound(this.name, sound, v1, v2);
-        executor.sendPacket(playSound);
-    }
-
-    public void sendTitle(CloudExecutor executor, String title, String subtitle) {
-        PacketCommunicationSendTitle sendTitle = new PacketCommunicationSendTitle(this.name, title, subtitle);
-        executor.sendPacket(sendTitle);
-    }
-
-    public void fallback(CloudExecutor executor) {
-        PacketCommunicationFallback fallback = new PacketCommunicationFallback(this.name);
-        executor.sendPacket(fallback);
-    }
-
-    public void sendToServer(CloudExecutor executor, String server) {
-        PacketCommunicationSendToServer sendToServer = new PacketCommunicationSendToServer(this.name, server);
-        executor.sendPacket(sendToServer);
-    }
-
-    public void kick(CloudExecutor executor, String reason) {
-        PacketCommunicationKick kick = new PacketCommunicationKick(this.name, reason);
-        executor.sendPacket(kick);
+    @Override
+    public void sendMessage(String message) {
+        PacketCommunicationSendMessage sendMessage = new PacketCommunicationSendMessage(this.uniqueId, message);
+        PlayerInstance.EXECUTOR.sendPacket(sendMessage);
     }
 
     @Override
-    public String toString() {
-        return this.name;
+    public void sendComponent(CloudComponent cloudComponent) {
+        PacketCommunicationSendComponent sendMessage = new PacketCommunicationSendComponent(this.uniqueId, cloudComponent);
+        PlayerInstance.EXECUTOR.sendPacket(sendMessage);
+    }
+
+    public void playSound(String sound, float v1, float v2) {
+        PacketCommunicationPlaySound playSound = new PacketCommunicationPlaySound(this.name, sound, v1, v2);
+        PlayerInstance.EXECUTOR.sendPacket(playSound);
+    }
+
+    public void sendTitle( String title, String subtitle) {
+        PacketCommunicationSendTitle sendTitle = new PacketCommunicationSendTitle(this.name, title, subtitle);
+        PlayerInstance.EXECUTOR.sendPacket(sendTitle);
+    }
+
+    @Override
+    public void fallback() {
+        PacketCommunicationFallback fallback = new PacketCommunicationFallback(this.name);
+        PlayerInstance.EXECUTOR.sendPacket(fallback);
+    }
+
+    @Override
+    public void connect(String server) {
+        PacketCommunicationSendToServer sendToServer = new PacketCommunicationSendToServer(this.name, server);
+        PlayerInstance.EXECUTOR.sendPacket(sendToServer);
+    }
+
+    @Override
+    public void kick(String reason) {
+        PacketCommunicationKick kick = new PacketCommunicationKick(this.name, reason);
+        PlayerInstance.EXECUTOR.sendPacket(kick);
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return PlayerInstance.PERMISSION_POOL.hasPermission(this.name, permission);
+    }
+
+
+    @Override
+    public void sendMessage(String prefix, String message) {
+        this.sendMessage("§8[§b" + prefix + "§8] §7" + message);
     }
 }
