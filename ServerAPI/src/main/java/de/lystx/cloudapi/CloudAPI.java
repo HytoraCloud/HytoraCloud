@@ -22,6 +22,7 @@ import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
+import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
@@ -72,7 +73,6 @@ public class CloudAPI {
         this.cloudClient =  this.cloudLibrary.getCloudClient();
         this.executorService = Executors.newCachedThreadPool();
 
-
         this.network = new CloudNetwork(this);
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool(cloudLibrary);
@@ -120,6 +120,10 @@ public class CloudAPI {
 
     public void unregisterCommand(Object commandObject) {
         this.commandService.unregisterCommand(commandObject);
+    }
+
+    public void installMaven(String groupId, String artifactId, String version, Repository repo) {
+        this.cloudLibrary.getLibraryService().install(groupId, artifactId, version, repo);
     }
 
     public void disconnect() {

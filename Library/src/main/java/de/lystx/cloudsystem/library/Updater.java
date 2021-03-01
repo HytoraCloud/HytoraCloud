@@ -47,10 +47,6 @@ public class Updater {
     public static boolean isUpToDate() {
         return (getCloudVersion().equalsIgnoreCase(getNewVersion()));
     }
-
-
-    //TODO: ADD LIBRARY LOADING
-
     public static boolean check(CloudConsole console) {
         if (getNewVersion().equals("ERROR")) {
             console.getLogger().sendMessage("INFO", "§cAutoUpdater seems to be broken!");

@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLogin;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverShutdown;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
@@ -81,9 +82,10 @@ public class Receiver extends CloudInstance {
                     System.exit(0);
                     return;
                 }
-                this.getService(FileService.class).copyFileWithURL("/implements/versions/spigot/spigot.jar", new File(this.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
-                this.getService(FileService.class).copyFileWithURL("/implements/versions/bungeecord/bungeeCord.jar", new File(this.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
+                this.getService(FileService.class).download(Spigot.V1_8_8.getUrl(), new File(this.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
+                this.getService(FileService.class).download("https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(this.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
                 this.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(this.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
+
                 ReceiverInfo receiverInfo = new ReceiverInfo(receiverSetup.getName(), receiverSetup.getHost(), receiverSetup.getPort(), true);
                 this.getService(ConfigService.class).setReceiverInfo(receiverInfo);
                 this.getService(ConfigService.class).save();

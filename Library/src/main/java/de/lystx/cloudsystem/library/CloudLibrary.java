@@ -56,22 +56,23 @@ public class CloudLibrary implements Serializable {
     protected Type type;
 
     public CloudLibrary(Type type) {
+        //TODO: Remove manual directorys for LibraryService
         if (type.equals(Type.RECEIVER) || type.equals(Type.CLOUDSYSTEM)) {
-
-            this.libraryService = new LibraryService("local/libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.libraryService = new LibraryService("./local/libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.installDefaultLibraries();
             AnsiConsole.systemInstall();
             Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
             loggers.disable();
+        } else {
+            this.libraryService = new LibraryService("../../../../../libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.installDefaultLibraries();
         }
-
         this.type = type;
         this.customs = new HashMap<>();
         this.cloudServices = new LinkedList<>();
         this.host = "127.0.0.1";
         this.port = 2131;
         this.running = true;
-
 
         this.cloudServer = new CloudServer(this.host, this.port);
         this.cloudClient = new CloudClient(this.host, this.port);
@@ -103,9 +104,9 @@ public class CloudLibrary implements Serializable {
         this.libraryService.install("io.netty", "netty-all", "4.0.0.CR1", Repository.CENTRAL);
 
         //Logging and Console
-       // this.libraryProvider.install("org.fusesource.jansi", "jansi", "2.0.1", "https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/2.0.1/jansi-2.0.1.jar");
         this.libraryService.install("jline", "jline", "2.14.6", Repository.CENTRAL);
         this.libraryService.install("org.jline", "jline-terminal-jna", "3.18.0", Repository.CENTRAL);
+        this.libraryService.install("org.jline", "jline-terminal", "3.19.0", Repository.CENTRAL);
         this.libraryService.install("ch.qos.logback", "logback-classic", "1.2.3", Repository.CENTRAL);
         this.libraryService.install("ch.qos.logback", "logback-core", "1.2.3", Repository.CENTRAL);
 
@@ -120,6 +121,7 @@ public class CloudLibrary implements Serializable {
         this.libraryService.install("org.projectlombok", "lombok", "1.18.16", Repository.CENTRAL);
         this.libraryService.install("com.google.code.gson", "gson", "2.8.5", Repository.CENTRAL);
         this.libraryService.install("com.google.guava", "guava", "25.1-jre", Repository.CENTRAL);
+
     }
 
     public ServerService getService() {

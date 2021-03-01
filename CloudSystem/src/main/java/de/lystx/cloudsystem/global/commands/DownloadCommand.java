@@ -34,7 +34,7 @@ public class DownloadCommand implements TabCompletable {
             if (args[0].equalsIgnoreCase("download")) {
                 try {
                     int id = Integer.parseInt(args[1]);
-                    Spigot spigot = Spigot.getVersionById(id);
+                    Spigot spigot = Spigot.byID(id);
                     if (spigot == null) {
                         sender.sendMessage("ERROR", "§cA SpigotVersion with id §e" + id + " §cdoesn't exist!");
                         return;
@@ -50,7 +50,7 @@ public class DownloadCommand implements TabCompletable {
             } else if (args[0].equalsIgnoreCase("activate")) {
                 try {
                     int id = Integer.parseInt(args[1]);
-                    Spigot spigot = Spigot.getVersionById(id);
+                    Spigot spigot = Spigot.byID(id);
                     if (spigot == null) {
                         sender.sendMessage("ERROR", "§cA SpigotVersion with id §e" + id + " §cdoesn't exist!");
                         return;

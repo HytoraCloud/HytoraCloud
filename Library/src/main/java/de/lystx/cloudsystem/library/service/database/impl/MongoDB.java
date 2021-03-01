@@ -112,7 +112,11 @@ public class MongoDB implements CloudDatabase {
         MongoClientURI uri = new MongoClientURI("mongodb://" + databaseService.getUsername() + ":" + databaseService.getPassword() + "@" + databaseService.getHost() + ":" + databaseService.getPort() + "/?authSource=admin");
         this.mongoClient = new MongoClient(uri);
         this.database = mongoClient.getDatabase(databaseService.getDefaultDatabase());
-        this.getDatabaseService().getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§aConnected to §2MongoDB Database§a!");
+        if (isConnected()) {
+            this.getDatabaseService().getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§aConnected to §2MongoDB Database§a!");
+        } else {
+            this.getDatabaseService().getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§cCouldn't connect to §eMongoDB §cDatabase!");
+        }
     }
 
     @Override

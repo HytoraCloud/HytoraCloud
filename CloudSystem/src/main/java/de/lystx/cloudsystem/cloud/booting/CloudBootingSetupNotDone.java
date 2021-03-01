@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -15,6 +16,8 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
 import de.lystx.cloudsystem.library.service.setup.impl.DatabaseSetup;
+import de.lystx.cloudsystem.library.service.util.Action;
+import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 
@@ -40,6 +43,9 @@ public class CloudBootingSetupNotDone {
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         cloudSystem.getService(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
+        Value<Spigot> spigot = new Value<>(null);
+        Value<String> bungeeCord = new Value<>(null);
+
         cloudSetup.start(cloudSystem.getConsole(), setup -> {
             if (setup.isCancelled()) {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cYou are §enot §callowed to §4cancel §ccloudSystem setup! Restart the cloud!");
@@ -66,9 +72,9 @@ public class CloudBootingSetupNotDone {
             document.append("proxyConfig", proxy);
             document.save();
 
-            cloudSystem.getService(FileService.class).copyFileWithURL("/implements/versions/spigot/spigot.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
-            cloudSystem.getService(FileService.class).copyFileWithURL("/implements/versions/bungeecord/bungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
-            cloudSystem.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
+            spigot.set(Spigot.byKey(sp.getSpigotVersion()));
+            bungeeCord.set(sp.getBungeeCordType());
+
             cloudSystem.getService(GroupService.class).createGroup(new ServiceGroup(
                     UUID.randomUUID(),
                     "Bungee",
@@ -101,6 +107,11 @@ public class CloudBootingSetupNotDone {
                     true,
                     true
             ));
+            if (spigot.get() == null) {
+                cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cPlease redo the setup and provide a §evalid spigot version§c!");
+                System.exit(0);
+                return;
+            }
             if (!sp.getDatabase().equalsIgnoreCase("FILES")) {
                 cloudSystem.getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");
                 cloudSystem.getConsole().getLogger().sendMessage("§9");
@@ -116,11 +127,21 @@ public class CloudBootingSetupNotDone {
                             .append("defaultDatabase", ds.getDefaultDatabase())
                             .append("collectionOrTable", ds.getCollectionOrTable())
                             .append("password", ds.getPassword());
-                    document1.save(new File(cloudSystem.getService(FileService.class).getDatabaseDirectory(), "database.vson"));
+                    document1.save(new File(cloudSystem.getService(FileService.class).getDatabaseDirectory(), "database.json"));
                     cloudSystem.getService(DatabaseService.class).reload(document1);
                 });
             }
+
             cloudSystem.getService(Scheduler.class).scheduleDelayedTask(() -> {
+                cloudSystem.getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
+                Action action = new Action();
+
+                cloudSystem.getService(FileService.class).download(spigot.get().getUrl(), new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
+
+                cloudSystem.getService(FileService.class).download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
+                cloudSystem.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
+
+                cloudSystem.getConsole().sendMessage("INFO", "§aDownloading newest §2Spigot §aand §2BungeeCord §atook §h[§e" + action.getMS() + "s§h]");
                 cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
                 cloudSystem.getService(DatabaseService.class).getDatabase().connect();
                 PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();

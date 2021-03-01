@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.setup.impl;
 import de.lystx.cloudsystem.library.service.setup.Setup;
 import de.lystx.cloudsystem.library.service.setup.SetupPart;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CloudSetup extends Setup {
@@ -27,5 +28,12 @@ public class CloudSetup extends Setup {
 
     @SetupPart(question = "What Datbase do you want to use? (MYSQL, MONGODB, FILES) You will have to enter your date in the next step!", id = 7, onlyAnswers = {"MONGODB", "MYSQL", "FILES"})
     private String database;
+
+    @SetupPart(question = "What Proxy Software do you prefer ? (WATERFALL, BUNGEECORD)", id = 8, onlyAnswers = {"BUNGEECORD", "WATERFALL"})
+    private String bungeeCordType;
+
+    @SetupPart(question = "What Spigot version do you prefer ? (1.8.8, 1.9, 1.10, 1.11 etc...)", id = 9)
+    private String spigotVersion;
+
 
 }
