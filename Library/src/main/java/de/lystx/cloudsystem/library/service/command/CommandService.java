@@ -65,7 +65,6 @@ public final class CommandService extends CloudService {
                     this.invokers.remove(alias.toLowerCase());
                 }
                 this.commandInfos.remove(this.getCommand(cmd.name().toLowerCase()));
-                System.out.println(true);
             }
         }
     }

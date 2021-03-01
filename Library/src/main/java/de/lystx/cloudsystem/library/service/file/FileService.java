@@ -17,6 +17,7 @@ public class FileService extends CloudService {
     private File startBat;
 
     private File cloudDirectory;
+    private File libraryDirectory;
     private File configFile;
     private File permissionsFile;
 
@@ -64,6 +65,7 @@ public class FileService extends CloudService {
         this.startSh = new File("start.sh");
 
         this.cloudDirectory = new File("./local/");
+        this.libraryDirectory = new File(this.cloudDirectory, "libs/");
         this.configFile = new File(this.cloudDirectory, "config.json");
         this.permissionsFile = new File(this.cloudDirectory, "perms.json");
 
@@ -121,6 +123,7 @@ public class FileService extends CloudService {
 
         this.serverDirectory.mkdirs();
         this.staticServerDirectory.mkdirs();
+        this.libraryDirectory.mkdirs();
         this.staticBukkitDirectory.mkdirs();
         this.staticProxyDirectory.mkdirs();
 

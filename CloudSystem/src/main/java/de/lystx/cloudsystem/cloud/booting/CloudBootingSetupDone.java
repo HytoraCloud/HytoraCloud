@@ -23,7 +23,7 @@ import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.player.impl.PlayerInstance;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 
@@ -51,7 +51,7 @@ public class CloudBootingSetupDone {
         cloudSystem.cloudServices.add(new ModuleService(cloudSystem, "Modules", CloudService.Type.MANAGING));
         cloudSystem.cloudServices.add(new BackupService(cloudSystem, "Backups", CloudService.Type.MANAGING));
 
-        PlayerInstance.EXECUTOR = cloudSystem.getService(CloudNetworkService.class).getCloudServer();
+        Constants.EXECUTOR = cloudSystem.getService(CloudNetworkService.class).getCloudServer();
 
         FileService fs = cloudSystem.getService(FileService.class);
         cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.Type.NETWORK, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory(), cloudSystem.getService(GroupService.class).getGroups()));

@@ -4,12 +4,9 @@ package de.lystx.cloudsystem.library.service.console;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.CommandService;
-import de.lystx.cloudsystem.library.service.command.command.CommandInfo;
-import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
-import jline.console.completer.Completer;
-import lombok.AllArgsConstructor;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -26,7 +23,6 @@ public class CloudConsole extends Thread implements CloudCommandSender {
         this.logger = logger;
         this.buffer = buffer;
         this.commandManager = commandManager;
-        this.logger.getConsoleReader().addCompleter(new CloudCompleter(commandManager));
         this.start();
     }
 
@@ -37,12 +33,14 @@ public class CloudConsole extends Thread implements CloudCommandSender {
             try {
                 String s = ConsoleColor.formatColorString(this.getPrefix());
                 String line;
-                if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
-                    if (line.trim().isEmpty()) {
-                        continue;
+                if (!Constants.NEEDS_DEPENDENCIES) {
+                    if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
+                        if (line.trim().isEmpty()) {
+                            continue;
+                        }
+                        this.logger.getConsoleReader().setPrompt("");
+                        this.commandManager.execute(line, this);
                     }
-                    this.logger.getConsoleReader().setPrompt("");
-                    this.commandManager.execute(line, this);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -106,50 +104,5 @@ public class CloudConsole extends Thread implements CloudCommandSender {
         this.logger.sendMessage(prefix, message);
     }
 
-
-
-    @AllArgsConstructor
-    public static class CloudCompleter implements Completer {
-
-        private final CommandService commandService;
-
-        @Override
-        public int complete(String buffer, int cursor, List<CharSequence> candidates) {
-            String[] input = buffer.split(" ");
-
-            List<String> responses = new ArrayList<>();
-            List<String> commands = new LinkedList<>();
-            for (CommandInfo commandInfo : this.commandService.getCommandInfos()) {
-                commands.add(commandInfo.getName());
-            }
-            if (buffer.isEmpty() || buffer.indexOf(' ') == -1) {
-                responses.addAll(commands);
-            } else {
-                Object object = this.commandService.getInvokers().get(input[0]);
-
-                if (object instanceof TabCompletable) {
-                    String[] args = buffer.split(" ");
-                    String testString = args[args.length - 1];
-
-                    List<String> list = ((TabCompletable) object).onTabComplete(this.commandService.getCloudLibrary(), args);
-                    List<String> retu = new LinkedList<>();
-                    for (String s : list) {
-                        if (s != null && (testString.isEmpty() || s.toLowerCase().contains(testString.toLowerCase()))) {
-                            retu.add(s);
-                        }
-                    }
-
-                    responses.addAll(retu);
-                }
-            }
-
-            Collections.sort(responses);
-
-            candidates.addAll(responses);
-            int lastSpace = buffer.lastIndexOf(' ');
-
-            return (lastSpace == -1) ? cursor - buffer.length() : cursor - (buffer.length() - lastSpace - 1);
-        }
-    }
 
 }

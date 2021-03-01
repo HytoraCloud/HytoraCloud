@@ -25,7 +25,6 @@ public class ConfigService extends CloudService {
 
     public ConfigService(CloudLibrary cloudLibrary, String name, Type type) {
         super(cloudLibrary, name, type);
-        System.out.println(this.networkConfig);
         this.reload();
     }
 

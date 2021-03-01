@@ -1,10 +1,8 @@
 package de.lystx.cloudsystem.global;
 
-import de.lystx.cloudsystem.cloud.commands.PermsCommand;
 import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.Updater;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInShutdown;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
@@ -21,7 +19,6 @@ import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
-import de.lystx.cloudsystem.library.service.player.impl.PlayerInstance;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -51,6 +48,7 @@ public class CloudInstance extends CloudLibrary {
 
         this.cloudServices.add(new FileService(this, "File", CloudService.Type.CONFIG));
 
+
         if (type.equals(Type.CLOUDSYSTEM)) {
             this.webServer = new WebServer(this);
             this.webServer.update("", new VsonObject().append("info", "There's nothing to see here").append("version", Updater.getCloudVersion()));
@@ -60,6 +58,7 @@ public class CloudInstance extends CloudLibrary {
         this.cloudServices.add(new ConfigService(this, "Config", CloudService.Type.CONFIG));
         this.cloudServices.add(new LogService(this, "Logging", CloudService.Type.UTIL));
         this.cloudServices.add(new StatisticsService(this, "Stats", CloudService.Type.UTIL));
+
 
         this.cloudServices.add(new DatabaseService(this, "Database", CloudService.Type.MANAGING));
         this.cloudServices.add(new CloudPlayerService(this, "CloudPlayerService", CloudService.Type.MANAGING));
@@ -91,7 +90,6 @@ public class CloudInstance extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new TpsCommand());
 
     }
-
 
     public boolean autoUpdater() {
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
@@ -138,9 +136,6 @@ public class CloudInstance extends CloudLibrary {
             e.printStackTrace();
         }
     }
-
-
-
     public void shutdown() {
         if (this.type.equals(Type.CLOUDSYSTEM) && this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             this.getService(CloudNetworkService.class).sendPacket(new PacketPlayInShutdown());

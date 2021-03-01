@@ -30,7 +30,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.player.impl.PlayerInstance;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
@@ -79,8 +79,8 @@ public class CloudAPI {
         this.templates = new Templates(this);
         this.commandService = new CommandService(this.cloudLibrary, "Command", CloudService.Type.MANAGING);
 
-        PlayerInstance.EXECUTOR = this.cloudClient;
-        PlayerInstance.PERMISSION_POOL = this.permissionPool;
+        Constants.EXECUTOR = this.cloudClient;
+        Constants.PERMISSION_POOL = this.permissionPool;
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
         this.useChat = false;

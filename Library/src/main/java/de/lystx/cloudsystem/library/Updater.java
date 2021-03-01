@@ -1,11 +1,22 @@
 package de.lystx.cloudsystem.library;
 
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBar;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBarStyle;
+import io.vson.VsonValue;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.FileFormat;
+import io.vson.manage.vson.VsonParser;
+import io.vson.other.TempVsonOptions;
 import lombok.Getter;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.fusesource.jansi.Ansi;
 
 import java.io.*;
@@ -15,12 +26,21 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Scanner;
 
 @Getter
 public class Updater {
 
-    private static final Document document = new Document(getText("http://placelikehell.me/hytoraCloud/updater.json"));
+    private static VsonObject vsonObject;
+
+    static {
+        try {
+            VsonValue value = new VsonParser(getText("http://placelikehell.me/hytoraCloud/updater.json", true), new TempVsonOptions()).parse();
+            vsonObject = value.asVsonObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static CloudConsole cloudConsole;
 
@@ -63,7 +83,7 @@ public class Updater {
             }
             console.getLogger().sendMessage("§9-----------------------------------------");
             console.getLogger().sendMessage("§9");
-            String download = document.getString("download");
+            String download = vsonObject.getString("download");
             File cloud = new File("./CloudSystem.jar");
             download(download, cloud);
         }
@@ -78,29 +98,37 @@ public class Updater {
     }
 
     public static String getNewVersion() {
-        return document.getString("version");
+        return vsonObject.getString("version");
     }
 
     public static String getCloudVersion() {
-        return "BETA-1.5.8";
+        return "BETA-1.6";
     }
 
     public static List<String> getChangeLog() {
-        List<String> list = document.getList("changelog");
+        List<String> list = vsonObject.getList("changelog", String.class);
         return list == null ? new LinkedList<>() : list;
     }
 
-    public static String getText(String urrl) {
+    public static String getText(String urrl, boolean apache) {
         try {
-            URL url = new URL(urrl);
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            while ((line = in.readLine()) != null) {
-                stringBuilder.append(line);
+            if (!apache) {
+                URL url = new URL(urrl);
+                BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                in.close();
+                return stringBuilder.toString();
+            } else {
+                HttpClient client = HttpClientBuilder.create().build();
+                HttpGet request = new HttpGet(urrl);
+                request.addHeader("accept", "application/json");
+                HttpResponse response = client.execute(request);
+                return IOUtils.toString(response.getEntity().getContent());
             }
-            in.close();
-            return stringBuilder.toString();
         } catch (IOException ignored) {
             return null;
         }

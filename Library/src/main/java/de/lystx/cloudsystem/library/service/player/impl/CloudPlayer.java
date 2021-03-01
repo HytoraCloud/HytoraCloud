@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.packets.communication.*;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,11 +31,11 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
 
     @Override
     public void update() {
-        PlayerInstance.EXECUTOR.sendPacket(new PacketCommunicationUpdateCloudPlayer(this.name, this));
+        Constants.EXECUTOR.sendPacket(new PacketCommunicationUpdateCloudPlayer(this.name, this));
     }
 
     public PermissionGroup getPermissionGroup() {
-        return PlayerInstance.PERMISSION_POOL.getHighestPermissionGroup(this.name);
+        return Constants.PERMISSION_POOL.getHighestPermissionGroup(this.name);
     }
 
     public String getServerGroup() {
@@ -44,46 +45,46 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
     @Override
     public void sendMessage(String message) {
         PacketCommunicationSendMessage sendMessage = new PacketCommunicationSendMessage(this.uniqueId, message);
-        PlayerInstance.EXECUTOR.sendPacket(sendMessage);
+        Constants.EXECUTOR.sendPacket(sendMessage);
     }
 
     @Override
     public void sendComponent(CloudComponent cloudComponent) {
         PacketCommunicationSendComponent sendMessage = new PacketCommunicationSendComponent(this.uniqueId, cloudComponent);
-        PlayerInstance.EXECUTOR.sendPacket(sendMessage);
+        Constants.EXECUTOR.sendPacket(sendMessage);
     }
 
     public void playSound(String sound, float v1, float v2) {
         PacketCommunicationPlaySound playSound = new PacketCommunicationPlaySound(this.name, sound, v1, v2);
-        PlayerInstance.EXECUTOR.sendPacket(playSound);
+        Constants.EXECUTOR.sendPacket(playSound);
     }
 
     public void sendTitle( String title, String subtitle) {
         PacketCommunicationSendTitle sendTitle = new PacketCommunicationSendTitle(this.name, title, subtitle);
-        PlayerInstance.EXECUTOR.sendPacket(sendTitle);
+        Constants.EXECUTOR.sendPacket(sendTitle);
     }
 
     @Override
     public void fallback() {
         PacketCommunicationFallback fallback = new PacketCommunicationFallback(this.name);
-        PlayerInstance.EXECUTOR.sendPacket(fallback);
+        Constants.EXECUTOR.sendPacket(fallback);
     }
 
     @Override
     public void connect(String server) {
         PacketCommunicationSendToServer sendToServer = new PacketCommunicationSendToServer(this.name, server);
-        PlayerInstance.EXECUTOR.sendPacket(sendToServer);
+        Constants.EXECUTOR.sendPacket(sendToServer);
     }
 
     @Override
     public void kick(String reason) {
         PacketCommunicationKick kick = new PacketCommunicationKick(this.name, reason);
-        PlayerInstance.EXECUTOR.sendPacket(kick);
+        Constants.EXECUTOR.sendPacket(kick);
     }
 
     @Override
     public boolean hasPermission(String permission) {
-        return PlayerInstance.PERMISSION_POOL.hasPermission(this.name, permission);
+        return Constants.PERMISSION_POOL.hasPermission(this.name, permission);
     }
 
 

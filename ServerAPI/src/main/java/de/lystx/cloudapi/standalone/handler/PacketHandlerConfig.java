@@ -2,17 +2,13 @@ package de.lystx.cloudapi.standalone.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutVsonObject;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
-import de.lystx.cloudsystem.library.service.player.impl.PlayerInstance;
-import io.vson.elements.object.VsonObject;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 import java.util.List;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import org.bukkit.Bukkit;
 
 @Getter
 public class PacketHandlerConfig extends PacketHandlerAdapter {
@@ -34,7 +30,7 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
             this.cloudAPI.getNetwork().setServices(info.getServices());
             this.cloudAPI.getCloudPlayers().setCloudPlayers(info.getCloudPlayers());
 
-            PlayerInstance.PERMISSION_POOL = this.cloudAPI.getPermissionPool();
+            Constants.PERMISSION_POOL = this.cloudAPI.getPermissionPool();
 
             for (List<Service> value : info.getServices().values()) {
                 for (Service service : value) {

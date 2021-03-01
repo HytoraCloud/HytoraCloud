@@ -7,6 +7,8 @@ import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.event.EventService;
+import de.lystx.cloudsystem.library.service.lib.LibraryService;
+import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
@@ -25,20 +27,21 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URLClassLoader;
 import java.util.*;
 
 @Getter
 public class CloudLibrary implements Serializable {
 
 
-    public final List<CloudService> cloudServices;
-    protected final Map<String, Object> customs;
+    public List<CloudService> cloudServices;
+    protected Map<String, Object> customs;
 
-    protected final String host;
-    protected final Integer port;
+    protected String host;
+    protected Integer port;
 
-    protected final CloudServer cloudServer;
-    protected final CloudClient cloudClient;
+    protected CloudServer cloudServer;
+    protected CloudClient cloudClient;
 
     @Setter
     protected boolean running;
@@ -47,13 +50,16 @@ public class CloudLibrary implements Serializable {
 
     protected CloudConsole console;
     protected CloudScreenPrinter screenPrinter;
-    protected final AuthManager authManager;
-    protected final TicksPerSecond ticksPerSecond;
-    protected final Type type;
+    protected LibraryService libraryService;
+    protected AuthManager authManager;
+    protected TicksPerSecond ticksPerSecond;
+    protected Type type;
 
     public CloudLibrary(Type type) {
-
         if (type.equals(Type.RECEIVER) || type.equals(Type.CLOUDSYSTEM)) {
+
+            this.libraryService = new LibraryService("local/libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.installDefaultLibraries();
             AnsiConsole.systemInstall();
             Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
             loggers.disable();
@@ -65,6 +71,7 @@ public class CloudLibrary implements Serializable {
         this.host = "127.0.0.1";
         this.port = 2131;
         this.running = true;
+
 
         this.cloudServer = new CloudServer(this.host, this.port);
         this.cloudClient = new CloudClient(this.host, this.port);
@@ -78,6 +85,41 @@ public class CloudLibrary implements Serializable {
 
     public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
         this.getService(CloudNetworkService.class).sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), type));
+    }
+
+    private void installDefaultLibraries() {
+
+        //APACHE
+        this.libraryService.install("org.apache.httpcomponents", "httpclient", "4.3.2", Repository.CENTRAL);
+        this.libraryService.install("org.apache.httpcomponents", "httpcore", "4.3.2", Repository.CENTRAL);
+        this.libraryService.install("commons-io", "commons-io", "2.6", Repository.CENTRAL);
+        this.libraryService.install("commons-logging", "commons-logging", "1.2", Repository.CENTRAL);
+        this.libraryService.install("org.slf4j", "slf4j-api", "1.7.25", Repository.CENTRAL);
+        this.libraryService.install("org.apache.logging.log4j", "log4j-api", "2.5", Repository.CENTRAL);
+        this.libraryService.install("log4j", "log4j", "1.2.17", Repository.CENTRAL);
+
+        //NETWORK
+        this.libraryService.install("io.netty", "netty-all", "4.1.44.Final", Repository.CENTRAL);
+        this.libraryService.install("io.netty", "netty-all", "4.0.0.CR1", Repository.CENTRAL);
+
+        //Logging and Console
+       // this.libraryProvider.install("org.fusesource.jansi", "jansi", "2.0.1", "https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/2.0.1/jansi-2.0.1.jar");
+        this.libraryService.install("jline", "jline", "2.14.6", Repository.CENTRAL);
+        this.libraryService.install("org.jline", "jline-terminal-jna", "3.18.0", Repository.CENTRAL);
+        this.libraryService.install("ch.qos.logback", "logback-classic", "1.2.3", Repository.CENTRAL);
+        this.libraryService.install("ch.qos.logback", "logback-core", "1.2.3", Repository.CENTRAL);
+
+        //Database
+        this.libraryService.install("mysql", "mysql-connector-java", "8.0.11", Repository.CENTRAL);
+        this.libraryService.install("org.mongodb", "bson", "4.2.0", Repository.CENTRAL);
+        this.libraryService.install("org.mongodb", "mongodb-driver", "3.12.7", Repository.CENTRAL);
+        this.libraryService.install("org.mongodb", "mongodb-driver-core", "3.12.7", Repository.CENTRAL);
+        this.libraryService.install("org.mongodb", "mongo-java-driver", "3.12.7", Repository.CENTRAL);
+
+        //OTHER
+        this.libraryService.install("org.projectlombok", "lombok", "1.18.16", Repository.CENTRAL);
+        this.libraryService.install("com.google.code.gson", "gson", "2.8.5", Repository.CENTRAL);
+        this.libraryService.install("com.google.guava", "guava", "25.1-jre", Repository.CENTRAL);
     }
 
     public ServerService getService() {

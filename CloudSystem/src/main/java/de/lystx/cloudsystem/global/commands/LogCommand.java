@@ -85,7 +85,6 @@ public class LogCommand implements TabCompletable {
             try {
                 if (!file.exists()) {
                     file.createNewFile();
-                    System.out.println(true);
                 }
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), true);
                 w.print(text);
