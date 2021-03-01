@@ -84,7 +84,7 @@ public class TemplateService extends CloudService {
 
     public void setTemplate(ServiceGroup serviceGroup, String template) {
         try {
-            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.append("template", template);
             document.save();
         } catch (IOException e) {

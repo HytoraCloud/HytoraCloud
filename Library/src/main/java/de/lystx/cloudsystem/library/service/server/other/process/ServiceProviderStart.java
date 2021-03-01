@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
+import io.vson.elements.object.VsonMember;
 import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
 
@@ -36,7 +37,7 @@ public class ServiceProviderStart {
     }
 
 
-    public boolean autoStartService(Service service, VsonObject propertiess) {
+    public boolean autoStartService(Service service, SerializableDocument propertiess) {
 
         /*NetworkInfo networkInfo = new NetworkInfo();
         int maxCPU = 0;
@@ -79,7 +80,7 @@ public class ServiceProviderStart {
             }
             cloudLibrary.getService(FileService.class).copyFileWithURL("/implements/plugins/CloudAPI.jar", new File(plugins, "CloudAPI.jar"));
 
-            service.setProperties((propertiess == null ? new VsonObject() : propertiess));
+            service.setProperties((propertiess == null ? new SerializableDocument() : propertiess));
             if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                 jarFile = "bungeeCord.jar";
                 FileUtils.copyFile(new File(global, "server-icon.png"), new File(serverLocation, "server-icon.png"));
@@ -183,7 +184,7 @@ public class ServiceProviderStart {
             cloud.mkdirs();
             VsonObject document = new VsonObject();
             document.putAll(service);
-            document.save(new File(cloud, "connection.vson"));
+            document.save(new File(cloud, "connection.json"));
 
             ProcessBuilder processBuilder = new ProcessBuilder(
                     "java",

@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 @Getter
 public class Updater {
 
-    private static final Document document = new Document(getText("https://placelikehell.de/cloud/updater.vson"));
+    private static final Document document = new Document(getText("http://placelikehell.me/hytoraCloud/updater.json"));
 
     private static CloudConsole cloudConsole;
 
@@ -29,6 +29,10 @@ public class Updater {
     }
 
     public static boolean check(CloudConsole console) {
+        if (getNewVersion().equals("ERROR")) {
+            console.getLogger().sendMessage("INFO", "§cAutoUpdater seems to be broken!");
+            return true;
+        }
         cloudConsole = console;
         if (!isUpToDate()) {
             console.getLogger().sendMessage("§9");
@@ -98,7 +102,6 @@ public class Updater {
             return null;
         }
     }
-
 
     public static void download(String search, File location)  {
         InputStream inputStream;

@@ -28,7 +28,7 @@ public class GroupService extends CloudService {
     public void loadGroups() {
         if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
             for (File file : this.getCloudLibrary().getService(FileService.class).getGroupsDirectory().listFiles()) {
-                if (file.getName().endsWith(".vson")) {
+                if (file.getName().endsWith(".json")) {
                     try {
                         VsonObject document = new VsonObject(file, VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
                         this.groups.add(document.getAs(ServiceGroup.class));
@@ -45,7 +45,7 @@ public class GroupService extends CloudService {
             return;
         }
         try {
-            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.putAll(serviceGroup);
             document.save();
             this.groups.add(serviceGroup);
@@ -60,7 +60,7 @@ public class GroupService extends CloudService {
             return;
         }
         try {
-            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.clear();
             document.getFile().delete();
             this.groups.remove(this.getGroup(serviceGroup.getName()));
@@ -76,7 +76,7 @@ public class GroupService extends CloudService {
             return;
         }
         try {
-            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.clear();
             document.getFile().delete();
             this.groups.remove(this.getGroup(serviceGroup.getName()));

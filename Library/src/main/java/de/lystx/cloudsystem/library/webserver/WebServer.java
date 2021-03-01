@@ -34,11 +34,11 @@ public class WebServer {
 
     public WebServer(CloudLibrary cloudLibrary) {
         try {
-            this.config = new VsonObject(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "web.vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            this.config = new VsonObject(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "web.json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
 
             this.port = this.config.getInteger("port", 2217);
             this.enabled = this.config.getBoolean("enabled", true);
-            this.whitelistedIps = this.config.has("whitelistedIps") ? this.config.getList("whitelistedIps") : (this.config.append("whitelistedIps", Collections.singletonList("127.0.0.1")).getList("whitelistedIps"));
+            this.whitelistedIps = this.config.getList("whitelistedIps", Collections.singletonList("127.0.0.1"));
             this.config.save();
             try {
                 this.handlers = new HashMap<>();

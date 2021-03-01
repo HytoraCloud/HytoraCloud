@@ -307,7 +307,7 @@ public class PermissionPool implements Serializable {
             database.setPlayerData(cloudPlayerData.getUuid(), cloudPlayerData);
             //Document dataDoc = new Document();
             //dataDoc.appendAll(cloudPlayerData);
-            //dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".vson"));
+            //dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".json"));
         }
         this.clearInvalidUUIDs(directory);
         return document;

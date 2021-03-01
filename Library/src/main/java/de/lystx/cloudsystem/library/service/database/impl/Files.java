@@ -33,7 +33,7 @@ public class Files implements CloudDatabase {
 
     @Override
     public boolean isRegistered(UUID uuid) {
-        return new File(this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory(), uuid + ".vson").exists();
+        return new File(this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory(), uuid + ".json").exists();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Files implements CloudDatabase {
     @Override
     public CloudPlayerData getPlayerData(UUID uuid) {
         File dir = this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory();
-        File file = new File(dir, uuid + ".vson");
+        File file = new File(dir, uuid + ".json");
         try {
             VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             return document.getAs(CloudPlayerData.class);
@@ -70,7 +70,7 @@ public class Files implements CloudDatabase {
     @Override
     public void setPlayerData(UUID uuid, CloudPlayerData data) {
         File dir = this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory();
-        File file = new File(dir, uuid + ".vson");
+        File file = new File(dir, uuid + ".json");
         try {
             VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             document.clear();

@@ -30,7 +30,7 @@ public class DatabaseService extends CloudService {
         super(cloudLibrary, name, type);
         this.database = new Files(this);
         try {
-            this.document = new VsonObject(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "database.vson"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+            this.document = new VsonObject(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "database.json"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             this.reload(document);
         } catch (IOException e) {
             e.printStackTrace();

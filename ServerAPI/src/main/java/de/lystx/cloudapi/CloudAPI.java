@@ -6,6 +6,7 @@ import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
@@ -170,13 +171,13 @@ public class CloudAPI {
         return this.getDocument().getAs(Service.class);
     }
 
-    public VsonObject getProperties() {
+    public SerializableDocument getProperties() {
         return this.getService().getProperties();
     }
 
     public VsonObject getDocument() {
         try {
-            return new VsonObject(new File("./CLOUD/connection.vson"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            return new VsonObject(new File("./CLOUD/connection.json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
         } catch (IOException e) {
             e.printStackTrace();
         }

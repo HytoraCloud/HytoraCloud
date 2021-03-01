@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.elements.packets.in.service;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import io.vson.elements.object.VsonObject;
@@ -12,9 +13,9 @@ import java.io.Serializable;
 public class PacketPlayInStartGroupWithProperties extends Packet implements Serializable {
 
     private final ServiceGroup serviceGroup;
-    private final VsonObject properties;
+    private final SerializableDocument properties;
 
-    public PacketPlayInStartGroupWithProperties(ServiceGroup serviceGroup, VsonObject properties) {
+    public PacketPlayInStartGroupWithProperties(ServiceGroup serviceGroup, SerializableDocument properties) {
         this.serviceGroup = serviceGroup;
         this.properties = properties;
     }

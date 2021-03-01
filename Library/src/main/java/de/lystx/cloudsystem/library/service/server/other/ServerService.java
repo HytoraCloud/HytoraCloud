@@ -88,7 +88,7 @@ public class ServerService extends CloudService {
             CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getScreenByName(service.getName());
 
             try {
-                VsonObject document = new VsonObject(new File(screen.getServerDir(), "CLOUD/connection.vson"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+                VsonObject document = new VsonObject(new File(screen.getServerDir(), "CLOUD/connection.json"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
                 document.putAll(service);
                 document.save();
             } catch (IOException e) {
@@ -224,7 +224,7 @@ public class ServerService extends CloudService {
         }, 3L);
     }
 
-    public VsonObject startService(ServiceGroup serviceGroup, Service service, VsonObject properties) {
+    public VsonObject startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
         VsonObject document = new VsonObject();
         if (!this.getCloudLibrary().isRunning()) {
             document.append("message", "§cCloudLibrary isn't running anymore!");
@@ -252,7 +252,7 @@ public class ServerService extends CloudService {
             int id = this.idService.getFreeID(serviceGroup.getName());
             service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, ((NetworkConfig) getCloudLibrary().getCustoms().get("networkConfig")).getPort(), service.getServiceState());
         }
-        service.setProperties((properties == null ? new VsonObject() : properties));
+        service.setProperties((properties == null ? new SerializableDocument() : properties));
         this.globalServices.add(service);
         List<Service> services = this.getServices(serviceGroup);
         services.add(service);
@@ -278,10 +278,10 @@ public class ServerService extends CloudService {
     }
 
     public VsonObject startService(ServiceGroup serviceGroup) {
-        return this.startService(serviceGroup, (VsonObject) null);
+        return this.startService(serviceGroup, (SerializableDocument) null);
     }
 
-    public VsonObject startService(ServiceGroup serviceGroup, VsonObject properties) {
+    public VsonObject startService(ServiceGroup serviceGroup, SerializableDocument properties) {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
         Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), ServiceState.LOBBY);

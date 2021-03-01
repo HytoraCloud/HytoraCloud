@@ -53,7 +53,7 @@ public class ModuleLoader {
                 for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
                     if (file.getName().endsWith(".jar")) {
                         HytoraClassLoader classLoader = new HytoraClassLoader(file);
-                        VsonObject document = new VsonObject(classLoader.loadJson("config.vson").toString(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+                        VsonObject document = new VsonObject(classLoader.loadJson("config.json").toString(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
                         if (document.isEmpty()) {
                             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
                             return;
@@ -73,7 +73,7 @@ public class ModuleLoader {
                                 File directory = new File(this.moduleService.getModuleDir(), mod.getInfo().getName());
                                 directory.mkdirs();
                                 mod.setModuleDirectory(directory);
-                                File file1 = new File(directory, "config.vson");
+                                File file1 = new File(directory, "config.json");
                                 VsonObject config = new VsonObject(file1, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
                                 if (!file1.exists()) {
                                     config.save();

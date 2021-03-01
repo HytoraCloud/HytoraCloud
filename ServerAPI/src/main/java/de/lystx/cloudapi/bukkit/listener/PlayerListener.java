@@ -4,6 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketLoginSuccess;
@@ -99,7 +100,7 @@ public class PlayerListener implements Listener {
             }
             int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
             if (percent <= 100 && ((Bukkit.getOnlinePlayers().size() / Bukkit.getMaxPlayers()) * 100) >= percent) {
-                CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new VsonObject().append("waitingForPlayers", true));
+                CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new SerializableDocument().append("waitingForPlayers", true));
             }
 
             //NPCs injecting for InteractEvent

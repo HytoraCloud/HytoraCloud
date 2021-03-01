@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInNetworkConfig;
@@ -55,13 +56,13 @@ public class CloudNetwork {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartGroup(serviceGroup));
     }
 
-    public void startService(String name, String serviceGroup, VsonObject properties) {
+    public void startService(String name, String serviceGroup, SerializableDocument properties) {
         Service service = new Service(name, UUID.randomUUID(), this.getServiceGroup(serviceGroup), -1, -1, -1, ServiceState.LOBBY);
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartService(service, properties));
     }
 
 
-    public void startService(String serviceGroup, VsonObject properties) {
+    public void startService(String serviceGroup, SerializableDocument properties) {
         this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties));
 
     }
