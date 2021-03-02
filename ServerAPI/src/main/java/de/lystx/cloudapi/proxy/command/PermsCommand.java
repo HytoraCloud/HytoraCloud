@@ -106,7 +106,7 @@ public class PermsCommand {
 							return;
 						}
 						CloudAPI.getInstance().getPermissionPool().updatePermissionEntry(args[1], permission, true);
-						CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+						CloudAPI.getInstance().getPermissionPool().update();
 						player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You added the permission §b" + permission + " §7 to the player §b" + args[1] + "§8!");
 
 					} else if (args[2].equalsIgnoreCase("remove")) {
@@ -116,7 +116,7 @@ public class PermsCommand {
 							return;
 						}
 						CloudAPI.getInstance().getPermissionPool().updatePermissionEntry(args[1], permission, false);
-						CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+						CloudAPI.getInstance().getPermissionPool().update();
 						player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You removed the permission §b" + permission + " §7 from the player §b" + args[1] + "§8!");
 					} else {
 						help(player);
@@ -132,12 +132,12 @@ public class PermsCommand {
 					if (args[2].equalsIgnoreCase("add")) {
 						String permission = args[3];
 						permissionPool.updatePermissionGroupEntry(group, permission, true);
-						permissionPool.update(CloudAPI.getInstance().getCloudClient());
+						permissionPool.update();
 						player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You added the permission §b" + permission + " §7to the group §b" + group.getName());
 					} else if (args[2].equalsIgnoreCase("remove")) {
 						String permission = args[3];
 						permissionPool.updatePermissionGroupEntry(group, permission, false);
-						permissionPool.update(CloudAPI.getInstance().getCloudClient());
+						permissionPool.update();
 						player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You removed the permission §b" + permission + " §7from the group §b" + group.getName());
 					} else {
 						this.help(player);
@@ -169,7 +169,7 @@ public class PermsCommand {
 								return;
 							}
 							CloudAPI.getInstance().getPermissionPool().removePermissionGroup(args[1], group);
-							CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+							CloudAPI.getInstance().getPermissionPool().update();
 							player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + args[1] + " §7is was removed from group §b" + rang + "§8!");
 						} else {
 							this.help(player);
@@ -210,7 +210,7 @@ public class PermsCommand {
 								validality = PermissionValidality.LIFETIME;
 
 								CloudAPI.getInstance().getPermissionPool().updatePermissionGroup(args[1], CloudAPI.getInstance().getPermissionPool().getPermissionGroupFromName(rang), -1, validality);
-								CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+								CloudAPI.getInstance().getPermissionPool().update();
 								if (ProxyServer.getInstance().getPlayer(uuid) != null) {
 									ProxyServer.getInstance().getPlayer(uuid).disconnect(CloudAPI.getInstance().getPrefix() + "§cPlease rejoin, you received a new rank!");
 								}
@@ -241,7 +241,7 @@ public class PermsCommand {
 								try {
 									Integer i = Integer.parseInt(args[5].split(format)[0]);
 									CloudAPI.getInstance().getPermissionPool().updatePermissionGroup(args[1], CloudAPI.getInstance().getPermissionPool().getPermissionGroupFromName(rang), i, validality);
-									CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+									CloudAPI.getInstance().getPermissionPool().update();
 									if (ProxyServer.getInstance().getPlayer(uuid) != null) {
 										ProxyServer.getInstance().getPlayer(uuid).disconnect(CloudAPI.getInstance().getPrefix() + "§cPlease rejoin, you received a new rank!");
 									}

@@ -6,9 +6,9 @@ import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermission
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermissionPool;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.util.UUIDService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -45,8 +45,8 @@ public class PermissionPool implements Serializable {
         return (!this.permissionGroups.isEmpty() || !this.playerCache.isEmpty());
     }
 
-    public void update(CloudExecutor connection) {
-        connection.sendPacket(new PacketPlayInPermissionPool(this));
+    public void update() {
+        Constants.EXECUTOR.sendPacket(new PacketPlayInPermissionPool(this));
     }
 
     public void updatePermissionEntry(String name, String permission, boolean add) {
@@ -179,13 +179,13 @@ public class PermissionPool implements Serializable {
         }
     }
 
-    public void checkFix(String player, CloudExecutor executor) {
+    public void checkFix(String player) {
         CloudPlayerData data = this.getPlayerData(player);
         if (data != null) {
             if (data.getPermissionEntries().isEmpty()) {
                 data.getPermissionEntries().add(new PermissionEntry(tryUUID(player), getDefaultPermissionGroup().getName(), ""));
                 this.updatePlayerData(player, data);
-                this.update(executor);
+                this.update();
             }
         }
     }

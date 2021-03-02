@@ -52,7 +52,7 @@ public class CloudCommand implements TabCompletable {
                         boolean change = !playerData.isNotifyServerStart();
                         playerData.setNotifyServerStart(change);
                         CloudAPI.getInstance().getPermissionPool().updatePlayerData(player.getName(), playerData);
-                        CloudAPI.getInstance().getPermissionPool().update(CloudAPI.getInstance().getCloudClient());
+                        CloudAPI.getInstance().getPermissionPool().update();
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + (change ? "§7You will §anow receive §7Server notifications§8!" : "§7You will §cno longer receive §7Server notifications§8!"));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7CloudSystem Version §a" + Updater.getCloudVersion());

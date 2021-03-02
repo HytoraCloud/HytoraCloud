@@ -118,6 +118,7 @@ public class CloudLibrary implements Serializable {
         this.libraryService.install("org.mongodb", "mongo-java-driver", "3.12.7", Repository.CENTRAL);
 
         //OTHER
+        this.libraryService.install("org.openjfx", "javafx-base", "11", Repository.CENTRAL);
         this.libraryService.install("org.projectlombok", "lombok", "1.18.16", Repository.CENTRAL);
         this.libraryService.install("com.google.code.gson", "gson", "2.8.5", Repository.CENTRAL);
         this.libraryService.install("com.google.guava", "guava", "25.1-jre", Repository.CENTRAL);

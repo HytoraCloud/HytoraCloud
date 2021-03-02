@@ -98,7 +98,7 @@ public class Updater {
     }
 
     public static String getCloudVersion() {
-        return "BETA-1.6";
+        return "BETA-1.6.1";
     }
 
     public static List<String> getChangeLog() {

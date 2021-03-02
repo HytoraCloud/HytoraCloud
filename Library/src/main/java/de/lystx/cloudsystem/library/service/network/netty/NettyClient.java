@@ -48,35 +48,45 @@ public class NettyClient {
     public void start() throws Exception {
         EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
-        Bootstrap bootstrap = new Bootstrap()
-                .channel(Epoll.isAvailable() ? EpollSocketChannel.class : NioSocketChannel.class)
-                .group(workerGroup)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.IP_TOS, 24)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel socketChannel) throws Exception {
-                        ChannelPipeline channelPipeline = socketChannel.pipeline();
-                        channelPipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2));
-                        channelPipeline.addLast(new LengthFieldPrepender(2));
-                        channelPipeline.addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(NettyClient.class.getClassLoader())));
-                        channelPipeline.addLast(new ObjectEncoder());
+        Bootstrap bootstrap;
+        try {
 
-                        channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
-                            @Override
-                            public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
-                                if (packet instanceof PacketPlayOutVerifyConnection && !established && consumerConnection != null) {
-                                    established = true;
-                                    consumerConnection.accept(NettyClient.this);
+            bootstrap = new Bootstrap()
+                    .channel(Epoll.isAvailable() ? EpollSocketChannel.class : NioSocketChannel.class)
+                    .group(workerGroup)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.IP_TOS, 24)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel socketChannel) throws Exception {
+                            ChannelPipeline channelPipeline = socketChannel.pipeline();
+                            channelPipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2));
+                            channelPipeline.addLast(new LengthFieldPrepender(2));
+                            channelPipeline.addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(NettyClient.class.getClassLoader())));
+                            channelPipeline.addLast(new ObjectEncoder());
+
+                            channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
+                                @Override
+                                public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
+                                    if (packet instanceof PacketPlayOutVerifyConnection && !established && consumerConnection != null) {
+                                        established = true;
+                                        consumerConnection.accept(NettyClient.this);
+                                    }
+                                    packetAdapter.handelAdapterHandler(packet);
                                 }
-                                packetAdapter.handelAdapterHandler(packet);
-                            }
-                        });
-                        channel = socketChannel;
-                    }
-                });
+                            });
+                            channel = socketChannel;
+                        }
+                    });
 
+        } catch (IllegalAccessError e) {
+            bootstrap = null;
+        }
+        if (bootstrap == null) {
+            System.out.println("[NettyClient] Couldn't build up Bootstrap for Client!");
+            return;
+        }
         try {
             ChannelFuture channelFuture = bootstrap.connect(this.host, port).sync();
             this.channel = channelFuture.channel();

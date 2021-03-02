@@ -78,8 +78,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
 
     @Override
     public void kick(String reason) {
-        PacketCommunicationKick kick = new PacketCommunicationKick(this.name, reason);
-        Constants.EXECUTOR.sendPacket(kick);
+        this.createConnection().disconnect(reason);
     }
 
     @Override
@@ -87,6 +86,9 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
         return Constants.PERMISSION_POOL.hasPermission(this.name, permission);
     }
 
+    public CloudConnection createConnection() {
+        return new CloudConnection(this.uniqueId, this.name, this.ipAddress);
+    }
 
     @Override
     public void sendMessage(String prefix, String message) {

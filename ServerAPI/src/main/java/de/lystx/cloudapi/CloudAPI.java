@@ -235,7 +235,7 @@ public class CloudAPI {
     }
 
     public void updatePermissions(String player, UUID uuid, String ipAddress, Consumer<String> accept) {
-        this.permissionPool.checkFix(player, this.cloudClient);
+        this.permissionPool.checkFix(player);
         CloudPlayerData data = this.permissionPool.getPlayerDataOrDefault(player);
         List<PermissionEntry> entries = data.getPermissionEntries();
 
@@ -257,7 +257,7 @@ public class CloudAPI {
         if (changed) {
             data.setPermissionEntries(entries);
             permissionPool.updatePlayerData(player, data);
-            permissionPool.update(this.cloudClient);
+            permissionPool.update();
         }
         List<String> permissions = new LinkedList<>();
         for (PermissionEntry entry : entries) {

@@ -31,12 +31,22 @@ public class ProxyPingListener implements Listener {
     @EventHandler
     public void onProxyPing(ProxyPingEvent event) {
         try {
+            int port = event.getConnection().getVirtualHost().getPort();
+            ServerPing ping = event.getResponse();
+            if (this.cloudAPI == null) {
+                ping.setDescription("§4CloudAPI is null!");
+                event.setResponse(ping);
+                return;
+            }
+            if (this.cloudAPI.getNetworkConfig() == null) {
+                ping.setDescription("§4NetworkConfig is null!");
+                event.setResponse(ping);
+                return;
+            }
             ProxyConfig proxyConfig = this.cloudAPI.getNetworkConfig().getProxyConfig();
             if (!proxyConfig.isEnabled()) {
                 return;
             }
-            int port = event.getConnection().getVirtualHost().getPort();
-            ServerPing ping = event.getResponse();
             Motd motd = proxyConfig.isMaintenance() ? proxyConfig.getMotdMaintenance() : proxyConfig.getMotdNormal();
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
                 ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), port)), 2));
