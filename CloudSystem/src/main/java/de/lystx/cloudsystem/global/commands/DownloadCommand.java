@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.global.commands;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
@@ -8,6 +9,7 @@ import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.util.Action;
+import lombok.AllArgsConstructor;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -16,7 +18,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+@AllArgsConstructor
 public class DownloadCommand implements TabCompletable {
+
+    private final CloudInstance cloudInstance;
 
     @Command(name = "download", description = "Manages spigot versions",aliases = {"spigot", "bukkit", "install"})
     public void execute(CloudCommandSender sender, String[] args) {
@@ -39,7 +44,7 @@ public class DownloadCommand implements TabCompletable {
                         sender.sendMessage("ERROR", "§cA SpigotVersion with id §e" + id + " §cdoesn't exist!");
                         return;
                     }
-                    FileService fs = CloudSystem.getInstance().getService(FileService.class);
+                    FileService fs = cloudInstance.getService(FileService.class);
                     Action action = new Action();
                     sender.sendMessage("INFO", "§aStarting download! This might take §2some time§a!");
                     fs.download(spigot.getUrl(), new File(fs.getSpigotVersionsDirectory(), spigot.getJarName()));
@@ -55,7 +60,7 @@ public class DownloadCommand implements TabCompletable {
                         sender.sendMessage("ERROR", "§cA SpigotVersion with id §e" + id + " §cdoesn't exist!");
                         return;
                     }
-                    FileService fs = CloudSystem.getInstance().getService(FileService.class);
+                    FileService fs = cloudInstance.getService(FileService.class);
                     File newSpigot = new File(fs.getSpigotVersionsDirectory(), spigot.getJarName());
                     if (!newSpigot.exists()) {
                         sender.sendMessage("INFO", "§cSpigot version §e" + spigot.getJarName() + " §chasn't been downloaded yet!");
@@ -79,7 +84,7 @@ public class DownloadCommand implements TabCompletable {
             } else if (args[0].equalsIgnoreCase("reactivate")) {
                 try {
                     int id = Integer.parseInt(args[1]);
-                    FileService fs = CloudSystem.getInstance().getService(FileService.class);
+                    FileService fs = cloudInstance.getService(FileService.class);
                     File spigot = new File(fs.getOldSpigotVersionsDirectory(), "spigot_old_" + id + ".jar");
                     if (!spigot.exists()) {
                         sender.sendMessage("ERROR", "§cA SpigotVersion with id §e" + id + " §cdoesn't exist!");

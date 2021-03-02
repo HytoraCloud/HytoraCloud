@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.global.commands;
 
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
@@ -11,18 +12,17 @@ import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
+import lombok.AllArgsConstructor;
 
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
 
+@AllArgsConstructor
 public class ScreenCommand implements TabCompletable {
 
     private final CloudScreenPrinter screenPrinter;
-
-    public ScreenCommand(CloudScreenPrinter screenPrinter) {
-        this.screenPrinter = screenPrinter;
-    }
+    private final CloudInstance cloudInstance;
 
     @Command(name = "screen", description = "Shows output of services", aliases = "sc")
     public void execute(CloudCommandSender sender, String[] args) {
@@ -37,16 +37,16 @@ public class ScreenCommand implements TabCompletable {
                 }
             } else if (subject.equalsIgnoreCase("list")) {
                 sender.sendMessage("§9CloudScreens§7:");
-                CloudSystem.getInstance().getService(ScreenService.class).getMap().forEach((s, screen) -> sender.sendMessage("INFO", s));
+                cloudInstance.getService(ScreenService.class).getMap().forEach((s, screen) -> sender.sendMessage("INFO", s));
             } else {
                 String serverName = args[0];
-                CloudScreen screen = CloudSystem.getInstance().getService(ScreenService.class).getScreenByName(serverName);
+                CloudScreen screen = cloudInstance.getService(ScreenService.class).getScreenByName(serverName);
                 if (screen != null) {
                     if (screen.getCachedLines().isEmpty()) {
                         sender.sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
                         return;
                     }
-                    screen.setCloudConsole(CloudSystem.getInstance().getConsole());
+                    screen.setCloudConsole(cloudInstance.getConsole());
                     screen.setScreenPrinter(screenPrinter);
                     sender.sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
                     this.screenPrinter.create(screen);

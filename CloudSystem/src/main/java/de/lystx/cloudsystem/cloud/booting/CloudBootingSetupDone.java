@@ -54,7 +54,7 @@ public class CloudBootingSetupDone {
         Constants.EXECUTOR = cloudSystem.getService(CloudNetworkService.class).getCloudServer();
 
         FileService fs = cloudSystem.getService(FileService.class);
-        cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.Type.NETWORK, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory(), cloudSystem.getService(GroupService.class).getGroups()));
+        cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.Type.NETWORK, cloudSystem.getService(GroupService.class).getGroups()));
 
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerRegister(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerStopServer(cloudSystem));

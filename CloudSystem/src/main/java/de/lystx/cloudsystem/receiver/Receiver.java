@@ -3,43 +3,41 @@ package de.lystx.cloudsystem.receiver;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLogin;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverShutdown;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.Spigot;
-import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
-import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.setup.impl.ReceiverSetup;
 import de.lystx.cloudsystem.receiver.handler.ReceiverPacketHandlerLogin;
 import de.lystx.cloudsystem.receiver.handler.ReceiverPacketHandlerServer;
 import de.lystx.cloudsystem.receiver.handler.ReceiverPacketHandlerShutdown;
+import de.lystx.cloudsystem.receiver.temp.template.TemplateTemp;
+import de.lystx.cloudsystem.receiver.temp.template.handler.PacketHandlerTemplate;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Consumer;
 
 @Getter @Setter
 public class Receiver extends CloudInstance {
 
     @Getter
     private static Receiver instance;
+    private final TemplateTemp templateTemp;
 
     int tries = 0;
 
     public Receiver() {
         super(Type.RECEIVER);
         instance = this;
-        
+
+        this.templateTemp = new TemplateTemp(this);
+        this.cloudClient.registerPacketHandler(new PacketHandlerTemplate());
         
         if (this.getService(ConfigService.class).getReceiverInfo().isEstablished()) {
 
@@ -82,10 +80,6 @@ public class Receiver extends CloudInstance {
                     System.exit(0);
                     return;
                 }
-                this.getService(FileService.class).download(Spigot.V1_8_8.getUrl(), new File(this.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
-                this.getService(FileService.class).download("https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(this.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
-                this.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(this.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
-
                 ReceiverInfo receiverInfo = new ReceiverInfo(receiverSetup.getName(), receiverSetup.getHost(), receiverSetup.getPort(), true);
                 this.getService(ConfigService.class).setReceiverInfo(receiverInfo);
                 this.getService(ConfigService.class).save();

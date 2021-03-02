@@ -15,6 +15,7 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.event.EventService;
+import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
@@ -57,7 +58,7 @@ public class ServerService extends CloudService {
 
     private List<ServiceGroup> serviceGroups;
 
-    public ServerService(CloudLibrary cloudLibrary, String name, Type type, File template, File dynamic, File staticDir, File spigotPlugins, File bungeePlugins, File global, File version, List<ServiceGroup> serviceGroups) {
+    public ServerService(CloudLibrary cloudLibrary, String name, Type type, List<ServiceGroup> serviceGroups) {
         super(cloudLibrary, name, type);
         this.serviceGroups = serviceGroups;
         this.actions = new HashMap<>();
@@ -72,7 +73,8 @@ public class ServerService extends CloudService {
         this.idService = new IDService();
         this.portService = new PortService();
 
-        this.providerStart = new ServiceProviderStart(cloudLibrary, template, dynamic, staticDir, spigotPlugins, bungeePlugins, global, version);
+        FileService fs = cloudLibrary.getService(FileService.class);
+        this.providerStart = new ServiceProviderStart(cloudLibrary, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory());
         this.providerStop = new ServiceProviderStop(cloudLibrary, this);
 
         this.startServices();
@@ -227,14 +229,14 @@ public class ServerService extends CloudService {
     public VsonObject startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
         VsonObject document = new VsonObject();
         if (!this.getCloudLibrary().isRunning()) {
-            document.append("message", "§cCloudLibrary isn't running anymore!");
-            document.append("sucess", false);
-            return document;
+            return new VsonObject().append("message", "CloudLibrary isn't running anymore").append("sucess", false);
         }
-        if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
-            document.append("message", "§cServiceGroup for §e" + serviceGroup.getName() + " §cwasn't found!");
-            document.append("sucess", false);
-            return document;
+        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
+                document.append("message", "§cServiceGroup for §e" + serviceGroup.getName() + " §cwasn't found!");
+                document.append("sucess", false);
+                return document;
+            }
         }
         if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             document.append("sucess", true);

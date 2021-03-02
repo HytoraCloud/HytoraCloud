@@ -57,37 +57,29 @@ public class CloudInstance extends CloudLibrary {
 
         this.cloudServices.add(new ConfigService(this, "Config", CloudService.Type.CONFIG));
         this.cloudServices.add(new LogService(this, "Logging", CloudService.Type.UTIL));
-        this.cloudServices.add(new StatisticsService(this, "Stats", CloudService.Type.UTIL));
 
 
-        this.cloudServices.add(new DatabaseService(this, "Database", CloudService.Type.MANAGING));
-        this.cloudServices.add(new CloudPlayerService(this, "CloudPlayerService", CloudService.Type.MANAGING));
-        this.cloudServices.add(new GroupService(this, "Groups", CloudService.Type.MANAGING));
-        this.cloudServices.add(new TemplateService(this, "Templates", CloudService.Type.MANAGING));
         this.cloudServices.add(new ScreenService(this, "Screens", CloudService.Type.MANAGING));
-        this.cloudServices.add(new PermissionService(this, "Permissions", CloudService.Type.MANAGING));
-        this.cloudServices.add(new SignService(this, "Signs", CloudService.Type.MANAGING));
-        this.cloudServices.add(new NPCService(this, "NPCs", CloudService.Type.MANAGING));
         this.cloudServices.add(new EventService(this, "Event", CloudService.Type.MANAGING));
 
-        this.getService(CommandService.class).registerCommand(new ShutdownCommand());
-        this.getService(CommandService.class).registerCommand(new HelpCommand());
-        this.getService(CommandService.class).registerCommand(new ExecuteCommand());
-        this.getService(CommandService.class).registerCommand(new ReloadCommand());
-        this.getService(CommandService.class).registerCommand(new ClearCommand());
+        this.getService(CommandService.class).registerCommand(new ShutdownCommand(this));
+        this.getService(CommandService.class).registerCommand(new HelpCommand(this));
+        this.getService(CommandService.class).registerCommand(new ExecuteCommand(this));
+        this.getService(CommandService.class).registerCommand(new ReloadCommand(this));
+        this.getService(CommandService.class).registerCommand(new ClearCommand(this));
 
-        this.getService(CommandService.class).registerCommand(new StopCommand());
-        this.getService(CommandService.class).registerCommand(new InfoCommand());
-        this.getService(CommandService.class).registerCommand(new RunCommand());
+        this.getService(CommandService.class).registerCommand(new StopCommand(this));
+        this.getService(CommandService.class).registerCommand(new InfoCommand(this));
+        this.getService(CommandService.class).registerCommand(new RunCommand(this));
         if (this.getType().equals(Type.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            this.getService(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter));
-            this.getService(CommandService.class).registerCommand(new DownloadCommand());
+            this.getService(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
+            this.getService(CommandService.class).registerCommand(new DownloadCommand(this));
         }
 
-        this.getService(CommandService.class).registerCommand(new UpdateCommand());
-        this.getService(CommandService.class).registerCommand(new LogCommand());
-        this.getService(CommandService.class).registerCommand(new BackupCommand());
-        this.getService(CommandService.class).registerCommand(new TpsCommand());
+        this.getService(CommandService.class).registerCommand(new UpdateCommand(this));
+        this.getService(CommandService.class).registerCommand(new LogCommand(this));
+        this.getService(CommandService.class).registerCommand(new BackupCommand(this));
+        this.getService(CommandService.class).registerCommand(new TpsCommand(this));
 
     }
 
@@ -115,14 +107,8 @@ public class CloudInstance extends CloudLibrary {
 
     public void reload() {
         try {
-            this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
             this.getService(ServerService.class).setServiceGroups(this.getService(GroupService.class).getGroups());
-            this.getService(PermissionService.class).load();
-            this.getService(PermissionService.class).loadEntries();
             this.getService(ConfigService.class).reload();
-            this.getService(NPCService.class).load();
-            this.getService(SignService.class).load();
-            this.getService(SignService.class).loadSigns();
 
             this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
@@ -138,20 +124,21 @@ public class CloudInstance extends CloudLibrary {
     }
     public void shutdown() {
         if (this.type.equals(Type.CLOUDSYSTEM) && this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            this.getService(CloudNetworkService.class).sendPacket(new PacketPlayInShutdown());
+            this.sendPacket(new PacketPlayInShutdown());
         }
         this.setRunning(false);
         this.getConsole().interrupt();
 
-        if (this.getService() != null) this.getService().stopServices();
+        if (this.getService() != null) {
+            this.getService().stopServices();
+        }
 
-        this.getService(StatisticsService.class).save();
         this.getService(LogService.class).save();
-        this.getService(SignService.class).save();
-        this.getService(NPCService.class).save();
         this.getService(ConfigService.class).save();
 
-        if (this.getService(ModuleService.class) != null) this.getService(ModuleService.class).shutdown();
+        if (this.getService(ModuleService.class) != null) {
+            this.getService(ModuleService.class).shutdown();
+        }
 
         this.getService(Scheduler.class).scheduleDelayedTask(() -> {
             try {

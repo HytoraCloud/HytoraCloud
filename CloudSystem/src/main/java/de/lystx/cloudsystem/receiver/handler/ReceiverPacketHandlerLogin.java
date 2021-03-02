@@ -6,7 +6,6 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
-import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.util.Decision;
 import de.lystx.cloudsystem.receiver.Receiver;
@@ -31,7 +30,7 @@ public class ReceiverPacketHandlerLogin {
             } else if (packet.getDecision().equals(Decision.TRUE)) {
                 this.receiver.getConsole().getLogger().sendMessage("NETWORK", "§aSuccessfully connected to CloudSystem with right key");
                 FileService fs = this.receiver.getService(FileService.class);
-                this.receiver.cloudServices.add(new ServerService(this.receiver, "Services", CloudService.Type.NETWORK, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory(), packet.getServiceGroups()));
+                this.receiver.cloudServices.add(new ServerService(this.receiver, "Services", CloudService.Type.NETWORK, packet.getServiceGroups()));
             } else if (packet.getDecision().equals(Decision.FALSE)) {
                 this.receiver.getConsole().getLogger().sendMessage("NETWORK", "§cThe provided §ekey §cwas §ewrong §cconnection refused!");
             } else if (packet.getDecision().equals(Decision.MAYBE)) {

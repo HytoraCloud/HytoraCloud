@@ -30,37 +30,38 @@ public class NPCService extends CloudService {
         try {
             this.document = new VsonObject(getCloudLibrary().getService(FileService.class).getNpcFile(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             this.config = new VsonObject(getCloudLibrary().getService(FileService.class).getNpcLayout(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (this.config.isEmpty() || !this.config.getFile().exists()) {
-            this.config.putAll(new NPCConfig(
-                    6,
-                    "§8» §7Group §8┃ §b%group%",
-                    true,
-                    "",
-                    "§8» §b%service%",
-                    Arrays.asList(
-                        "§8",
-                        "§8§m-----------",
-                        "§8» §bOnline §8» §7%online%",
-                        "§8» §bMaxPlayers §8» §7%max%",
-                        "§8» §bMotd §8» §7%motd%",
-                        "§8» §bState §8» §7%state%"
-                    ),
-                    "MINECART",
-                    Collections.singletonList(new VsonObject()
-                            .append("slot", 4)
-                            .append("type", "NAME_TAG")
-                            .append("name", "§8» §3%group%")
-                            .append("lore", Arrays.asList(
-                                    "§8§m-----------",
-                                    "§8» §bOnline §8» §7%online_services%",
-                                    "§8» §bType §8» §7%type%",
-                                    "§8» §bTemplate §8» §7%template%"
-                            )).append("glow", false))
-            ));
-            this.config.save();
+
+            if (this.config.isEmpty() || !this.config.getFile().exists()) {
+                this.config.putAll(new NPCConfig(
+                        6,
+                        "§8» §7Group §8┃ §b%group%",
+                        true,
+                        "",
+                        "§8» §b%service%",
+                        Arrays.asList(
+                                "§8",
+                                "§8§m-----------",
+                                "§8» §bOnline §8» §7%online%",
+                                "§8» §bMaxPlayers §8» §7%max%",
+                                "§8» §bMotd §8» §7%motd%",
+                                "§8» §bState §8» §7%state%"
+                        ),
+                        "MINECART",
+                        Collections.singletonList(new VsonObject()
+                                .append("slot", 4)
+                                .append("type", "NAME_TAG")
+                                .append("name", "§8» §3%group%")
+                                .append("lore", Arrays.asList(
+                                        "§8§m-----------",
+                                        "§8» §bOnline §8» §7%online_services%",
+                                        "§8» §bType §8» §7%type%",
+                                        "§8» §bTemplate §8» §7%template%"
+                                )).append("glow", false))
+                ));
+                this.config.save();
+            }
+        } catch (Exception e) {
+            //Receiver
         }
     }
 
@@ -83,7 +84,11 @@ public class NPCService extends CloudService {
     }
 
     public void save() {
-        this.document.save();
-        this.config.save();
+        try {
+            this.document.save();
+            this.config.save();
+        } catch (Exception e) {
+            // Not saved because of Receiver!
+        }
     }
 }

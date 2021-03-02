@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.global.commands;
 
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
@@ -10,6 +11,7 @@ import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
+import lombok.AllArgsConstructor;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
@@ -21,8 +23,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
+@AllArgsConstructor
 public class LogCommand implements TabCompletable {
 
+    private final CloudInstance cloudInstance;
 
     @Command(name = "log", description = "Logs a server or all")
     public void execute(CloudCommandSender sender, String[] args) {
@@ -33,22 +37,22 @@ public class LogCommand implements TabCompletable {
             String finalText;
             if (args[0].equalsIgnoreCase("all")) {
                 StringBuilder sb = new StringBuilder();
-                for (List<Service> value : CloudSystem.getInstance().getService(ServerService.class).getServices().values()) {
+                for (List<Service> value : cloudInstance.getService(ServerService.class).getServices().values()) {
                     for (Service service : value) {
                         sb.append("================ LOG OF " + service.getName() + " ================").append("\n").append("\n").append("\n");
-                        sb.append(this.getLog(service, CloudSystem.getInstance()));
+                        sb.append(this.getLog(service, cloudInstance));
                         sb.append("================ END OF LOG FOR " + service.getName() + " ================").append("\n").append("\n").append("\n");
                     }
                 }
                 finalText = sb.toString();
             } else {
                 String s = args[0];
-                Service service = CloudSystem.getInstance().getService().getService(s);
+                Service service = cloudInstance.getService().getService(s);
                 if (service == null) {
                     sender.sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
                     return;
                 }
-                finalText = this.getLog(service, CloudSystem.getInstance());
+                finalText = this.getLog(service, cloudInstance);
             }
             try {
                 String realLink = this.post(finalText, type,false, file);
