@@ -9,7 +9,6 @@ import java.util.List;
 public class NetworkInfo {
 
 
-
     public double getCPUUsage() {
         return this.getOperatingSystemMX().getSystemCpuLoad() * 100;
     }

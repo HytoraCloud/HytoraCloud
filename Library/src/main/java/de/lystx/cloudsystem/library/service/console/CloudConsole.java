@@ -27,7 +27,6 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     }
 
 
-
     public void run() {
         while (!this.isInterrupted()) {
             try {
@@ -48,7 +47,6 @@ public class CloudConsole extends Thread implements CloudCommandSender {
         }
     }
 
-
     public void clearScreen() {
         for (int i = 0; i < 100; i++) {
             System.out.println(" ");
@@ -61,12 +59,12 @@ public class CloudConsole extends Thread implements CloudCommandSender {
 
     @Override
     public UUID getUniqueId() {
-        return UUID.randomUUID();
+        throw new UnsupportedOperationException("Console doesn't support : UUID" );
     }
 
     @Override
     public boolean hasPermission(String permission) {
-        return true;
+        throw new UnsupportedOperationException("Console doesn't support : hasPermission" );
     }
 
     @Override

@@ -32,22 +32,20 @@ import java.util.Scanner;
 public class Updater {
 
     private static VsonObject vsonObject;
+    private static CloudConsole cloudConsole;
 
-    static {
+    public static boolean isUpToDate() {
+        return (getCloudVersion().equalsIgnoreCase(getNewVersion()));
+    }
+
+
+    public static boolean check(CloudConsole console) {
         try {
             VsonValue value = new VsonParser(getText("http://placelikehell.me/hytoraCloud/updater.json", true), new TempVsonOptions()).parse();
             vsonObject = value.asVsonObject();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static CloudConsole cloudConsole;
-
-    public static boolean isUpToDate() {
-        return (getCloudVersion().equalsIgnoreCase(getNewVersion()));
-    }
-    public static boolean check(CloudConsole console) {
         if (getNewVersion().equals("ERROR")) {
             console.getLogger().sendMessage("INFO", "§cAutoUpdater seems to be broken!");
             return true;

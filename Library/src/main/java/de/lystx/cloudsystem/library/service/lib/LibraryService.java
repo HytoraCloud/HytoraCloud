@@ -3,14 +3,11 @@ package de.lystx.cloudsystem.library.service.lib;
 import lombok.Getter;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +24,6 @@ public class LibraryService {
         this.directory.mkdirs();
         this.classLoader = classLoader;
         this.libraries = new LinkedList<>();
-
     }
 
     public void addURL(Path path) {
