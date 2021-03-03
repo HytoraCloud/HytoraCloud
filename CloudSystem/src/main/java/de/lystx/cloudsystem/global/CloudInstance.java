@@ -71,7 +71,7 @@ public class CloudInstance extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new StopCommand(this));
         this.getService(CommandService.class).registerCommand(new InfoCommand(this));
         this.getService(CommandService.class).registerCommand(new RunCommand(this));
-        if (this.getType().equals(Type.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getService(ConfigService.class).getNetworkConfig() != null && this.getType().equals(Type.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             this.getService(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
             this.getService(CommandService.class).registerCommand(new DownloadCommand(this));
         }

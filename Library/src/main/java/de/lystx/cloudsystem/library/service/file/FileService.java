@@ -51,6 +51,7 @@ public class FileService extends CloudService {
     private File globalDirectory;
     private File pluginsDirectory;
     private File spigotPluginsDirectory;
+    private File globalPluginsDirectory;
     private File bungeeCordPluginsDirectory;
     private File modulesDirectory;
     private File statsFile;
@@ -96,6 +97,7 @@ public class FileService extends CloudService {
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");
         this.bungeeCordPluginsDirectory = new File(this.pluginsDirectory, "bungee/");
+        this.globalPluginsDirectory = new File(this.pluginsDirectory, "global/");
         this.spigotPluginsDirectory = new File(this.pluginsDirectory, "spigot/");
         this.versionsDirectory = new File(this.globalDirectory, "versions/");
         this.spigotVersionsDirectory = new File(this.versionsDirectory, "downloads/");
@@ -147,6 +149,7 @@ public class FileService extends CloudService {
         this.spigotPluginsDirectory.mkdirs();
         this.versionsDirectory.mkdirs();
         this.spigotVersionsDirectory.mkdirs();
+        this.globalPluginsDirectory.mkdirs();
         this.oldSpigotVersionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
         if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {

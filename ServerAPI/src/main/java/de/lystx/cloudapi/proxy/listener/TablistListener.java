@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -65,7 +66,8 @@ public class TablistListener implements Listener {
     }
 
     public void updateTab() {
-        TabList tabList = this.cloudAPI.getNetworkConfig().getProxyConfig().getTabList();
+        ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : this.cloudAPI.getNetworkConfig().getProxyConfig();
+        TabList tabList = proxyConfig.getTabList();
         if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
             return;
         }

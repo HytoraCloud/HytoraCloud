@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonComment;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,11 +16,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-@Getter @Setter
+@Getter @Setter @AllArgsConstructor
 public class NetworkConfig implements Serializable {
 
     private String host;
     private Integer port;
+    private Integer proxyStartPort;
+    private Integer serverStartPort;
     private boolean useWrapper;
     private boolean setupDone;
     private boolean autoUpdater;
@@ -30,23 +33,13 @@ public class NetworkConfig implements Serializable {
     private MessageConfig messageConfig;
     private FallbackConfig fallbackConfig;
 
-    public NetworkConfig(String host, Integer port, boolean useWrapper, boolean setupDone, boolean autoUpdater, boolean proxyProtocol, ProxyConfig proxyConfig, LabyModConfig labyModConfig, MessageConfig messageConfig, FallbackConfig fallbackConfig) {
-        this.host = host;
-        this.port = port;
-        this.useWrapper = useWrapper;
-        this.setupDone = setupDone;
-        this.autoUpdater = autoUpdater;
-        this.proxyProtocol = proxyProtocol;
-        this.proxyConfig = proxyConfig;
-        this.labyModConfig = labyModConfig;
-        this.messageConfig = messageConfig;
-        this.fallbackConfig = fallbackConfig;
-    }
 
     public static VsonObject defaultConfig() {
         return new VsonObject()
                 .append("host", "127.0.0.1")
                 .append("port", 2131)
+                .append("proxyStartPort", 25565)
+                .append("serverStartPort", 30000)
                 .append("useWrapper", false)
                 .append("setupDone", false)
                 .append("autoUpdater", false)

@@ -75,6 +75,15 @@ public class ServiceProviderStart {
                     }
                 }
 
+                folder = cloudLibrary.getService(FileService.class).getGlobalPluginsDirectory();
+                for (File file : Objects.requireNonNull(folder.listFiles())) {
+                    if (file.isDirectory()) {
+                        FileUtils.copyDirectory(file, new File(plugins, file.getName()));
+                    } else {
+                        FileUtils.copyFile(file, new File(plugins, file.getName()));
+                    }
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -83,9 +92,12 @@ public class ServiceProviderStart {
             service.setProperties((propertiess == null ? new SerializableDocument() : propertiess));
             if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
                 jarFile = "bungeeCord.jar";
-                FileUtils.copyFile(new File(global, "server-icon.png"), new File(serverLocation, "server-icon.png"));
+                File serverIcon = new File(global, "server-icon.png");
+                if (serverIcon.exists()) {
+                    FileUtils.copyFile(serverIcon, new File(serverLocation, "server-icon.png"));
+                }
                 FileWriter writer = new FileWriter(serverLocation + "/config.yml");
-                writer.write("player_limit: 550\n" +
+                writer.write("player_limit: " + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getProxyConfig().getMaxPlayers() + "\n" +
                         "permissions:\n" +
                         "  default: []\n" +
                         "  admin:\n" +
@@ -98,13 +110,13 @@ public class ServiceProviderStart {
                         "    - bungeecord.command.list\n" +
                         "timeout: 30000\n" +
                         "log_commands: false\n" +
-                        "online_mode: true\n" +
+                        "online_mode: " + service.getServiceGroup().getValues().getBoolean("onlineMode", true) + "\n" +
                         "disabled_commands:\n" +
                         "  - disabledcommandhere\n" +
                         "servers:\n" +
                         "  Lobby-1:\n" +
-                        "    motd: ''\n" +
-                        "    address: '127.0.0.1:30000'\n" +
+                        "    motd: '" + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getProxyConfig().getMotdMaintenance().getFirstLine() + "'\n" +
+                        "    address: '127.0.0.1:" + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getServerStartPort() + "'\n" +
                         "    restricted: false\n" +
                         "listeners:\n" +
                         "  - query_port: 25577\n" +
@@ -125,8 +137,6 @@ public class ServiceProviderStart {
                         "ip_forward: true\n" +
                         "network_compression_threshold: 256\n" +
                         "groups:\n" +
-                        "  md_5:\n" +
-                        "    - admin\n" +
                         "connection_throttle: -1\n" +
                         "stats: 13be5ac9-5731-4502-9ccc-c4a80163f14a\n" +
                         "prevent_proxy_connections: false");

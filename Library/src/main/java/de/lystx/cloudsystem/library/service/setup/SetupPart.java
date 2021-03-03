@@ -16,5 +16,7 @@ public @interface SetupPart {
 
     String[] exitAfterAnswer() default {};
 
+    GoTo goTo() default @GoTo(id = -1, value = "", elseID = -1);
+
     String question();
 }

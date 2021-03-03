@@ -71,7 +71,7 @@ public class ServerService extends CloudService {
         this.cloudProxies = new LinkedList<>();
 
         this.idService = new IDService();
-        this.portService = new PortService();
+        this.portService = new PortService(cloudLibrary.getService(ConfigService.class).getNetworkConfig());
 
         FileService fs = cloudLibrary.getService(FileService.class);
         this.providerStart = new ServiceProviderStart(cloudLibrary, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory());

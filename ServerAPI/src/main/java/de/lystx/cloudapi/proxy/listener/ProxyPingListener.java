@@ -43,7 +43,7 @@ public class ProxyPingListener implements Listener {
                 event.setResponse(ping);
                 return;
             }
-            ProxyConfig proxyConfig = this.cloudAPI.getNetworkConfig().getProxyConfig();
+            ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : this.cloudAPI.getNetworkConfig().getProxyConfig();
             if (!proxyConfig.isEnabled()) {
                 return;
             }

@@ -81,6 +81,14 @@ public abstract class Setup {
                 this.cloudConsole.getLogger().sendMessage("ERROR", !lastAnswer.trim().isEmpty() ? ("§cThe answer '§e" + lastAnswer + " §cmay not be used for this question!") : "§cThis §eanswer §cmay not be used for this question!");
                 return;
             }
+            GoTo goTo = isAnswerGoto(this.currentPart.getValue(), lastAnswer);
+            if (goTo != null) {
+                if (lastAnswer.equalsIgnoreCase(goTo.value())) {
+                    this.current = goTo.id() - 1;
+                } else {
+                    this.current = goTo.elseID() - 1;
+                }
+            }
             this.currentPart.getKey().setAccessible(true);
             try {
                 Object value;
@@ -141,6 +149,13 @@ public abstract class Setup {
                 if (forbiddenAnswer.equalsIgnoreCase(answer)) return true;
             }
         return false;
+    }
+
+    public GoTo isAnswerGoto(SetupPart setupPart, String answer) {
+        if (setupPart.goTo().id() != -1) {
+            return setupPart.goTo();
+        }
+        return null;
     }
 
     public boolean isAnswerAllowed(SetupPart setupPart, String answer) {

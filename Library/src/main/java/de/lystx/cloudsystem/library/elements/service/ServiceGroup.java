@@ -1,12 +1,15 @@
 package de.lystx.cloudsystem.library.elements.service;
 
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import io.vson.elements.object.VsonObject;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@Getter @Setter
+@Getter @Setter @AllArgsConstructor
 public class ServiceGroup implements Serializable {
 
     private final UUID uniqueId;
@@ -22,6 +25,7 @@ public class ServiceGroup implements Serializable {
     private boolean maintenance;
     private boolean lobby;
     private boolean dynamic;
+    private SerializableDocument values;
 
     public ServiceGroup(UUID uniqueId, String name, String template, ServiceType serviceType, int maxServer, int minServer, int maxRam, int minRam, int maxPlayers, int newServerPercent, boolean maintenance, boolean lobby, boolean dynamic) {
         this.uniqueId = uniqueId;
@@ -37,6 +41,7 @@ public class ServiceGroup implements Serializable {
         this.maintenance = maintenance;
         this.lobby = lobby;
         this.dynamic = dynamic;
+        this.values = new SerializableDocument();
     }
 
 

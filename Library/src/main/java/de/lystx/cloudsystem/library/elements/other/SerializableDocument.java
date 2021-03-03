@@ -44,27 +44,22 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
     }
 
     public Integer getInteger(String key) {
-        return ((JsonPrimitive) this.get(key)).getAsInt();
+        return (Integer) this.get(key);
     }
 
     public Boolean getBoolean(String key) {
-        return ((JsonPrimitive) this.get(key)).getAsBoolean();
+        return (Boolean) this.get(key);
+    }
+
+    public Boolean getBoolean(String key, Boolean defaultValue) {
+        if (!this.has(key)) {
+            return defaultValue;
+        }
+        return (Boolean) this.get(key);
     }
 
     public String getString(String key) {
-        return ((JsonPrimitive) this.get(key)).getAsString();
-    }
-
-    public java.lang.Double getDouble(String key) {
-        return ((JsonPrimitive) this.get(key)).getAsDouble();
-    }
-
-    public Short getShort(String key) {
-        return ((JsonPrimitive) this.get(key)).getAsShort();
-    }
-
-    public Long getLong(String key) {
-        return ((JsonPrimitive) this.get(key)).getAsLong();
+        return (String) this.get(key);
     }
 
     public boolean has(String key) {

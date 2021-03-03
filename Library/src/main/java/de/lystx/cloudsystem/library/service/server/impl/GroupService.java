@@ -1,9 +1,11 @@
 package de.lystx.cloudsystem.library.service.server.impl;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -31,6 +33,10 @@ public class GroupService extends CloudService {
                 if (file.getName().endsWith(".json")) {
                     try {
                         VsonObject document = new VsonObject(file, VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+                        if (!document.has("values")) {
+                            document.append("values", new SerializableDocument());
+                            document.save();
+                        }
                         this.groups.add(document.getAs(ServiceGroup.class));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -62,9 +68,11 @@ public class GroupService extends CloudService {
         try {
             VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.clear();
-            document.getFile().delete();
             this.groups.remove(this.getGroup(serviceGroup.getName()));
             this.getCloudLibrary().getService(TemplateService.class).deleteTemplates(serviceGroup);
+            this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
+                document.getFile().delete();
+            }, 40L);
         } catch (IOException e) {
             e.printStackTrace();
         }

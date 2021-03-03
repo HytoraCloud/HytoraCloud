@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.cloud.commands;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.command.*;
@@ -49,6 +50,10 @@ public class CreateCommand implements TabCompletable {
                         maxPlayers = groupSetup.getMaxPlayers();
                     }
 
+                    SerializableDocument document = new SerializableDocument();
+                    if (groupSetup.getType().equalsIgnoreCase("PROXY")) {
+                        document.append("onlineMode", !groupSetup.isOnlineMode());
+                    }
                     ServiceGroup serviceGroup = new ServiceGroup(
                             UUID.randomUUID(),
                             groupSetup.getServerName(),
@@ -62,7 +67,8 @@ public class CreateCommand implements TabCompletable {
                             groupSetup.getNewPlayersInPercent(),
                             false,
                             lobbyServer,
-                            groupSetup.isDynamic()
+                            groupSetup.isDynamic(),
+                            document
                     );
                     sender.sendMessage("INFO", "§2Created ServiceGroup §a" + serviceGroup.getName() + " §7| §bMaxMB " + serviceGroup.getMaxRam() + " §7| §bMinMB " + serviceGroup.getMinRam() + " §7| §bMinServer " + serviceGroup.getMinServer() + " §7| §bMaxServer" + serviceGroup.getMaxServer());
                     CloudSystem.getInstance().getService(GroupService.class).createGroup(serviceGroup);
