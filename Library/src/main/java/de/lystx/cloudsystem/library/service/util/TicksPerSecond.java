@@ -9,7 +9,6 @@ public class TicksPerSecond {
     public long[] ticks;
     public long lastTick;
 
-
     public TicksPerSecond(CloudLibrary cloudLibrary) {
         this.tickCount = 0;
         this.lastTick = 0L;
@@ -20,10 +19,19 @@ public class TicksPerSecond {
         }, 100L, 1L);
     }
 
+    /**
+     * Gets TPS by 100 ticks
+     * @return
+     */
     public double getTPS() {
         return this.getTPS(100);
     }
 
+    /**
+     * Raw TPS Method
+     * @param tickss
+     * @return TPS double
+     */
     public double getTPS(int tickss) {
         if (tickCount< tickss) {
             return 20.0D;
@@ -38,6 +46,10 @@ public class TicksPerSecond {
 
     }
 
+    /**
+     * Lag- O meter
+     * @return Lag percentage
+     */
     public double getLag() {
         return (double) Math.round((1.0D - this.getTPS() / 20.0D) * 100.0D);
     }

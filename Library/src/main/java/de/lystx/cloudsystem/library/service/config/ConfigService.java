@@ -1,21 +1,13 @@
 package de.lystx.cloudsystem.library.service.config;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.config.impl.MessageConfig;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
-import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
-import de.lystx.cloudsystem.library.service.config.impl.fallback.FallbackConfig;
-import de.lystx.cloudsystem.library.service.config.impl.labymod.LabyModConfig;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.Motd;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import io.vson.annotation.other.VsonConfigValue;
-import io.vson.annotation.other.VsonInstance;
 import io.vson.elements.object.VsonObject;
-import io.vson.enums.VsonComment;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +23,7 @@ public class ConfigService extends CloudService {
     private VsonObject vsonObject;
     int tries = 0;
 
-    public ConfigService(CloudLibrary cloudLibrary, String name, Type type) {
+    public ConfigService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         this.reload();
     }
@@ -41,7 +33,7 @@ public class ConfigService extends CloudService {
             tries += 1;
             this.vsonObject = new VsonObject(getCloudLibrary().getService(FileService.class).getConfigFile(), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             if (!getCloudLibrary().getService(FileService.class).getConfigFile().exists()) {
-                if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+                if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
                     VsonObject vsonObject = NetworkConfig.defaultConfig();
                     this.vsonObject.putAll(vsonObject);
                 } else {
@@ -55,7 +47,7 @@ public class ConfigService extends CloudService {
                 }
                 return;
             }
-            if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+            if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
                 this.receiverInfo = null;
                 if (!this.vsonObject.has("proxyStartPort")) {
                     this.vsonObject.append("proxyStartPort", 25565);
@@ -76,7 +68,7 @@ public class ConfigService extends CloudService {
     }
 
     public void save() {
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             this.vsonObject.putAll(this.networkConfig);
         } else {
             this.vsonObject.putAll(this.receiverInfo);

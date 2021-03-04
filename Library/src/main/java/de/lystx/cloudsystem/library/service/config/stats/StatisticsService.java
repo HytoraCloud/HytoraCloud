@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.config.stats;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -19,7 +20,7 @@ public class StatisticsService extends CloudService {
 
     private Statistics statistics;
 
-    public StatisticsService(CloudLibrary cloudLibrary, String name, Type type) {
+    public StatisticsService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         this.file = cloudLibrary.getService(FileService.class).getStatsFile();
         try {

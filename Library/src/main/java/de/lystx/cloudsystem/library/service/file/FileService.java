@@ -1,7 +1,9 @@
 package de.lystx.cloudsystem.library.service.file;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
@@ -59,8 +61,8 @@ public class FileService extends CloudService {
     private File spigotVersionsDirectory;
     private File oldSpigotVersionsDirectory;
 
-    public FileService(CloudLibrary cloudLibrary, String name, Type type) {
-        super(cloudLibrary, name, type);
+    public FileService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+        super(cloudLibrary, name, cloudType);
 
         this.startBat = new File("start.bat");
         this.startSh = new File("start.sh");
@@ -132,7 +134,7 @@ public class FileService extends CloudService {
         this.dynamicProxyDirectory.delete();
         this.dynamicBukkitDirectory.mkdirs();
 
-        if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             this.databaseDirectory.mkdirs();
             this.signDirectory.mkdirs();
             this.npcDirectory.mkdirs();
@@ -151,7 +153,7 @@ public class FileService extends CloudService {
         this.globalPluginsDirectory.mkdirs();
         this.oldSpigotVersionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
-        if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             this.modulesDirectory.mkdirs();
             this.backupDirectory.mkdirs();
         }

@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.serverselector.npc;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import io.vson.VsonValue;
 import io.vson.elements.VsonArray;
@@ -9,7 +10,6 @@ import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -21,8 +21,8 @@ public class NPCService extends CloudService {
     private VsonObject document;
     private VsonObject config;
 
-    public NPCService(CloudLibrary cloudLibrary, String name, Type type) {
-        super(cloudLibrary, name, type);
+    public NPCService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+        super(cloudLibrary, name, cloudType);
         this.load();
     }
 
@@ -49,12 +49,12 @@ public class NPCService extends CloudService {
                         "MINECART",
                         Collections.singletonList(new VsonObject()
                                 .append("slot", 4)
-                                .append("type", "NAME_TAG")
+                                .append("cloudType", "NAME_TAG")
                                 .append("name", "§8» §3%group%")
                                 .append("lore", Arrays.asList(
                                         "§8§m-----------",
                                         "§8» §bOnline §8» §7%online_services%",
-                                        "§8» §bType §8» §7%type%",
+                                        "§8» §bType §8» §7%cloudType%",
                                         "§8» §bTemplate §8» §7%template%"
                                 )).append("glow", false))
                 ));

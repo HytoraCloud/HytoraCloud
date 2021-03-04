@@ -20,8 +20,6 @@ import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
-import java.util.UUID;
-
 public class TablistListener implements Listener {
 
     private final CloudAPI cloudAPI;
@@ -85,7 +83,7 @@ public class TablistListener implements Listener {
         int i = CloudAPI.getInstance().getCloudPlayers().getAll().size();
         try {
             String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
-            stringValue.set(string
+            stringValue.setValue(string
                     .replace("&", "§")
                     .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
                     .replace("%online_players%", String.valueOf(i))
@@ -95,7 +93,7 @@ public class TablistListener implements Listener {
                     .replace("%server%", server)
                     .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance())));
         } catch (NullPointerException e) {}
-        return stringValue.get();
+        return stringValue.getValue();
     }
 
     public void doUpdate() {

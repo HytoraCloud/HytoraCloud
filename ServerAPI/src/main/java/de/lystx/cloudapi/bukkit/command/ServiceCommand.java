@@ -87,7 +87,7 @@ public class ServiceCommand {
 
                         if (!deleters.contains(player.getUniqueId())) {
                             deleters.add(player.getUniqueId());
-                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Leftclick the §bNPC §7you want to remove§8! §cTo cancel type this command §eagain§c!");
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Leftclick the §bNPC §7you want to remove§8! §cTo cancel cloudType this command §eagain§c!");
                         } else {
                             deleters.remove(player.getUniqueId());
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cDeletion was §ecancelled§c!");

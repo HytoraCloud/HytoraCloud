@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.event.EventService;
@@ -20,7 +21,7 @@ public class CloudPlayerService extends CloudService {
     private final List<CloudPlayer> cloudPlayers;
     private final CloudDatabase database;
 
-    public CloudPlayerService(CloudLibrary cloudLibrary, String name, Type type) {
+    public CloudPlayerService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         this.cloudPlayers = new LinkedList<>();
         this.database = this.getCloudLibrary().getService(DatabaseService.class).getDatabase();

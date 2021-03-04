@@ -280,7 +280,7 @@ public class SignUpdater {
         line = line.replace("%server%", service.getName());
         line = line.replace("%group%", group.getName());
         line = line.replace("%template%", group.getTemplate());
-        line = line.replace("%type%", group.getServiceType().name());
+        line = line.replace("%cloudType%", group.getServiceType().name());
         line = line.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
         try {
             if (serverPinger != null) {

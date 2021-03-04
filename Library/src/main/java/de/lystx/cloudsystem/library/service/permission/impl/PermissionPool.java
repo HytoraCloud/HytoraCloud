@@ -9,7 +9,7 @@ import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.Constants;
-import de.lystx.cloudsystem.library.service.util.UUIDService;
+import de.lystx.cloudsystem.library.service.uuid.UUIDService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.service.util;
+package de.lystx.cloudsystem.library.service.uuid;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

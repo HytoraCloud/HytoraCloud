@@ -9,20 +9,18 @@ public abstract class CloudService  {
 
     private final CloudLibrary cloudLibrary;
     private final String name;
-    private final Type type;
+    private final CloudServiceType type;
 
-    public CloudService(CloudLibrary cloudLibrary, String name, Type type) {
+    /**
+     * Initialsing the CloudService
+     * @param cloudLibrary
+     * @param name
+     * @param type
+     */
+    public CloudService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         this.cloudLibrary = cloudLibrary;
         this.name = name;
         this.type = type;
     }
 
-    public enum Type {
-        UTIL,
-        MANAGING,
-        NETWORK,
-        CONFIG,
-        FETCHER,
-        OTHER;
-    }
 }

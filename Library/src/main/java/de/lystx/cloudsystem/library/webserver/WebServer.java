@@ -22,7 +22,6 @@ import java.util.Map;
 @Getter
 public class WebServer {
 
-
     private HttpServer server;
     private CloudLibrary cloudLibrary;
     private Map<String, HttpHandler> handlers;
@@ -32,13 +31,22 @@ public class WebServer {
     private boolean enabled;
     private List<String> whitelistedIps;
 
+    /**
+     * Loads the webserver
+     * @param cloudLibrary
+     */
     public WebServer(CloudLibrary cloudLibrary) {
         try {
-            this.config = new VsonObject(new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "web.json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            this.config = new VsonObject(
+                    new File(cloudLibrary.getService(FileService.class).getDatabaseDirectory(), "web.json"),
+                    VsonSettings.OVERRITE_VALUES,
+                    VsonSettings.CREATE_FILE_IF_NOT_EXIST);
 
             this.port = this.config.getInteger("port", 2217);
             this.enabled = this.config.getBoolean("enabled", true);
-            this.whitelistedIps = this.config.has("whitelistedIps") ? this.config.getList("whitelistedIps", String.class) : this.config.append("whitelistedIps", Collections.singletonList("127.0.0.1")).getList("whitelistedIps", String.class);
+            this.whitelistedIps = this.config.has("whitelistedIps") ?
+                    this.config.getList("whitelistedIps", String.class) :
+                    this.config.append("whitelistedIps", Collections.singletonList("127.0.0.1")).getList("whitelistedIps", String.class);
             this.config.save();
             try {
                 this.handlers = new HashMap<>();
@@ -53,6 +61,9 @@ public class WebServer {
         }
     }
 
+    /**
+     * Starts the Webserver
+     */
     public void start() {
         if (this.enabled) {
             this.server.setExecutor(null);
@@ -60,6 +71,10 @@ public class WebServer {
         }
     }
 
+    /**
+     * Removes a "Route"
+     * @param web > URL
+     */
     public void remove(String web) {
         try {
             String finalWeb = (web.startsWith("/") ? web : "/" + web);
@@ -69,8 +84,12 @@ public class WebServer {
         }
     }
 
+    /**
+     * Updates a "route"
+     * @param web
+     * @param document
+     */
     public void update(String web, VsonObject document) {
-
         String finalWeb = (web.startsWith("/") ? web : "/" + web);
         this.remove(web);
         this.server.createContext(finalWeb, httpExchange -> {
@@ -89,7 +108,5 @@ public class WebServer {
             }
         });
     }
-
-
 
 }

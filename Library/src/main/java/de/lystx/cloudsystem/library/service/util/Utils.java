@@ -5,6 +5,11 @@ import java.util.List;
 
 public class Utils {
 
+    /**
+     * Adds all objects to a string
+     * @param input
+     * @return List with given objects
+     */
     public static List<String> toStringList(List<?> input) {
         List<String> list = new LinkedList<>();
 

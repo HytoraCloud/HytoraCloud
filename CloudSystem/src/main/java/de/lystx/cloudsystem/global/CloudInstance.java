@@ -2,17 +2,16 @@ package de.lystx.cloudsystem.global;
 
 import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInShutdown;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
-import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
-import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
-import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
@@ -23,7 +22,6 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
-import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
@@ -37,30 +35,30 @@ import java.io.IOException;
 public class CloudInstance extends CloudLibrary {
 
 
-    public CloudInstance(Type type) {
-        super(type);
+    public CloudInstance(CloudType cloudType) {
+        super(cloudType);
 
-        this.cloudServices.add(new CommandService(this, "Command", CloudService.Type.MANAGING));
-        this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.Type.UTIL));
+        this.cloudServices.add(new CommandService(this, "Command", CloudServiceType.MANAGING));
+        this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudServiceType.UTIL));
         this.console = new CloudConsole(this.getService(LoggerService.class), this.getService(CommandService.class), System.getProperty("user.name"));
 
         this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
-        this.cloudServices.add(new FileService(this, "File", CloudService.Type.CONFIG));
+        this.cloudServices.add(new FileService(this, "File", CloudServiceType.CONFIG));
 
 
-        if (type.equals(Type.CLOUDSYSTEM)) {
+        if (cloudType.equals(CloudType.CLOUDSYSTEM)) {
             this.webServer = new WebServer(this);
             this.webServer.update("", new VsonObject().append("info", "There's nothing to see here").append("version", Updater.getCloudVersion()));
             this.webServer.start();
         }
 
-        this.cloudServices.add(new ConfigService(this, "Config", CloudService.Type.CONFIG));
-        this.cloudServices.add(new LogService(this, "Logging", CloudService.Type.UTIL));
+        this.cloudServices.add(new ConfigService(this, "Config", CloudServiceType.CONFIG));
+        this.cloudServices.add(new LogService(this, "Logging", CloudServiceType.UTIL));
 
 
-        this.cloudServices.add(new ScreenService(this, "Screens", CloudService.Type.MANAGING));
-        this.cloudServices.add(new EventService(this, "Event", CloudService.Type.MANAGING));
+        this.cloudServices.add(new ScreenService(this, "Screens", CloudServiceType.MANAGING));
+        this.cloudServices.add(new EventService(this, "Event", CloudServiceType.MANAGING));
 
         this.getService(CommandService.class).registerCommand(new ShutdownCommand(this));
         this.getService(CommandService.class).registerCommand(new HelpCommand(this));
@@ -71,7 +69,7 @@ public class CloudInstance extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new StopCommand(this));
         this.getService(CommandService.class).registerCommand(new InfoCommand(this));
         this.getService(CommandService.class).registerCommand(new RunCommand(this));
-        if (this.getService(ConfigService.class).getNetworkConfig() != null && this.getType().equals(Type.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getService(ConfigService.class).getNetworkConfig() != null && this.getCloudType().equals(CloudType.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             this.getService(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
             this.getService(CommandService.class).registerCommand(new DownloadCommand(this));
         }
@@ -123,7 +121,7 @@ public class CloudInstance extends CloudLibrary {
         }
     }
     public void shutdown() {
-        if (this.type.equals(Type.CLOUDSYSTEM) && this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.cloudType.equals(CloudType.CLOUDSYSTEM) && this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             this.sendPacket(new PacketPlayInShutdown());
         }
         this.setRunning(false);
@@ -145,7 +143,7 @@ public class CloudInstance extends CloudLibrary {
                 FileUtils.deleteDirectory(this.getService(FileService.class).getDynamicServerDirectory());
             } catch (IOException ignored) {}
         }, 20L);
-        if (this.type.equals(Type.CLOUDSYSTEM)) {
+        if (this.cloudType.equals(CloudType.CLOUDSYSTEM)) {
             this.getService(Scheduler.class).scheduleDelayedTask(() -> this.getService(CloudNetworkService.class).shutdown(), 60L);
         }
         this.getService(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 80L);

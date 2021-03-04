@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NPC implements Serializable {
 
     public static Map<Integer, NPC> npcByID = Maps.newConcurrentMap();
-    public static Map<String, NPC> cachedNPCS = new ConcurrentHashMap<>();
     private static final long serialVersionUID = -672963264444438574L;
     private int entityID, sched;
     private Location location;
@@ -35,7 +34,6 @@ public class NPC implements Serializable {
     private Float health = 20F;
     private UUID uuid;
     private final SkinFetcher skinFetcher = new SkinFetcher();
-    private Boolean sneaking, sprinting, blocking, sleeping;
 
     private org.bukkit.inventory.ItemStack helmet, handHeld, chestplate, leggins, boots;
 
@@ -44,10 +42,6 @@ public class NPC implements Serializable {
         gameprofile = new GameProfile(UUID.randomUUID(), name);
         this.location = location.clone();
         this.uuid = gameprofile.getId();
-        sneaking = false;
-        sprinting = false;
-        blocking = false;
-        sleeping = false;
     }
 
     public NPC(String name, Integer entityID, UUID uuid, Location location) {
@@ -55,10 +49,6 @@ public class NPC implements Serializable {
         gameprofile = new GameProfile(uuid, name);
         this.location = location.clone();
         this.uuid = gameprofile.getId();
-        sneaking = false;
-        sprinting = false;
-        blocking = false;
-        sleeping = false;
     }
 
     public int getEntityID() {
@@ -141,7 +131,6 @@ public class NPC implements Serializable {
     }
 
     public NPC sleep(boolean state) {
-        sleeping = state;
         if (state) {
             Location bedLocation = new Location(location.getWorld(), 1, 1, 1);
             PacketPlayOutBed packet = new PacketPlayOutBed();
@@ -285,13 +274,16 @@ public class NPC implements Serializable {
     public NPC addToTablist() {
         PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
         PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(gameprofile, 1, EnumGamemode.NOT_SET, CraftChatMessage.fromString(gameprofile.getName())[0]);
-        @SuppressWarnings("unchecked")
-        List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
-        players.add(data);
 
-        setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER);
-        setValue(packet, "b", players);
-        sendPacket(packet);
+        List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
+        if (players != null) {
+            players.add(data);
+            setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER);
+            setValue(packet, "b", players);
+            sendPacket(packet);
+        } else {
+            System.out.println("[NPC] Couldn't get field for NPC from Method addToTablist()!");
+        }
         return this;
     }
 
@@ -325,9 +317,6 @@ public class NPC implements Serializable {
     }
 
     public void resetMovement() {
-        sneaking = false;
-        blocking = false;
-        sprinting = false;
         DataWatcher w = new DataWatcher(null);
         w.a(0, (byte) 0);
         w.a(1, (short) 0);
@@ -376,9 +365,6 @@ public class NPC implements Serializable {
     }
 
     public void sprint() {
-        sneaking = false;
-        blocking = false;
-        sprinting = true;
         DataWatcher w = new DataWatcher(null);
         w.a(0, (byte) 8);
         w.a(1, (short) 0);
@@ -388,9 +374,6 @@ public class NPC implements Serializable {
     }
 
     public void block() {
-        sneaking = false;
-        blocking = true;
-        sprinting = false;
         DataWatcher w = new DataWatcher(null);
         w.a(0, (byte) 16);
         w.a(1, (short) 0);
@@ -414,9 +397,6 @@ public class NPC implements Serializable {
     }
 
     public void sneak(Player player, Boolean b) {
-        sneaking = b;
-        blocking = false;
-        sprinting = false;
         DataWatcher w = new DataWatcher(null);
         w.a(0, (byte) 2);
         w.a(1, (short) 0);
@@ -449,13 +429,17 @@ public class NPC implements Serializable {
     public NPC removeFromTablist(Player player) {
         PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
         PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(gameprofile, 1, EnumGamemode.NOT_SET, CraftChatMessage.fromString(gameprofile.getName())[0]);
-        @SuppressWarnings("unchecked")
-        List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
-        players.add(data);
-        setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER);
-        setValue(packet, "b", players);
 
-        sendPacket(packet, player);
+        List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
+        if (players != null) {
+            players.add(data);
+            setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER);
+            setValue(packet, "b", players);
+
+            sendPacket(packet, player);
+        } else {
+            System.out.println("[NPC] Couldn't get field for NPC from Method removeFromTablist(Player player)!");
+        }
         return this;
     }
 
@@ -472,7 +456,9 @@ public class NPC implements Serializable {
             Field field = obj.getClass().getDeclaredField(name);
             field.setAccessible(true);
             field.set(obj, value);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Object getValue(Object obj, String name) {
@@ -480,7 +466,9 @@ public class NPC implements Serializable {
             Field field = obj.getClass().getDeclaredField(name);
             field.setAccessible(true);
             return field.get(obj);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -494,8 +482,8 @@ public class NPC implements Serializable {
         }
     }
 
-    public HashMap<String, Object> encode() {
-        HashMap<String, Object> map = new HashMap<>();
+    public Map<String, Object> encode() {
+        Map<String, Object> map = new HashMap<>();
 
         map.put("X", location.getX());
         map.put("Y", location.getY());
@@ -521,7 +509,7 @@ public class NPC implements Serializable {
         return map;
     }
 
-    public static NPC decode(HashMap<String, Object> map) {
+    public static NPC decode(Map<String, Object> map) {
         String name = (String) map.get("name");
         Integer entityID = (Integer) map.get("entityID");
         UUID uuid = (UUID) map.get("UUID");
@@ -543,17 +531,6 @@ public class NPC implements Serializable {
     }
 
     public String toString() {
-        return encode().toString();
+        return this.encode().toString();
     }
-
-
-    public NPC cache(String name) {
-        cachedNPCS.put(name, this);
-        return this;
-    }
-
-    public static NPC fromCache(String name) {
-        return cachedNPCS.get(name);
-    }
-
 }

@@ -34,11 +34,19 @@ public class Updater {
     private static VsonObject vsonObject;
     private static CloudConsole cloudConsole;
 
+    /**
+     * @return if the cloud is newest version
+     */
     public static boolean isUpToDate() {
         return (getCloudVersion().equalsIgnoreCase(getNewVersion()));
     }
 
 
+    /**
+     * Runs the AutoUpdater
+     * @param console > CloudConsole
+     * @return if checking was succesful
+     */
     public static boolean check(CloudConsole console) {
         try {
             VsonValue value = new VsonParser(getText("http://placelikehell.me/hytoraCloud/updater.json", true), new TempVsonOptions()).parse();
@@ -79,31 +87,42 @@ public class Updater {
             console.getLogger().sendMessage("§9");
             String download = vsonObject.getString("download");
             File cloud = new File("./CloudSystem.jar");
-            download(download, cloud);
+            download(download, cloud, "Updating CloudSystem");
         }
         return isUpToDate();
     }
 
-    public static void debug(String prefix, String message) {
-        boolean debug = false;
-        if (debug) {
-            System.out.println("[" + prefix + "] " + ConsoleColor.construct(Ansi.Color.CYAN, false) + message);
-        }
-    }
-
+    /**
+     *
+     * @return newest version from AutoUpdater
+     */
     public static String getNewVersion() {
         return vsonObject.getString("version");
     }
 
+    /**
+     *
+     * @return current version of cloud
+     */
     public static String getCloudVersion() {
         return "BETA-1.6.4";
     }
 
+    /**
+     *
+     * @return changelog
+     */
     public static List<String> getChangeLog() {
         List<String> list = vsonObject.getList("changelog", String.class);
         return list == null ? new LinkedList<>() : list;
     }
 
+    /**
+     * Gets text from an url
+     * @param urrl > URL to get text from
+     * @param apache > Using apache client
+     * @return text from website
+     */
     public static String getText(String urrl, boolean apache) {
         try {
             if (!apache) {
@@ -128,7 +147,12 @@ public class Updater {
         }
     }
 
-    public static void download(String search, File location)  {
+    /**
+     * Downloads a file from a website
+     * @param search > URL
+     * @param location > File to download to
+     */
+    public static void download(String search, File location, String task)  {
         InputStream inputStream;
         OutputStream outputStream;
 
@@ -139,7 +163,7 @@ public class Updater {
             } else {
                 style = ProgressBarStyle.UNICODE_BLOCK;
             }
-            ProgressBar pb = new ProgressBar("Updating CloudSystem", 100, 1000, System.err, style, "", 1, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
+            ProgressBar pb = new ProgressBar(task, 100, 1000, System.err, style, "", 1, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
 
             URL url = new URL(search);
             String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
@@ -163,7 +187,9 @@ public class Updater {
             outputStream.close();
             inputStream.close();
             pb.close();
-        } catch (Exception ex) { }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

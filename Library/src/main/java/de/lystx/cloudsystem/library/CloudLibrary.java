@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.lib.LibraryService;
@@ -53,11 +54,11 @@ public class CloudLibrary implements Serializable {
     protected LibraryService libraryService;
     protected AuthManager authManager;
     protected TicksPerSecond ticksPerSecond;
-    protected Type type;
+    protected CloudType cloudType;
 
-    public CloudLibrary(Type type) {
+    public CloudLibrary(CloudType cloudType) {
         //TODO: Remove manual directorys for LibraryService
-        if (type.equals(Type.RECEIVER) || type.equals(Type.CLOUDSYSTEM)) {
+        if (cloudType.equals(CloudType.RECEIVER) || cloudType.equals(CloudType.CLOUDSYSTEM)) {
             this.libraryService = new LibraryService("./local/libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.installDefaultLibraries();
             AnsiConsole.systemInstall();
@@ -67,7 +68,7 @@ public class CloudLibrary implements Serializable {
             this.libraryService = new LibraryService("../../../../../libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.installDefaultLibraries();
         }
-        this.type = type;
+        this.cloudType = cloudType;
         this.customs = new HashMap<>();
         this.cloudServices = new LinkedList<>();
         this.host = "127.0.0.1";
@@ -77,17 +78,27 @@ public class CloudLibrary implements Serializable {
         this.cloudServer = new CloudServer(this.host, this.port);
         this.cloudClient = new CloudClient(this.host, this.port);
 
-        this.cloudServices.add(new Scheduler(this, "Scheduler", CloudService.Type.UTIL));
-        this.cloudServices.add(new EventService(this, "Event", CloudService.Type.MANAGING));
+        this.cloudServices.add(new Scheduler(this, "Scheduler", CloudServiceType.UTIL));
+        this.cloudServices.add(new EventService(this, "Event", CloudServiceType.MANAGING));
 
         this.authManager = new AuthManager(new File("auth.json"));
         this.ticksPerSecond = new TicksPerSecond(this);
     }
 
-    public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
-        this.getService(CloudNetworkService.class).sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), type));
+    /**
+     * Sends custom Message
+     * @param channel > Channel for handling
+     * @param key > Key for handling
+     * @param document > Document to send
+     * @param cloudType > PROXY or SPIGOT
+     */
+    public void sendSubMessage(String channel, String key, Document document, ServiceType cloudType) {
+        this.getService(CloudNetworkService.class).sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), cloudType));
     }
 
+    /**
+     * Installs default maven libraries
+     */
     private void installDefaultLibraries() {
 
         //APACHE
@@ -125,10 +136,18 @@ public class CloudLibrary implements Serializable {
 
     }
 
+    /**
+     * @return Main service (ServerService)
+     */
     public ServerService getService() {
         return this.getService(ServerService.class);
     }
 
+    /**
+     * @param tClass
+     * @param <T>
+     * @return service from Class
+     */
     public <T> T getService(Class<T> tClass) {
         for (CloudService cloudService : this.cloudServices) {
             if (cloudService.getClass() == tClass) {
@@ -138,24 +157,25 @@ public class CloudLibrary implements Serializable {
         return null;
     }
 
-    public void sendPacket(Packet packet) {
-    }
+    /**
+     * Raw method to send packet
+     * @param packet
+     */
+    public void sendPacket(Packet packet) {}
 
-    public void reload() {
-    }
+    /**
+     * Raw method to reload
+     */
+    public void reload() { }
 
-    public void shutdown() {
-    }
+    /**
+     * Raw method to shutdown
+     */
+    public void shutdown() { }
 
-    public void reloadNPCS() {
-    }
-
-    public enum Type {
-
-        RECEIVER,
-        CLOUDSYSTEM,
-        LIBRARY,
-        CLOUDAPI
-    }
+    /**
+     * Raw method to reload NPCS
+     */
+    public void reloadNPCS() { }
 
 }

@@ -16,7 +16,7 @@ import de.lystx.cloudsystem.cloud.handler.services.PacketHandlerServiceUpdate;
 import de.lystx.cloudsystem.cloud.handler.services.PacketHandlerStart;
 import de.lystx.cloudsystem.cloud.handler.services.PacketHandlerStopServer;
 import de.lystx.cloudsystem.library.Updater;
-import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.backup.BackupService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -47,14 +47,14 @@ public class CloudBootingSetupDone {
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
 
         cloudSystem.getService(DatabaseService.class).getDatabase().connect();
-        cloudSystem.cloudServices.add(new CloudNetworkService(cloudSystem, "CloudNetwork", CloudService.Type.NETWORK));
-        cloudSystem.cloudServices.add(new ModuleService(cloudSystem, "Modules", CloudService.Type.MANAGING));
-        cloudSystem.cloudServices.add(new BackupService(cloudSystem, "Backups", CloudService.Type.MANAGING));
+        cloudSystem.cloudServices.add(new CloudNetworkService(cloudSystem, "CloudNetwork", CloudServiceType.NETWORK));
+        cloudSystem.cloudServices.add(new ModuleService(cloudSystem, "Modules", CloudServiceType.MANAGING));
+        cloudSystem.cloudServices.add(new BackupService(cloudSystem, "Backups", CloudServiceType.MANAGING));
 
         Constants.EXECUTOR = cloudSystem.getService(CloudNetworkService.class).getCloudServer();
 
         FileService fs = cloudSystem.getService(FileService.class);
-        cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.Type.NETWORK, cloudSystem.getService(GroupService.class).getGroups()));
+        cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudServiceType.NETWORK, cloudSystem.getService(GroupService.class).getGroups()));
 
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerRegister(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerStopServer(cloudSystem));

@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.serverselector.sign;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.DefaultSignLayout;
@@ -24,7 +25,7 @@ public class SignService extends CloudService {
 
     private SignLayOut signLayOut;
 
-    public SignService(CloudLibrary cloudLibrary, String name, Type type) {
+    public SignService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         this.layOutFile = cloudLibrary.getService(FileService.class).getSignLayoutFile();
         this.signFile = cloudLibrary.getService(FileService.class).getSignsFile();

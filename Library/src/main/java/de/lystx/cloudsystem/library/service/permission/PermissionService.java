@@ -1,7 +1,9 @@
 package de.lystx.cloudsystem.library.service.permission;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGroup;
@@ -25,8 +27,8 @@ public class PermissionService extends CloudService {
     private PermissionPool permissionPool;
     private boolean enabled;
 
-    public PermissionService(CloudLibrary cloudLibrary, String name, Type type) {
-        super(cloudLibrary, name, type);
+    public PermissionService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+        super(cloudLibrary, name, cloudType);
         this.file = cloudLibrary.getService(FileService.class).getPermissionsFile();
         this.enabled = true;
         this.permissionPool = new PermissionPool(cloudLibrary);
@@ -36,7 +38,7 @@ public class PermissionService extends CloudService {
     }
 
     public void loadEntries() {
-        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
         try {
@@ -47,7 +49,7 @@ public class PermissionService extends CloudService {
     }
 
     public void load() {
-        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
         this.permissionPool.getPlayerCache().clear();
@@ -105,7 +107,7 @@ public class PermissionService extends CloudService {
     }
 
     public void save() {
-        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
         if (this.permissionPool == null) {

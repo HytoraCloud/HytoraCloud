@@ -4,6 +4,7 @@ package de.lystx.cloudsystem.library.service.event;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.event.raw.EventMethod;
 import de.lystx.cloudsystem.library.service.event.raw.SubscribeEvent;
@@ -17,8 +18,8 @@ public class EventService extends CloudService {
 
     private final Map<Object, List<EventMethod>> registeredClasses;
 
-    public EventService(CloudLibrary cloudLibrary, String name, Type type) {
-        super(cloudLibrary, name, type);
+    public EventService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+        super(cloudLibrary, name, cloudType);
         this.registeredClasses = new HashMap<>();
     }
 

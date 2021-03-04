@@ -1,12 +1,14 @@
 package de.lystx.cloudsystem.library.service.database.impl;
 
+import com.mysql.cj.jdbc.MysqlDataSource;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
-import de.lystx.cloudsystem.library.service.database.impl.mysqlapi.MySQLConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.*;
 import java.util.*;
@@ -135,4 +137,76 @@ public class MySQL implements CloudDatabase {
         return list;
     }
 
+    @Getter
+    @Setter
+    public static class MySQLConnection {
+
+        private String host, user, password, db;
+        private int port = 3306;
+        private Connection con;
+        private boolean debug = false;
+
+
+        public boolean connect() {
+            try {
+                MysqlDataSource dataSource = new MysqlDataSource();
+                dataSource.setServerName(host);
+                dataSource.setPort(port);
+                dataSource.setDatabaseName(db);
+                dataSource.setUser(user);
+                dataSource.setPassword(password);
+                dataSource.setAllowMultiQueries(true);
+                con = dataSource.getConnection();
+                return true;
+            } catch(SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }
+        public boolean isConnected() {
+            if (con == null) {
+                return false;
+            }
+            try {
+                if (con.isClosed()) {
+                    return false;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+        public boolean close() {
+            try {
+                con.close();
+                return true;
+            } catch (SQLException e) {
+                return false;
+            }
+        }
+
+        public void createTable(String table, String colums) {
+            this.custom("CREATE TABLE IF NOT EXISTS " + table + "(" + colums + ")");
+        }
+
+        public boolean custom(String sql) {
+            Statement stmt = null;
+            try {
+                stmt = con.createStatement();
+                stmt.execute(sql);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    stmt.close();
+                    return true;
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            return false;
+        }
+    }
 }

@@ -11,6 +11,9 @@ public class Loggers {
     private final LoggerContext loggerContext;
     private final String[] loggers;
 
+    /**
+     * Disables Logging for given classes using LoggerContext
+     */
     public void disable() {
         for (String logger : this.loggers) {
             Logger log = this.loggerContext.getLogger(logger);

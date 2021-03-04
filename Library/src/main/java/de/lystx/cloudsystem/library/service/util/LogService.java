@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.util;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,17 +19,32 @@ public class LogService extends CloudService {
     private File logFile;
     private boolean active;
 
-    public LogService(CloudLibrary cloudLibrary, String name, Type type) {
-        super(cloudLibrary, name, type);
+    /**
+     * Initialising LogService
+     * @param cloudLibrary
+     * @param name
+     * @param cloudType
+     */
+    public LogService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+        super(cloudLibrary, name, cloudType);
         this.logs = new LinkedList<>();
         this.newFile();
         this.active = true;
     }
 
+    /**
+     * Logs something
+     * @param prefix
+     * @param message
+     */
     public void log(String prefix, String message) {
         this.log("[" + prefix.toUpperCase() + "] " + message);
     }
 
+    /**
+     * Raw logging method
+     * @param message
+     */
     public void log(String message) {
         if (!this.isActive()) {
             return;
@@ -36,15 +52,23 @@ public class LogService extends CloudService {
         this.logs.add(message);
     }
 
+    /**
+     * Saves current log
+     */
     public void save() {
         try {
             for (String log : this.logs) {
                 this.getCloudLibrary().getService(FileService.class).write(this.logFile, log);
             }
             this.newFile();
-        } catch (NullPointerException | ConcurrentModificationException ignored) {}
+        } catch (NullPointerException | ConcurrentModificationException ignored) {
+            //Exception thrown sometimes but doesn't make sense
+        }
     }
 
+    /**
+     * Creates new file if not exists
+     */
     public void newFile() {
         if (!this.getCloudLibrary().isRunning()) {
             return;

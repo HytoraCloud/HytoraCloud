@@ -6,6 +6,7 @@ import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
@@ -17,7 +18,7 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.Result;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
-import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
@@ -69,7 +70,7 @@ public class CloudAPI {
 
     public CloudAPI() {
         instance = this;
-        this.cloudLibrary = new CloudLibrary(CloudLibrary.Type.CLOUDAPI);
+        this.cloudLibrary = new CloudLibrary(CloudType.CLOUDAPI);
         this.cloudClient =  this.cloudLibrary.getCloudClient();
         this.executorService = Executors.newCachedThreadPool();
 
@@ -77,7 +78,7 @@ public class CloudAPI {
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool(cloudLibrary);
         this.templates = new Templates(this);
-        this.commandService = new CommandService(this.cloudLibrary, "Command", CloudService.Type.MANAGING);
+        this.commandService = new CommandService(this.cloudLibrary, "Command", CloudServiceType.MANAGING);
 
         Constants.EXECUTOR = this.cloudClient;
         Constants.PERMISSION_POOL = this.permissionPool;
@@ -146,7 +147,7 @@ public class CloudAPI {
                 if (packet instanceof ResultPacket) {
                     ResultPacket resultPacket = (ResultPacket)packet;
                     if (uuid.equals(resultPacket.getUniqueId())) {
-                        value.set(resultPacket.getResult());
+                        value.setValue(resultPacket.getResult());
                         cloudClient.getPacketAdapter().unregisterAdapter(this);
                     }
                 }
@@ -155,7 +156,7 @@ public class CloudAPI {
         this.sendPacket(packet.uuid(uuid));
         int count = 0;
 
-        while (value.get() == null && count++ < 3000) {
+        while (value.getValue() == null && count++ < 3000) {
             try {
                 Thread.sleep(0, 500000);
             } catch (InterruptedException e) {
@@ -166,9 +167,9 @@ public class CloudAPI {
         if (count >= 2999) {
             Result r = new Result(uuid, new VsonObject());
             r.setError(true);
-            value.set(r);
+            value.setValue(r);
         }
-        return value.get();
+        return value.getValue();
     }
 
     public void shutdown() {

@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.module;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.module.loader.ModuleLoader;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class ModuleService extends CloudService {
     private final ModuleLoader moduleLoader;
     private final File moduleDir;
 
-    public ModuleService(CloudLibrary cloudLibrary, String name, Type type) {
+    public ModuleService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         this.moduleDir = cloudLibrary.getService(FileService.class).getModulesDirectory();
         moduleDir.mkdirs();

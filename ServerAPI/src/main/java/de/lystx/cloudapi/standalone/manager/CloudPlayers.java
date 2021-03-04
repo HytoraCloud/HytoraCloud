@@ -74,17 +74,17 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     public CloudPlayer getByQuery(String name) {
         Value<CloudPlayer> value = new Value<>(null);
         this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name)).onResultSet(result -> {
-            value.set(result.getResultAs(CloudPlayer.class));
+            value.setValue(result.getResultAs(CloudPlayer.class));
         });
-        return value.get();
+        return value.getValue();
     }
 
     public CloudPlayer getByQuery(UUID uuid) {
         Value<CloudPlayer> value = new Value<>(null);
         this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uuid)).onResultSet(result -> {
-            value.set(result.getResultAs(CloudPlayer.class));
+            value.setValue(result.getResultAs(CloudPlayer.class));
         });
-        return value.get();
+        return value.getValue();
     }
 
     public List<CloudPlayer> getAll() {

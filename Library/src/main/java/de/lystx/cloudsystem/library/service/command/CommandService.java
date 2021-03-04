@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.command;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutExecuteCommand;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.command.CommandInfo;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
@@ -24,8 +25,8 @@ public final class CommandService extends CloudService {
     private final Map<String, Object> invokers;
     private boolean active;
 
-    public CommandService(CloudLibrary cloudLibrary, String name, Type type) {
-        super(cloudLibrary, name, type);
+    public CommandService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+        super(cloudLibrary, name, cloudType);
         this.commandClasses = new HashMap<>();
         this.invokers = new HashMap<>();
         this.active = true;

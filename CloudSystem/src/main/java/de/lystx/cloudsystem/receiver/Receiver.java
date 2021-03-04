@@ -1,15 +1,14 @@
 package de.lystx.cloudsystem.receiver;
 
 import de.lystx.cloudsystem.global.CloudInstance;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLogin;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverShutdown;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
-import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.setup.impl.ReceiverSetup;
 import de.lystx.cloudsystem.receiver.handler.ReceiverPacketHandlerLogin;
@@ -20,7 +19,6 @@ import de.lystx.cloudsystem.receiver.temp.template.handler.PacketHandlerTemplate
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.File;
 import java.util.LinkedList;
 
 @Getter @Setter
@@ -33,7 +31,7 @@ public class Receiver extends CloudInstance {
     int tries = 0;
 
     public Receiver() {
-        super(Type.RECEIVER);
+        super(CloudType.RECEIVER);
         instance = this;
 
         this.templateTemp = new TemplateTemp(this);

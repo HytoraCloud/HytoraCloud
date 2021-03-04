@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.BufferedReader;
@@ -16,17 +17,16 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-@Getter
+@Getter @AllArgsConstructor
 public class HytoraClassLoader {
-
 
     private final File file;
 
-    public HytoraClassLoader(File file) {
-        this.file = file;
-    }
-
-
+    /**
+     * Used for {loadJson}
+     * @param filename
+     * @return content of provided file
+     */
     public String loadFile(String filename) {
         try {
             JarFile jf = new JarFile(this.file);
@@ -48,12 +48,21 @@ public class HytoraClassLoader {
         }
     }
 
+    /**
+     *
+     * @param filename
+     * @return JsonObject from File content
+     */
     public JsonObject loadJson(String filename) {
         return new JsonParser().parse(this.loadFile(filename)).getAsJsonObject();
     }
 
+    /**
+     * Finds a class
+     * @param name
+     * @return class by name
+     */
     public Class<?> findClass(String name) {
-
         try {
             URLClassLoader child  = new URLClassLoader(new URL[] {new URL("file:" + this.file.toString())}, CloudLibrary.class.getClassLoader());
             return Class.forName(name, true, child);
@@ -64,6 +73,11 @@ public class HytoraClassLoader {
         return null;
     }
 
+    /**
+     * Finds a class
+     * @param name
+     * @return class by name but uses JarEntry
+     */
     public Class<?> findClassWithJarEntry(String name) {
         try {
             JarFile jarFile = new JarFile(file);

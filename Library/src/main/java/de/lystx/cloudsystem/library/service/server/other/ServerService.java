@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.service.server.other;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
@@ -12,11 +13,11 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -26,7 +27,6 @@ import de.lystx.cloudsystem.library.service.server.other.manager.PortService;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStart;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStop;
 import de.lystx.cloudsystem.library.service.util.Action;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -58,8 +58,8 @@ public class ServerService extends CloudService {
 
     private List<ServiceGroup> serviceGroups;
 
-    public ServerService(CloudLibrary cloudLibrary, String name, Type type, List<ServiceGroup> serviceGroups) {
-        super(cloudLibrary, name, type);
+    public ServerService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType, List<ServiceGroup> serviceGroups) {
+        super(cloudLibrary, name, cloudType);
         this.serviceGroups = serviceGroups;
         this.actions = new HashMap<>();
         this.services = new HashMap<>();
@@ -100,7 +100,7 @@ public class ServerService extends CloudService {
     }
 
     public void notifyStart(Service service) {
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
         }
         List<Service> list = this.getServices(service.getServiceGroup());
@@ -119,7 +119,7 @@ public class ServerService extends CloudService {
     }
 
     public void notifyStop(Service service) {
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
         }
         List<Service> services = this.services.get(service.getServiceGroup());
@@ -140,7 +140,7 @@ public class ServerService extends CloudService {
     public void updateService(Service service, ServiceState state) {
         List<Service> services = this.getServices(service.getServiceGroup());
         services.remove(service);
-        Service newService = new Service(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), state);
+        Service newService = new Service(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), state);
         services.add(newService);
         this.services.put(service.getServiceGroup(), services);
     }
@@ -155,7 +155,7 @@ public class ServerService extends CloudService {
                 int id = this.idService.getFreeID(serviceGroup.getName());
                 int port = serviceGroup.getServiceType().equals(ServiceType.SPIGOT) ? this.portService.getFreePort() : this.portService.getFreeProxyPort();
 
-                Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : getCloudLibrary().getService(ConfigService.class).getReceiverInfo().getPort(), ServiceState.LOBBY);
+                Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : getCloudLibrary().getService(ConfigService.class).getReceiverInfo().getPort(), ServiceState.LOBBY);
 
                 if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT)) {
                     if (serviceGroup.isLobby()) {
@@ -199,7 +199,7 @@ public class ServerService extends CloudService {
 
         this.getCloudLibrary().sendPacket(new PacketPlayOutRegisterServer(service).setAction(action.getMS()));
         this.actions.remove(service.getName());
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
         }
         if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
@@ -231,14 +231,14 @@ public class ServerService extends CloudService {
         if (!this.getCloudLibrary().isRunning()) {
             return new VsonObject().append("message", "CloudLibrary isn't running anymore").append("sucess", false);
         }
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
                 document.append("message", "§cServiceGroup for §e" + serviceGroup.getName() + " §cwasn't found!");
                 document.append("sucess", false);
                 return document;
             }
         }
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             document.append("sucess", true);
             return document;
         }
@@ -260,7 +260,7 @@ public class ServerService extends CloudService {
         services.add(service);
         this.services.put(serviceGroup, services);
 
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return document;
         }
         if (this.providerStart.autoStartService(service, properties)) {
@@ -286,7 +286,7 @@ public class ServerService extends CloudService {
     public VsonObject startService(ServiceGroup serviceGroup, SerializableDocument properties) {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-        Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), ServiceState.LOBBY);
+        Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), ServiceState.LOBBY);
         return this.startService(serviceGroup, service, properties);
     }
 
@@ -296,7 +296,7 @@ public class ServerService extends CloudService {
     }
 
     public void stopService(Service service, boolean newServices) {
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
         }
         try {
@@ -327,7 +327,7 @@ public class ServerService extends CloudService {
     }
 
     public void stopServices() {
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
         }
         List<String> already = new LinkedList<>();
@@ -357,15 +357,15 @@ public class ServerService extends CloudService {
         this.stopServices(serviceGroup, true);
     }
     public void stopServices(ServiceGroup serviceGroup, boolean newOnes) {
-        if (this.getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
         }
         Value<Integer> count = new Value<>(this.getServices(serviceGroup).size());
         for (Service service : this.getServices(serviceGroup)) {
             this.stopService(service, false);
-            count.set(count.get() - 1);
+            count.setValue(count.getValue() - 1);
 
-            if (count.get() == 0 && newOnes) {
+            if (count.getValue() == 0 && newOnes) {
                 this.needServices(serviceGroup);
             }
         }

@@ -31,7 +31,7 @@ public class LogCommand implements TabCompletable {
     @Command(name = "log", description = "Logs a server or all")
     public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 2) {
-            String type = args[1];
+            String cloudType = args[1];
             String fileName = args[0].equals("all") ? "log_all" : "log_" + args[0];
             File file = new File(fileName + ".txt");
             String finalText;
@@ -55,8 +55,8 @@ public class LogCommand implements TabCompletable {
                 finalText = this.getLog(service, cloudInstance);
             }
             try {
-                String realLink = this.post(finalText, type,false, file);
-                if (type.equalsIgnoreCase("file")) {
+                String realLink = this.post(finalText, cloudType,false, file);
+                if (cloudType.equalsIgnoreCase("file")) {
                     Desktop.getDesktop().open(file);
                 } else {
                     Desktop.getDesktop().browse(new URI(realLink));
@@ -84,8 +84,8 @@ public class LogCommand implements TabCompletable {
         return sb.toString();
     }
 
-    public String post(String text, String type, boolean raw, File file) throws IOException {
-        if (type.equalsIgnoreCase("file")) {
+    public String post(String text, String cloudType, boolean raw, File file) throws IOException {
+        if (cloudType.equalsIgnoreCase("file")) {
             try {
                 if (!file.exists()) {
                     file.createNewFile();

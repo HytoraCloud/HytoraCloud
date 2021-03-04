@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.backup;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
@@ -25,8 +26,8 @@ public class BackupService extends CloudService {
     private long lastBackup;
     private boolean enabled;
 
-    public BackupService(CloudLibrary cloudLibrary, String name, Type type) {
-        super(cloudLibrary, name, type);
+    public BackupService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+        super(cloudLibrary, name, cloudType);
         VsonObject finalDocument = null;
         try {
             finalDocument = new VsonObject(cloudLibrary.getService(FileService.class).getBackupFile(), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
@@ -62,8 +63,8 @@ public class BackupService extends CloudService {
         }
         Value<Integer> i = new Value<>(-1);
         this.getCloudLibrary().getService(Scheduler.class).scheduleRepeatingTask(() -> {
-            int finalInt = i.get() + 1;
-            i.set(finalInt);
+            int finalInt = i.getValue() + 1;
+            i.setValue(finalInt);
             if (finalInt != 0) {
                 this.createBackup(UUID.randomUUID().toString());
             }

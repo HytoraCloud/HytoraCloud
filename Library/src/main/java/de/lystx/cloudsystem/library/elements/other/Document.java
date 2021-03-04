@@ -253,7 +253,7 @@ public class Document {
     }
 
     public Boolean isEmpty() {
-        return this.keys().size() == 0;
+        return this.keys().isEmpty();
     }
 
     public void clear() {

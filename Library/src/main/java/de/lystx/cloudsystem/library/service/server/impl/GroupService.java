@@ -1,9 +1,11 @@
 package de.lystx.cloudsystem.library.service.server.impl;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import io.vson.elements.object.VsonObject;
@@ -20,7 +22,7 @@ public class GroupService extends CloudService {
 
     private final List<ServiceGroup> groups;
 
-    public GroupService(CloudLibrary cloudLibrary, String name, Type type) {
+    public GroupService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         this.groups = new LinkedList<>();
 
@@ -28,7 +30,7 @@ public class GroupService extends CloudService {
     }
 
     public void loadGroups() {
-        if (getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             for (File file : this.getCloudLibrary().getService(FileService.class).getGroupsDirectory().listFiles()) {
                 if (file.getName().endsWith(".json")) {
                     try {
@@ -47,7 +49,7 @@ public class GroupService extends CloudService {
     }
 
     public void createGroup(ServiceGroup serviceGroup) {
-        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
         try {
@@ -62,7 +64,7 @@ public class GroupService extends CloudService {
     }
 
     public void deleteGroup(ServiceGroup serviceGroup) {
-        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
         try {
@@ -80,7 +82,7 @@ public class GroupService extends CloudService {
     }
 
     public void updateGroup(ServiceGroup serviceGroup, ServiceGroup newServiceGroup) {
-        if (!getCloudLibrary().getType().equals(CloudLibrary.Type.CLOUDSYSTEM)) {
+        if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
         try {

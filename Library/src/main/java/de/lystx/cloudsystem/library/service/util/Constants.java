@@ -2,7 +2,6 @@ package de.lystx.cloudsystem.library.service.util;
 
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
-import io.netty.channel.epoll.Epoll;
 
 public class Constants {
 
@@ -10,8 +9,11 @@ public class Constants {
     public static PermissionPool PERMISSION_POOL = null;
 
     public static boolean NEEDS_DEPENDENCIES;
-    public static boolean NEEDS_DEPENDENCIES_2;
+    public static boolean JLINE_COMPLETER_INSTALLED;
 
+    /**
+     * Checks if dependencies are already loaded
+     */
     static {
         try {
             Class.forName("jline.console.ConsoleReader");
@@ -21,9 +23,9 @@ public class Constants {
         }
         try {
             Class.forName("jline.console.completer.Completer");
-            NEEDS_DEPENDENCIES_2 = false;
+            JLINE_COMPLETER_INSTALLED = false;
         } catch (ClassNotFoundException e) {
-            NEEDS_DEPENDENCIES_2 =  true;
+            JLINE_COMPLETER_INSTALLED =  true;
         }
     }
 }

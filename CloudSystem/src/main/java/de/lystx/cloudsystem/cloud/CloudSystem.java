@@ -5,9 +5,10 @@ import de.lystx.cloudsystem.cloud.booting.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.cloud.commands.*;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.cloud.commands.PlayerCommand;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketTransferFile;
-import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -21,7 +22,6 @@ import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
-import de.lystx.cloudsystem.library.service.util.LogService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,19 +40,19 @@ public class CloudSystem extends CloudInstance {
     private final List<ReceiverInfo> receivers;
 
     public CloudSystem() {
-        super(Type.CLOUDSYSTEM);
+        super(CloudType.CLOUDSYSTEM);
         instance = this;
 
         this.receivers = new LinkedList<>();
 
-        this.cloudServices.add(new StatisticsService(this, "Stats", CloudService.Type.UTIL));
-        this.cloudServices.add(new GroupService(this, "Groups", CloudService.Type.MANAGING));
-        this.cloudServices.add(new TemplateService(this, "Templates", CloudService.Type.MANAGING));
-        this.cloudServices.add(new PermissionService(this, "Permissions", CloudService.Type.MANAGING));
-        this.cloudServices.add(new SignService(this, "Signs", CloudService.Type.MANAGING));
-        this.cloudServices.add(new NPCService(this, "NPCs", CloudService.Type.MANAGING));
-        this.cloudServices.add(new DatabaseService(this, "Database", CloudService.Type.MANAGING));
-        this.cloudServices.add(new CloudPlayerService(this, "CloudPlayerService", CloudService.Type.MANAGING));
+        this.cloudServices.add(new StatisticsService(this, "Stats", CloudServiceType.UTIL));
+        this.cloudServices.add(new GroupService(this, "Groups", CloudServiceType.MANAGING));
+        this.cloudServices.add(new TemplateService(this, "Templates", CloudServiceType.MANAGING));
+        this.cloudServices.add(new PermissionService(this, "Permissions", CloudServiceType.MANAGING));
+        this.cloudServices.add(new SignService(this, "Signs", CloudServiceType.MANAGING));
+        this.cloudServices.add(new NPCService(this, "NPCs", CloudServiceType.MANAGING));
+        this.cloudServices.add(new DatabaseService(this, "Database", CloudServiceType.MANAGING));
+        this.cloudServices.add(new CloudPlayerService(this, "CloudPlayerService", CloudServiceType.MANAGING));
 
         this.getService(CommandService.class).registerCommand(new EditCommand());
         this.getService(CommandService.class).registerCommand(new ModulesCommand());

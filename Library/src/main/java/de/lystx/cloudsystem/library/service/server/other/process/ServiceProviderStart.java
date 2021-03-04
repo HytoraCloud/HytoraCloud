@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.service.server.other.process;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
@@ -11,7 +12,6 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
-import io.vson.elements.object.VsonMember;
 import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
 
@@ -133,7 +133,7 @@ public class ServiceProviderStart {
                         "    tab_size: 60\n" +
                         "    ping_passthrough: false\n" +
                         "    force_default_server: false\n" +
-                        "    proxy_protocol: " + (cloudLibrary.getType().equals(CloudLibrary.Type.CLOUDSYSTEM) ? cloudLibrary.getService(ConfigService.class).getNetworkConfig().isProxyProtocol() : ((NetworkConfig)cloudLibrary.getCustoms().get("networkConfig")).isProxyProtocol()) + "\n" +
+                        "    proxy_protocol: " + (cloudLibrary.getCloudType().equals(CloudType.CLOUDSYSTEM) ? cloudLibrary.getService(ConfigService.class).getNetworkConfig().isProxyProtocol() : ((NetworkConfig)cloudLibrary.getCustoms().get("networkConfig")).isProxyProtocol()) + "\n" +
                         "ip_forward: true\n" +
                         "network_compression_threshold: 256\n" +
                         "groups:\n" +

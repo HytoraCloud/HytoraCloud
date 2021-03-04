@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.scheduler;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.CloudServiceType;
 
 import java.util.Map;
 import java.util.Random;
@@ -14,8 +15,8 @@ public class Scheduler extends CloudService {
 
 	public final Map<Integer, Task> schedulerMap;
 
-	public Scheduler(CloudLibrary cloudLibrary, String name, Type type) {
-		super(cloudLibrary, name, type);
+	public Scheduler(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
+		super(cloudLibrary, name, cloudType);
 		this.schedulerMap = new ConcurrentHashMap<>();
 	}
 

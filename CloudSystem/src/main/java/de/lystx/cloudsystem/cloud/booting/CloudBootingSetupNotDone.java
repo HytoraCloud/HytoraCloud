@@ -1,7 +1,6 @@
 package de.lystx.cloudsystem.cloud.booting;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.Spigot;
@@ -72,8 +71,8 @@ public class CloudBootingSetupNotDone {
             document.append("proxyConfig", proxy);
             document.save();
 
-            spigot.set(Spigot.byKey(sp.getSpigotVersion()));
-            bungeeCord.set(sp.getBungeeCordType());
+            spigot.setValue(Spigot.byKey(sp.getSpigotVersion()));
+            bungeeCord.setValue(sp.getBungeeCordType());
 
             cloudSystem.getService(GroupService.class).createGroup(new ServiceGroup(
                     UUID.randomUUID(),
@@ -107,7 +106,7 @@ public class CloudBootingSetupNotDone {
                     true,
                     true
             ));
-            if (spigot.get() == null) {
+            if (spigot.getValue() == null) {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cPlease redo the setup and provide a §evalid spigot version§c!");
                 System.exit(0);
                 return;
@@ -120,7 +119,7 @@ public class CloudBootingSetupNotDone {
                 databaseSetup.start(cloudSystem.getConsole(), s -> {
                     DatabaseSetup ds = (DatabaseSetup)s;
                     VsonObject document1 = new VsonObject(VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST)
-                            .append("type", sp.getDatabase().toUpperCase())
+                            .append("cloudType", sp.getDatabase().toUpperCase())
                             .append("host", ds.getHost())
                             .append("port", ds.getPort())
                             .append("username", ds.getUsername())
@@ -136,9 +135,9 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
                 Action action = new Action();
 
-                cloudSystem.getService(FileService.class).download(spigot.get().getUrl(), new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
+                cloudSystem.getService(FileService.class).download(spigot.getValue().getUrl(), new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
 
-                cloudSystem.getService(FileService.class).download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
+                cloudSystem.getService(FileService.class).download(bungeeCord.getValue().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
                 cloudSystem.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
 
                 cloudSystem.getConsole().sendMessage("INFO", "§aDownloading newest §2Spigot §aand §2BungeeCord §atook §h[§e" + action.getMS() + "s§h]");
