@@ -53,7 +53,8 @@ public class ReceiverPacketHandlerServer {
 
     @PacketHandler
     public void handleTemplate(PacketPlayInUpdateServiceGroup packet) {
-        this.receiver.getService().updateGroup(this.receiver.getGroup(packet.getServiceGroup().getName()), packet.getServiceGroup());
+        //TODO: Manage groups
+        //this.receiver.getService().updateGroup(this.receiver.getGroup(packet.getServiceGroup().getName()), packet.getServiceGroup());
     }
 
     @PacketHandler

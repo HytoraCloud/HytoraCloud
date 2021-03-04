@@ -5,15 +5,15 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class Scheduler extends CloudService {
 
-	public final Map<Integer, Task> schedulerMap;
+	private static Scheduler instance;
+	private final Map<Integer, Task> schedulerMap;
 
 	public Scheduler(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
 		super(cloudLibrary, name, cloudType);
@@ -195,7 +195,7 @@ public class Scheduler extends CloudService {
 	 * @param async
 	 * @return task
 	 */
-	private Task delayTask(Runnable task, long delay, boolean async) {
+	public Task delayTask(Runnable task, long delay, boolean async) {
 		if (delay < 0) {
 			return null;
 		}
@@ -272,4 +272,39 @@ public class Scheduler extends CloudService {
 		}, delay * 50, period * 50);
 		return t;
 	}
+
+
+
+	/**
+	 * Returns instance
+	 * @return
+	 */
+	public static Scheduler getInstance() {
+		if (instance == null) {
+			instance = new Scheduler(null, "Scheduler", CloudServiceType.UTIL);
+		}
+		return instance;
+	}
+
+	/**
+	 * Schedules something by Annotation
+	 * @param object
+	 * @param runnable
+	 */
+	public static void schedule(Object object, Runnable runnable) {
+		StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+		String method = ste[ste.length - 1 - 1].getMethodName();
+		try {
+			Method declaredMethod = object.getClass().getDeclaredMethod(method);
+			Schedule schedule = declaredMethod.getAnnotation(Schedule.class);
+			if (schedule.period() != -1L) {
+				getInstance().scheduleRepeatingTask(runnable, schedule.delay(), schedule.period(), !schedule.sync());
+			} else {
+				getInstance().delayTask(runnable, schedule.delay(), !schedule.sync());
+			}
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

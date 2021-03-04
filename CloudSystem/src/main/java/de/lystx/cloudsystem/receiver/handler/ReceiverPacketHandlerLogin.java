@@ -29,7 +29,6 @@ public class ReceiverPacketHandlerLogin {
                 this.receiver.getConsole().getLogger().sendMessage("NETWORK", "§cThere is already a Receiver with the name §e" + packet.getReceiverInfo().getName() + " §cconnected to the CloudSystem!");
             } else if (packet.getDecision().equals(Decision.TRUE)) {
                 this.receiver.getConsole().getLogger().sendMessage("NETWORK", "§aSuccessfully connected to CloudSystem with right key");
-                FileService fs = this.receiver.getService(FileService.class);
                 this.receiver.cloudServices.add(new ServerService(this.receiver, "Services", CloudServiceType.NETWORK, packet.getServiceGroups()));
             } else if (packet.getDecision().equals(Decision.FALSE)) {
                 this.receiver.getConsole().getLogger().sendMessage("NETWORK", "§cThe provided §ekey §cwas §ewrong §cconnection refused!");

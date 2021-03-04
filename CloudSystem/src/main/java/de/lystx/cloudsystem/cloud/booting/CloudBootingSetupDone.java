@@ -29,7 +29,11 @@ import de.lystx.cloudsystem.library.service.server.other.ServerService;
 
 public class CloudBootingSetupDone {
 
-
+    /**
+     * CloudSystem Setup starts
+     * > Because Setup was not done
+     * @param cloudSystem
+     */
     public CloudBootingSetupDone(CloudSystem cloudSystem) {
 
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");

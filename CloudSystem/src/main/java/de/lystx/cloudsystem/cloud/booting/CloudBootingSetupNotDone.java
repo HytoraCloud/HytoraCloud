@@ -25,7 +25,11 @@ import java.util.UUID;
 
 public class CloudBootingSetupNotDone {
 
-
+    /**
+     * Starts Cloud
+     * > Setup was done
+     * @param cloudSystem
+     */
     public CloudBootingSetupNotDone(CloudSystem cloudSystem) {
 
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");

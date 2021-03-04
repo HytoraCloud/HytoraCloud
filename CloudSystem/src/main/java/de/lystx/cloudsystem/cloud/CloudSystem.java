@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.cloud;
 import de.lystx.cloudsystem.cloud.booting.CloudBootingSetupDone;
 import de.lystx.cloudsystem.cloud.booting.CloudBootingSetupNotDone;
 import de.lystx.cloudsystem.cloud.commands.*;
+import de.lystx.cloudsystem.cloud.handler.ReceiverManager;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.cloud.commands.PlayerCommand;
 import de.lystx.cloudsystem.library.CloudType;
@@ -37,13 +38,12 @@ public class CloudSystem extends CloudInstance {
     private static CloudSystem instance;
 
     public ServerService service;
-    private final List<ReceiverInfo> receivers;
+    private final ReceiverManager receiverManager;
+
 
     public CloudSystem() {
         super(CloudType.CLOUDSYSTEM);
         instance = this;
-
-        this.receivers = new LinkedList<>();
 
         this.cloudServices.add(new StatisticsService(this, "Stats", CloudServiceType.UTIL));
         this.cloudServices.add(new GroupService(this, "Groups", CloudServiceType.MANAGING));
@@ -69,12 +69,12 @@ public class CloudSystem extends CloudInstance {
         } else {
             new CloudBootingSetupNotDone(this);
         }
+        this.receiverManager = new ReceiverManager(this);
     }
 
     @Override
     public void reload() {
         super.reload();
-        this.syncTemplates();
         this.getService(PermissionService.class).load();
         this.getService(PermissionService.class).loadEntries();
         this.getService(NPCService.class).load();
@@ -83,17 +83,9 @@ public class CloudSystem extends CloudInstance {
         this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
     }
 
-    public void syncTemplates() {
-        File directory = this.getService(FileService.class).getTemplatesDirectory();
-        for (File file : directory.listFiles()) {
-            this.sendPacket(new PacketTransferFile("template_transfer", file));
-        }
-    }
-
     @Override
     public void shutdown() {
         super.shutdown();
-
         this.getService(StatisticsService.class).save();
         this.getService(SignService.class).save();
         this.getService(NPCService.class).save();
@@ -102,10 +94,6 @@ public class CloudSystem extends CloudInstance {
     @Override
     public void sendPacket(Packet packet) {
         this.getService(CloudNetworkService.class).sendPacket(packet);
-    }
-
-    public ReceiverInfo getReceiver(String name) {
-        return this.receivers.stream().filter(receiverInfo -> receiverInfo.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
 }

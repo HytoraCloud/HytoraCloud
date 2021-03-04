@@ -1,12 +1,12 @@
 package de.lystx.cloudsystem.library;
 
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
-import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBar;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBarStyle;
+import de.lystx.cloudsystem.library.service.scheduler.Schedule;
+import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import io.vson.VsonValue;
 import io.vson.elements.object.VsonObject;
-import io.vson.enums.FileFormat;
 import io.vson.manage.vson.VsonParser;
 import io.vson.other.TempVsonOptions;
 import lombok.Getter;
@@ -14,10 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.fusesource.jansi.Ansi;
 
 import java.io.*;
 import java.net.URL;
@@ -26,7 +23,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
 @Getter
 public class Updater {
@@ -41,6 +37,21 @@ public class Updater {
         return (getCloudVersion().equalsIgnoreCase(getNewVersion()));
     }
 
+
+    public static void main(String[] args) {
+        Updater updater = new Updater();
+        updater.scheduleExample();
+    }
+
+    @Schedule(delay = 0L, period = 20L, sync = false)
+    public void scheduleExample() {
+        Scheduler.schedule(this, new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("PENIS");
+            }
+        });
+    }
 
     /**
      * Runs the AutoUpdater

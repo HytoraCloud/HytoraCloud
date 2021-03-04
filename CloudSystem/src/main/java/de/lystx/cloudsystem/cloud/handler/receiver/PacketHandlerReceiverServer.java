@@ -12,10 +12,6 @@ public class PacketHandlerReceiverServer {
 
     private final CloudSystem cloudSystem;
 
-    @PacketHandler
-    public void handleRegister(PacketPlayInRegister packet) {
-        this.cloudSystem.sendPacket(packet);
-    }
 
     @PacketHandler
     public void handleStartNew(Packet packet) {

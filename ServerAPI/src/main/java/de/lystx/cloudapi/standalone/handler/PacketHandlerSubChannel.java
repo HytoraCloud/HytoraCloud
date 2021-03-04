@@ -4,17 +4,14 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
-@Getter
+@Getter @AllArgsConstructor
 public class PacketHandlerSubChannel extends PacketHandlerAdapter {
 
     private final CloudAPI cloudAPI;
-
-    public PacketHandlerSubChannel(CloudAPI cloudAPI) {
-        this.cloudAPI = cloudAPI;
-    }
 
     @Override
     public void handle(Packet packet) {

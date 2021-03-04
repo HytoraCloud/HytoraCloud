@@ -19,43 +19,14 @@ public class PacketHandlerReceiver {
 
     private final CloudSystem cloudSystem;
 
-
     @PacketHandler
     public void handleExit(PacketReceiverShutdown packet) {
-        ReceiverInfo receiverInfo = packet.getReceiverInfo();
-
-        if (cloudSystem.getReceiver(receiverInfo.getName()) == null) {
-            cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cTried to unregister §e" + receiverInfo.getName() + " §cwhich isn't registered!");
-            return;
-        }
-        cloudSystem.getReceivers().remove(cloudSystem.getReceiver(receiverInfo.getName()));
-        cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§7The Receiver §c" + receiverInfo.getName() + " §7has disconnected from §bHytoraCloud§h!");
+        cloudSystem.getReceiverManager().unregisterReceiver(packet.getReceiverInfo());
     }
 
     @PacketHandler
     public void handleReceiverLogin(PacketReceiverLogin packet) {
-        String key = cloudSystem.getAuthManager().getKey();
-        ReceiverInfo receiverInfo = packet.getReceiverInfo();
-
-        Decision decision;
-        if (cloudSystem.getReceiver(receiverInfo.getName()) != null) {
-            decision = null;
-        } else {
-            if (!cloudSystem.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-                decision = Decision.MAYBE;
-            } else {
-                if (key.equalsIgnoreCase(packet.getKey())) {
-                    decision = Decision.TRUE;
-                    cloudSystem.getReceivers().add(receiverInfo);
-                    cloudSystem.reload();
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§aReceiver §h[§2" + receiverInfo.getName() + "@" + UUID.randomUUID() + "§h] §aconnected!");
-                } else {
-                    decision = Decision.FALSE;
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cReceiver §e" + receiverInfo.getName() + " §cprovided a wrong key and couldn't connect!");
-                }
-            }
-        }
-        cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketReceiverLoginResult(receiverInfo, decision, this.cloudSystem.getService(GroupService.class).getGroups()));
+        cloudSystem.getReceiverManager().registerReceiver(packet.getKey(), packet.getReceiverInfo());
     }
 
 }
