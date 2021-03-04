@@ -35,8 +35,7 @@ public class Scheduler extends CloudService {
 
 	public void cancelTask(Task id) {
 		id.cancel();
-		if (schedulerMap.containsKey(id.getId()))
-			schedulerMap.remove(id.getId());
+		schedulerMap.remove(id.getId());
 	}
 
 	public void cancelAll() {
@@ -106,9 +105,9 @@ public class Scheduler extends CloudService {
 			return null;
 		}
 		int id = 0;
-		for (int i = 1; i > 0; ++i) {
-			if (!schedulerMap.containsKey(i)) {
-				id = i;
+		while (true) {
+			if (!schedulerMap.containsKey(id)) {
+				id++;
 				break;
 			}
 		}

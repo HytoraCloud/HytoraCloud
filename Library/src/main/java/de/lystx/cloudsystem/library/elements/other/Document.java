@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Getter @Setter
-public class Document implements Serializable {
+public class Document {
 
     private final Gson gson;
     private final File file;
@@ -54,7 +54,9 @@ public class Document implements Serializable {
         if (file != null) {
             try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
                 jsonObject = parser.parse(new BufferedReader(reader)).getAsJsonObject();
-            } catch (Exception ex) {}
+            } catch (Exception ignored) {
+
+            }
         }
         if (input != null) {
             JsonElement jsonElement;
@@ -339,12 +341,12 @@ public class Document implements Serializable {
     }
 
     public void save(File file) {
-        try {
-            PrintWriter w = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), true);
+        try (PrintWriter w = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), true)) {
             w.print(gson.toJson(this.getJsonObject()));
             w.flush();
-            w.close();
-        } catch (Exception var2) {}
+        } catch (Exception ignored) {
+
+        }
     }
 
     public String toString() {

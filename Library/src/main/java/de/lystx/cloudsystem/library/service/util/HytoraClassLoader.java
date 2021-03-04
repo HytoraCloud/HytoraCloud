@@ -31,17 +31,18 @@ public class HytoraClassLoader {
         try {
             JarFile jf = new JarFile(this.file);
             JarEntry je = jf.getJarEntry(filename);
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(jf.getInputStream(je)));
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                builder.append(line);
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(jf.getInputStream(je)))) {
+                StringBuilder builder = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    builder.append(line);
+                }
+                jf.close();
+                br.close();
+                return builder.toString();
+            } catch (Exception e) {
+                return null;
             }
-            jf.close();
-            br.close();
-            return builder.toString();
-
         } catch (IOException e) {
             return null;
         }

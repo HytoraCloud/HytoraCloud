@@ -159,6 +159,7 @@ public class CloudAPI {
             try {
                 Thread.sleep(0, 500000);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
         }

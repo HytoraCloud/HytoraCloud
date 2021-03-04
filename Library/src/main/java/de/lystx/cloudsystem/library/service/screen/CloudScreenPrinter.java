@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Getter
-public class CloudScreenPrinter extends Thread {
+public class CloudScreenPrinter {
 
     private final CloudConsole colouredConsoleProvider;
     private final CloudLibrary hytoraLibrary;
@@ -45,7 +45,6 @@ public class CloudScreenPrinter extends Thread {
         if (this.screen == null) {
             return;
         }
-        this.interrupt();
         this.hytoraLibrary.getConsole().getLogger().sendMessage("INFO", "§cYou left the §esession §cof the service §e" + this.screen.getName() + "§c!");
         try {
             this.screen.stop();

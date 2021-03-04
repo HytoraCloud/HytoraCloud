@@ -115,8 +115,7 @@ public class FileService extends CloudService {
     public void check() {
         this.cloudDirectory.mkdirs();
 
-        if (!this.startSh.exists() || !this.startSh.exists()) {
-
+        if (!this.startSh.exists() || !this.startBat.exists()) {
             this.copyFileWithURL("/implements/start/start.bat", this.startBat);
             this.copyFileWithURL("/implements/start/start.sh", this.startSh);
             System.exit(0);
@@ -166,7 +165,9 @@ public class FileService extends CloudService {
                 }
             }
 
-        } catch (IOException e) {}
+        } catch (IOException e) {
+
+        }
     }
 
     public void copyFileWithURL(String filename, File location) {
