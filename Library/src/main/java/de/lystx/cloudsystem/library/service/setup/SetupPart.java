@@ -8,15 +8,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface SetupPart {
-    int id();
+    int id(); //ID of the question
 
-    String[] forbiddenAnswers() default {};
-    String[] onlyAnswers() default {};
-    String[] changeAnswers() default {};
+    String[] forbiddenAnswers() default {}; //Answers that are not allowed
+    String[] onlyAnswers() default {}; //Anwsers that are only allowe
+    String[] changeAnswers() default {}; //Answers that change
 
-    String[] exitAfterAnswer() default {};
+    String[] exitAfterAnswer() default {}; //Exit after a given answer
 
-    GoTo goTo() default @GoTo(id = -1, value = "", elseID = -1);
+    GoTo goTo() default @GoTo(id = -1, value = "", elseID = -1); //Goto after a value
 
-    String question();
+    String question(); //Given question
 }

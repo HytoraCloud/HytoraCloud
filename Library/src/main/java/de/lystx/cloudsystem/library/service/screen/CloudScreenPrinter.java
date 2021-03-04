@@ -33,6 +33,10 @@ public class CloudScreenPrinter {
         this.executorService = Executors.newFixedThreadPool(1);
     }
 
+    /**
+     * Sets current screen
+     * @param cloudScreen
+     */
     public void create(CloudScreen cloudScreen) {
         this.screen = cloudScreen;
         this.inputStream = null;
@@ -40,6 +44,9 @@ public class CloudScreenPrinter {
         this.inScreen = true;
     }
 
+    /**
+     * Leaves current screen
+     */
     public void quitCurrentScreen() {
         this.inScreen = false;
         if (this.screen == null) {

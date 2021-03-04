@@ -31,6 +31,9 @@ public class StatisticsService extends CloudService {
         this.load();
     }
 
+    /**
+     * Loads service
+     */
     public void load() {
         this.statistics = new Statistics();
         this.statistics.setFile(this.file);
@@ -42,6 +45,9 @@ public class StatisticsService extends CloudService {
         this.getCloudLibrary().getWebServer().update("stats", this.statistics.toVson());
     }
 
+    /**
+     * Saves service
+     */
     public void save() {
         this.statistics.save(this.file);
     }

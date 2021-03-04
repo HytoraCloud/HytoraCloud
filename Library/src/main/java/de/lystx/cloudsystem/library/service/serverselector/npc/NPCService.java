@@ -26,6 +26,9 @@ public class NPCService extends CloudService {
         this.load();
     }
 
+    /**
+     * Loads config and all NPCs
+     */
     public void load() {
         try {
             this.document = new VsonObject(getCloudLibrary().getService(FileService.class).getNpcFile(), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
@@ -65,6 +68,10 @@ public class NPCService extends CloudService {
         }
     }
 
+    /**
+     * Get NPCConfig
+     * @return NPCConfig
+     */
     public NPCConfig getNPCConfig() {
         this.load();
         VsonArray vsonArray = this.config.getArray("items");
@@ -75,14 +82,26 @@ public class NPCService extends CloudService {
         return new NPCConfig(this.config.getInteger("inventoryRows", 0), this.config.getString("inventoryTitle"), this.config.getBoolean("corners"), this.config.getString("connectingMessage"), this.config.getString("itemName"), this.config.getList("lore", String.class), this.config.getString("itemType"), vsonObjects);
     }
 
+    /**
+     * Saves NPC
+     * @param key
+     * @param vsonObject
+     */
     public void append(String key, VsonObject vsonObject) {
         this.document.append(key, vsonObject);
     }
 
+    /**
+     * Deletes NPC
+     * @param key
+     */
     public void remove(String key) {
         this.document.remove(key);
     }
 
+    /**
+     * Saves Config and NPCs
+     */
     public void save() {
         try {
             this.document.save();

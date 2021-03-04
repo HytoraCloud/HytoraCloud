@@ -16,6 +16,14 @@ public class CloudSign implements Serializable {
     private final String group;
     private final String world;
 
+    /**
+     * Constructs a CloudSign
+     * @param x
+     * @param y
+     * @param z
+     * @param group
+     * @param world
+     */
     public CloudSign(Integer x, Integer y, Integer z, String group, String world) {
         this.x = x;
         this.uuid = UUID.randomUUID();

@@ -22,11 +22,15 @@ public class ServiceProviderStop {
         this.service = service;
     }
 
-
+    /**
+     * Stops service
+     * @param service
+     * @return
+     */
     public boolean stopService(Service service) {
         try {
             String serverName = service.getName();
-            CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getScreenByName(serverName);
+            CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getMap().get(serverName);
             if (screen == null || screen.getServerDir() == null) {
                 return false;
             }
@@ -59,7 +63,7 @@ public class ServiceProviderStop {
                 }, 5L);
             }
             this.service.notifyStop(service);
-            this.cloudLibrary.getService(ScreenService.class).unregisterScreen(screen);
+            this.cloudLibrary.getService(ScreenService.class).getMap().remove(screen.getName());
             return true;
         } catch (Exception e) {
             return true;

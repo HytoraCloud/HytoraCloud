@@ -5,7 +5,7 @@ import de.lystx.cloudsystem.library.service.setup.SetupPart;
 import lombok.Getter;
 
 @Getter
-public class PermissionGroupSetup extends Setup {
+public class PermissionGroupSetup extends Setup<PermissionGroupSetup> {
 
     @SetupPart(id = 1, question = "How should this group be called?", forbiddenAnswers = {""})
     private String groupName;

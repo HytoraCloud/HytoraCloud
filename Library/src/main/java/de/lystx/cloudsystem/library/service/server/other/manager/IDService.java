@@ -13,6 +13,11 @@ public class IDService {
         this.serverIdList = new HashMap<>();
     }
 
+    /**
+     * Returns free ID
+     * @param group
+     * @return
+     */
     public int getFreeID(String group) {
         if (!this.serverIdList.containsKey(group)) {
             List<String> ids = new ArrayList<>();
@@ -32,6 +37,11 @@ public class IDService {
         }
     }
 
+    /**
+     * Marks ID as unused
+     * @param group
+     * @param id
+     */
     public void removeID(String group, int id) {
         List<String> ids = this.serverIdList.getOrDefault(group, new LinkedList<>());
         ids.remove(String.valueOf(id));

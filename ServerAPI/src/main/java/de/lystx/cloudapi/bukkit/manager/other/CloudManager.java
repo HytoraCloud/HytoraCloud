@@ -1,12 +1,17 @@
 package de.lystx.cloudapi.bukkit.manager.other;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceStateChange;
 import de.lystx.cloudsystem.library.enums.ServiceState;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 @Getter @Setter
@@ -28,13 +33,11 @@ public class CloudManager {
         }
         this.maxPlayers = Bukkit.getMaxPlayers();
         this.motd = Bukkit.getMotd();
-
     }
 
     public void update() {
-        String bukkitversion = this.getBukkitVersion();
         try {
-            Object playerlist = Class.forName("org.bukkit.craftbukkit." + bukkitversion    + ".CraftServer").getDeclaredMethod("getHandle", null).invoke(Bukkit.getServer(), null);
+            Object playerlist = Reflections.getCraftBukkitClass("CraftServer").getDeclaredMethod("getHandle", null).invoke(Bukkit.getServer(), null);
             Field maxplayers = playerlist.getClass().getSuperclass().getDeclaredField("maxPlayers");
             maxplayers.setAccessible(true);
             maxplayers.set(playerlist, this.maxPlayers);
@@ -43,19 +46,24 @@ public class CloudManager {
         }
         Object minecraftserver;
         try {
-            minecraftserver = Class.forName("org.bukkit.craftbukkit." + bukkitversion + ".CraftServer").getDeclaredMethod("getServer", null).invoke(Bukkit.getServer(), null);
+            minecraftserver = Reflections.getCraftBukkitClass("CraftServer").getDeclaredMethod("getServer", null).invoke(Bukkit.getServer(), null);
             Field f = minecraftserver.getClass().getSuperclass().getDeclaredField("motd");
             f.setAccessible(true);
             f.set(minecraftserver, this.motd);
-        } catch (IllegalAccessException|java.lang.reflect.InvocationTargetException|NoSuchMethodException|ClassNotFoundException|NoSuchFieldException e) {
+        } catch (IllegalAccessException|java.lang.reflect.InvocationTargetException|NoSuchMethodException| NoSuchFieldException e) {
             e.printStackTrace();
         }
+        try {
+            VsonObject vsonObject = new VsonObject(new File("./CLOUD/connection.json"), VsonSettings.OVERRITE_VALUES);
+            vsonObject.append("serviceState", this.serviceState);
+            vsonObject.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         this.cloudAPI.sendPacket(new PacketPlayInServiceStateChange(cloudAPI.getService(), this.serviceState));
     }
 
-
-    private String getBukkitVersion() {
-        return Bukkit.getServer().getClass().getPackage().getName().substring(23);
-    }
 
 }

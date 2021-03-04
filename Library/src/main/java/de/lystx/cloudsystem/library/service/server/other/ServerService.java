@@ -80,6 +80,11 @@ public class ServerService extends CloudService {
         this.startServices();
     }
 
+    /**
+     * Updates a group
+     * @param group
+     * @param newGroup
+     */
     public void updateGroup(ServiceGroup group, ServiceGroup newGroup) {
         List<Service> list = this.getServices(this.getGroup(group.getName()));
         this.services.remove(this.getGroup(group.getName()));
@@ -87,7 +92,7 @@ public class ServerService extends CloudService {
 
         for (Service service : this.getServices(this.getGroup(group.getName()))) {
             service.setServiceGroup(newGroup);
-            CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getScreenByName(service.getName());
+            CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getMap().get(service.getName());
 
             try {
                 VsonObject document = new VsonObject(new File(screen.getServerDir(), "CLOUD/connection.json"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
@@ -99,6 +104,10 @@ public class ServerService extends CloudService {
         }
     }
 
+    /**
+     * Sends notify to console
+     * @param service
+     */
     public void notifyStart(Service service) {
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
@@ -118,6 +127,10 @@ public class ServerService extends CloudService {
 
     }
 
+    /**
+     * Sends stop notify
+     * @param service
+     */
     public void notifyStop(Service service) {
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
@@ -137,6 +150,11 @@ public class ServerService extends CloudService {
         this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7has §4stopped §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name());
     }
 
+    /**
+     * Updates service
+     * @param service
+     * @param state
+     */
     public void updateService(Service service, ServiceState state) {
         List<Service> services = this.getServices(service.getServiceGroup());
         services.remove(service);
@@ -145,10 +163,17 @@ public class ServerService extends CloudService {
         this.services.put(service.getServiceGroup(), services);
     }
 
+    /**
+     * Starts services
+     */
     public void startServices() {
         this.startServices(this.serviceGroups);
     }
 
+    /**
+     * Starts services from list
+     * @param serviceGroups
+     */
     public void startServices(List<ServiceGroup> serviceGroups) {
         for (ServiceGroup serviceGroup : serviceGroups) {
             for (int i = 0; i < serviceGroup.getMinServer(); i++) {
@@ -188,6 +213,10 @@ public class ServerService extends CloudService {
         }, 3L);
     }
 
+    /**
+     * Registers service after packetHandler handled
+     * @param service
+     */
     public void registerService(Service service) {
         List<Service> list = this.getServices(service.getServiceGroup());
         Service s = this.getService(service.getName());
@@ -209,6 +238,10 @@ public class ServerService extends CloudService {
 
     }
 
+    /**
+     * Checks if serviceGroup needs services
+     * @param serviceGroup
+     */
     public void needServices(ServiceGroup serviceGroup) {
         if (!this.getCloudLibrary().isRunning()) {
             return;
@@ -226,6 +259,13 @@ public class ServerService extends CloudService {
         }, 3L);
     }
 
+    /**
+     * Starts service
+     * @param serviceGroup
+     * @param service
+     * @param properties
+     * @returns VsonObject response
+     */
     public VsonObject startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
         VsonObject document = new VsonObject();
         if (!this.getCloudLibrary().isRunning()) {
@@ -275,14 +315,31 @@ public class ServerService extends CloudService {
         }
         return document;
     }
+
+    /**
+     * Starts service from group
+     * @param serviceGroup
+     * @param service
+     */
     public void startService(ServiceGroup serviceGroup, Service service) {
         this.startService(serviceGroup, service, null);
     }
 
+    /**
+     * Starts service with no properties
+     * @param serviceGroup
+     * @return
+     */
     public VsonObject startService(ServiceGroup serviceGroup) {
         return this.startService(serviceGroup, (SerializableDocument) null);
     }
 
+    /**
+     * Starts service with properties
+     * @param serviceGroup
+     * @param properties
+     * @return
+     */
     public VsonObject startService(ServiceGroup serviceGroup, SerializableDocument properties) {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
@@ -290,11 +347,19 @@ public class ServerService extends CloudService {
         return this.startService(serviceGroup, service, properties);
     }
 
-
+    /**
+     * Stops service
+     * @param service
+     */
     public void stopService(Service service) {
         this.stopService(service, true);
     }
 
+    /**
+     * Stops service
+     * @param service
+     * @param newServices > Should new services start if needed
+     */
     public void stopService(Service service, boolean newServices) {
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
@@ -326,6 +391,9 @@ public class ServerService extends CloudService {
         }
     }
 
+    /**
+     * Stops all services
+     */
     public void stopServices() {
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
@@ -353,9 +421,19 @@ public class ServerService extends CloudService {
         }
     }
 
+    /**
+     * Stops services from group
+     * @param serviceGroup
+     */
     public void stopServices(ServiceGroup serviceGroup) {
         this.stopServices(serviceGroup, true);
     }
+
+    /**
+     * Stops services from group
+     * @param serviceGroup
+     * @param newOnes > Should new ones start
+     */
     public void stopServices(ServiceGroup serviceGroup, boolean newOnes) {
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
             return;
@@ -371,6 +449,11 @@ public class ServerService extends CloudService {
         }
     }
 
+    /**
+     * Returns all services from a group
+     * @param serviceGroup
+     * @return
+     */
     public List<Service> getServices(ServiceGroup serviceGroup) {
         List<Service> list = this.services.get(this.getGroup(serviceGroup.getName()));
         if (list == null) list = new LinkedList<>();
@@ -378,16 +461,11 @@ public class ServerService extends CloudService {
         return list;
     }
 
-    public List<Service> getRealOnlineServices() {
-        List<Service> services = new LinkedList<>();
-        for (Service globalService : this.globalServices) {
-            if (this.getService(globalService.getName()) != null) {
-                services.add(globalService);
-            }
-        }
-        return services;
-    }
-
+    /**
+     * Returns services by name
+     * @param name
+     * @return
+     */
     public Service getService(String name) {
         try {
             for (List<Service> value : this.services.values()) {
@@ -403,13 +481,13 @@ public class ServerService extends CloudService {
         return null;
     }
 
+    /**
+     * Returns group by name
+     * @param name
+     * @return
+     */
     public ServiceGroup getGroup(String name) {
-        for (ServiceGroup serviceGroup : this.services.keySet()) {
-            if (serviceGroup.getName().equalsIgnoreCase(name)) {
-                return serviceGroup;
-            }
-        }
-        return null;
+        return this.services.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
 }

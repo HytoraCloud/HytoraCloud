@@ -27,6 +27,9 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     }
 
 
+    /**
+     * Starts Thread
+     */
     public void run() {
         while (!this.isInterrupted()) {
             try {
@@ -47,6 +50,9 @@ public class CloudConsole extends Thread implements CloudCommandSender {
         }
     }
 
+    /**
+     * Clears screen
+     */
     public void clearScreen() {
         for (int i = 0; i < 100; i++) {
             System.out.println(" ");

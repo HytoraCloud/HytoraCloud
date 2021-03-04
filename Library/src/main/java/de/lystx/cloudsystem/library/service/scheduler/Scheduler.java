@@ -20,32 +20,49 @@ public class Scheduler extends CloudService {
 		this.schedulerMap = new ConcurrentHashMap<>();
 	}
 
-
+	/**
+	 * Task by ID
+	 * @param id
+	 * @return Task by ID
+	 */
 	public Task getTask(int id) {
-		if (schedulerMap.containsKey(id))
-			return schedulerMap.get(id);
-		return null;
+		return schedulerMap.getOrDefault(id, null);
 	}
 
+	/**
+	 * Cancels a task
+	 * @param id
+	 */
 	public void cancelTask(int id) {
-		if (schedulerMap.containsKey(id)) {
-			schedulerMap.get(id).cancel();
-			schedulerMap.remove(id);
-		}
+		this.cancelTask(this.getTask(id));
 	}
 
+	/**
+	 * Cancels a single Task
+	 * @param id
+	 */
 	public void cancelTask(Task id) {
-		id.cancel();
+		id.setCancelled(true);
 		schedulerMap.remove(id.getId());
 	}
 
-	public void cancelAll() {
+	/**
+	 * Cancels all tasks
+	 */
+	public void cancelTasks() {
 		for (Integer r : schedulerMap.keySet()) {
-			schedulerMap.get(r).cancel();
+			schedulerMap.get(r).setCancelled(true);
 		}
 		schedulerMap.clear();
 	}
 
+	/**
+	 * Schedules while something
+	 * @param run
+	 * @param delay
+	 * @param repeat
+	 * @return task ID
+	 */
 	public int scheduleAsyncWhile(Runnable run, long delay, long repeat) {
 		int taskid = new Random().nextInt(2147483647);
 		Task task = new Task(true, run, taskid, false);
@@ -53,54 +70,105 @@ public class Scheduler extends CloudService {
 		return task.getId();
 	}
 
+	/**
+	 * Schedules something for times
+	 * @param task
+	 * @param delay
+	 * @param period
+	 * @param times
+	 * @return task ID
+	 */
 	public Task scheduleRepeatingTaskForTimes(Runnable task, long delay, long period, long times) {
 		return scheduleRepeatingTaskForTimes(task, delay, period, times, false);
 	}
 
+	/**
+	 * Schedules something for times
+	 * But asynchronous
+	 * @param task
+	 * @param delay
+	 * @param period
+	 * @param times
+	 * @return task ID
+	 */
 	public Task scheduleRepeatingTaskAsync(Runnable task, long delay, long period, long times) {
 		return scheduleRepeatingTaskForTimes(task, delay, period, times, true);
 	}
 
+	/**
+	 * Schedules something repeating
+	 * @param task
+	 * @param delay
+	 * @param period
+	 * @return task ID
+	 */
 	public Task scheduleRepeatingTask(Runnable task, long delay, long period) {
 		return scheduleRepeatingTask(task, delay, period, false);
 	}
 
+	/**
+	 * Schedules something repeating
+	 * But asynchronous
+	 * @param task
+	 * @param delay
+	 * @param period
+	 * @return task ID
+	 */
 	public Task scheduleRepeatingTaskAsync(Runnable task, long delay, long period) {
 		return scheduleRepeatingTask(task, delay, period, true);
 	}
 
+	/**
+	 * Runs a task
+	 * @param task
+	 * @return task
+	 */
 	public Task runTask(Runnable task) {
-		final Task t = runTask(task, false, false);
-		new Thread(new Runnable() {
-			public void run() {
-				cancelTask(t);
-				Thread.interrupted();
-			}
-		}).start();
-		return t;
+		Task task1 = this.runTask(task, false, false);
+		new Thread(() -> { cancelTask(task1);Thread.interrupted();}).start();
+		return task1;
 	}
 
+	/**
+	 * Runs a task
+	 * But asynchronous
+	 * @param task
+	 * @return task
+	 */
 	public Task runTaskAsync(Runnable task) {
-		final Task t = runTask(task, true, false);
-		new Thread(new Runnable() {
-			public void run() {
-				t.run();
-				cancelTask(t);
-				Thread.interrupted();
-			}
-		}).start();
-		return t;
+		Task task1 = runTask(task, true, false);
+		new Thread(() -> { task1.run();cancelTask(task1);Thread.interrupted(); }).start();
+		return task1;
 	}
 
+	/**
+	 * Schedules a task delayed
+	 * @param task
+	 * @param delay
+	 * @return task
+	 */
 	public Task scheduleDelayedTask(Runnable task, long delay) {
 		return delayTask(task, delay, false);
 	}
 
-
+	/**
+	 * Schedules a task delayed
+	 * But asynchronous
+	 * @param task
+	 * @param delay
+	 * @return task
+	 */
 	public Task scheduleDelayedTaskAsync(Runnable task, long delay) {
 		return delayTask(task, delay, true);
 	}
 
+	/**
+	 * Runs a task (private Method)
+	 * @param task
+	 * @param async
+	 * @param multipleTimes
+	 * @return task
+	 */
 	private Task runTask(Runnable task, boolean async, boolean multipleTimes) {
 		if (task == null) {
 			return null;
@@ -114,15 +182,24 @@ public class Scheduler extends CloudService {
 		}
 		try {
 			schedulerMap.put(id, new Task(!async, task, id, multipleTimes));
-		} catch (Exception ignored) {}
+		} catch (Exception e) {
+			//ignoring this error
+		}
 		return schedulerMap.get(id);
 	}
 
+	/**
+	 * Delays Task (Private Method)
+	 * @param task
+	 * @param delay
+	 * @param async
+	 * @return task
+	 */
 	private Task delayTask(Runnable task, long delay, boolean async) {
 		if (delay < 0) {
 			return null;
 		}
-		final Task t = runTask(task, async, false);
+		Task t = runTask(task, async, false);
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 					t.run();
@@ -134,6 +211,14 @@ public class Scheduler extends CloudService {
 		return t;
 	}
 
+	/**
+	 * Repeats task (private Method)
+	 * @param task
+	 * @param delay
+	 * @param period
+	 * @param async
+	 * @return Task
+	 */
 	private Task scheduleRepeatingTask(Runnable task, long delay, long period, boolean async) {
 		if (period < 0) {
 			return null;
@@ -141,7 +226,7 @@ public class Scheduler extends CloudService {
 		if (delay < 0) {
 			return null;
 		}
-		final Task t = runTask(task, async, true);
+		Task t = runTask(task, async, true);
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 					t.run();
@@ -151,10 +236,19 @@ public class Scheduler extends CloudService {
 					Thread.interrupted();
 					}
 			}
-		}, delay*50, period*50);
+		}, delay * 50, period * 50);
 		return t;
 	}
 
+	/**
+	 * Repeats for times
+	 * @param task
+	 * @param delay
+	 * @param period
+	 * @param times
+	 * @param async
+	 * @return Task
+	 */
 	private Task scheduleRepeatingTaskForTimes(Runnable task, long delay, long period, final long times, boolean async) {
 		if (times <= 0) {
 			return null;
@@ -169,13 +263,13 @@ public class Scheduler extends CloudService {
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 					t.run();
-					if(t.isCancelled()||t.runTimes()>=times) {
+					if(t.isCancelled()||t.getRunTimes()>=times) {
 					cancelTask(t);
 					cancel();
 					Thread.interrupted();
 					}
 			}
-		}, delay*50, period*50);
+		}, delay * 50, period * 50);
 		return t;
 	}
 }

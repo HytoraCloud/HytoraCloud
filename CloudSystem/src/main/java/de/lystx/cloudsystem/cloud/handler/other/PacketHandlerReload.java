@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.handler.other;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 
 
 public class PacketHandlerReload  {

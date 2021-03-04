@@ -18,7 +18,12 @@ public class LoggerService extends CloudService {
 
     private ConsoleReader consoleReader;
 
-
+    /**
+     * Loads logger
+     * @param cloudLibrary
+     * @param name
+     * @param type
+     */
     public LoggerService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         if (!Constants.NEEDS_DEPENDENCIES) {
@@ -36,10 +41,19 @@ public class LoggerService extends CloudService {
         }
     }
 
+    /**
+     * Sends message with prefix
+     * @param prefix
+     * @param message
+     */
     public void sendMessage(String prefix, String message) {
         this.sendMessage("§7[§9" + prefix.toUpperCase() + "§7] §b" + message);
     }
 
+    /**
+     * Sends message to console
+     * @param message
+     */
     public void sendMessage(String message) {
         try {
             message = ConsoleColor.formatColorString(message);

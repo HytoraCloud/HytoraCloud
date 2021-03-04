@@ -16,6 +16,10 @@ public class CloudConnection implements Serializable {
     private final String name;
     private final String address;
 
+    /**
+     * Closes connection
+     * @param reason
+     */
     public void disconnect(String reason) {
         Constants.EXECUTOR.sendPacket(new PacketCommunicationKick(this.name, reason));
     }

@@ -34,6 +34,10 @@ public class NetworkConfig implements Serializable {
     private FallbackConfig fallbackConfig;
 
 
+    /**
+     * Create default Config for everything
+     * @return VsonObject
+     */
     public static VsonObject defaultConfig() {
         return new VsonObject()
                 .append("host", "127.0.0.1")

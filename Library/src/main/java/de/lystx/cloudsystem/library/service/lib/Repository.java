@@ -12,8 +12,7 @@ public enum Repository {
     SONATYPE("https://oss.sonatype.org/content/repositories/releases/"),
     JCENTER("https://jcenter.bintray.com"),
     MINECRAFT_SPIGOT("https://your-repo.net/"),
-    MINECRAFT_BUNGEECORD("https://oss.sonatype.org/content/repositories/snapshots")
-    ;
+    MINECRAFT_BUNGEECORD("https://oss.sonatype.org/content/repositories/snapshots");
     
     
     private final String url;

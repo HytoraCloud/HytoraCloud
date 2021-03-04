@@ -43,6 +43,9 @@ public class NettyServer {
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
     }
 
+    /**
+     * Starts server with netty
+     */
     public void start() {
 
         EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
@@ -96,6 +99,10 @@ public class NettyServer {
     }
 
 
+    /**
+     * Sends packet
+     * @param packet
+     */
     public void sendPacket(Packet packet) {
         for (Channel registeredChannel : registeredChannels) {
             registeredChannel.writeAndFlush(packet).addListener((ChannelFutureListener) channelFuture -> {

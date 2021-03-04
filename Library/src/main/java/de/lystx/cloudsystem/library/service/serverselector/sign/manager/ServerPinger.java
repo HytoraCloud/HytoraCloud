@@ -23,6 +23,13 @@ public class ServerPinger {
     private InputStream inputStream = null;
     private InputStreamReader inputStreamReader = null;
 
+    /**
+     * Pings Server and sets fields to returned values
+     * @param adress
+     * @param port
+     * @param timeout
+     * @throws IOException
+     */
     public void pingServer(final String adress, final int port, final int timeout) throws IOException {
         this.socket = new Socket();
         this.socket.setSoTimeout(timeout);
@@ -74,6 +81,10 @@ public class ServerPinger {
         }
     }
 
+    /**
+     * Stops pinging server
+     * @throws IOException
+     */
     private void close() throws IOException {
         dataOutputStream.close();
         outputStream.close();

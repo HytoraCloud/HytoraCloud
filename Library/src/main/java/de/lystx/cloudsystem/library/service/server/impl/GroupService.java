@@ -29,6 +29,9 @@ public class GroupService extends CloudService {
         this.loadGroups();
     }
 
+    /**
+     * Loads all groups
+     */
     public void loadGroups() {
         if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             for (File file : this.getCloudLibrary().getService(FileService.class).getGroupsDirectory().listFiles()) {
@@ -48,6 +51,10 @@ public class GroupService extends CloudService {
         }
     }
 
+    /**
+     * Creates a group
+     * @param serviceGroup
+     */
     public void createGroup(ServiceGroup serviceGroup) {
         if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
@@ -63,6 +70,10 @@ public class GroupService extends CloudService {
         }
     }
 
+    /**
+     * Deletes a group
+     * @param serviceGroup
+     */
     public void deleteGroup(ServiceGroup serviceGroup) {
         if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
@@ -81,6 +92,11 @@ public class GroupService extends CloudService {
 
     }
 
+    /**
+     * Updates a group
+     * @param serviceGroup
+     * @param newServiceGroup
+     */
     public void updateGroup(ServiceGroup serviceGroup, ServiceGroup newServiceGroup) {
         if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
@@ -98,16 +114,22 @@ public class GroupService extends CloudService {
         }
     }
 
+    /**
+     * Gets a group by name
+     * @param name
+     * @return
+     */
     public ServiceGroup getGroup(String name) {
         return this.getGroup(name, this.groups);
     }
 
+    /**
+     * Returns group by name within list
+     * @param name
+     * @param groups
+     * @return
+     */
     public ServiceGroup getGroup(String name, List<ServiceGroup> groups) {
-        for (ServiceGroup group : groups) {
-            if (group.getName().equals(name)) {
-                return group;
-            }
-        }
-        return null;
+        return groups.stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 }

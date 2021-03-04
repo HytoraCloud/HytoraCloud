@@ -19,14 +19,25 @@ public class CloudNetworkService extends CloudService {
         this.start();
     }
 
+    /**
+     * Sends a packet
+     * @param packet
+     */
     public void sendPacket(Packet packet) {
         this.cloudServer.sendPacket(packet);
     }
 
+    /**
+     * Registers a class object
+     * @param packetHandlerAdapter
+     */
     public void registerHandler(Object packetHandlerAdapter) {
         this.cloudServer.registerPacketHandler(packetHandlerAdapter);
     }
 
+    /**
+     * Starts server in thread
+     */
     public void start() {
         Thread server = new Thread(() -> {
             this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
@@ -35,6 +46,9 @@ public class CloudNetworkService extends CloudService {
         server.start();
     }
 
+    /**
+     * Stops server
+     */
     public void shutdown() {
         this.cloudServer.disconnect();
     }

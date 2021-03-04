@@ -23,7 +23,10 @@ public class EventService extends CloudService {
         this.registeredClasses = new HashMap<>();
     }
 
-
+    /**
+     * Registers an EventClass
+     * @param o
+     */
     public void registerEvent(Object o) {
         List<EventMethod> eventMethods = new ArrayList<>();
 
@@ -42,10 +45,19 @@ public class EventService extends CloudService {
         registeredClasses.put(o, eventMethods);
     }
 
+    /**
+     * Unregisters a class
+     * @param instance
+     */
     public void unregister(Object instance) {
         registeredClasses.remove(instance);
     }
-    
+
+    /**
+     * Calls an event
+     * @param event
+     * @return if cancelled
+     */
     public boolean callEvent(Event event) {
         try {
             registeredClasses.forEach((object, methodList) -> {

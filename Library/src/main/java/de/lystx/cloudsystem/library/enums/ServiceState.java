@@ -1,7 +1,11 @@
 package de.lystx.cloudsystem.library.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.io.Serializable;
 
+@Getter @AllArgsConstructor
 public enum ServiceState implements Serializable {
 
 
@@ -11,15 +15,6 @@ public enum ServiceState implements Serializable {
     INGAME("§c"),
     LOBBY("§a");
 
-
     private final String color;
 
-    ServiceState(String color) {
-        this.color = color;
-    }
-
-
-    public String getColor() {
-        return color;
-    }
 }

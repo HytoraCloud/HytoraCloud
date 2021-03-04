@@ -12,6 +12,11 @@ import java.util.UUID;
 @Getter
 public class DefaultCloudPlayerData extends CloudPlayerData {
 
+    /**
+     * Creates default data
+     * @param uuid
+     * @param name
+     */
     public DefaultCloudPlayerData(UUID uuid, String name) {
         super(uuid, name, Collections.singletonList(new PermissionEntry(uuid, "Player", "")), new LinkedList<>(), "0", true, new Date().getTime(), 0L);
         this.setDefault(true);

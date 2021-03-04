@@ -41,14 +41,27 @@ public class PermissionPool implements Serializable {
         this.format = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss", Locale.GERMAN);
     }
 
+    /**
+     * Checks if pool is available
+     * @return boolean
+     */
     public boolean isAvailable() {
         return (!this.permissionGroups.isEmpty() || !this.playerCache.isEmpty());
     }
 
+    /**
+     * Updates the permissionPool
+     */
     public void update() {
         Constants.EXECUTOR.sendPacket(new PacketPlayInPermissionPool(this));
     }
 
+    /**
+     * Adds or removes a permission from a player
+     * @param name
+     * @param permission
+     * @param add
+     */
     public void updatePermissionEntry(String name, String permission, boolean add) {
         CloudPlayerData data = this.getPlayerData(name);
         if (data == null) {
@@ -65,6 +78,11 @@ public class PermissionPool implements Serializable {
         this.playerCache.add(data);
     }
 
+    /**
+     * Updates Playerdata
+     * @param playerName
+     * @param newData
+     */
     public void updatePlayerData(String playerName, CloudPlayerData newData) {
         CloudPlayerData oldData = this.getPlayerData(playerName);
         if (oldData == null) {
@@ -73,16 +91,28 @@ public class PermissionPool implements Serializable {
         this.playerCache.set(this.playerCache.indexOf(oldData), newData);
     }
 
+    /**
+     * Checks for lowest ID if none is found returns DefaultPermissionGroup.class
+     * @return default permissionGroup
+     */
     public PermissionGroup getDefaultPermissionGroup() {
         this.permissionGroups.sort(Comparator.comparingInt(PermissionGroup::getId));
         try {
             if (!this.permissionGroups.isEmpty()) {
                 return this.permissionGroups.get(this.permissionGroups.size() - 1);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            //Ignoring
+        }
         return new DefaultPermissionGroup();
     }
 
+    /**
+     * Checks if rank of player is valid
+     * @param playerName
+     * @param permissionGroup
+     * @return valid
+     */
     public boolean isRankValid(String playerName, PermissionGroup permissionGroup) {
         CloudPlayerData data = this.getPlayerData(playerName);
         if (data == null) {
@@ -96,35 +126,41 @@ public class PermissionPool implements Serializable {
         try {
             Date date1 = new Date();
             Date date2 = this.format.parse(bis);
-            return (this.getDateDiff(date1, date2) >= 1);
+            long diffInMillies = date2.getTime() - date1.getTime();
+            long d =  TimeUnit.MILLISECONDS.convert(diffInMillies,TimeUnit.MILLISECONDS);
+            return (d >= 1);
         } catch (ParseException e) {
             return false;
         }
     }
 
-    private long getDateDiff(Date date1, Date date2) {
-        long diffInMillies = date2.getTime() - date1.getTime();
-        return TimeUnit.MILLISECONDS.convert(diffInMillies,TimeUnit.MILLISECONDS);
-    }
-
+    /**
+     * Removes a group from a player
+     * @param playerName
+     * @param group
+     */
     public void removePermissionGroup(String playerName, PermissionGroup group) {
-        try {
-            CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
-            if (data == null) {
-                return;
-            }
-            this.playerCache.remove(data);
-            List<PermissionEntry> permissionEntries = data.getPermissionEntries();
-            PermissionEntry permissionEntry = data.getForGroup(group.getName());
-            permissionEntries.remove(permissionEntry);
-            data.setPermissionEntries(permissionEntries);
-            this.playerCache.add(data);
-            if (cloudLibrary != null) {
-                cloudLibrary.getService(EventService.class).callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
-            }
-        } catch (Exception e) {}
+        CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
+        if (data == null) {
+            return;
+        }
+        this.playerCache.remove(data);
+        List<PermissionEntry> permissionEntries = data.getPermissionEntries();
+        PermissionEntry permissionEntry = data.getForGroup(group.getName());
+        permissionEntries.remove(permissionEntry);
+        data.setPermissionEntries(permissionEntries);
+        this.playerCache.add(data);
+        if (cloudLibrary != null) {
+            cloudLibrary.getService(EventService.class).callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
+        }
     }
 
+    /**
+     * Gives a permission to a group or removes a permission
+     * @param permissionGroup
+     * @param permission
+     * @param add
+     */
     public void updatePermissionGroupEntry(PermissionGroup permissionGroup, String permission, boolean add) {
         PermissionGroup group = this.getPermissionGroupFromName(permissionGroup.getName());
         if (add) {
@@ -135,12 +171,23 @@ public class PermissionPool implements Serializable {
         this.permissionGroups.set(this.permissionGroups.indexOf(group), group);
     }
 
+    /**
+     * Updates a permissionGroup
+     * @param permissionGroup
+     */
     public void updatePermissionGroup(PermissionGroup permissionGroup) {
         PermissionGroup group = this.getPermissionGroupFromName(permissionGroup.getName());
         this.permissionGroups.set(this.permissionGroups.indexOf(group), permissionGroup);
         this.update();
     }
 
+    /**
+     * Gives a player a permissionGroup
+     * @param playerName
+     * @param group
+     * @param i
+     * @param validality
+     */
     public void updatePermissionGroup(String playerName, PermissionGroup group, Integer i, PermissionValidality validality) {
         CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
         if (data == null) {
@@ -181,6 +228,10 @@ public class PermissionPool implements Serializable {
         }
     }
 
+    /**
+     * Checks if player has entries
+     * @param player
+     */
     public void checkFix(String player) {
         CloudPlayerData data = this.getPlayerData(player);
         if (data != null) {
@@ -192,6 +243,11 @@ public class PermissionPool implements Serializable {
         }
     }
 
+    /**
+     * Returns all groups of player
+     * @param player
+     * @return
+     */
     public List<PermissionGroup> getPermissionGroups(String player) {
         List<PermissionGroup> permissionGroups = new LinkedList<>();
         try {
@@ -202,10 +258,17 @@ public class PermissionPool implements Serializable {
                     permissionGroups.add(permissionGroup);
                 }
             }
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+            //Ignoring
+        }
         return permissionGroups;
     }
 
+    /**
+     * Returns highest Group of player
+     * @param player
+     * @return (group sorted by IDS)
+     */
     public PermissionGroup getHighestPermissionGroup(String player) {
         List<PermissionGroup> list = this.getPermissionGroups(player);
         list.sort(Comparator.comparingInt(PermissionGroup::getId));
@@ -216,13 +279,29 @@ public class PermissionPool implements Serializable {
         }
     }
 
+    /**
+     * Data | Name
+     * @param playerName
+     * @return Players data
+     */
     public CloudPlayerData getPlayerData(String playerName) {
         return this.playerCache.stream().filter(cloudPlayerData -> cloudPlayerData.getName().equalsIgnoreCase(playerName)).findFirst().orElse(null);
     }
+
+    /**
+     * Data | UUID
+     * @param uuid
+     * @return Players data
+     */
     public CloudPlayerData getPlayerData(UUID uuid) {
         return this.playerCache.stream().filter(cloudPlayerData -> cloudPlayerData.getUuid().equals(uuid)).findFirst().orElse(null);
     }
 
+    /**
+     * Data | Default
+     * @param playerName
+     * @return Data or default data
+     */
     public CloudPlayerData getPlayerDataOrDefault(String playerName) {
         CloudPlayerData pre = this.getPlayerData(playerName);
         if (pre == null) {
@@ -234,7 +313,13 @@ public class PermissionPool implements Serializable {
             return pre;
         }
     }
-    
+
+    /**
+     * Checks if a player has permision
+     * @param playerName
+     * @param permission
+     * @return boolean
+     */
     public boolean hasPermission(String playerName, String permission) {
         if (!this.enabled) {
             return true;
@@ -271,15 +356,22 @@ public class PermissionPool implements Serializable {
         return is;
     }
 
+    /**
+     * Streams through groups
+     * @param name
+     * @return group from Name
+     */
     public PermissionGroup getPermissionGroupFromName(String name) {
-        for (PermissionGroup permissionGroup : this.permissionGroups) {
-            if (permissionGroup.getName().equalsIgnoreCase(name)) {
-                return permissionGroup;
-            }
-        }
-        return null;
+        return this.permissionGroups.stream().filter(permissionGroup -> permissionGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
+    /**
+     * Saves all groups and data to database
+     * @param file
+     * @param directory
+     * @param database
+     * @return object of file
+     */
     public VsonObject save(File file, File directory, CloudDatabase database) {
         try {
             VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
@@ -297,6 +389,10 @@ public class PermissionPool implements Serializable {
         return null;
     }
 
+    /**
+     * Clearing invalid UUIDs from directory
+     * @param directory
+     */
     public void clearInvalidUUIDs(File directory) {
         new Thread(() -> {
             try {
@@ -315,6 +411,11 @@ public class PermissionPool implements Serializable {
         }, "async_uuid_clear_cache").start();
     }
 
+    /**
+     * Checks if something is uuid for clearingUUIDs
+     * @param string
+     * @return
+     */
     private boolean isUUID(String string) {
         try {
             UUID.fromString(string);
@@ -324,19 +425,34 @@ public class PermissionPool implements Serializable {
         }
     }
 
+    /**
+     * Gets UUID internal by name
+     * @param name
+     * @return
+     */
     private UUID getUUID(String name) {
-        for (CloudPlayerData data : this.playerCache) {
-            if (data.getName().equalsIgnoreCase(name)) {
-                return data.getUuid();
-            }
+        CloudPlayerData cloudPlayerData = this.playerCache.stream().filter(data -> data.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        if (cloudPlayerData == null) {
+            return null;
         }
-        return null;
+        return cloudPlayerData.getUuid();
     }
 
+    /**
+     * Tries to get UUID by name
+     * If its not cached from pool it gets from web
+     * @param name
+     * @return
+     */
     public UUID tryUUID(String name) {
         return this.getUUID(name) == null ? UUIDService.getUUID(name) : this.getUUID(name);
     }
 
+    /**
+     * Tries to get UUID from IP
+     * @param input
+     * @return
+     */
     public UUID fromIP(String input) {
         CloudPlayerData data = this.playerCache.stream().filter(cloudPlayerData -> cloudPlayerData.getIpAddress().equalsIgnoreCase(input)).findFirst().orElse(null);
         if (data == null) {
@@ -345,6 +461,12 @@ public class PermissionPool implements Serializable {
         return data.getUuid();
     }
 
+    /**
+     * Tries to get Name by UUID
+     * If its not cached from pool it gets from web
+     * @param uuid
+     * @return
+     */
     public String tryName(UUID uuid) {
         try {
             return this.getName(uuid) == null ? UUIDService.getName(uuid) : this.getName(uuid);
@@ -354,15 +476,19 @@ public class PermissionPool implements Serializable {
     }
 
     private String getName(UUID uuid) {
-        for (CloudPlayerData data : this.playerCache) {
-            if (data.getUuid().equals(uuid)) {
-                return data.getName();
-            }
+        CloudPlayerData cloudPlayerData = this.playerCache.stream().filter(data -> data.getUuid().equals(uuid)).findFirst().orElse(null);
+        if (cloudPlayerData == null) {
+            return null;
         }
-        return null;
+        return cloudPlayerData.getName();
     }
 
 
+    /**
+     * CHecks if player is registered in Database
+     * @param name
+     * @return
+     */
     public boolean isRegistered(String name) {
         return (this.getPlayerData(name) != null);
     }

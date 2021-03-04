@@ -35,39 +35,38 @@ public class CreateCommand implements TabCompletable {
             if (args[0].equalsIgnoreCase("group")) {
                 CloudSystem.getInstance().getService(CommandService.class).setActive(false);
                 new GroupSetup().start(CloudSystem.getInstance().getConsole(), setup -> {
-                    GroupSetup groupSetup = (GroupSetup) setup;
                     CloudSystem.getInstance().getService(CommandService.class).setActive(true);
-                    if (groupSetup.isCancelled()) {
+                    if (setup.isCancelled()) {
                         return;
                     }
                     boolean lobbyServer;
                     int maxPlayers;
-                    if (groupSetup.isSkipped()) {
+                    if (setup.isSkipped()) {
                         lobbyServer = false;
                         maxPlayers = -1;
                     } else {
-                        lobbyServer = groupSetup.isLobby();
-                        maxPlayers = groupSetup.getMaxPlayers();
+                        lobbyServer = setup.isLobby();
+                        maxPlayers = setup.getMaxPlayers();
                     }
 
                     SerializableDocument document = new SerializableDocument();
-                    if (groupSetup.getType().equalsIgnoreCase("PROXY")) {
-                        document.append("onlineMode", !groupSetup.isOnlineMode());
+                    if (setup.getType().equalsIgnoreCase("PROXY")) {
+                        document.append("onlineMode", !setup.isOnlineMode());
                     }
                     ServiceGroup serviceGroup = new ServiceGroup(
                             UUID.randomUUID(),
-                            groupSetup.getServerName(),
+                            setup.getServerName(),
                             "default",
-                            ServiceType.valueOf(groupSetup.getType().toUpperCase()),
-                            groupSetup.getMaxyServer(),
-                            groupSetup.getMinServer(),
-                            groupSetup.getMaxMem(),
-                            groupSetup.getMinMem(),
+                            ServiceType.valueOf(setup.getType().toUpperCase()),
+                            setup.getMaxyServer(),
+                            setup.getMinServer(),
+                            setup.getMaxMem(),
+                            setup.getMinMem(),
                             maxPlayers,
-                            groupSetup.getNewPlayersInPercent(),
+                            setup.getNewPlayersInPercent(),
                             false,
                             lobbyServer,
-                            groupSetup.isDynamic(),
+                            setup.isDynamic(),
                             document
                     );
                     sender.sendMessage("INFO", "§2Created ServiceGroup §a" + serviceGroup.getName() + " §7| §bMaxMB " + serviceGroup.getMaxRam() + " §7| §bMinMB " + serviceGroup.getMinRam() + " §7| §bMinServer " + serviceGroup.getMinServer() + " §7| §bMaxServer" + serviceGroup.getMaxServer());
@@ -79,17 +78,16 @@ public class CreateCommand implements TabCompletable {
                 CloudSystem.getInstance().getService(CommandService.class).setActive(false);
                 new FallbackSetup().start(CloudSystem.getInstance().getConsole(), setup -> {
                     CloudSystem.getInstance().getService(CommandService.class).setActive(true);
-                    FallbackSetup fs = (FallbackSetup) setup;
-                    if (fs.isCancelled()) {
+                    if (setup.isCancelled()) {
                         return;
                     }
                     String permission;
-                    if (fs.isSkipped()) {
+                    if (setup.isSkipped()) {
                         permission = null;
                     } else {
-                        permission = fs.getPermission();
+                        permission = setup.getPermission();
                     }
-                    Fallback fallback = new Fallback(fs.getId(), fs.getName(), permission);
+                    Fallback fallback = new Fallback(setup.getId(), setup.getName(), permission);
 
                     NetworkConfig networkConfig = CloudSystem.getInstance().getService(ConfigService.class).getNetworkConfig();
                     FallbackConfig fallbackConfig = networkConfig.getFallbackConfig();
@@ -106,17 +104,16 @@ public class CreateCommand implements TabCompletable {
                 PermissionGroupSetup setup = new PermissionGroupSetup();
                 CloudSystem.getInstance().getService(CommandService.class).setActive(false);
                 setup.start(CloudSystem.getInstance().getConsole(), setup1 -> {
-                    PermissionGroupSetup ps = (PermissionGroupSetup) setup1;
                     CloudSystem.getInstance().getService(CommandService.class).setActive(true);
                     if (setup1.isCancelled()) {
                         return;
                     }
                     PermissionGroup permissionGroup = new PermissionGroup(
-                            ps.getGroupName(),
-                            ps.getGroupId(),
-                            ps.getPrefix(),
-                            ps.getSuffix(),
-                            ps.getDisplay(),
+                            setup.getGroupName(),
+                            setup.getGroupId(),
+                            setup.getPrefix(),
+                            setup.getSuffix(),
+                            setup.getDisplay(),
                             "",
                             new LinkedList<>(),
                             new LinkedList<>()

@@ -39,6 +39,9 @@ public class BackupService extends CloudService {
         this.start();
     }
 
+    /**
+     * Loads config of backupservice
+     */
     public void load() {
         this.timeUnit = TimeUnit.valueOf(this.document.getString("timeUnit", "DAYS"));
         this.interval = this.document.getInteger("interval", 1);
@@ -47,6 +50,9 @@ public class BackupService extends CloudService {
         this.document.save();
     }
 
+    /**
+     * Starts couting
+     */
     public void start() {
         if (!this.enabled) {
             return;
@@ -71,6 +77,10 @@ public class BackupService extends CloudService {
         }, 0, l);
     }
 
+    /**
+     * Creating backup with given name
+     * @param name
+     */
     public void createBackup(String name) {
         this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§7Now creating new Backup with UUID §b" + name + "§7!");
         this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§aNext Backup will be created in §a" + this.interval + " " + this.timeUnit.name());

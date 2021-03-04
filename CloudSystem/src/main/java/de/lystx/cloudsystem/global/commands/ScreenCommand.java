@@ -40,7 +40,7 @@ public class ScreenCommand implements TabCompletable {
                 cloudInstance.getService(ScreenService.class).getMap().forEach((s, screen) -> sender.sendMessage("INFO", s));
             } else {
                 String serverName = args[0];
-                CloudScreen screen = cloudInstance.getService(ScreenService.class).getScreenByName(serverName);
+                CloudScreen screen = cloudInstance.getService(ScreenService.class).getMap().get(serverName);
                 if (screen != null) {
                     if (screen.getCachedLines().isEmpty()) {
                         sender.sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");

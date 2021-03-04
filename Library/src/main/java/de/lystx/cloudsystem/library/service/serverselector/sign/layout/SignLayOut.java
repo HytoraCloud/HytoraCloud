@@ -5,7 +5,9 @@ import com.google.gson.JsonObject;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import io.vson.elements.VsonArray;
 import io.vson.elements.object.VsonObject;
+import lombok.Getter;
 
+@Getter
 public class SignLayOut {
 
     private final VsonObject document;
@@ -44,11 +46,12 @@ public class SignLayOut {
         return this.check().getVson("otherLayouts").getVson("FULL");
     }
 
+    public VsonObject getCustom(String name) {
+        return this.check().getVson("otherLayouts").getVson(name);
+    }
+
     public VsonArray getOfflineLayOut(){
         return this.check().getArray("loadingLayout");
     }
 
-    public VsonObject getDocument() {
-        return document;
-    }
 }

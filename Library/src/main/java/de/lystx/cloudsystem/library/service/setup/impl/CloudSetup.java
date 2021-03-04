@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class CloudSetup extends Setup {
+public class CloudSetup extends Setup<CloudSetup> {
 
     @SetupPart(question = "What's the ip of this CloudSystem? (Use : 127.0.0.1) ", id = 1, forbiddenAnswers = {"localhost", "0"})
     private String hostname;

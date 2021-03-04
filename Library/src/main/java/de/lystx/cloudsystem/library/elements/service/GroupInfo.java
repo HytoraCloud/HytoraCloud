@@ -21,6 +21,13 @@ public class GroupInfo extends ServiceGroup {
         this.onlineServices.removeIf(onlineService -> !onlineService.getServiceGroup().getName().equalsIgnoreCase(name));
     }
 
+    /**
+     * Returns groupInfo
+     * @param serviceGroup
+     * @param cloudPlayers
+     * @param services
+     * @return
+     */
     public static GroupInfo fromGroup(ServiceGroup serviceGroup, List<CloudPlayer> cloudPlayers, List<Service> services) {
         return new GroupInfo(serviceGroup.getUniqueId(), serviceGroup.getName(), serviceGroup.getTemplate(), serviceGroup.getServiceType(), serviceGroup.getMaxServer(), serviceGroup.getMinServer(), serviceGroup.getMaxRam(), serviceGroup.getMinRam(), serviceGroup.getMaxPlayers(), serviceGroup.getNewServerPercent(), serviceGroup.isMaintenance(), serviceGroup.isLobby(), serviceGroup.isDynamic(), cloudPlayers, services);
     }

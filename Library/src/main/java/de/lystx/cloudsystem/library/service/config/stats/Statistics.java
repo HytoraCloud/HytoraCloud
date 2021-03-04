@@ -23,6 +23,9 @@ public class Statistics implements Serializable {
         this.stats = new HashMap<>();
     }
 
+    /**
+     * Loads stats
+     */
     public void load() {
         try {
             VsonObject vsonObject = new VsonObject(this.file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
@@ -33,6 +36,10 @@ public class Statistics implements Serializable {
 
     }
 
+    /**
+     * Loads statistics of cloud
+     * @param document
+     */
     public void load(VsonObject document) {
         this.file = document.getFile();
         if (document.isEmpty()) {
@@ -50,10 +57,18 @@ public class Statistics implements Serializable {
         }
     }
 
+    /**
+     * Increases stats
+     * @param key
+     */
     public void add(String key) {
         this.stats.put(key, (this.stats.getOrDefault(key, 0) + 1));
     }
 
+    /**
+     * TO vson
+     * @return VsonObject
+     */
     public VsonObject toVson() {
         VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
         this.stats.forEach((key, i) -> {
@@ -62,6 +77,10 @@ public class Statistics implements Serializable {
         return document;
     }
 
+    /**
+     * Saves to file
+     * @param file
+     */
     public void save(File file) {
         this.file = file;
         this.toVson().save(file);

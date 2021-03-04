@@ -8,6 +8,10 @@ public class Constants {
     public static CloudExecutor EXECUTOR = null;
     public static PermissionPool PERMISSION_POOL = null;
 
+    public static final String PASTE_SERVER_URL_DOCUMENTS = "https://paste.labymod.net/documents";
+    public static final String PASTE_SERVER_URL = "https://paste.labymod.net/";
+    public static final String PASTE_SERVER_URL_RAW = "https://paste.labymod.net/raw/";
+
     public static boolean NEEDS_DEPENDENCIES;
     public static boolean JLINE_COMPLETER_INSTALLED;
 

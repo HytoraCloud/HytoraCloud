@@ -1,11 +1,9 @@
 package de.lystx.cloudsystem.library.service.network.connection.adapter;
 
-import de.lystx.cloudsystem.library.Updater;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketMethod;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketMethod;
 import lombok.Getter;
 
 import java.lang.reflect.InvocationTargetException;
@@ -23,8 +21,10 @@ public class PacketAdapter {
         this.registeredClasses = new HashMap<>();
     }
 
-
-
+    /**
+     * Registers adapter
+     * @param adapterHandler
+     */
     public void registerAdapter(Object adapterHandler) {
         if (adapterHandler instanceof PacketHandlerAdapter) {
             this.registeredHandlers.add((PacketHandlerAdapter) adapterHandler);
@@ -45,6 +45,10 @@ public class PacketAdapter {
         this.registeredClasses.put(adapterHandler, packetMethods);
     }
 
+    /**
+     * Unregisters adapter
+     * @param adapterHandler
+     */
     public void unregisterAdapter(Object adapterHandler) {
         if (adapterHandler instanceof PacketHandlerAdapter) {
             this.registeredHandlers.remove(adapterHandler);
@@ -53,6 +57,10 @@ public class PacketAdapter {
     }
 
 
+    /**
+     * Handles packet through all adapters
+     * @param packet
+     */
     public void handelAdapterHandler(Packet packet) {
         try {
             registeredClasses.forEach((object, methodList) -> {
@@ -74,7 +82,9 @@ public class PacketAdapter {
             for (PacketHandlerAdapter adapter : this.registeredHandlers) {
                 adapter.handle(packet);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            //Ignoring...
+        }
     }
 
 

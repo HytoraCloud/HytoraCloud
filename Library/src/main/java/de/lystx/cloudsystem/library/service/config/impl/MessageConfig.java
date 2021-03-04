@@ -1,10 +1,11 @@
 package de.lystx.cloudsystem.library.service.config.impl;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
 
-@Getter
+@Getter @AllArgsConstructor
 public class MessageConfig implements Serializable {
 
     private final String prefix;
@@ -20,18 +21,4 @@ public class MessageConfig implements Serializable {
     private final String serverShutdownMessage;
     private final String errorMessage;
 
-    public MessageConfig(String prefix, String serverStartMessage, String serverStopMessage, String alreadyHubMessage, String noHubMessage, String maintenanceKickMessage, String networkStillBootingMessage, String groupMaintenanceMessage, String alreadyConnectedMessage, String alreadyOnNetworkMessage, String serverShutdownMessage, String errorMessage) {
-        this.prefix = prefix;
-        this.serverStartMessage = serverStartMessage;
-        this.serverStopMessage = serverStopMessage;
-        this.alreadyHubMessage = alreadyHubMessage;
-        this.noHubMessage = noHubMessage;
-        this.maintenanceKickMessage = maintenanceKickMessage;
-        this.networkStillBootingMessage = networkStillBootingMessage;
-        this.groupMaintenanceMessage = groupMaintenanceMessage;
-        this.alreadyConnectedMessage = alreadyConnectedMessage;
-        this.alreadyOnNetworkMessage = alreadyOnNetworkMessage;
-        this.serverShutdownMessage = serverShutdownMessage;
-        this.errorMessage = errorMessage;
-    }
 }

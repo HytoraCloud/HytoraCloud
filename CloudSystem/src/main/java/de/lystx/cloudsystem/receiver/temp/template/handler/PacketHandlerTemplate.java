@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.receiver.temp.template.handler;
 
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketTransferFile;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import de.lystx.cloudsystem.receiver.Receiver;
 import org.apache.commons.io.FileUtils;
 

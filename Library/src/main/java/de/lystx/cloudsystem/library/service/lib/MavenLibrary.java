@@ -12,7 +12,7 @@ import java.nio.file.*;
 @Getter
 public class MavenLibrary {
 
-    private String groupId, artifactId, version, repo;
+    private final String groupId, artifactId, version, repo;
     private final LibraryService libraryService;
 
     public MavenLibrary(LibraryService libraryService, String groupId, String artifactId, String version, String repo) {
@@ -23,7 +23,10 @@ public class MavenLibrary {
         this.repo = repo.endsWith("/") ? repo : repo + "/";
     }
 
-
+    /**
+     * Downloads this Library from a given URL
+     * @param url
+     */
     public void install(String url) {
         if (!new File(this.libraryService.getDirectory(), path()).exists()) {
             System.out.println("[Libraries] Downloading dependency for " + groupId + ":" + artifactId + " - " + version + " [" + url + "]");
@@ -56,15 +59,25 @@ public class MavenLibrary {
     }
 
 
-
+    /**
+     * Installs this library
+     */
     public void install() {
         this.install(this.repo + path());
     }
 
+    /**
+     * Returns path
+     * @return
+     */
     public Path getPath() {
         return Paths.get(this.libraryService.getDirectory() + "/" + path());
     }
 
+    /**
+     * Returns string path
+     * @return
+     */
     private String path() {
         return this.getGroupId().replace('.', '/') + "/" + this.getArtifactId() + "/" + this.getVersion() + "/" + this.getArtifactId() + "-" + this.getVersion() + ".jar";
     }

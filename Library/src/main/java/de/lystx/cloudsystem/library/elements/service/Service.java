@@ -23,7 +23,16 @@ public class Service implements Serializable {
     private SerializableDocument properties;
     private ServiceGroup serviceGroup;
 
-
+    /**
+     * Constructs service
+     * @param name
+     * @param uniqueId
+     * @param serviceGroup
+     * @param serviceID
+     * @param port
+     * @param cloudPort
+     * @param serviceState
+     */
     public Service(String name, UUID uniqueId, ServiceGroup serviceGroup, int serviceID, int port, int cloudPort, ServiceState serviceState) {
         this.name = name;
         this.uniqueId = uniqueId;

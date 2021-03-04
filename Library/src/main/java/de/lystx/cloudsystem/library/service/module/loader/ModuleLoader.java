@@ -31,6 +31,10 @@ public class ModuleLoader {
     }
 
 
+    /**
+     * Ignoring al files that don't end with ".jar" (folders etc)
+     * @return amount of modules
+     */
     public int getSize() {
         int i = 0;
         for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
@@ -44,6 +48,9 @@ public class ModuleLoader {
         return i;
     }
 
+    /**
+     * Loads all modules
+     */
     public void loadModules() {
         if (this.getSize() == 0) {
             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cNo modules to §eload§c!");

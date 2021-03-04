@@ -28,20 +28,27 @@ public class ModuleService extends CloudService {
         this.load();
     }
 
+    /**
+     * Returns module by name
+     * @param name
+     * @return
+     */
     public Module getModule(String name) {
         return this.modules.stream().filter((module -> module.getInfo().getName().equalsIgnoreCase(name))).findFirst().orElse(null);
     }
 
+    /**
+     * Enables all modules
+     */
     public void load() {
         this.moduleLoader.loadModules();
-        this.modules.forEach((module -> {
-            module.onEnable(this.getCloudLibrary());
-        }));
+        this.modules.forEach((module -> module.onEnable(this.getCloudLibrary())));
     }
 
+    /**
+     * Disables all modules
+     */
     public void shutdown() {
-        this.modules.forEach((module -> {
-            module.onDisable(this.getCloudLibrary());
-        }));
+        this.modules.forEach((module -> module.onDisable(this.getCloudLibrary())));
     }
 }

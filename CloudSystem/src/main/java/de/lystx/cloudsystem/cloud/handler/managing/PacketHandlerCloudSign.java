@@ -23,7 +23,7 @@ public class PacketHandlerCloudSign extends PacketHandlerAdapter {
             CloudSign sign = packetPlayInCreateCloudSign.getCloudSign();
             CloudSign get = this.cloudSystem.getService(SignService.class).getCloudSign(sign.getX(), sign.getY(), sign.getZ(), sign.getWorld());
             if (get == null) {
-                this.cloudSystem.getService(SignService.class).add(sign);
+                this.cloudSystem.getService(SignService.class).getCloudSigns().add(sign);
                 this.cloudSystem.getService(SignService.class).save();
                 this.cloudSystem.getService(SignService.class).load();
                 this.cloudSystem.getService(SignService.class).loadSigns();
@@ -35,7 +35,7 @@ public class PacketHandlerCloudSign extends PacketHandlerAdapter {
             CloudSign sign = packetPlayInDeleteCloudSign.getCloudSign();
             CloudSign get = this.cloudSystem.getService(SignService.class).getCloudSign(sign.getX(), sign.getY(), sign.getZ(), sign.getWorld());
             if (get != null) {
-                this.cloudSystem.getService(SignService.class).remove(get);
+                this.cloudSystem.getService(SignService.class).getCloudSigns().remove(get);
                 this.cloudSystem.getService(SignService.class).save();
                 this.cloudSystem.getService(SignService.class).load();
                 this.cloudSystem.getService(SignService.class).loadSigns();

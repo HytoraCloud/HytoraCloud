@@ -1,10 +1,10 @@
 
-package de.lystx.cloudsystem.library.service.packet.raw;
+package de.lystx.cloudsystem.library.service.network.packet.raw;
 
 
 
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.packet.enums.PacketPriority;
+import de.lystx.cloudsystem.library.service.network.packet.enums.PacketPriority;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,6 +17,6 @@ public @interface PacketHandler {
 
     PacketPriority priority() default PacketPriority.NORMAL;
 
-    Class<? extends Packet> transformTo() default Packet.class;
+    Class<? extends Packet> transformTo() default Packet.class; //Used for custom packets
 
 }

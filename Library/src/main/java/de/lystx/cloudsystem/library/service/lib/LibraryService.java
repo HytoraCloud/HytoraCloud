@@ -26,6 +26,10 @@ public class LibraryService {
         this.libraries = new LinkedList<>();
     }
 
+    /**
+     * Injects a dependency into runtime
+     * @param path
+     */
     public void addURL(Path path) {
         try {
             Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
@@ -36,12 +40,26 @@ public class LibraryService {
         }
     }
 
+    /**
+     * Installs a library from a repo
+     * @param groupId
+     * @param artifactId
+     * @param version
+     * @param repo
+     */
     public void install(String groupId, String artifactId, String version, Repository repo) {
         MavenLibrary mavenLibrary = new MavenLibrary(this, groupId, artifactId, version, repo.getUrl());
         libraries.add(mavenLibrary);
         mavenLibrary.install();
     }
 
+    /**
+     * Installs a library from a custom URL
+     * @param groupId
+     * @param artifactId
+     * @param version
+     * @param url
+     */
     public void install(String groupId, String artifactId, String version, String url) {
         MavenLibrary mavenLibrary = new MavenLibrary(this, groupId, artifactId, version, url);
         libraries.add(mavenLibrary);

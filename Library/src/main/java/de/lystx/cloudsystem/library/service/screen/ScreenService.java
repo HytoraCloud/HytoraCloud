@@ -14,21 +14,16 @@ public class ScreenService extends CloudService {
     private final Map<String, CloudScreen> map;
     private final Map<CloudScreen, List<String>> cachedLines;
 
+    /**
+     * Sets up Cached lines and Register Map
+     * @param cloudLibrary
+     * @param name
+     * @param type
+     */
     public ScreenService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
         this.map = new HashMap<>();
         this.cachedLines = new HashMap<>();
-    }
-    public CloudScreen getScreenByName(String name) {
-        return map.getOrDefault(name, null);
-    }
-
-    public void unregisterScreen(CloudScreen screen) {
-        map.remove(screen.getName());
-    }
-
-    public void registerScreen(CloudScreen screen, String name) {
-        map.put(name, screen);
     }
 
 }

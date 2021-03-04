@@ -36,7 +36,12 @@ public class ServiceProviderStart {
         this.global = global;
     }
 
-
+    /**
+     * Starts a service
+     * @param service
+     * @param propertiess > Properties for service
+     * @return if success
+     */
     public boolean autoStartService(Service service, SerializableDocument propertiess) {
 
         /*NetworkInfo networkInfo = new NetworkInfo();
@@ -226,7 +231,7 @@ public class ServiceProviderStart {
             Process process = processBuilder.start();
             CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());
             this.cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> {
-                this.cloudLibrary.getService(ScreenService.class).registerScreen(cloudScreen, service.getName());
+                this.cloudLibrary.getService(ScreenService.class).getMap().put(cloudScreen.getName(), cloudScreen);
                 cloudScreen.start();
             }, 3L);
             return true;

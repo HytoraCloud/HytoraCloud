@@ -1,6 +1,5 @@
 package de.lystx.cloudsystem.library.service.screen;
 
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +38,12 @@ public class CloudScreen {
         this.running = false;
     }
 
+    /**
+     * Starts the screen printing
+     * Checks if the current screen is this
+     * if (true) > Prints line
+     * And caches line
+     */
     public void start() {
         this.running = true;
         this.inputStream = process.getInputStream();
@@ -55,15 +60,16 @@ public class CloudScreen {
                         this.cloudConsole.getLogger().sendMessage("§9[§b" + this.name + "§9]§f " + line);
                     }
                 }
-            } catch (NoSuchElementException ignored) {}
+            } catch (NoSuchElementException e) {
+                //Is ignored and doesn't make sense
+            }
         }
-
     }
 
     public void stop() throws IOException {
-        //this.running = false;
-        //this.inputStream.close();
-        //this.reader.close();
+        /**
+         * Empty method beacuse it crashed
+         */
     }
 
 }

@@ -4,7 +4,7 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import lombok.AllArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;

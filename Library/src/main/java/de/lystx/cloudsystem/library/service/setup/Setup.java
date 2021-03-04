@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Getter
-public abstract class Setup {
+public abstract class Setup<T> {
 
     private final Map<Field, SetupPart> setupParts = new HashMap<>();
     private int current = 43084380;
@@ -20,9 +20,14 @@ public abstract class Setup {
     private boolean cancelled;
     private boolean skipped;
     private Map.Entry<Field, SetupPart> currentPart;
-    private Consumer<Setup> consumer;
+    private Consumer<T> consumer;
 
-    public void start(CloudConsole scanner, Consumer<Setup> consumer) {
+    /**
+     * Starts the setup and loops through the given questions
+     * @param scanner
+     * @param consumer
+     */
+    public void start(CloudConsole scanner, Consumer<T> consumer) {
         scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("SETUP", "§aIf you want to setup just cloudType §2'cancel'§a!");
@@ -55,9 +60,13 @@ public abstract class Setup {
                 e.printStackTrace();
             }
         }
-        this.consumer.accept(this);
+        this.consumer.accept((T) this);
     }
 
+    /**
+     * Handles next question
+     * @param lastAnswer
+     */
     public void next(String lastAnswer) {
         if (this.currentPart != null) {
             if (lastAnswer.trim().isEmpty()) {
@@ -143,6 +152,11 @@ public abstract class Setup {
         }
     }
 
+    /**
+     * @param setupPart
+     * @param answer
+     * @return if answer is forbidden
+     */
     public boolean isAnswerForbidden(SetupPart setupPart, String answer) {
         if ((setupPart.forbiddenAnswers()).length > 0)
             for (String forbiddenAnswer : setupPart.forbiddenAnswers()) {
@@ -151,6 +165,11 @@ public abstract class Setup {
         return false;
     }
 
+    /**
+     * @param setupPart
+     * @param answer
+     * @return if answer is a goTO
+     */
     public GoTo isAnswerGoto(SetupPart setupPart, String answer) {
         if (setupPart.goTo().id() != -1) {
             return setupPart.goTo();
@@ -158,6 +177,11 @@ public abstract class Setup {
         return null;
     }
 
+    /**
+     * @param setupPart
+     * @param answer
+     * @return if answer is allowed
+     */
     public boolean isAnswerAllowed(SetupPart setupPart, String answer) {
         if ((setupPart.onlyAnswers()).length > 0) {
             for (String forbiddenAnswer : setupPart.onlyAnswers()) {
@@ -167,6 +191,11 @@ public abstract class Setup {
         return true;
     }
 
+    /**
+     * @param setupPart
+     * @param answer
+     * @return if answer is change
+     */
     public String isChangeAnswer(SetupPart setupPart, String answer) {
         if ((setupPart.onlyAnswers()).length > 0)
             for (String forbiddenAnswer : setupPart.changeAnswers()) {
@@ -176,6 +205,11 @@ public abstract class Setup {
         return null;
     }
 
+    /**
+     * @param setupPart
+     * @param answer
+     * @return if answer is exit
+     */
     public boolean isAnswerExit(SetupPart setupPart, String answer) {
         if ((setupPart.exitAfterAnswer()).length > 0) {
             for (String forbiddenAnswer : setupPart.exitAfterAnswer()) {
@@ -185,6 +219,11 @@ public abstract class Setup {
         return false;
     }
 
+    /**
+     * Getting Map.Entry
+     * @param id
+     * @return entry by ID
+     */
     public Map.Entry<Field, SetupPart> getEntry(int id) {
         Map.Entry<Field, SetupPart> entry = null;
         for (Map.Entry<Field, SetupPart> currentEntry : this.setupParts.entrySet()) {

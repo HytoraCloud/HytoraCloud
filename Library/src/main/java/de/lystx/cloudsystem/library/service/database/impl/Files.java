@@ -29,8 +29,6 @@ public class Files implements CloudDatabase {
     @Override
     public void disconnect() {}
 
-
-
     @Override
     public boolean isRegistered(UUID uuid) {
         return new File(this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory(), uuid + ".json").exists();

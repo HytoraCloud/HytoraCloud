@@ -33,6 +33,10 @@ public final class CommandService extends CloudService {
         this.commandInfos = new LinkedList<>();
     }
 
+    /**
+     * Registers command
+     * @param classObject
+     */
     public void registerCommand(Object classObject) {
         for (Method declaredMethod : classObject.getClass().getDeclaredMethods()) {
             if (Arrays.asList(declaredMethod.getParameterTypes()).contains(CloudCommandSender.class) && Arrays.asList(declaredMethod.getParameterTypes()).contains(String[].class) ) {
@@ -53,6 +57,10 @@ public final class CommandService extends CloudService {
         }
     }
 
+    /**
+     * Unregisters command
+     * @param command
+     */
     public void unregisterCommand(Object command) {
         for (Method declaredMethod : command.getClass().getDeclaredMethods()) {
             if (Arrays.asList(declaredMethod.getParameterTypes()).contains(CloudCommandSender.class) && Arrays.asList(declaredMethod.getParameterTypes()).contains(String[].class) ) {
@@ -70,6 +78,13 @@ public final class CommandService extends CloudService {
         }
     }
 
+    /**
+     * Executes command
+     * @param sender
+     * @param prefix
+     * @param line
+     * @return
+     */
     public boolean execute(CloudCommandSender sender, boolean prefix, String line) {
         if (prefix) line = line.substring(1);
 
@@ -102,6 +117,11 @@ public final class CommandService extends CloudService {
         return true;
     }
 
+    /**
+     * Console execute
+     * @param line
+     * @param cloudConsole
+     */
     public void execute(String line, CloudConsole cloudConsole) {
         if (!active) {
             return;
@@ -123,6 +143,11 @@ public final class CommandService extends CloudService {
         }
     }
 
+    /**
+     * Returns command by name or alias
+     * @param commandName
+     * @return
+     */
     public CommandInfo getCommand(String commandName) {
         for (CommandInfo commandInfo : this.commandInfos) {
             if (commandInfo.getName().equalsIgnoreCase(commandName) || Arrays.<String>asList(commandInfo.getAliases()).contains(commandName))

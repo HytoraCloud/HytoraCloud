@@ -34,6 +34,9 @@ public class SignService extends CloudService {
         this.loadSigns();
     }
 
+    /**
+     * Loads LayOuts and signs
+     */
     public void load() {
         this.cloudSigns = new LinkedList<>();
         if (!this.layOutFile.exists()) {
@@ -46,26 +49,14 @@ public class SignService extends CloudService {
                 e.printStackTrace();
             }
         }
-
-        try {
-            VsonObject config = new VsonObject(this.signFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
-            if (!this.signFile.exists()) {
-                config.save();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!this.signFile.exists()) {
+            new VsonObject().save(this.signFile);
         }
     }
 
-    public void add(CloudSign cloudSign) {
-        this.cloudSigns.add(cloudSign);
-    }
-
-    public void remove(CloudSign cloudSign) {
-        this.cloudSigns.remove(cloudSign);
-    }
-
-
+    /**
+     * Loads signs
+     */
     public void loadSigns() {
         try {
             VsonObject config = new VsonObject(this.signFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
@@ -78,6 +69,9 @@ public class SignService extends CloudService {
         }
     }
 
+    /**
+     * Saves signs
+     */
     public void save() {
         try {
             try {
@@ -90,9 +84,19 @@ public class SignService extends CloudService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException e) {
+            //Ignored because of Receiver
+        }
     }
 
+    /**
+     * Gets CloudSign by values
+     * @param x
+     * @param y
+     * @param z
+     * @param world
+     * @return cloudSign
+     */
     public CloudSign getCloudSign(int x, int y, int z, String world) {
         for (CloudSign cloudSign : this.cloudSigns) {
             if (cloudSign.getX() == x && cloudSign.getY() == y && cloudSign.getZ() == z && world.equalsIgnoreCase(cloudSign.getWorld())) {

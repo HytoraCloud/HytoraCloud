@@ -27,13 +27,29 @@ public class TemplateService extends CloudService {
 
     }
 
+    /**
+     * Creates template
+     * @param serviceGroup
+     */
     public void createTemplate(ServiceGroup serviceGroup) {
         this.createTemplate(serviceGroup, serviceGroup.getTemplate());
     }
+
+    /**
+     * Creates custom template
+     * @param serviceGroup
+     * @param template
+     */
     public void createTemplate(ServiceGroup serviceGroup, String template) {
         File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/" + template);
        this.createTemplate(dir, serviceGroup);
     }
+
+    /**
+     * Creates dir for template
+     * @param dir
+     * @param serviceGroup
+     */
     public void createTemplate(File dir, ServiceGroup serviceGroup) {
         if (dir.exists()) {
             return;
@@ -47,8 +63,13 @@ public class TemplateService extends CloudService {
         plugins.mkdirs();
     }
 
+    /**
+     * COpies server to template
+     * @param service
+     * @param template
+     */
     public void copy(Service service, String template) {
-        CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getScreenByName(service.getName());
+        CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getMap().get(service.getName());
         if (screen == null) {
             return;
         }
@@ -66,11 +87,20 @@ public class TemplateService extends CloudService {
         this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§2Copied Service §a" + service.getName() + " §2into template §a" + template + "§8!");
     }
 
+    /**
+     * Deletes template
+     * @param serviceGroup
+     * @param template
+     */
     public void deleteTemplate(ServiceGroup serviceGroup, String template) {
         File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/" + template);
         dir.delete();
     }
 
+    /**
+     * Deletes all templates
+     * @param serviceGroup
+     */
     public void deleteTemplates(ServiceGroup serviceGroup) {
         File dir = new File(this.getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), serviceGroup.getName() + "/");
         for (File file : dir.listFiles()) {
@@ -83,6 +113,11 @@ public class TemplateService extends CloudService {
         dir.delete();
     }
 
+    /**
+     * Sets template for group
+     * @param serviceGroup
+     * @param template
+     */
     public void setTemplate(ServiceGroup serviceGroup, String template) {
         try {
             VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);

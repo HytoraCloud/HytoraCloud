@@ -7,6 +7,12 @@ import org.fusesource.jansi.Ansi;
 public class ConsoleColor {
 
 
+    /**
+     * Constructs color
+     * @param color
+     * @param b
+     * @return
+     */
     public static String construct(Ansi.Color color, boolean b) {
         Ansi ansi = Ansi.ansi().a(Ansi.Attribute.RESET).fg(color);
         if (b) {
@@ -17,6 +23,11 @@ public class ConsoleColor {
         return ansi.toString();
     }
 
+    /**
+     * Formats color
+     * @param input
+     * @return
+     */
     public static String formatColorString(String input) {
         try {
             Class.forName("org.fusesource.jansi.Ansi");
@@ -54,6 +65,11 @@ public class ConsoleColor {
         return input;
     }
 
+    /**
+     * Removes color
+     * @param input
+     * @return
+     */
     public static String stripColor(String input) {
         return input.replaceAll("\033\\[[;\\d]*m", "");
     }

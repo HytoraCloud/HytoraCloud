@@ -61,6 +61,12 @@ public class FileService extends CloudService {
     private File spigotVersionsDirectory;
     private File oldSpigotVersionsDirectory;
 
+    /**
+     * Initialising all files and folders
+     * @param cloudLibrary
+     * @param name
+     * @param cloudType
+     */
     public FileService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
         super(cloudLibrary, name, cloudType);
 
@@ -114,6 +120,9 @@ public class FileService extends CloudService {
         this.check();
     }
 
+    /**
+     * Checking and createing folders and files if needed
+     */
     public void check() {
         this.cloudDirectory.mkdirs();
 
@@ -172,6 +181,11 @@ public class FileService extends CloudService {
         }
     }
 
+    /**
+     * Copies a file from resources folder
+     * @param filename
+     * @param location
+     */
     public void copyFileWithURL(String filename, File location) {
         try {
             URL inputUrl = getClass().getResource(filename);
@@ -186,6 +200,11 @@ public class FileService extends CloudService {
         } catch (NullPointerException e) { }
     }
 
+    /**
+     * Downloads file from website
+     * @param url
+     * @param location
+     */
     public void download(String url, File location) {
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
         FileOutputStream fileOutputStream = new FileOutputStream(location)) {
@@ -194,9 +213,16 @@ public class FileService extends CloudService {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Writes message to a file
+     * @param file
+     * @param message
+     */
     public void write(File file, String message) {
         if (!file.exists()) {
             try {

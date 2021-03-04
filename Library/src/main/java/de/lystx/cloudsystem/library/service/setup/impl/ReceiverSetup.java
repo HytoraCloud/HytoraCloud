@@ -5,7 +5,7 @@ import de.lystx.cloudsystem.library.service.setup.SetupPart;
 import lombok.Getter;
 
 @Getter
-public class ReceiverSetup extends Setup {
+public class ReceiverSetup extends Setup<ReceiverSetup> {
 
     @SetupPart(question = "What's the host of your CloudSystem?", id = 1, forbiddenAnswers = {""})
     private String host;

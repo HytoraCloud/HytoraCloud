@@ -16,6 +16,13 @@ public class CloudCompleter implements Completer {
 
     private final CommandService commandService;
 
+    /**
+     * Console TabCompleter
+     * @param buffer
+     * @param cursor
+     * @param candidates
+     * @return
+     */
     @Override
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {
         String[] input = buffer.split(" ");

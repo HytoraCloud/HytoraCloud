@@ -73,7 +73,7 @@ public class LogCommand implements TabCompletable {
 
     public String getLog(Service service, CloudLibrary cloudLibrary) {
 
-        CloudScreen screen = cloudLibrary.getService(ScreenService.class).getScreenByName(service.getName());
+        CloudScreen screen = cloudLibrary.getService(ScreenService.class).getMap().get(service.getName());
         if (screen == null) {
             return null;
         }

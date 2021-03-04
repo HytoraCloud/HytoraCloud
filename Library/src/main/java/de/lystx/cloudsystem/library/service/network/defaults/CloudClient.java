@@ -19,34 +19,54 @@ public class CloudClient extends NettyClient implements CloudExecutor {
         this.networkHandlers = new LinkedList<>();
     }
 
-
+    /**
+     * COnnects
+     * @throws Exception
+     */
     public void connect() throws Exception {
         this.start();
     }
 
+    /**
+     * Connect with custom host and port
+     * @param host
+     * @param port
+     * @throws Exception
+     */
     public void connect(String host, int port) throws Exception {
         this.setHost(host);
         this.setPort(port);
         this.connect();
     }
 
+    /**
+     * @return if connected
+     */
     public boolean isConnected() {
         return this.isRunning();
     }
 
+    /**
+     * Disconnecting
+     */
     public void disconnect() {
         this.getChannel().close();
     }
 
+    /**
+     * Registers handler
+     * @param packetHandlerAdapter
+     */
     public void registerPacketHandler(Object packetHandlerAdapter) {
         this.getPacketAdapter().registerAdapter(packetHandlerAdapter);
     }
 
+    /**
+     * registers networkHandler
+     * @param networkHandler
+     */
     public void registerHandler(NetworkHandler networkHandler) {
         this.networkHandlers.add(networkHandler);
     }
 
-    public List<NetworkHandler> getNetworkHandlers() {
-        return networkHandlers;
-    }
 }

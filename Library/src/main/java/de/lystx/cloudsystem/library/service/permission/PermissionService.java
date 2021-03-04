@@ -39,6 +39,9 @@ public class PermissionService extends CloudService {
         this.loadEntries();
     }
 
+    /**
+     * Loads entries from database
+     */
     public void loadEntries() {
         if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
@@ -52,6 +55,9 @@ public class PermissionService extends CloudService {
         }
     }
 
+    /**
+     * Loads groups
+     */
     public void load() {
         if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;
@@ -117,6 +123,9 @@ public class PermissionService extends CloudService {
         }
     }
 
+    /**
+     * Saves Pool and groups
+     */
     public void save() {
         if (!getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             return;

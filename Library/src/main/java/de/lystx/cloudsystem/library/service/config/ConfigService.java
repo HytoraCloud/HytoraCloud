@@ -28,6 +28,9 @@ public class ConfigService extends CloudService {
         this.reload();
     }
 
+    /**
+     * (Re-)loads config
+     */
     public void reload() {
         try {
             tries += 1;
@@ -67,6 +70,9 @@ public class ConfigService extends CloudService {
         }
     }
 
+    /**
+     * saves config
+     */
     public void save() {
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             this.vsonObject.putAll(this.networkConfig);
@@ -75,6 +81,4 @@ public class ConfigService extends CloudService {
         }
         this.vsonObject.save();
     }
-
-
 }

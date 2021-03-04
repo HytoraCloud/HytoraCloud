@@ -1,6 +1,7 @@
 package de.lystx.cloudapi;
 
 
+import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.standalone.handler.*;
 import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
@@ -18,6 +19,7 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.Result;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
@@ -276,5 +278,26 @@ public class CloudAPI {
         for (String permission : permissions) {
             accept.accept(permission);
         }
+    }
+
+
+    public CloudAPI update() {
+        CloudServer.getInstance().getManager().update();
+        return this;
+    }
+
+    public CloudAPI setServiceState(ServiceState serviceState) {
+        CloudServer.getInstance().getManager().setServiceState(serviceState);
+        return this;
+    }
+
+    public CloudAPI setMaxPlayers(int maxPlayers) {
+        CloudServer.getInstance().getManager().setMaxPlayers(maxPlayers);
+        return this;
+    }
+
+    public CloudAPI setMotd(String motd) {
+        CloudServer.getInstance().getManager().setMotd(motd);
+        return this;
     }
 }

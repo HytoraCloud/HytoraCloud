@@ -45,6 +45,10 @@ public class NettyClient {
         this.established = false;
     }
 
+    /**
+     * Starts the client with netty
+     * @throws Exception
+     */
     public void start() throws Exception {
         EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
@@ -104,10 +108,19 @@ public class NettyClient {
 
     }
 
+    /**
+     * Adds consumer
+     * @param consumer
+     */
     public void onConnectionEstablish(Consumer<NettyClient> consumer) {
         this.consumerConnection = consumer;
     }
 
+    /**
+     * Sends a packet
+     * If failed tries to send another 5 times then throws error
+     * @param packet
+     */
     public void sendPacket(Packet packet) {
         if (channel != null) {
 
@@ -117,7 +130,6 @@ public class NettyClient {
                 try {
                     this.channel.eventLoop().execute(() -> channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE));
                 } catch (NullPointerException ignored) {
-
                 }
             }
 

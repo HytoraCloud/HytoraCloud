@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 public @interface GoTo {
 
-    int id();
+    int id(); //ID IF VALUE IS GIVEN
 
-    int elseID();
+    int elseID(); //ID IF VALUE IS NOT GIVE
 
-    String value();
+    String value(); //THE VALUE
 }

@@ -5,7 +5,7 @@ import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLogi
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.service.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.util.Decision;
 import de.lystx.cloudsystem.receiver.Receiver;

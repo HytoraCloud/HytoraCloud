@@ -14,6 +14,10 @@ public class CustomPacket extends PacketCommunication implements Serializable {
         this.setSendBack(true);
      }
 
+    /**
+     * Returns customPacket
+     * @return
+     */
      public Packet getPacket() {
          return (Packet) this.document().get("packet");
      }

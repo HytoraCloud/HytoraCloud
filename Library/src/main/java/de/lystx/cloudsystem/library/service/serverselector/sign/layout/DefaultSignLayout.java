@@ -7,6 +7,9 @@ import io.vson.elements.object.VsonObject;
 public class DefaultSignLayout extends VsonObject {
 
 
+    /**
+     * Returns new Default SignLayOut
+     */
     public DefaultSignLayout() {
 
         VsonArray loadingLayouts = new VsonArray();

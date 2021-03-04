@@ -21,11 +21,22 @@ public class CloudComponent implements Serializable {
         this.cloudComponents = new LinkedList<>();
     }
 
+    /**
+     * Adds events like click or hover
+     * @param action
+     * @param value
+     * @return
+     */
     public CloudComponent addEvent(CloudComponentAction action, Object... value) {
         this.actions.put(action, value);
         return this;
     }
 
+    /**
+     * Adds another component to chain
+     * @param cloudComponent
+     * @return
+     */
     public CloudComponent append(CloudComponent cloudComponent) {
         this.cloudComponents.add(cloudComponent);
         return this;

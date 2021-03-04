@@ -34,6 +34,12 @@ public class ServiceInfo extends Service{
         }
     }
 
+    /**
+     * Constructs ServiceInfo
+     * @param service
+     * @param cloudPlayers
+     * @return
+     */
     public static ServiceInfo fromService(Service service, List<CloudPlayer> cloudPlayers) {
         return new ServiceInfo(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), service.getCloudPort(), service.getServiceState(), cloudPlayers);
     }

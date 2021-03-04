@@ -1,11 +1,12 @@
 package de.lystx.cloudsystem.library.service.setup.impl;
 
+import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import de.lystx.cloudsystem.library.service.setup.Setup;
 import de.lystx.cloudsystem.library.service.setup.SetupPart;
 import lombok.Getter;
 
 @Getter
-public class FallbackSetup extends Setup {
+public class FallbackSetup extends Setup<FallbackSetup> {
 
     @SetupPart(id = 1, question = "For which group is this fallback?")
     private String name;

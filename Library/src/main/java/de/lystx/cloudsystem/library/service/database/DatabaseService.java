@@ -38,6 +38,10 @@ public class DatabaseService extends CloudService {
         }
     }
 
+    /**
+     * Saves settings
+     * @param document
+     */
     public void reload(VsonObject document) {
         this.document = document;
         this.databaseType = document.getString("type", "FILES");

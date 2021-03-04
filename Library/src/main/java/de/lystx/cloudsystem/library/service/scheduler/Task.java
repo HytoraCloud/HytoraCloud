@@ -1,55 +1,39 @@
 package de.lystx.cloudsystem.library.service.scheduler;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
+@Getter @RequiredArgsConstructor @Setter
 public class Task implements Runnable {
 
-	private Runnable run;
-	private final boolean s, repeat;
+	//Constructor parameters
+	private final boolean sync;
+	private final Runnable runnable;
 	private final int id;
-	private int r;
-	private boolean c;
+	private final boolean repeating;
+
+	//Non final fields
+	private int runTimes;
+	private boolean cancelled;
 	private boolean error;
 
-	public Task(boolean sync, Runnable runnable, int id, boolean multipleTimes) {
-		run = runnable;
-		s = sync;
-		this.id = id;
-		repeat = multipleTimes;
-	}
-
-	public int getId() {
-		return id;
-	}
-
+	/**
+	 * Executes the current Task
+	 */
 	@Override
 	public void run() {
-		if(c||error)return;
-		++r;
+		if (cancelled || error) {
+			return;
+		}
+		this.runTimes++;
 		try {
-			run.run();
-		}catch(Exception er) {
-			error=true;
-			er.printStackTrace();
+			this.runnable.run();
+		} catch (Exception e) {
+			this.error = true;
+			e.printStackTrace();
 		}
 	}
 
-	public boolean isRepeating() {
-		return repeat;
-	}
 
-	public boolean isSync() {
-		return s;
-	}
-
-	public boolean isCancelled() {
-		return c;
-	}
-
-	public void cancel() {
-		c = true;
-	}
-
-	public int runTimes() {
-		return r;
-	}
 }

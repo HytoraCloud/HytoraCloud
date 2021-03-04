@@ -19,10 +19,18 @@ public class PortService {
         this.proxyPortList = new LinkedList<>();
     }
 
+    /**
+     * Marks port as unused
+     * @param port
+     */
     public void removePort(Integer port) {
         this.portlist.remove(String.valueOf(port));
     }
 
+    /**
+     * Returns free port for server
+     * @return
+     */
     public int getFreePort() {
         for (int i = this.networkConfig.getServerStartPort(); i < (this.networkConfig.getServerStartPort() + 300000);) {
             if (this.portlist.contains(String.valueOf(i))) {
@@ -35,6 +43,10 @@ public class PortService {
         return 404;
     }
 
+    /**
+     * Returns free port for proxy
+     * @return
+     */
     public int getFreeProxyPort() {
         for (int i = this.networkConfig.getProxyStartPort(); i < (this.networkConfig.getProxyStartPort() + 300000);) {
             if (this.proxyPortList.contains(String.valueOf(i))) {
@@ -47,6 +59,10 @@ public class PortService {
         return 404;
     }
 
+    /**
+     * Marks port as unused
+     * @param port
+     */
     public void removeProxyPort(Integer port) {
         this.proxyPortList.remove(String.valueOf(port));
     }

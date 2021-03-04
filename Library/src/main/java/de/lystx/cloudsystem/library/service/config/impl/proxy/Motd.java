@@ -1,10 +1,11 @@
 package de.lystx.cloudsystem.library.service.config.impl.proxy;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
 
-@Getter
+@Getter @AllArgsConstructor
 public class Motd implements Serializable {
 
     private final boolean enabled;
@@ -13,11 +14,4 @@ public class Motd implements Serializable {
     private final String protocolString;
     private final String versionString;
 
-    public Motd(boolean enabled, String firstLine, String secondLine, String protocolString, String versionString) {
-        this.enabled = enabled;
-        this.firstLine = firstLine;
-        this.secondLine = secondLine;
-        this.protocolString = protocolString;
-        this.versionString = versionString;
-    }
 }

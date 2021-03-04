@@ -1,12 +1,13 @@
 package de.lystx.cloudsystem.library.service.config.impl.proxy;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Getter @Setter
+@Getter @Setter @AllArgsConstructor
 public class ProxyConfig implements Serializable {
 
     private boolean enabled;
@@ -18,14 +19,4 @@ public class ProxyConfig implements Serializable {
     private Motd motdNormal;
     private Motd motdMaintenance;
 
-    public ProxyConfig(boolean enabled, boolean maintenance, boolean hubCommandEnabled, int maxPlayers, List<String> whitelistedPlayers, TabList tabList, Motd motdNormal, Motd motdMaintenance) {
-        this.enabled = enabled;
-        this.maintenance = maintenance;
-        this.hubCommandEnabled = hubCommandEnabled;
-        this.maxPlayers = maxPlayers;
-        this.whitelistedPlayers = whitelistedPlayers;
-        this.tabList = tabList;
-        this.motdNormal = motdNormal;
-        this.motdMaintenance = motdMaintenance;
-    }
 }
