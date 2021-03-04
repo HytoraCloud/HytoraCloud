@@ -1,8 +1,6 @@
 package de.lystx.cloudsystem.library.service.util;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Is used for forEach loops
@@ -10,13 +8,28 @@ import lombok.Setter;
  * @param <T>
  */
 
-@AllArgsConstructor @Getter @Setter
+@AllArgsConstructor
 public class Value<T> {
 
-    private final T value;
+    private T value;
 
     public Value() {
         this(null);
     }
 
+    /**
+     * Sets value
+     * @param value
+     */
+    public void setValue(T value) {
+        this.value = value;
+    }
+
+    /**
+     * Returns value
+     * @return
+     */
+    public T getValue() {
+        return value;
+    }
 }

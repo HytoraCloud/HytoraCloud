@@ -112,9 +112,12 @@ public class CloudServer extends JavaPlugin {
         }
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LABYMOD");
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");
-        int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
-        Bukkit.getScheduler().cancelTask(animationScheduler);
-
+        try {
+            int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
+            Bukkit.getScheduler().cancelTask(animationScheduler);
+        } catch (NullPointerException e) {
+            System.out.println("[CloudAPI] Couldn't cancel task for SignUpdater!");
+        }
     }
 
     public void executeCommand(String command) {

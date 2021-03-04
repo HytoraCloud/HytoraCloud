@@ -20,8 +20,12 @@ public class CloudManager {
 
     public CloudManager(CloudAPI cloudAPI) {
         this.cloudAPI = cloudAPI;
-
-        this.serviceState = cloudAPI.getService().getServiceState();
+        try {
+            this.serviceState = cloudAPI.getService().getServiceState();
+        } catch (NullPointerException e) {
+            //Exception thrown by PaperSpigot
+            this.serviceState = ServiceState.LOBBY;
+        }
         this.maxPlayers = Bukkit.getMaxPlayers();
         this.motd = Bukkit.getMotd();
 
