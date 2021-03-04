@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.permission;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.CloudType;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -11,6 +12,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,7 +47,9 @@ public class PermissionService extends CloudService {
             List<CloudPlayerData> list = this.getCloudLibrary().getService(DatabaseService.class).getDatabase().loadEntries();
             this.permissionPool.getPlayerCache().addAll(list);
             this.permissionPool.setEnabled(this.enabled);
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+            //Ignoring because it throws null on startUp
+        }
     }
 
     public void load() {
@@ -81,7 +85,8 @@ public class PermissionService extends CloudService {
                         "bungeecord.command.server",
                         "bungeecord.command.list"
                     ),
-                    Collections.singletonList("Player")
+                    Collections.singletonList("Player"),
+                    new SerializableDocument()
             );
             vsonObject.append("enabled", true);
             vsonObject.append(defaultGroup.getName(), defaultGroup);
@@ -91,14 +96,20 @@ public class PermissionService extends CloudService {
             return;
         }
         try {
-            VsonObject vsonObject = new VsonObject(file);
+            VsonObject vsonObject = new VsonObject(file, VsonSettings.OVERRITE_VALUES);
             for (String key : vsonObject.keys()) {
                 if (key.equalsIgnoreCase("enabled")) {
                     enabled = vsonObject.getBoolean(key);
                     this.permissionPool.setEnabled(enabled);
                     continue;
                 }
-                PermissionGroup group = vsonObject.getObject(key, PermissionGroup.class);
+                VsonObject permsGroup = vsonObject.getVson(key);
+                if (!permsGroup.has("entries")) {
+                    permsGroup.append("entries", new SerializableDocument());
+                    vsonObject.append(key, permsGroup);
+                    vsonObject.save();
+                }
+                PermissionGroup group = permsGroup.getAs(PermissionGroup.class);
                 this.permissionPool.getPermissionGroups().add(group);
             }
         } catch (IOException e) {
@@ -119,6 +130,7 @@ public class PermissionService extends CloudService {
         if (this.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory() == null) {
             return;
         }
+
         this.permissionPool.save(this.file, this.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory(), getCloudLibrary().getService(DatabaseService.class).getDatabase());
     }
 

@@ -135,6 +135,12 @@ public class PermissionPool implements Serializable {
         this.permissionGroups.set(this.permissionGroups.indexOf(group), group);
     }
 
+    public void updatePermissionGroup(PermissionGroup permissionGroup) {
+        PermissionGroup group = this.getPermissionGroupFromName(permissionGroup.getName());
+        this.permissionGroups.set(this.permissionGroups.indexOf(group), permissionGroup);
+        this.update();
+    }
+
     public void updatePermissionGroup(String playerName, PermissionGroup group, Integer i, PermissionValidality validality) {
         CloudPlayerData data = this.getPlayerDataOrDefault(playerName);
         if (data == null) {
@@ -143,11 +149,7 @@ public class PermissionPool implements Serializable {
         this.playerCache.remove(data);
         List<PermissionEntry> permissionEntries = new LinkedList<>(data.getPermissionEntries());
         PermissionEntry entry = new PermissionEntry(this.tryUUID(playerName), group.getName(), "");
-        for (PermissionEntry permissionEntry : permissionEntries) {
-            if (permissionEntry.getPermissionGroup().equalsIgnoreCase(entry.getPermissionGroup())) {
-                permissionEntries.remove(permissionEntry);
-            }
-        }
+        permissionEntries.removeIf(permissionEntry -> permissionEntry.getPermissionGroup().equalsIgnoreCase(entry.getPermissionGroup()));
 
         permissionEntries.add(entry);
         if (i > 0) {
@@ -215,20 +217,10 @@ public class PermissionPool implements Serializable {
     }
 
     public CloudPlayerData getPlayerData(String playerName) {
-        for (CloudPlayerData cloudPlayerData : this.playerCache) {
-            if (cloudPlayerData.getName().equalsIgnoreCase(playerName)) {
-                return cloudPlayerData;
-            }
-        }
-        return null;
+        return this.playerCache.stream().filter(cloudPlayerData -> cloudPlayerData.getName().equalsIgnoreCase(playerName)).findFirst().orElse(null);
     }
     public CloudPlayerData getPlayerData(UUID uuid) {
-        for (CloudPlayerData cloudPlayerData : this.playerCache) {
-            if (cloudPlayerData.getUuid().equals(uuid)) {
-                return cloudPlayerData;
-            }
-        }
-        return null;
+        return this.playerCache.stream().filter(cloudPlayerData -> cloudPlayerData.getUuid().equals(uuid)).findFirst().orElse(null);
     }
 
     public CloudPlayerData getPlayerDataOrDefault(String playerName) {
@@ -289,28 +281,20 @@ public class PermissionPool implements Serializable {
     }
 
     public VsonObject save(File file, File directory, CloudDatabase database) {
-        VsonObject document = null;
         try {
-            document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+            VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+            document.clear();
+            for (PermissionGroup permissionGroup : this.permissionGroups) {
+                document.append(permissionGroup.getName(), permissionGroup);
+            }
+            document.save();
+            this.playerCache.forEach(cloudPlayerData -> database.setPlayerData(cloudPlayerData.getUuid(), cloudPlayerData));
+            this.clearInvalidUUIDs(directory);
+            return document;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (document == null) {
-            return null;
-        }
-        for (PermissionGroup permissionGroup : this.permissionGroups) {
-            document.append(permissionGroup.getName(), permissionGroup);
-        }
-        document.save();
-
-        for (CloudPlayerData cloudPlayerData : this.playerCache) {
-            database.setPlayerData(cloudPlayerData.getUuid(), cloudPlayerData);
-            //Document dataDoc = new Document();
-            //dataDoc.appendAll(cloudPlayerData);
-            //dataDoc.save(new File(directory, cloudPlayerData.getUuid() + ".json"));
-        }
-        this.clearInvalidUUIDs(directory);
-        return document;
+        return null;
     }
 
     public void clearInvalidUUIDs(File directory) {

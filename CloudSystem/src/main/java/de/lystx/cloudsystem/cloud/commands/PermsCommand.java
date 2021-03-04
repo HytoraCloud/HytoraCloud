@@ -36,17 +36,23 @@ public class PermsCommand implements TabCompletable {
             if (args[0].equalsIgnoreCase("info")) {
                 String player = args[1];
                 PermissionPool pool = CloudSystem.getInstance().getService(PermissionService.class).getPermissionPool();
-                PermissionGroup group = pool.getHighestPermissionGroup(player);
-                if (group == null) {
-                    sender.sendMessage("ERROR", "§cThe player §e" + player + " §cis not registered!");
+                PermissionGroup group = pool.getPermissionGroupFromName(player);
+                if (group != null) {
+                    sender.sendMessage("INFO", "§7Name: §b" + group.getName());
+                    sender.sendMessage("INFO", "§7ID: §b" + group.getId());
+                    sender.sendMessage("INFO", "§7Display: §b" + group.getDisplay() + "PlayerName");
+                    sender.sendMessage("INFO", "§7Prefix: §b" + group.getPrefix());
+                    sender.sendMessage("INFO", "§7Suffix: §b" + group.getSuffix());
+                    sender.sendMessage("INFO", "§7Chatformat: §b" + group.getChatFormat());
+                    sender.sendMessage("INFO", "§7Permissions: §b" + group.getPermissions().toString());
+                    sender.sendMessage("INFO", "§7Inheritances: §b" + group.getInheritances().toString());
+                    sender.sendMessage("INFO", "§7Entries:");
+                    group.getEntries().forEach((key, value) -> {
+                        sender.sendMessage("INFO", "  > §a" + key + " §8: §e" + value);
+                    });
                     return;
                 }
-                UUID uuid = pool.tryUUID(player);
-                if (uuid == null) {
-                    sender.sendMessage("ERROR", "§cThe uuid of player §e" + player + " §cis invalid!");
-                    return;
-                }
-                sender.sendMessage("ERROR", "§cPlease use §e<players info " + player + "> §c!");
+                sender.sendMessage("ERROR", "§cThe group §e" + player + " §cdoesn't exist!");
             } else {
                 this.help(sender);
             }
@@ -143,7 +149,7 @@ public class PermsCommand implements TabCompletable {
         sender.sendMessage("INFO", "§9perms list §7| Lists all groups");
         sender.sendMessage("INFO", "§9perms add <player> <group> <lifetime/timeSpan> §7| Adds player to a group");
         sender.sendMessage("INFO", "§9perms remove <player> <group>  §7| Removes player from a group");
-        sender.sendMessage("INFO", "§9perms info <player> §7| Displays infos about a player");
+        sender.sendMessage("INFO", "§9perms info <group> §7| Displays infos about a group");
     }
 
     @Override
