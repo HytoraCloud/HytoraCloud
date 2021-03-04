@@ -1,9 +1,0 @@
-{
-  "type": "FILES",
-  "host": "127.0.0.1",
-  "username": "root",
-  "password": "password",
-  "port": 3306,
-  "defaultDatabase": "database",
-  "collectionOrTable": "collectionOrTable"
-}
