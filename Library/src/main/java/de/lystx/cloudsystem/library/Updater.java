@@ -37,22 +37,6 @@ public class Updater {
         return (getCloudVersion().equalsIgnoreCase(getNewVersion()));
     }
 
-
-    public static void main(String[] args) {
-        Updater updater = new Updater();
-        updater.scheduleExample();
-    }
-
-    @Schedule(delay = 0L, period = 20L, sync = false)
-    public void scheduleExample() {
-        Scheduler.schedule(this, new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("PENIS");
-            }
-        });
-    }
-
     /**
      * Runs the AutoUpdater
      * @param console > CloudConsole

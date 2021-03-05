@@ -12,7 +12,6 @@
         <module>Library</module>
         <module>CloudSystem</module>
         <module>ServerAPI</module>
-        <module>Modules</module>
     </modules>
 
     <properties>
