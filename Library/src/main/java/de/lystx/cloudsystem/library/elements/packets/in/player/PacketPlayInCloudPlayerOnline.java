@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.elements.packets.in.other;
+package de.lystx.cloudsystem.library.elements.packets.in.player;
 
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;

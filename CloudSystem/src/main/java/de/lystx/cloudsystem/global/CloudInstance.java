@@ -10,6 +10,7 @@ import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
+import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
 import de.lystx.cloudsystem.library.service.event.EventService;
@@ -26,6 +27,7 @@ import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import de.lystx.cloudsystem.library.service.util.LogService;
+import de.lystx.cloudsystem.library.service.util.NetworkInfo;
 import de.lystx.cloudsystem.library.webserver.WebServer;
 import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
@@ -137,6 +139,7 @@ public class CloudInstance extends CloudLibrary {
         if (this.getService(ModuleService.class) != null) {
             this.getService(ModuleService.class).shutdown();
         }
+        this.getService(StatisticsService.class).getStatistics().add("allCPUUsage", new NetworkInfo().getCPUUsage());
 
         this.getService(Scheduler.class).scheduleDelayedTask(() -> {
             try {

@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
@@ -101,8 +102,11 @@ public class ServiceProviderStart {
                 if (serverIcon.exists()) {
                     FileUtils.copyFile(serverIcon, new File(serverLocation, "server-icon.png"));
                 }
+
+
+                ProxyConfig config = service.getServiceGroup().getValues().has("proxyConfig") ? service.getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
                 FileWriter writer = new FileWriter(serverLocation + "/config.yml");
-                writer.write("player_limit: " + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getProxyConfig().getMaxPlayers() + "\n" +
+                writer.write("player_limit: " + config.getMaxPlayers() + "\n" +
                         "permissions:\n" +
                         "  default: []\n" +
                         "  admin:\n" +
@@ -115,13 +119,13 @@ public class ServiceProviderStart {
                         "    - bungeecord.command.list\n" +
                         "timeout: 30000\n" +
                         "log_commands: false\n" +
-                        "online_mode: " + service.getServiceGroup().getValues().getBoolean("onlineMode", true) + "\n" +
+                        "online_mode: " + config.isOnlineMode() + "\n" +
                         "disabled_commands:\n" +
                         "  - disabledcommandhere\n" +
                         "servers:\n" +
                         "  Lobby-1:\n" +
-                        "    motd: '" + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getProxyConfig().getMotdMaintenance().getFirstLine() + "'\n" +
-                        "    address: '127.0.0.1:" + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getServerStartPort() + "'\n" +
+                        "    motd: '" + config.getMotdMaintenance().getFirstLine() + "'\n" +
+                        "    address: '127.0.0.1:" + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getNetworkConfig().getServerStartPort() + "'\n" +
                         "    restricted: false\n" +
                         "listeners:\n" +
                         "  - query_port: 25577\n" +
@@ -138,7 +142,7 @@ public class ServiceProviderStart {
                         "    tab_size: 60\n" +
                         "    ping_passthrough: false\n" +
                         "    force_default_server: false\n" +
-                        "    proxy_protocol: " + (cloudLibrary.getCloudType().equals(CloudType.CLOUDSYSTEM) ? cloudLibrary.getService(ConfigService.class).getNetworkConfig().isProxyProtocol() : ((NetworkConfig)cloudLibrary.getCustoms().get("networkConfig")).isProxyProtocol()) + "\n" +
+                        "    proxy_protocol: " + (cloudLibrary.getCloudType().equals(CloudType.CLOUDSYSTEM) ? cloudLibrary.getService(ConfigService.class).getNetworkConfig().getNetworkConfig().isProxyProtocol() : ((NetworkConfig)cloudLibrary.getCustoms().get("networkConfig")).getNetworkConfig().isProxyProtocol()) + "\n" +
                         "ip_forward: true\n" +
                         "network_compression_threshold: 256\n" +
                         "groups:\n" +

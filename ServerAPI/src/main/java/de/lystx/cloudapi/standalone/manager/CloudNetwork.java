@@ -74,7 +74,24 @@ public class CloudNetwork {
     public List<Service> getServices() {
         List<Service> list = new LinkedList<>();
         for (List<Service> value : this.services.values()) {
-            list.addAll(value);
+            for (Service service : value) {
+                if (list.stream().filter(s -> s.getName().equalsIgnoreCase(service.getName())).findFirst().orElse(null) == null) {
+                    list.add(service);
+                }
+            }
+        }
+        return list;
+    }
+
+    public List<Service> getServices(ServiceState serviceState) {
+        List<Service> list = new LinkedList<>();
+        for (Service service : this.getServices()) {
+            if (!service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
+                continue;
+            }
+            if (service.getServiceState().equals(serviceState)) {
+                list.add(service);
+            }
         }
         return list;
     }

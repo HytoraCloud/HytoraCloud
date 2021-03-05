@@ -25,7 +25,10 @@ public class ReloadCommand {
             return;
         }
         sender.sendMessage("COMMAND", "§2The CloudSystem was §areloaded§2!");
-        cloudInstance.reloadNPCS();
         cloudInstance.reload();
+        cloudInstance.reloadNPCS();
+        if (cloudInstance instanceof CloudSystem) {
+            ((CloudSystem) cloudInstance).syncGroupsWithServices();
+        }
     }
 }

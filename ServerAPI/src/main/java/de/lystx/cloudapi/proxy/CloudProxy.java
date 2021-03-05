@@ -3,25 +3,17 @@ package de.lystx.cloudapi.proxy;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
 import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Getter
 public class CloudProxy extends Plugin {
@@ -64,6 +56,12 @@ public class CloudProxy extends Plugin {
         this.cloudAPI.registerCommand(new WhereAmICommand());
         this.cloudAPI.registerCommand(new WhereIsCommand());
         this.cloudAPI.registerCommand(new PermsCommand());
+        this.cloudAPI.registerCommand(new NetworkCommand());
+
+        if (this.getProxyConfig() == null) {
+            this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
+            System.out.println("[CloudAPI] Couldn't find ProxyConfig!");
+        }
 
     }
 
@@ -76,6 +74,10 @@ public class CloudProxy extends Plugin {
 
     public void executeCommand(String line) {
         ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), line);
+    }
+
+    public ProxyConfig getProxyConfig() {
+        return this.cloudAPI.getService().getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class);
     }
 
     public int getProxyPort() {

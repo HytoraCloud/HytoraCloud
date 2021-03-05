@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 
@@ -19,29 +20,24 @@ public class MaintenanceCommand implements TabCompletable {
     @Command(name = "maintenance", description = "Manages maintenance of network", aliases = "mc")
     public void execute(CloudCommandSender sender, String[] args) {
         NetworkConfig config = CloudSystem.getInstance().getService(ConfigService.class).getNetworkConfig();
-        ProxyConfig proxyConfig = config.getProxyConfig();
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("switch")) {
-
-                if (!proxyConfig.isMaintenance()) {
-                    proxyConfig.setMaintenance(true);
-                    config.setProxyConfig(proxyConfig);
-                    CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
-                    CloudSystem.getInstance().getService(ConfigService.class).save();
-                    CloudSystem.getInstance().reload();
+                GlobalProxyConfig globalProxyConfig = config.getNetworkConfig();
+                if (!config.getNetworkConfig().isMaintenance()) {
+                    globalProxyConfig.setMaintenance(true);
                     sender.sendMessage("INFO", "§9The network is now in §amaintenance§9!");
                 } else {
-                    proxyConfig.setMaintenance(false);
-                    config.setProxyConfig(proxyConfig);
-                    CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
-                    CloudSystem.getInstance().getService(ConfigService.class).save();
-                    CloudSystem.getInstance().reload();
+                    globalProxyConfig.setMaintenance(false);
                     sender.sendMessage("INFO", "§9The network is no longer in §cmaintenance§9!");
                 }
+                config.setNetworkConfig(globalProxyConfig);
+                CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
+                CloudSystem.getInstance().getService(ConfigService.class).save();
+                CloudSystem.getInstance().reload();
                 CloudSystem.getInstance().getService(StatisticsService.class).getStatistics().add("maintenanceSwitched");
             } else if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("INFO", "§bWhitelisted Players§7:");
-                for (String whitelistedPlayer : proxyConfig.getWhitelistedPlayers()) {
+                for (String whitelistedPlayer : config.getNetworkConfig().getWhitelistedPlayers()) {
                     sender.sendMessage("INFO", "§9" + whitelistedPlayer);
                 }
             } else {
@@ -49,8 +45,10 @@ public class MaintenanceCommand implements TabCompletable {
             }
         } else if (args.length == 2) {
             String identifier = args[0];
-            String user = args[1];
-            List<String> whitelist = proxyConfig.getWhitelistedPlayers();
+            String user = args[1].trim();
+
+            GlobalProxyConfig globalProxyConfig = config.getNetworkConfig();
+            List<String> whitelist = globalProxyConfig.getWhitelistedPlayers();
             boolean contains = whitelist.toString().toLowerCase().contains(user.toLowerCase());
             if (identifier.equalsIgnoreCase("add")) {
                 if (contains) {
@@ -58,8 +56,8 @@ public class MaintenanceCommand implements TabCompletable {
                     return;
                 }
                 whitelist.add(user);
-                proxyConfig.setWhitelistedPlayers(whitelist);
-                config.setProxyConfig(proxyConfig);
+                globalProxyConfig.setWhitelistedPlayers(whitelist);
+                config.setNetworkConfig(globalProxyConfig);
                 CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getService(ConfigService.class).save();
                 CloudSystem.getInstance().reload();
@@ -70,8 +68,8 @@ public class MaintenanceCommand implements TabCompletable {
                     return;
                 }
                 whitelist.remove(user);
-                proxyConfig.setWhitelistedPlayers(whitelist);
-                config.setProxyConfig(proxyConfig);
+                globalProxyConfig.setWhitelistedPlayers(whitelist);
+                config.setNetworkConfig(globalProxyConfig);
                 CloudSystem.getInstance().getService(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getService(ConfigService.class).save();
                 CloudSystem.getInstance().reload();
@@ -100,7 +98,7 @@ public class MaintenanceCommand implements TabCompletable {
             list.add("remove");
             list.add("switch");
         } else if (args.length == 3 && args[1].equalsIgnoreCase("remove")) {
-            list.addAll(cloudLibrary.getService(ConfigService.class).getNetworkConfig().getProxyConfig().getWhitelistedPlayers());
+            list.addAll(cloudLibrary.getService(ConfigService.class).getNetworkConfig().getNetworkConfig().getWhitelistedPlayers());
         }
         return list;
     }

@@ -13,7 +13,9 @@ import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacke
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
+import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
@@ -36,13 +38,13 @@ public class CloudCommand implements TabCompletable {
                         CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInReload());
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");
                     } else if (args[0].equalsIgnoreCase("tps")) {
-                        CloudAPI.getInstance().sendPacket(new PacketPlayInTPS(player.getName()));
-                    } else if (args[0].equalsIgnoreCase("stats")) {
-                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§bStatistics§8:");
 
-                        CloudAPI.getInstance().getStatistics().getStats().forEach((stats, i) -> {
-                            player.sendMessage(" §8» §b" + stats + " §8┃ §7" + i);
-                        });
+                        String format = CloudAPI.getInstance().sendQuery(new PacketPlayInTPS()).getResult().getString("tps");
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§6TPS§8: §b" + format);
+
+                    } else if (args[0].equalsIgnoreCase("stats")) {
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§c/networkInfo");
+
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());
                         if (playerData == null) {
@@ -140,7 +142,7 @@ public class CloudCommand implements TabCompletable {
                             });
                         } else if (args[1].equalsIgnoreCase("maintenance")) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Players:");
-                            CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().forEach(whitelisted -> {
+                            CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().forEach(whitelisted -> {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§8» §7" + whitelisted);
                             });
                         } else {
@@ -176,36 +178,39 @@ public class CloudCommand implements TabCompletable {
                         if (groupname.equalsIgnoreCase("switch")) {
                             boolean maintenance = Boolean.parseBoolean(args[2]);
                             NetworkConfig networkConfig = CloudAPI.getInstance().getNetworkConfig();
-                            ProxyConfig proxyConfig = networkConfig.getProxyConfig();
-                            proxyConfig.setMaintenance(maintenance);
-                            networkConfig.setProxyConfig(proxyConfig);
+                            GlobalProxyConfig globalProxyConfig = networkConfig.getNetworkConfig();
+                            globalProxyConfig.setMaintenance(maintenance);
+                            networkConfig.setNetworkConfig(globalProxyConfig);
                             CloudAPI.getInstance().getNetwork().updateNetworkConfig(networkConfig);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Set maintenance of §bCloudSystem §7to §b" + (maintenance ? "§a" : "§c") + maintenance + "§8!");
                         } else if (groupname.equalsIgnoreCase("add")) {
                             String playername = args[2];
-                            if (CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(playername)) {
+                            if (CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().contains(playername)) {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + playername + " §cis already added to maintenance§8!");
                                 return;
                             }
 
                             NetworkConfig networkConfig = CloudAPI.getInstance().getNetworkConfig();
-                            ProxyConfig proxyConfig = networkConfig.getProxyConfig();
-                            List<String> whitelist = proxyConfig.getWhitelistedPlayers();
+                            List<String> whitelist = networkConfig.getNetworkConfig().getWhitelistedPlayers();
                             whitelist.add(playername);
-                            networkConfig.setProxyConfig(proxyConfig);
+                            GlobalProxyConfig globalProxyConfig = networkConfig.getNetworkConfig();
+                            globalProxyConfig.setWhitelistedPlayers(whitelist);
+                            networkConfig.setNetworkConfig(globalProxyConfig);
                             CloudAPI.getInstance().getNetwork().updateNetworkConfig(networkConfig);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + playername + " §7was added to maintenance§8!");
                         } else if (groupname.equalsIgnoreCase("remove")) {
                             String playername = args[2];
-                            if (!CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(playername)) {
+                            if (!CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().contains(playername)) {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + playername + " §cis not added to maintenance§8!");
                                 return;
                             }
                             NetworkConfig networkConfig = CloudAPI.getInstance().getNetworkConfig();
-                            ProxyConfig proxyConfig = networkConfig.getProxyConfig();
-                            List<String> whitelist = proxyConfig.getWhitelistedPlayers();
+                            List<String> whitelist = networkConfig.getNetworkConfig().getWhitelistedPlayers();
                             whitelist.remove(playername);
-                            networkConfig.setProxyConfig(proxyConfig);
+
+                            GlobalProxyConfig globalProxyConfig = networkConfig.getNetworkConfig();
+                            globalProxyConfig.setWhitelistedPlayers(whitelist);
+                            networkConfig.setNetworkConfig(globalProxyConfig);
                             CloudAPI.getInstance().getNetwork().updateNetworkConfig(networkConfig);
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + playername + " §7was removed from maintenance§8!");
                         } else {

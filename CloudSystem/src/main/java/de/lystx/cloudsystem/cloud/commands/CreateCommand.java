@@ -13,6 +13,7 @@ import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.FallbackConfig;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
@@ -51,7 +52,9 @@ public class CreateCommand implements TabCompletable {
 
                     SerializableDocument document = new SerializableDocument();
                     if (setup.getType().equalsIgnoreCase("PROXY")) {
-                        document.append("onlineMode", !setup.isOnlineMode());
+                        ProxyConfig config = ProxyConfig.defaultConfig();
+                        config.setOnlineMode(!setup.isOnlineMode());
+                        document.append("proxyConfig", config);
                     }
                     ServiceGroup serviceGroup = new ServiceGroup(
                             UUID.randomUUID(),

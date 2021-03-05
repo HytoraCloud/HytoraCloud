@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.command;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
@@ -18,7 +19,7 @@ public class ListCommand{
             if (player.hasPermission("cloudsystem.list.command") || player.hasPermission("*")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("global")) {
-                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7At the moment there are §b" + CloudAPI.getInstance().getCloudPlayers().getAll().size() + " §7out of §b" + CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers() + " players online§8!");
+                        player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7At the moment there are §b" + CloudAPI.getInstance().getCloudPlayers().getAll().size() + " §7out of §b" + CloudProxy.getInstance().getProxyConfig().getMaxPlayers() + " players online§8!");
                     } else {
                         this.help(player);
                     }

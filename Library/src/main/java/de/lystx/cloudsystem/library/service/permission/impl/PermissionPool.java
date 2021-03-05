@@ -306,7 +306,7 @@ public class PermissionPool implements Serializable {
         CloudPlayerData pre = this.getPlayerData(playerName);
         if (pre == null) {
             UUID uuid = this.tryUUID(playerName);
-            CloudPlayerData data = new DefaultCloudPlayerData(uuid, playerName);
+            CloudPlayerData data = new DefaultCloudPlayerData(uuid, playerName, "-1");
             data.setDefault(true);
             return data;
         } else {
@@ -362,7 +362,16 @@ public class PermissionPool implements Serializable {
      * @return group from Name
      */
     public PermissionGroup getPermissionGroupFromName(String name) {
-        return this.permissionGroups.stream().filter(permissionGroup -> permissionGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return this
+                .permissionGroups
+                .stream().
+                        filter(permissionGroup ->
+                                permissionGroup
+                                        .getName().
+                                        equalsIgnoreCase(name)
+                        ).
+                        findFirst()
+                .orElse(null);
     }
 
     /**

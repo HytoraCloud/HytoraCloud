@@ -15,7 +15,7 @@ import java.util.Map;
 @Setter
 public class Statistics implements Serializable {
 
-    private final Map<String, Integer> stats;
+    private final Map<String, Double> stats;
 
     private File file;
 
@@ -43,17 +43,19 @@ public class Statistics implements Serializable {
     public void load(VsonObject document) {
         this.file = document.getFile();
         if (document.isEmpty()) {
-            document.append("connections", 0);
-            document.append("startedServices", 0);
-            document.append("connections", 0);
-            document.append("bootedUp", 0);
-            document.append("executedCommands", 0);
-            document.append("maintenanceSwitched", 0);
-            document.append("reloadedCloud", 0);
+            document.append("connections", 0D);
+            document.append("startedServices", 0D);
+            document.append("pings", 0D);
+            document.append("registeredPlayers", 0D);
+            document.append("bootedUp", 0D);
+            document.append("executedCommands", 0D);
+            document.append("maintenanceSwitched", 0D);
+            document.append("reloadedCloud", 0D);
+            document.append("allCPUUsage", 0D);
             document.save(this.file);
         }
         for (String key : document.keys()) {
-            this.stats.put(key, document.getInteger(key, 0));
+            this.stats.put(key, document.getDouble(key, 0D));
         }
     }
 
@@ -62,7 +64,16 @@ public class Statistics implements Serializable {
      * @param key
      */
     public void add(String key) {
-        this.stats.put(key, (this.stats.getOrDefault(key, 0) + 1));
+        this.add(key, 1D);
+    }
+
+    /**
+     * Adds stats
+     * @param key
+     * @param add
+     */
+    public void add(String key, Double add) {
+        this.stats.put(key, (this.stats.getOrDefault(key, 0D) + add));
     }
 
     /**
@@ -72,7 +83,7 @@ public class Statistics implements Serializable {
     public VsonObject toVson() {
         VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
         this.stats.forEach((key, i) -> {
-            document.append(key, (int)i);
+            document.append(key, (double)i);
         });
         return document;
     }

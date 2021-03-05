@@ -17,6 +17,7 @@ public class PacketHandlerReload  {
     public void handleReload(PacketPlayInReload reload) {
         this.cloudSystem.reload();
         this.cloudSystem.reloadNPCS();
+        cloudSystem.syncGroupsWithServices();
     }
 
 }

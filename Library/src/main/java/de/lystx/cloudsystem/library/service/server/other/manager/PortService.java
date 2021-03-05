@@ -32,7 +32,7 @@ public class PortService {
      * @return
      */
     public int getFreePort() {
-        for (int i = this.networkConfig.getServerStartPort(); i < (this.networkConfig.getServerStartPort() + 300000);) {
+        for (int i = this.networkConfig.getNetworkConfig().getServerStartPort(); i < (this.networkConfig.getNetworkConfig().getServerStartPort() + 300000);) {
             if (this.portlist.contains(String.valueOf(i))) {
                 i++;
                 continue;
@@ -48,7 +48,7 @@ public class PortService {
      * @return
      */
     public int getFreeProxyPort() {
-        for (int i = this.networkConfig.getProxyStartPort(); i < (this.networkConfig.getProxyStartPort() + 300000);) {
+        for (int i = this.networkConfig.getNetworkConfig().getProxyStartPort(); i < (this.networkConfig.getNetworkConfig().getProxyStartPort() + 300000);) {
             if (this.proxyPortList.contains(String.valueOf(i))) {
                 i++;
                 continue;

@@ -1,11 +1,14 @@
 package de.lystx.cloudsystem.library.service.database.impl;
 
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -43,7 +46,7 @@ public class Files implements CloudDatabase {
     @Override
     public void registerPlayer(CloudPlayer cloudPlayer) {
         if (!this.isRegistered(cloudPlayer.getUniqueId())) {
-            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUniqueId(), cloudPlayer.getName());
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayer.getIpAddress());
             this.setPlayerData(cloudPlayer.getUniqueId(), data);
         } else {
             CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUniqueId());
@@ -69,14 +72,10 @@ public class Files implements CloudDatabase {
     public void setPlayerData(UUID uuid, CloudPlayerData data) {
         File dir = this.databaseService.getCloudLibrary().getService(FileService.class).getCloudPlayerDirectory();
         File file = new File(dir, uuid + ".json");
-        try {
-            VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
-            document.clear();
-            document.putAll(data);
-            document.save();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Document document = new Document(file);
+        document.clear();
+        document.append(data);
+        document.save();
     }
 
     @Override

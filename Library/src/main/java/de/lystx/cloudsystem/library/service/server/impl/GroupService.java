@@ -33,6 +33,7 @@ public class GroupService extends CloudService {
      * Loads all groups
      */
     public void loadGroups() {
+        this.groups.clear();
         if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             for (File file : this.getCloudLibrary().getService(FileService.class).getGroupsDirectory().listFiles()) {
                 if (file.getName().endsWith(".json")) {

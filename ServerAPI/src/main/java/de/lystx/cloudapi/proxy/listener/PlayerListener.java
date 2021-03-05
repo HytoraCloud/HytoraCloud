@@ -34,14 +34,14 @@ public class PlayerListener implements Listener {
         if (cloudPlayer == null) {
             cloudAPI.sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(connection.getName(), connection.getUuid(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName())));
 
-            if (!cloudAPI.getNetworkConfig().getProxyConfig().isEnabled()) {
+            if (!CloudProxy.getInstance().getProxyConfig().isEnabled()) {
                 return;
             }
 
-            if (cloudAPI.getNetworkConfig()
-                    .getProxyConfig().isMaintenance()
+            if (this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance()
                     &&
-                    !cloudAPI.getNetworkConfig().getProxyConfig()
+                    !cloudAPI.getNetworkConfig()
+                            .getNetworkConfig()
                             .getWhitelistedPlayers().contains(connection.getName())
                     &&
                     !cloudAPI.getPermissionPool()
@@ -57,7 +57,7 @@ public class PlayerListener implements Listener {
                     event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
                 }
             }
-            if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= cloudAPI.getNetworkConfig().getProxyConfig().getMaxPlayers()) {
+            if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= CloudProxy.getInstance().getProxyConfig().getMaxPlayers()) {
                 ProxyServerLoginFailEvent failEvent = new ProxyServerLoginFailEvent(event.getConnection(), ProxyServerLoginFailEvent.Reason.NETWORK_FULL);
                 ProxyServer.getInstance().getPluginManager().callEvent(failEvent);
                 event.setCancelled(true);
@@ -153,6 +153,9 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
+        if (CloudAPI.getInstance().getCloudPlayers().get(player.getName()) == null) {
+            cloudAPI.sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), player.getServer().getInfo().getName(), cloudAPI.getNetwork().getProxy(player.getPendingConnection().getVirtualHost().getPort()).getName())));
+        }
     }
 
     @EventHandler

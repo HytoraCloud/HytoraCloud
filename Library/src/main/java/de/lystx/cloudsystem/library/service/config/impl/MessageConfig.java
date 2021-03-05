@@ -1,12 +1,13 @@
 package de.lystx.cloudsystem.library.service.config.impl;
 
+import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class MessageConfig implements Serializable {
+public class MessageConfig implements Serializable, Objectable {
 
     private final String prefix;
     private final String serverStartMessage;

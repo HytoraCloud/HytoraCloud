@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -12,7 +13,7 @@ public class NetworkManager {
     public void switchMaintenance(Boolean to) {
         if (to) {
             for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-                if (CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance() && !CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getWhitelistedPlayers().contains(player.getName()) && !CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), "cloudsystem.network.maintenance") ) {
+                if (CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().isMaintenance() && !CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().contains(player.getName()) && !CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), "cloudsystem.network.maintenance") ) {
                     player.disconnect(
                             new TextComponent(
                                     CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().

@@ -1,11 +1,15 @@
 package de.lystx.cloudsystem.cloud.booting;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
+import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
+import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
@@ -42,12 +46,12 @@ public class CloudBootingSetupNotDone {
                 "                   /_/      \n");
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cSetup crashes if trying to use history (arrow keys)");
-        cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
+        cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cMight have to enter some values multiple times (If 3 times > Kill process and restart)");
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         cloudSystem.getService(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
-        Value<Spigot> spigot = new Value<>(null);
-        Value<String> bungeeCord = new Value<>(null);
+        Value<Spigot> spigot = new Value<>();
+        Value<String> bungeeCord = new Value<>();
 
         cloudSetup.start(cloudSystem.getConsole(), setup -> {
             if (setup.isCancelled()) {
@@ -55,8 +59,7 @@ public class CloudBootingSetupNotDone {
                 System.exit(0);
             }
 
-            CloudSetup sp = (CloudSetup) setup;
-            if (!sp.getDatabase().equalsIgnoreCase("FILES") && !sp.getDatabase().equalsIgnoreCase("MONGODB") && !sp.getDatabase().equalsIgnoreCase("MYSQL")) {
+            if (!setup.getDatabase().equalsIgnoreCase("FILES") && !setup.getDatabase().equalsIgnoreCase("MONGODB") && !setup.getDatabase().equalsIgnoreCase("MYSQL")) {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cPlease provide a §evalid database§c!");
                 System.exit(0);
             }
@@ -64,19 +67,16 @@ public class CloudBootingSetupNotDone {
             document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.getVsonSettings().add(VsonSettings.OVERRITE_VALUES);
             document.append("setupDone", true);
-            document.append("host", sp.getHostname());
-            document.append("port", sp.getPort());
-            document.append("proxyProtocol", sp.isProxyProtocol());
-            document.append("autoUpdater", sp.isAutoUpdater());
-            VsonObject proxy = document.getVson("proxyConfig");
-            proxy.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
-            proxy.getVsonSettings().add(VsonSettings.OVERRITE_VALUES);
-            proxy.append("maxPlayers", sp.getMaxPlayers());
-            document.append("proxyConfig", proxy);
+            document.append("host", setup.getHostname());
+            document.append("port", setup.getPort());
+            document.append("proxyProtocol", setup.isProxyProtocol());
+            document.append("autoUpdater", setup.isAutoUpdater());
             document.save();
+            spigot.setValue(Spigot.byKey(setup.getSpigotVersion()));
+            bungeeCord.setValue(setup.getBungeeCordType());
 
-            spigot.setValue(Spigot.byKey(sp.getSpigotVersion()));
-            bungeeCord.setValue(sp.getBungeeCordType());
+            ProxyConfig config = ProxyConfig.defaultConfig();
+            config.setMaxPlayers(setup.getMaxPlayers());
 
             cloudSystem.getService(GroupService.class).createGroup(new ServiceGroup(
                     UUID.randomUUID(),
@@ -91,7 +91,8 @@ public class CloudBootingSetupNotDone {
                     100,
                     false,
                     false,
-                    true
+                    true,
+                    new SerializableDocument().append("proxyConfig", config)
             ));
 
 
@@ -115,15 +116,14 @@ public class CloudBootingSetupNotDone {
                 System.exit(0);
                 return;
             }
-            if (!sp.getDatabase().equalsIgnoreCase("FILES")) {
+            if (!setup.getDatabase().equalsIgnoreCase("FILES")) {
                 cloudSystem.getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");
                 cloudSystem.getConsole().getLogger().sendMessage("§9");
                 cloudSystem.getConsole().getLogger().sendMessage("§9");
                 DatabaseSetup databaseSetup = new DatabaseSetup();
-                databaseSetup.start(cloudSystem.getConsole(), s -> {
-                    DatabaseSetup ds = (DatabaseSetup)s;
+                databaseSetup.start(cloudSystem.getConsole(), ds -> {
                     VsonObject document1 = new VsonObject(VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST)
-                            .append("cloudType", sp.getDatabase().toUpperCase())
+                            .append("cloudType", setup.getDatabase().toUpperCase())
                             .append("host", ds.getHost())
                             .append("port", ds.getPort())
                             .append("username", ds.getUsername())
@@ -135,8 +135,9 @@ public class CloudBootingSetupNotDone {
                 });
             }
 
+            cloudSystem.getService(StatisticsService.class).getStatistics().add("registeredPlayers");
+            cloudSystem.getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
             cloudSystem.getService(Scheduler.class).scheduleDelayedTask(() -> {
-                cloudSystem.getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
                 Action action = new Action();
 
                 cloudSystem.getService(FileService.class).download(spigot.getValue().getUrl(), new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
@@ -148,8 +149,7 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
                 cloudSystem.getService(DatabaseService.class).getDatabase().connect();
                 PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
-                permissionPool.removePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Player"));
-                permissionPool.updatePermissionGroup(sp.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1, PermissionValidality.LIFETIME);
+                permissionPool.updatePermissionGroup(setup.getFirstAdmin(), permissionPool.getPermissionGroupFromName("Admin"), -1, PermissionValidality.LIFETIME);
                 permissionPool.save(cloudSystem.getService(FileService.class).getPermissionsFile(),
                         cloudSystem.getService(FileService.class).getCloudPlayerDirectory(),
                         cloudSystem.getService(DatabaseService.class).getDatabase());

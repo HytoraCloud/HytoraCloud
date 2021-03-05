@@ -3,11 +3,9 @@ package de.lystx.cloudsystem.library.service.config.impl;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.FallbackConfig;
 import de.lystx.cloudsystem.library.service.config.impl.labymod.LabyModConfig;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.Motd;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
+import io.vson.elements.object.Objectable;
 import io.vson.elements.object.VsonObject;
-import io.vson.enums.VsonComment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,18 +15,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 @Getter @Setter @AllArgsConstructor
-public class NetworkConfig implements Serializable {
+public class NetworkConfig implements Serializable, Objectable {
 
     private String host;
     private Integer port;
-    private Integer proxyStartPort;
-    private Integer serverStartPort;
     private boolean useWrapper;
     private boolean setupDone;
     private boolean autoUpdater;
-    private boolean proxyProtocol;
 
-    private ProxyConfig proxyConfig;
+    private GlobalProxyConfig networkConfig;
     private LabyModConfig labyModConfig;
     private MessageConfig messageConfig;
     private FallbackConfig fallbackConfig;
@@ -47,41 +42,14 @@ public class NetworkConfig implements Serializable {
                 .append("useWrapper", false)
                 .append("setupDone", false)
                 .append("autoUpdater", false)
-                .append("proxyProtocol", false)
-                .append("proxyConfig",
-                    new VsonObject()
-                        .append("enabled", true)
-                        .append("maintenance", true)
-                        .append("hubCommandEnabled", true)
-                        .append("maxPlayers", 100)
-                        .append("whitelistedPlayers", new LinkedList<>())
-                        .append("tabList", new VsonObject()
-                                .append("enabled", true)
-                                .append("header", "&8┃&8&m------------------------------------------&8┃&r\n\n&8» &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&7! &8«\n&7Service &8&l‴&7&l‴ &b%server% &8┃ &7Online &8&l‴&7&l‴ &b%online_players%&8/&b%max_players%\n")
-                                .append("footer", "\n&8» &7Developer &8┃ &bLystx &8«\n &8» &7Proxy &8┃ &b%proxy%&8«\n\n&8┃&8&m------------------------------------------&8┃")
-                                .comment("enabled", VsonComment.MULTI_LINE,
-                                        "PlaceHolder for the tabList:",
-                                        "%max_players% > Max players on network",
-                                        "%online_players% > Online players on network",
-                                        "%proxy% > Player's current proxy",
-                                        "%server% > Player's current server",
-                                        "%maintenance% > If network is in maintenance (returns true or false)"
-                                )
-                        ).append("motdNormal", new VsonObject()
-                            .append("enabled", true)
-                            .append("firstLine", "&r  &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&8! &8[&f1.8 &8- &b1.16&8]")
-                            .append("secondLine", "&r  &8» &7News &8× &7Now Public &8» §a%proxy%")
-                            .append("protocolString", "&8&m--------------------------------------------||&7||&7||&7                 &8» &bCloudSystem &8┃ &7made for &byou&8                 &8||    &8||&7                 &8➜ &bTwitter &8● &7@HytoraCloud         &8||&7                 &8➜ &bDiscord &8● &7discord.io/HytoraCloud    &8||&7                 &8➜ &bSpigotSupport &8● &71.8 &8- &71.16.1   &8||&8||&8||&8&m-------------------------------------------")
-                            .append("versionString", "")
-                            .comment("enabled", VsonComment.BEHIND_VALUE, "Same PlaceHolders as for the TabList (Without %server%)"))
-                        .append("motdMaintenance", new Motd(
-                                    true,
-                                    "&r  &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&8! &8[&f1.8 &8- &b1.16&8]",
-                                    "&r  &8» &cWe are in §emaintenance &8» §a%proxy%",
-                                    "&8&m--------------------------------------------||&7||&7||&7                 &8» &bCloudSystem &8┃ &7made for &byou&8                 &8||    &8||&7                 &8➜ &bTwitter &8● &7@HytoraCloud         &8||&7                 &8➜ &bDiscord &8● &7discord.io/HytoraCloud    &8||&7                 &8➜ &bSpigotSupport &8● &71.8 &8- &71.16.1   &8||&8||&8||&8&m-------------------------------------------",
-                                    "&8» &c&oMaintenance"
-                            )
-                    ))
+                .append("networkConfig", new GlobalProxyConfig(
+                        25565,
+                        30000,
+                        false,
+                        true,
+                        true,
+                        new LinkedList<>()
+                ))
                 .append("labyModConfig",
                     new LabyModConfig(
                             false,

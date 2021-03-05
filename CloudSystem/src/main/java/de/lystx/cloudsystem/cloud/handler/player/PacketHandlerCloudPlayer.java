@@ -1,13 +1,8 @@
 package de.lystx.cloudsystem.cloud.handler.player;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationUpdateCloudPlayer;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCloudPlayerOnline;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.in.player.*;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerJoin;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerQuit;
 import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerServerChange;
@@ -39,8 +34,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
         if (packet instanceof PacketPlayInRegisterCloudPlayer) {
             PacketPlayInRegisterCloudPlayer packetPlayInRegisterCloudPlayer = (PacketPlayInRegisterCloudPlayer) packet;
             CloudPlayer cloudPlayer = packetPlayInRegisterCloudPlayer.getCloudPlayer();
-            //cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerData(cloudPlayer.getName()));
-            //cloudPlayer.setProperties(cloudSystem.getService(CloudPlayerService.class).getProperties(cloudPlayer.getUuid()));
+            cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerDataOrDefault(cloudPlayer.getName()));
             if (packetPlayInRegisterCloudPlayer.isSendMessage()) {
                 if (!list.contains(cloudPlayer.getName())) {
                     list.add(cloudPlayer.getName());
@@ -66,6 +60,11 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
 
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
             this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerJoin(cloudPlayer));
+            this.cloudSystem.reload();
+        } else if (packet instanceof PacketPlayInNetworkPing) {
+            //TODO: FIX RELOADING EVERY TIME
+            PacketPlayInNetworkPing packetPlayInNetworkPing = (PacketPlayInNetworkPing)packet;
+            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("pings");
             this.cloudSystem.reload();
         } else if (packet instanceof PacketCommunicationUpdateCloudPlayer) {
             PacketCommunicationUpdateCloudPlayer player = (PacketCommunicationUpdateCloudPlayer)packet;

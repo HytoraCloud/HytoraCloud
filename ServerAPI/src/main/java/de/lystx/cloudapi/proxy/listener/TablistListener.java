@@ -64,9 +64,9 @@ public class TablistListener implements Listener {
     }
 
     public void updateTab() {
-        ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : this.cloudAPI.getNetworkConfig().getProxyConfig();
+        ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
         TabList tabList = proxyConfig.getTabList();
-        if (!this.cloudAPI.getNetworkConfig().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
+        if (!CloudProxy.getInstance().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
             return;
         }
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
@@ -85,13 +85,13 @@ public class TablistListener implements Listener {
             String server = player.getServer() == null ? "not_available" : player.getServer().getInfo().getName();
             stringValue.setValue(string
                     .replace("&", "§")
-                    .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
+                    .replace("%max_players%", String.valueOf(CloudProxy.getInstance().getProxyConfig().getMaxPlayers()))
                     .replace("%online_players%", String.valueOf(i))
                     .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
                             CloudProxy.getInstance().getProxyPort()
                     ).getName())
                     .replace("%server%", server)
-                    .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance())));
+                    .replace("%maintenance%", String.valueOf(this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance())));
         } catch (NullPointerException e) {}
         return stringValue.getValue();
     }

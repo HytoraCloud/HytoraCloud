@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonComment;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +38,7 @@ public class ConfigService extends CloudService {
             this.vsonObject = new VsonObject(getCloudLibrary().getService(FileService.class).getConfigFile(), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             if (!getCloudLibrary().getService(FileService.class).getConfigFile().exists()) {
                 if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
-                    VsonObject vsonObject = NetworkConfig.defaultConfig();
-                    this.vsonObject.putAll(vsonObject);
+                    this.vsonObject.putAll(NetworkConfig.defaultConfig());
                 } else {
                     this.vsonObject.putAll(new ReceiverInfo("Receiver-1", "127.0.0.1", 0, false));
                 }

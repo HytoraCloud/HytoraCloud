@@ -20,12 +20,12 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketPlayInNetworkConfig) {
             PacketPlayInNetworkConfig packetPlayInNetworkConfig = (PacketPlayInNetworkConfig)packet;
-            boolean mc = this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getProxyConfig().isMaintenance();
+            boolean mc = this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getNetworkConfig().isMaintenance();
             NetworkConfig config = packetPlayInNetworkConfig.getNetworkConfig();
             this.cloudSystem.getService(ConfigService.class).setNetworkConfig(config);
             this.cloudSystem.getService(ConfigService.class).save();
             this.cloudSystem.getService(ConfigService.class).reload();
-            if (mc != config.getProxyConfig().isMaintenance()) {
+            if (mc != config.getNetworkConfig().isMaintenance()) {
                 this.cloudSystem.getService(StatisticsService.class).getStatistics().add("maintenanceSwitched");
             }
             this.cloudSystem.reload();

@@ -4,7 +4,9 @@ package de.lystx.cloudapi.proxy.listener;
 import java.util.UUID;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInNetworkPing;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.Motd;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
@@ -38,16 +40,17 @@ public class ProxyPingListener implements Listener {
                 event.setResponse(ping);
                 return;
             }
+            CloudAPI.getInstance().sendPacket(new PacketPlayInNetworkPing());
             if (this.cloudAPI.getNetworkConfig() == null) {
                 ping.setDescription("§4NetworkConfig is null!");
                 event.setResponse(ping);
                 return;
             }
-            ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : this.cloudAPI.getNetworkConfig().getProxyConfig();
+            ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
             if (!proxyConfig.isEnabled()) {
                 return;
             }
-            Motd motd = proxyConfig.isMaintenance() ? proxyConfig.getMotdMaintenance() : proxyConfig.getMotdNormal();
+            Motd motd = this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance() ? proxyConfig.getMotdMaintenance() : proxyConfig.getMotdNormal();
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
                 ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), port)), 2));
             }
@@ -96,9 +99,9 @@ public class ProxyPingListener implements Listener {
     public String replace(String string, int port) {
         Service service = CloudAPI.getInstance().getNetwork().getProxy(port);
         return string
-                .replace("%max_players%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().getMaxPlayers()))
+                .replace("%max_players%", String.valueOf(CloudProxy.getInstance().getProxyConfig().getMaxPlayers()))
                 .replace("%online_players%", String.valueOf(CloudAPI.getInstance().getCloudPlayers().getAll().size()))
                 .replace("%proxy%", service == null ? "no_proxy_available" : service.getName())
-                .replace("%maintenance%", String.valueOf(CloudAPI.getInstance().getNetworkConfig().getProxyConfig().isMaintenance()));
+                .replace("%maintenance%", String.valueOf(this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance()));
     }
 }

@@ -26,6 +26,7 @@ import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
+import de.lystx.cloudsystem.library.service.util.NetworkInfo;
 
 public class CloudBootingSetupDone {
 
@@ -80,7 +81,6 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCreateTemplate(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerLog(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerTPS(cloudSystem));
-        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudTPS(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerResult(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerEvent(cloudSystem));
 
@@ -88,6 +88,7 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerReceiverServer(cloudSystem));
 
         cloudSystem.getService(StatisticsService.class).getStatistics().add("bootedUp");
+        cloudSystem.getService(StatisticsService.class).getStatistics().add("allCPUUsage", new NetworkInfo().getCPUUsage());
         cloudSystem.reload();
     }
 }

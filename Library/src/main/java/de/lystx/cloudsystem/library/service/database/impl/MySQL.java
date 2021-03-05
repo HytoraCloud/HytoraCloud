@@ -69,7 +69,7 @@ public class MySQL implements CloudDatabase {
     @Override
     public void registerPlayer(CloudPlayer cloudPlayer) {
         if (!this.isRegistered(cloudPlayer.getUniqueId())) {
-            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUniqueId(), cloudPlayer.getName());
+            CloudPlayerData data = new DefaultCloudPlayerData(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayer.getIpAddress());
             this.setPlayerData(cloudPlayer.getUniqueId(), data);
         } else {
             CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUniqueId());

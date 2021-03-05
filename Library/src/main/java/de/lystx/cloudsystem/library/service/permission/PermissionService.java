@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGro
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -65,7 +66,7 @@ public class PermissionService extends CloudService {
         this.permissionPool.getPlayerCache().clear();
         this.permissionPool.getPermissionGroups().clear();
         if (!this.file.exists()) {
-            VsonObject vsonObject = new VsonObject();
+            VsonObject vsonObject = new VsonObject(VsonSettings.SAFE_TREE_OBJECTS);
             PermissionGroup defaultGroup = new DefaultPermissionGroup();
             PermissionGroup adminGroup = new PermissionGroup(
                     "Admin",
@@ -91,7 +92,7 @@ public class PermissionService extends CloudService {
                         "bungeecord.command.server",
                         "bungeecord.command.list"
                     ),
-                    Collections.singletonList("Player"),
+                    Collections.singletonList(defaultGroup.getName()),
                     new SerializableDocument()
             );
             vsonObject.append("enabled", true);
@@ -121,6 +122,7 @@ public class PermissionService extends CloudService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Constants.PERMISSION_POOL = this.permissionPool;
     }
 
     /**

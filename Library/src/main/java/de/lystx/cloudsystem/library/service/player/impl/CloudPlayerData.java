@@ -1,8 +1,10 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -49,5 +51,6 @@ public class CloudPlayerData implements Serializable {
     public PermissionEntry getForGroup(String group) {
         return this.permissionEntries.stream().filter(permissionEntry -> group.equalsIgnoreCase(permissionEntry.getPermissionGroup())).findFirst().orElse(null);
     }
+
 
 }

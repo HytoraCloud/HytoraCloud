@@ -26,7 +26,7 @@ import java.util.*;
 public class ServiceCommand {
 
     public static final List<UUID> deleters = new LinkedList<>();
-
+    private boolean executed = false;
 
     @Command(name = "service", description = "Bukkit server command", aliases = {"hs", "cloudserver"})
     public void execute(CloudCommandSender sender, String[] args) {
@@ -35,18 +35,28 @@ public class ServiceCommand {
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("info")) {
+                        if (!this.executed) {
+                            this.executed = true;
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Loading §bService Infos§8...");
+                        }
                         DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##.##");
                         long used = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
                         long max = Runtime.getRuntime().maxMemory() / 1048576L;
                         String format = DECIMAL_FORMAT.format(((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getProcessCpuLoad() * 100);
-                        player.sendMessage("§bCloudServiceInfo §7Help§8:");
+                        player.sendMessage("§bCloudService Info§8:");
                         player.sendMessage("§8§m--------------------------------------");
                         player.sendMessage("  §8» §bServer §8┃ §7" + CloudAPI.getInstance().getService().getName());
                         player.sendMessage("  §8» §bState §8┃ §7" + CloudAPI.getInstance().getService().getServiceState().getColor() + CloudAPI.getInstance().getService().getServiceState());
                         player.sendMessage("  §8» §bID §8┃ §7" + CloudAPI.getInstance().getService().getServiceID());
+                        player.sendMessage("  §8» §bUUID §8┃ §7" + CloudAPI.getInstance().getService().getUniqueId());
+                        player.sendMessage("  §8» §bPort §8┃ §7" + CloudAPI.getInstance().getService().getPort());
+                        player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudAPI.getInstance().getService().getHost());
                         player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudAPI.getInstance().getService().getServiceGroup().getTemplate());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
                         player.sendMessage("  §8» §bInternal CPU Usage §8┃ §7" + format);
+                        if (!CloudAPI.getInstance().getService().getProperties().isEmpty()) {
+                            CloudAPI.getInstance().getService().getProperties().forEach((key, value) -> player.sendMessage("  §8» §b" + key + " §8┃ §7" + value));
+                        }
                         player.sendMessage("§8§m--------------------------------------");
                     } else if (args[0].equalsIgnoreCase("removeSign")) {
                         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {

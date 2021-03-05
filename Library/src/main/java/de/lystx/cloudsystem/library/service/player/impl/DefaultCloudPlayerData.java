@@ -1,7 +1,9 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Collections;
 import java.util.Date;
@@ -17,8 +19,9 @@ public class DefaultCloudPlayerData extends CloudPlayerData {
      * @param uuid
      * @param name
      */
-    public DefaultCloudPlayerData(UUID uuid, String name) {
-        super(uuid, name, Collections.singletonList(new PermissionEntry(uuid, "Player", "")), new LinkedList<>(), "0", true, new Date().getTime(), 0L);
+    public DefaultCloudPlayerData(UUID uuid, String name, String ip) {
+        super(uuid, name, Collections.singletonList(new PermissionEntry(uuid, Constants.PERMISSION_POOL.getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), ip, true, new Date().getTime(), 0L);
         this.setDefault(true);
     }
+
 }

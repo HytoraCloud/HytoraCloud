@@ -9,6 +9,9 @@ import de.lystx.cloudsystem.cloud.commands.PlayerCommand;
 import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketTransferFile;
+import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
@@ -18,15 +21,21 @@ import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
+import de.lystx.cloudsystem.library.service.screen.CloudScreen;
+import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
+import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,6 +90,27 @@ public class CloudSystem extends CloudInstance {
         this.getService(SignService.class).load();
         this.getService(SignService.class).loadSigns();
         this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
+    }
+
+    public void syncGroupsWithServices() {
+        this.getService(GroupService.class).loadGroups();
+        for (List<Service> value : this.getService().getServices().values()) {
+            for (Service s : value) {
+                s.setServiceGroup(this.getService(GroupService.class).getGroup(s.getServiceGroup().getName()));
+                CloudScreen cloudScreen = this.getService(ScreenService.class).getMap().get(s.getName());
+                if (cloudScreen != null) {
+                    File serverDir = cloudScreen.getServerDir();
+                    try {
+                        VsonObject vsonObject = new VsonObject(new File(serverDir, "CLOUD/connection.json"), VsonSettings.SAFE_TREE_OBJECTS, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
+                        vsonObject.clear();
+                        vsonObject.putAll(s);
+                        vsonObject.save();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     @Override

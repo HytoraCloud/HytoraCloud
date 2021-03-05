@@ -30,7 +30,7 @@ public abstract class Setup<T> {
     public void start(CloudConsole scanner, Consumer<T> consumer) {
         scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("§9");
-        scanner.getLogger().sendMessage("SETUP", "§aIf you want to setup just cloudType §2'cancel'§a!");
+        scanner.getLogger().sendMessage("SETUP", "§aIf you want to setup just type §2'cancel'§a!");
         this.consumer = consumer;
         this.cloudConsole = scanner;
         this.current = 1;

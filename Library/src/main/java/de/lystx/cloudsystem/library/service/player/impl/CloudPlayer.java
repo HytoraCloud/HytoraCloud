@@ -8,11 +8,12 @@ import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@Getter @Setter
+@Getter @Setter @ToString
 public class CloudPlayer implements Serializable, CloudCommandSender {
 
     private final String name;
@@ -28,6 +29,15 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
         this.ipAddress = ipAddress;
         this.server = server;
         this.proxy = proxy;
+    }
+
+    /**
+     * Tries to get data
+     * > If null returns defaultData
+     * @return CloudPlayerData
+     */
+    public CloudPlayerData getCloudPlayerData() {
+        return this.cloudPlayerData == null ? new DefaultCloudPlayerData(this.uniqueId, this.name, this.ipAddress) : this.cloudPlayerData;
     }
 
     /**
