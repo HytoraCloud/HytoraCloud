@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.lib;
 
+import de.lystx.cloudsystem.library.service.scheduler.Schedule;
 import lombok.Getter;
 
 import java.io.File;

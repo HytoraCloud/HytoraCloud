@@ -17,6 +17,9 @@ public class Receiver extends CloudInstance {
     @Getter
     private static Receiver instance;
 
+    /**
+     * Boots up the Receiver
+     */
     public Receiver() {
         super(CloudType.RECEIVER);
         instance = this;
