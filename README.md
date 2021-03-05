@@ -1,6 +1,8 @@
 # HytoraCloud
 Open source Minecraft Server management
 
+![hytoraCloud_banner](https://user-images.githubusercontent.com/63949927/110115056-d457ab80-7db5-11eb-89e0-0a143d4954de.png)
+
 
 HytoraCloud is a project that has taken the last 10 months of my life.
 HytoraCloud is used to manage all of your BungeeCord and Spigot servers together in one big process.
