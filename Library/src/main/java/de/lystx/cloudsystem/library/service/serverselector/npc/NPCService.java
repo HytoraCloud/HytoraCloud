@@ -52,12 +52,12 @@ public class NPCService extends CloudService {
                         "MINECART",
                         Collections.singletonList(new VsonObject()
                                 .append("slot", 4)
-                                .append("cloudType", "NAME_TAG")
+                                .append("type", "NAME_TAG")
                                 .append("name", "§8» §3%group%")
                                 .append("lore", Arrays.asList(
                                         "§8§m-----------",
                                         "§8» §bOnline §8» §7%online_services%",
-                                        "§8» §bType §8» §7%cloudType%",
+                                        "§8» §bType §8» §7%type%",
                                         "§8» §bTemplate §8» §7%template%"
                                 )).append("glow", false))
                 ));

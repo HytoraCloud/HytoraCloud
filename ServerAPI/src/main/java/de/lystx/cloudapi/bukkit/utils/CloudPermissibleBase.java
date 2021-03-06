@@ -82,18 +82,19 @@ public class CloudPermissibleBase extends PermissibleBase {
                                     .put(
                                             s,
                                             new PermissionAttachmentInfo(
-                                                    CloudPermissibleBase.this,
+                                                    this,
                                                     s,
                                                     new PermissionAttachment(
                                                             CloudServer
                                                                     .getInstance(),
-                                                            CloudPermissibleBase.this
+                                                            this
                                                     ), true)));
         } catch (NullPointerException e) {
             tries += 1;
             CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::recalculatePermissions, 5L);
             if (tries >= 5) {
                 System.out.println("[CloudAPI] Something went wrong while recalculating permissions of a player!");
+                e.printStackTrace();
                 tries = 0;
             }
         }

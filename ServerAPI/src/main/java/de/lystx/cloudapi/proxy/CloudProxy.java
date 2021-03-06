@@ -41,6 +41,7 @@ public class CloudProxy extends Plugin {
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyCloudPlayerHandler(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStop(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyChatEvent(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyEvent(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
 
         this.getProxy().getPluginManager().registerListener(this, new ProxyPingListener());

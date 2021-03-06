@@ -1,6 +1,8 @@
 package de.lystx.cloudsystem.library.service.permission.impl;
 
-public enum PermissionValidality {
+import java.io.Serializable;
+
+public enum PermissionValidality implements Serializable {
 
     SECOND,
     MINUTE,

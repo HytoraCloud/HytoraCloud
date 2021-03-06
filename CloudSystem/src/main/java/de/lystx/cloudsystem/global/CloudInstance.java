@@ -89,7 +89,6 @@ public class CloudInstance extends CloudLibrary {
                 this.getService(CommandService.class).setActive(false);
                 if (!Updater.check(this.console)) {
                     this.console.getLogger().sendMessage("INFO", "§2Succesfully downloaded Version §a" + Updater.getNewVersion() + "§2!");
-                    System.exit(0);
                 } else {
                     console.getLogger().sendMessage("INFO", "§2CloudSystem is §anewest version§2!");
                 }

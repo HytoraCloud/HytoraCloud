@@ -73,6 +73,7 @@ public class CloudServer extends JavaPlugin {
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSubChannel(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerTPS(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitEvent(this.cloudAPI));
 
         // Connecting to cloud and managing cloud stuff
         this.cloudAPI.getCloudClient().registerHandler(new CloudListener());

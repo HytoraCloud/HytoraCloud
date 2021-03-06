@@ -5,6 +5,7 @@ import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermission
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermissionPool;
 import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
@@ -118,8 +119,12 @@ public class PermissionPool implements Serializable {
         if (data == null) {
             return false;
         }
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(this.format.toPattern());
-        String bis = data.getForGroup(permissionGroup.getName()).getValidTime();
+        PermissionEntry entry = data.getForGroup(permissionGroup.getName());
+        if (entry == null) {
+            return false;
+        }
+        String bis = entry.getValidTime();
+
         if (bis.equalsIgnoreCase("lifetime") || bis.trim().isEmpty()) {
             return true;
         }
@@ -150,9 +155,7 @@ public class PermissionPool implements Serializable {
         permissionEntries.remove(permissionEntry);
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
-        if (cloudLibrary != null) {
-            cloudLibrary.getService(EventService.class).callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
-        }
+        Constants.EXECUTOR.callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
     }
 
     /**
@@ -223,9 +226,7 @@ public class PermissionPool implements Serializable {
         }
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
-        if (cloudLibrary != null) {
-            cloudLibrary.getService(EventService.class).callEvent(new CloudPlayerPermissionGroupAddEvent(playerName, group, i, validality));
-        }
+        Constants.EXECUTOR.callEvent(new CloudPlayerPermissionGroupAddEvent(playerName, group, i, validality));
     }
 
     /**
@@ -233,13 +234,16 @@ public class PermissionPool implements Serializable {
      * @param player
      */
     public void checkFix(String player) {
+        UUID uuid = this.tryUUID(player);
         CloudPlayerData data = this.getPlayerData(player);
         if (data != null) {
             if (data.getPermissionEntries().isEmpty()) {
-                data.getPermissionEntries().add(new PermissionEntry(tryUUID(player), getDefaultPermissionGroup().getName(), ""));
+                data.getPermissionEntries().add(new PermissionEntry(uuid, this.getDefaultPermissionGroup().getName(), ""));
                 this.updatePlayerData(player, data);
                 this.update();
             }
+        } else {
+            this.playerCache.add(new DefaultCloudPlayerData(uuid, player, "-1"));
         }
     }
 

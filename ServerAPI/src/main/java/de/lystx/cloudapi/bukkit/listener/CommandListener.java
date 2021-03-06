@@ -14,7 +14,7 @@ public class CommandListener implements Listener {
 
         if (CloudAPI.getInstance().getCommandService().getCommand(event.getMessage().substring(1).split(" ")[0]) != null) {
             event.setCancelled(true);
-            Player proxiedPlayer = (Player)event.getPlayer();
+            Player proxiedPlayer = event.getPlayer();
             CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(proxiedPlayer.getUniqueId());
             if (cloudPlayer == null) {
                 proxiedPlayer.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cYou couldn't be found in CloudPlayers! Please rejoin");

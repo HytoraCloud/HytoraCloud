@@ -1,17 +1,17 @@
 package de.lystx.cloudsystem.library.elements.packets.in.player;
 
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunication;
 import lombok.Getter;
 
 import java.io.Serializable;
 
 @Getter
-public class PacketPlayInUnregisterCloudPlayer extends Packet implements Serializable {
+public class PacketPlayInUnregisterCloudPlayer extends PacketCommunication implements Serializable {
 
     private final String name;
 
     public PacketPlayInUnregisterCloudPlayer(String name) {
-        super();
+        this.setSendBack(true);
         this.name = name;
     }
 }

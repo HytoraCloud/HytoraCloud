@@ -16,11 +16,6 @@ public class PacketHandlerEvent {
 
     @PacketHandler
     public void handleEvent(PacketCallEvent packet) {
-        try {
-            Event event = (Event) packet.getEventClass().getDeclaredConstructors()[0].newInstance(packet.getParameters());
-            this.cloudSystem.getService(EventService.class).callEvent(event);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        this.cloudSystem.getService(EventService.class).callEvent(packet.getEvent());
     }
 }

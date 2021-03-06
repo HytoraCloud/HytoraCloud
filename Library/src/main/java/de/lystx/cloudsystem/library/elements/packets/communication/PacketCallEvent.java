@@ -4,9 +4,10 @@ import de.lystx.cloudsystem.library.service.event.raw.Event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor @Getter
-public class PacketCallEvent extends PacketCommunication {
+import java.io.Serializable;
 
-    private final Class<? extends Event> eventClass;
-    private final Object[] parameters;
+@AllArgsConstructor @Getter
+public class PacketCallEvent extends PacketCommunication implements Serializable {
+
+    private final Event event;
 }

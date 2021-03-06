@@ -1,14 +1,15 @@
 package de.lystx.cloudsystem.cloud.handler.player;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationUpdateCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.*;
-import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerJoin;
-import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerQuit;
-import de.lystx.cloudsystem.library.elements.packets.out.player.PacketPlayOutCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
-import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
@@ -17,6 +18,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import java.util.LinkedList;
 import java.util.List;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
+import de.lystx.cloudsystem.library.service.util.Constants;
 
 public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
 
@@ -34,6 +36,7 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
         if (packet instanceof PacketPlayInRegisterCloudPlayer) {
             PacketPlayInRegisterCloudPlayer packetPlayInRegisterCloudPlayer = (PacketPlayInRegisterCloudPlayer) packet;
             CloudPlayer cloudPlayer = packetPlayInRegisterCloudPlayer.getCloudPlayer();
+            Constants.EXECUTOR.callEvent(new CloudPlayerJoinEvent(cloudPlayer));
             cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerDataOrDefault(cloudPlayer.getName()));
             if (packetPlayInRegisterCloudPlayer.isSendMessage()) {
                 if (!list.contains(cloudPlayer.getName())) {
@@ -59,13 +62,16 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             }
 
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
-            this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerJoin(cloudPlayer));
-            this.cloudSystem.reload();
+           // this.cloudSystem.reload();
+
+        } else if (packet instanceof PacketPlayInPlayerExecuteCommand) {
+
+            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
+
         } else if (packet instanceof PacketPlayInNetworkPing) {
-            //TODO: FIX RELOADING EVERY TIME
-            PacketPlayInNetworkPing packetPlayInNetworkPing = (PacketPlayInNetworkPing)packet;
+
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("pings");
-            this.cloudSystem.reload();
+
         } else if (packet instanceof PacketCommunicationUpdateCloudPlayer) {
             PacketCommunicationUpdateCloudPlayer player = (PacketCommunicationUpdateCloudPlayer)packet;
             PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
@@ -75,17 +81,6 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             this.cloudSystem.getService(CloudPlayerService.class).update(player.getName(), player.getNewCloudPlayer());
             this.cloudSystem.reload();
 
-        } else if (packet instanceof PacketPlayInCloudPlayerOnline) {
-            PacketPlayInCloudPlayerOnline packetPlayInCloudPlayerOnline = (PacketPlayInCloudPlayerOnline)packet;
-            tries++;
-            if (tries == cloudSystem.getService().getCloudProxies().size()) {
-                if (!packetPlayInCloudPlayerOnline.isOnline()) {
-                    cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInCloudPlayerOnline.getPlayerName()));
-                    cloudSystem.reload();
-                }
-            }
-        } else if (packet instanceof PacketPlayInPlayerExecuteCommand) {
-            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
        } else if (packet instanceof PacketPlayInUnregisterCloudPlayer) {
             PacketPlayInUnregisterCloudPlayer packetPlayInUnregisterCloudPlayer = (PacketPlayInUnregisterCloudPlayer)packet;
             CloudPlayer cloudPlayer = this
@@ -93,36 +88,23 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
                     .getService(CloudPlayerService.class)
                     .getOnlinePlayer(packetPlayInUnregisterCloudPlayer.getName());
             if (cloudPlayer != null) {
-                this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerQuit(cloudPlayer));
+                Constants.EXECUTOR.callEvent(new CloudPlayerQuitEvent(cloudPlayer));
                 this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
-                this.cloudSystem.reload();
-
-                if (!cloudSystem.isRunning() || (this.cloudSystem.getScreenPrinter().getScreen() != null && this.cloudSystem.getScreenPrinter().isInScreen())) {
-                    return;
-                }
-                /*if (!list.contains(cloudPlayer.getName())) {
-                    return;
-                }
-                list.remove(cloudPlayer.getName());*/
-                if (cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
-                    //this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cPlayer §e" + cloudPlayer.getName() + " §ccouldnt be logged in!");
-                } else {
-                   // this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is disconnected from §a" + cloudPlayer.getServer());
-                }
-
+                //this.cloudSystem.reload();
             }
-        } else if (packet instanceof PacketPlayInCloudPlayerServerChange) {
-            PacketPlayInCloudPlayerServerChange packetPlayInCloudPlayerServerChange = (PacketPlayInCloudPlayerServerChange)packet;
-            try {
-                CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInCloudPlayerServerChange.getCloudPlayer().getName());
-                if (cloudPlayer != null) {
-                    this.cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutCloudPlayerServerChange(cloudPlayer, packetPlayInCloudPlayerServerChange.getNewServer()));
-                    cloudPlayer.setServer(packetPlayInCloudPlayerServerChange.getNewServer());
-                    this.cloudSystem.getService(CloudPlayerService.class).update(cloudPlayer.getName(), cloudPlayer);
-                    this.cloudSystem.reload();
-                }
-            } catch (NullPointerException e) {}
+        }
+    }
 
+
+    @PacketHandler
+    public void handleEvent(PacketCallEvent event) {
+        if (event.getEvent() instanceof CloudPlayerChangeServerEvent) {
+            CloudPlayerChangeServerEvent serverEvent = (CloudPlayerChangeServerEvent)event.getEvent();
+            CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(serverEvent.getCloudPlayer().getName());
+            if (cloudPlayer != null) {
+                cloudPlayer.setServer(serverEvent.getNewServer());
+                this.cloudSystem.getService(CloudPlayerService.class).update(cloudPlayer.getName(), cloudPlayer);
+            }
         }
     }
 }

@@ -1,12 +1,14 @@
 package de.lystx.cloudapi.proxy.listener;
 
+import com.google.gson.reflect.TypeToken;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.other.ProxyServerLoginFailEvent;
-import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
+import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInCloudPlayerServerChange;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketLoginRequest;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -18,6 +20,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class PlayerListener implements Listener {
 
@@ -27,12 +30,16 @@ public class PlayerListener implements Listener {
         this.cloudAPI = CloudAPI.getInstance();
     }
 
-    @EventHandler
+
+    @EventHandler(priority = EventPriority.LOWEST)
     public void handlePreLogin(LoginEvent event) {
-        CloudConnection connection = new CloudConnection(event.getConnection().getUniqueId(), this.cloudAPI.getPermissionPool().tryName(event.getConnection().getUniqueId()), event.getConnection().getAddress().getAddress().getHostAddress());
-        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(connection.getName());
+        CloudConnection connection = new CloudConnection(event.getConnection().getUniqueId(), event.getConnection().getName(), event.getConnection().getAddress().getAddress().getHostAddress());
+        CloudPlayer cloudPlayer = this.cloudAPI.getCloudPlayers().get(connection.getName());
+
         if (cloudPlayer == null) {
-            cloudAPI.sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(connection.getName(), connection.getUuid(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName())));
+            CloudPlayer cp = new CloudPlayer(connection.getName(), connection.getUuid(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName());
+            PacketPlayInRegisterCloudPlayer packet = new PacketPlayInRegisterCloudPlayer(cp);
+            packet.unsafe().async().send(cloudAPI.getCloudClient());
 
             if (!CloudProxy.getInstance().getProxyConfig().isEnabled()) {
                 return;
@@ -83,7 +90,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void handleFail(ProxyServerLoginFailEvent event) {
-        cloudAPI.sendPacket(new PacketPlayInUnregisterCloudPlayer(event.getConnection().getName()));
+        PacketPlayInUnregisterCloudPlayer packet = new PacketPlayInUnregisterCloudPlayer(event.getConnection().getName());
+        packet.unsafe().async().send(cloudAPI.getCloudClient());
     }
 
     @EventHandler
@@ -105,6 +113,7 @@ public class PlayerListener implements Listener {
         } else {
             e.setHasPermission(cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), e.getPermission()));
         }
+        System.out.println(e.getPermission() + " - " + e.hasPermission());
     }
 
     @EventHandler
@@ -129,20 +138,17 @@ public class PlayerListener implements Listener {
                 try {
                     ServerInfo info = player.getServer().getInfo();
                     CloudPlayer cloudPlayer = this.cloudAPI.getCloudPlayers().get(player.getName());
-                    this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInCloudPlayerServerChange(cloudPlayer, info.getName()));
-                    for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                        networkHandler.onServerChange(cloudPlayer, info.getName());
-                    }
-                } catch (NullPointerException e) {}
+                    this.cloudAPI.callEvent(new CloudPlayerChangeServerEvent(cloudPlayer, info.getName()));
+                } catch (NullPointerException e) {
+                    // Ingoring
+                }
             }
             if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
                 ServiceGroup serviceGroup = cloudAPI.getNetwork().getServiceGroup(event.getTarget().getName().split("-")[0]);
                 if (serviceGroup.isMaintenance() && (!cloudAPI.getPermissionPool().hasPermission(player.getName(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
                     player.disconnect(cloudAPI.getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", cloudAPI.getPrefix()));
                     event.setCancelled(true);
-                    return;
                 }
-
             }
         } catch (IllegalStateException e){
             e.printStackTrace();
@@ -151,17 +157,10 @@ public class PlayerListener implements Listener {
 
 
     @EventHandler
-    public void onJoin(PostLoginEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-        if (CloudAPI.getInstance().getCloudPlayers().get(player.getName()) == null) {
-            cloudAPI.sendPacket(new PacketPlayInRegisterCloudPlayer(new CloudPlayer(player.getName(), player.getUniqueId(), player.getAddress().getAddress().getHostAddress(), player.getServer().getInfo().getName(), cloudAPI.getNetwork().getProxy(player.getPendingConnection().getVirtualHost().getPort()).getName())));
-        }
-    }
-
-    @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        this.cloudAPI.getCloudClient().sendPacket(new PacketPlayInUnregisterCloudPlayer(player.getName()));
+        PacketPlayInUnregisterCloudPlayer packet = new PacketPlayInUnregisterCloudPlayer(player.getName());
+        packet.unsafe().async().send(this.cloudAPI.getCloudClient());
     }
 
 

@@ -84,8 +84,8 @@ public class LogCommand implements TabCompletable {
         return sb.toString();
     }
 
-    public String post(String text, String cloudType, boolean raw, File file) throws IOException {
-        if (cloudType.equalsIgnoreCase("file")) {
+    public String post(String text, String type, boolean raw, File file) throws IOException {
+        if (type.equalsIgnoreCase("file")) {
             try {
                 if (!file.exists()) {
                     file.createNewFile();

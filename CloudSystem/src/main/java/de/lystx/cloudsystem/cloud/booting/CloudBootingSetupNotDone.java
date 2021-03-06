@@ -83,7 +83,7 @@ public class CloudBootingSetupNotDone {
                     "Bungee",
                     "default",
                     ServiceType.PROXY,
-                    1,
+                    -1,
                     1,
                     512,
                     128,
@@ -101,7 +101,7 @@ public class CloudBootingSetupNotDone {
                     "Lobby",
                     "default",
                     ServiceType.SPIGOT,
-                    2,
+                    -1,
                     1,
                     512,
                     128,
@@ -123,7 +123,7 @@ public class CloudBootingSetupNotDone {
                 DatabaseSetup databaseSetup = new DatabaseSetup();
                 databaseSetup.start(cloudSystem.getConsole(), ds -> {
                     VsonObject document1 = new VsonObject(VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST)
-                            .append("cloudType", setup.getDatabase().toUpperCase())
+                            .append("type", setup.getDatabase().toUpperCase())
                             .append("host", ds.getHost())
                             .append("port", ds.getPort())
                             .append("username", ds.getUsername())

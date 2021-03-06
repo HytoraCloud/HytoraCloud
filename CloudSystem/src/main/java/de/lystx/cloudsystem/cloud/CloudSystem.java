@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.cloud.commands.PlayerCommand;
 import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketTransferFile;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
@@ -16,6 +17,7 @@ import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
+import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -126,4 +128,8 @@ public class CloudSystem extends CloudInstance {
         this.getService(CloudNetworkService.class).sendPacket(packet);
     }
 
+    @Override
+    public void callEvent(Event event) {
+        this.sendPacket(new PacketCallEvent(event).setSendBack(true));
+    }
 }

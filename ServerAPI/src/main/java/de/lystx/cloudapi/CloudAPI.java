@@ -10,7 +10,6 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
@@ -29,7 +28,6 @@ import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
-import de.lystx.cloudsystem.library.service.network.netty.NettyClient;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
@@ -98,12 +96,7 @@ public class CloudAPI {
 
         Thread cloudClient = new Thread(() -> {
             try {
-                this.cloudClient.onConnectionEstablish(new Consumer<NettyClient>() {
-                    @Override
-                    public void accept(NettyClient nettyClient) {
-                        nettyClient.sendPacket(new PacketPlayInRegister(getService()));
-                    }
-                });
+                this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketPlayInRegister(this.getService())));
                 this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
             } catch (Exception e) {
                 System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
@@ -134,9 +127,7 @@ public class CloudAPI {
     }
 
     public void executeAsyncQuery(ResultPacket resultPacket, Consumer<Result> consumer) {
-        this.executorService.execute(() -> {
-            this.sendQuery(resultPacket).onResultSet(consumer);
-        });
+        this.executorService.execute(() -> this.sendQuery(resultPacket).onResultSet(consumer));
     }
 
     public Result sendQuery(ResultPacket packet) {
@@ -184,6 +175,10 @@ public class CloudAPI {
     }
 
     public void sendPacket(Packet packet) {
+        if (packet.unsafe() != null && packet.unsafe().isAsync()) {
+            this.executorService.execute(() -> this.sendPacket(packet));
+            return;
+        }
         if (packet.getClass().getName().toLowerCase().contains("de.lystx.cloudsystem.library.elements.packets")) {
             this.cloudClient.sendPacket(packet);
         } else {
@@ -191,8 +186,9 @@ public class CloudAPI {
         }
     }
 
-    public void callEvent(Class<? extends Event> eventClass, Object... parameters) {
-        this.sendPacket(new PacketCallEvent(eventClass, parameters));
+
+    public void callEvent(Event event) {
+        this.cloudLibrary.callEvent(event);
     }
 
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
@@ -239,9 +235,14 @@ public class CloudAPI {
     }
 
     public void updatePermissions(String player, UUID uuid, String ipAddress, Consumer<String> accept) {
+        if (this.permissionPool == null || !this.permissionPool.isAvailable() ) {
+            System.out.println("[CloudAPI] Couldn't update Permissions for " + player + " because PermissionPool is not available!");
+            return;
+        }
         this.permissionPool.checkFix(player);
         CloudPlayerData data = this.permissionPool.getPlayerDataOrDefault(player);
-        List<PermissionEntry> entries = data.getPermissionEntries();
+
+        List<PermissionEntry> entries = new LinkedList<>(data.getPermissionEntries());
 
         boolean changed = false;
         try {
@@ -252,7 +253,9 @@ public class CloudAPI {
                     permissionPool.removePermissionGroup(player, permissionGroup);
                 }
             }
-        } catch (ConcurrentModificationException e) {}
+        } catch (ConcurrentModificationException | UnsupportedOperationException e) {
+            e.printStackTrace();
+        }
 
         if (data.isDefault()) {
             data.setUuid(uuid);

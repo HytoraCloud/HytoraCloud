@@ -37,8 +37,6 @@ public class NetworkConfig implements Serializable, Objectable {
         return new VsonObject()
                 .append("host", "127.0.0.1")
                 .append("port", 2131)
-                .append("proxyStartPort", 25565)
-                .append("serverStartPort", 30000)
                 .append("useWrapper", false)
                 .append("setupDone", false)
                 .append("autoUpdater", false)

@@ -118,12 +118,12 @@ public class NPCListener implements Listener {
             if (document.isEmpty()) {
                 continue;
             }
-            List<String> lore = document.getList("lore");
+            List<String> lore = document.getList("lore", String.class);
             for (String s : lore) {
                 lore.set(lore.indexOf(s), this.replace(s, null, serviceGroup));
             }
             int slot = document.getInteger("slot", 0);
-            inventory.setItem(slot, new Item(Material.valueOf(document.getString("cloudType")))
+            inventory.setItem(slot, new Item(Material.valueOf(document.getString("type")))
                     .setDisplayName(this.replace(document.getString("name"), null, serviceGroup))
                     .addLoreAll(lore)
                     .build());
@@ -170,7 +170,7 @@ public class NPCListener implements Listener {
                 GroupInfo groupInfo = CloudAPI.getInstance().getNetwork().getGroupInfo(serviceGroup.getName());
                 input = input.replace("%group%", groupInfo.getName());
                 input = input.replace("%template%", serviceGroup.getTemplate());
-                input = input.replace("%cloudType%", serviceGroup.getServiceType().name());
+                input = input.replace("%type%", serviceGroup.getServiceType().name());
                 input = input.replace("%newServer%", "" + serviceGroup.getNewServerPercent());
                 input = input.replace("%online_services%", groupInfo.getOnlineServices().size() + "");
                 input = input.replace("%online_players%", groupInfo.getOnlinePlayers().size() + "");

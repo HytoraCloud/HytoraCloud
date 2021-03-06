@@ -1,6 +1,5 @@
 package de.lystx.cloudsystem.library.elements.packets.out.other;
 
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import io.vson.elements.object.VsonObject;

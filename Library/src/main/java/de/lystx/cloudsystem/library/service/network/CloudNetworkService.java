@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 
 @Getter
@@ -42,7 +43,7 @@ public class CloudNetworkService extends CloudService {
         Thread server = new Thread(() -> {
             this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
         }, "hytoraCloud_cloudNetwork");
-
+        Constants.EXECUTOR = this.cloudServer;
         server.start();
     }
 

@@ -57,8 +57,8 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
          return this.getPlayersOnServer(serverName).size();
     }
 
-    public void update(String name, CloudPlayer newPlayer) {
-        CloudPlayer cloudPlayer = this.get(name);
+    public void update(CloudPlayer newPlayer) {
+        CloudPlayer cloudPlayer = this.get(newPlayer.getName());
         this.cloudPlayers.set(this.cloudPlayers.indexOf(cloudPlayer), newPlayer);
     }
 
@@ -74,7 +74,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     public CloudPlayer getByQuery(String name) {
         Value<CloudPlayer> value = new Value<>(null);
         this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name)).onResultSet(result -> {
-            value.setValue(result.getResultAs(CloudPlayer.class));
+            value.setValue(result.getDocument().getObject("cloudPlayer", CloudPlayer.class));
         });
         return value.getValue();
     }
@@ -82,7 +82,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     public CloudPlayer getByQuery(UUID uuid) {
         Value<CloudPlayer> value = new Value<>(null);
         this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uuid)).onResultSet(result -> {
-            value.setValue(result.getResultAs(CloudPlayer.class));
+            value.setValue(result.getDocument().getObject("cloudPlayer", CloudPlayer.class));
         });
         return value.getValue();
     }

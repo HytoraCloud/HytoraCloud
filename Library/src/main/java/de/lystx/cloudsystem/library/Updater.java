@@ -5,11 +5,13 @@ import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBar;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBarStyle;
 import de.lystx.cloudsystem.library.service.scheduler.Schedule;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
+import de.lystx.cloudsystem.library.service.util.ZipHelper;
 import io.vson.VsonValue;
 import io.vson.elements.object.VsonObject;
 import io.vson.manage.vson.VsonParser;
 import io.vson.other.TempVsonOptions;
 import lombok.Getter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -19,10 +21,11 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public class Updater {
@@ -54,6 +57,9 @@ public class Updater {
             return true;
         }
         cloudConsole = console;
+        String download = vsonObject.getString("download");
+        File cloud = new File("./temp_" + UUID.randomUUID() + "_update_part.jar");
+
         if (!isUpToDate()) {
             console.getLogger().sendMessage("§9");
             console.getLogger().sendMessage("§9-----------------------------------------");
@@ -66,6 +72,7 @@ public class Updater {
                     "  \\____/| .__/ \\__,_|\\__,_|\\__\\___|_|   \n" +
                     "        | |                             \n" +
                     "        |_|                             ");
+            console.getLogger().sendMessage("URL", "§a" + download);
             console.getLogger().sendMessage("§9-----------------------------------------");
             console.getLogger().sendMessage("INFO", "§2There is a §anewer §2version available!");
             console.getLogger().sendMessage("INFO", "§2As you enabled §aAutoUpdate §2the CloudSystem will be stopped and the new version will be downloaded!");
@@ -80,9 +87,19 @@ public class Updater {
             }
             console.getLogger().sendMessage("§9-----------------------------------------");
             console.getLogger().sendMessage("§9");
-            String download = vsonObject.getString("download");
-            File cloud = new File("./CloudSystem.jar");
             download(download, cloud, "Updating CloudSystem");
+
+            try {
+                FileChannel src = new FileInputStream(cloud).getChannel();
+                FileChannel dest = new FileOutputStream("./CloudSystem.jar").getChannel();
+                dest.transferFrom(src, 0, src.size());
+                dest.close();
+                src.close();
+                cloud.delete();
+                System.exit(0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return isUpToDate();
     }
@@ -100,7 +117,7 @@ public class Updater {
      * @return current version of cloud
      */
     public static String getCloudVersion() {
-        return "BETA-1.6.6";
+        return "BETA-1.6.7";
     }
 
     /**

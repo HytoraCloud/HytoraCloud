@@ -52,14 +52,6 @@ public class ConfigService extends CloudService {
             }
             if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
                 this.receiverInfo = null;
-                if (!this.vsonObject.has("proxyStartPort")) {
-                    this.vsonObject.append("proxyStartPort", 25565);
-                }
-                if (!this.vsonObject.has("serverStartPort")) {
-                    this.vsonObject.append("serverStartPort", 30000);
-                }
-                this.vsonObject.save();
-
                this.networkConfig = vsonObject.getAs(NetworkConfig.class);
             } else {
                 this.receiverInfo = vsonObject.getAs(ReceiverInfo.class);

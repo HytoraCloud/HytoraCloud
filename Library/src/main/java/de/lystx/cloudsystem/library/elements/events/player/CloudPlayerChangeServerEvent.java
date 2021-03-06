@@ -8,8 +8,9 @@ import lombok.Getter;
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class CloudPlayerJoinEvent extends Event implements Serializable {
+public class CloudPlayerChangeServerEvent extends Event implements Serializable {
 
     private final CloudPlayer cloudPlayer;
+    private final String newServer;
 
 }

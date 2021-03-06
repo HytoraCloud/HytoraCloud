@@ -2,12 +2,14 @@ package de.lystx.cloudsystem.library;
 
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.event.EventService;
+import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.lib.LibraryService;
 import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
@@ -18,6 +20,7 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.util.AuthManager;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.util.Loggers;
 import de.lystx.cloudsystem.library.service.util.TicksPerSecond;
 import de.lystx.cloudsystem.library.webserver.WebServer;
@@ -90,10 +93,10 @@ public class CloudLibrary implements Serializable {
      * @param channel > Channel for handling
      * @param key > Key for handling
      * @param document > Document to send
-     * @param cloudType > PROXY or SPIGOT
+     * @param type > PROXY or SPIGOT
      */
-    public void sendSubMessage(String channel, String key, Document document, ServiceType cloudType) {
-        this.getService(CloudNetworkService.class).sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), cloudType));
+    public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
+        this.getService(CloudNetworkService.class).sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), type));
     }
 
     /**
@@ -141,6 +144,15 @@ public class CloudLibrary implements Serializable {
      */
     public ServerService getService() {
         return this.getService(ServerService.class);
+    }
+
+
+    /**
+     * Calls an Event
+     * @param event
+     */
+    public void callEvent(Event event) {
+        Constants.EXECUTOR.callEvent(event);
     }
 
     /**

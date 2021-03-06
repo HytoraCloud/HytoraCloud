@@ -2,6 +2,7 @@ package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -11,24 +12,20 @@ public class NetworkManager {
 
 
     public void switchMaintenance(Boolean to) {
-        if (to) {
-            for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-                if (CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().isMaintenance() && !CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().contains(player.getName()) && !CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), "cloudsystem.network.maintenance") ) {
-                    player.disconnect(
-                            new TextComponent(
-                                    CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().
-                                            replace("%prefix%", CloudAPI.getInstance().getPrefix()
-                                            )
-                            )
-                    );
-                }
+        if (!to) {
+            return;
+        }
+        for (CloudPlayer cloudPlayer : CloudAPI.getInstance().getCloudPlayers()) {
+            if (!CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().contains(cloudPlayer.getName()) && !cloudPlayer.hasPermission("cloudsystem.network.maintenance")) {
+                cloudPlayer.createConnection().disconnect(
+                        CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix()));
             }
         }
     }
 
 
     public void sendStartServerMessage(ProxiedPlayer player, String servername) {
-        if (!player.hasPermission("cloudsystem.notify")) {
+        if (!CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), "cloudsystem.notify")) {
             return;
         }
         CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());
@@ -43,7 +40,7 @@ public class NetworkManager {
     }
 
     public void sendStopServerMessage(ProxiedPlayer player, String servername) {
-        if (!player.hasPermission("cloudsystem.notify")) {
+        if (!CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), "cloudsystem.notify")) {
             return;
         }
         CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());

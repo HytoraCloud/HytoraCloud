@@ -89,6 +89,5 @@ public class CloudBootingSetupDone {
 
         cloudSystem.getService(StatisticsService.class).getStatistics().add("bootedUp");
         cloudSystem.getService(StatisticsService.class).getStatistics().add("allCPUUsage", new NetworkInfo().getCPUUsage());
-        cloudSystem.reload();
     }
 }

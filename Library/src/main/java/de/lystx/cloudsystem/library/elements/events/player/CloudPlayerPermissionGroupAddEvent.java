@@ -6,8 +6,10 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter @AllArgsConstructor
-public class CloudPlayerPermissionGroupAddEvent extends Event {
+public class CloudPlayerPermissionGroupAddEvent extends Event implements Serializable {
 
     private final String name;
     private final PermissionGroup permissionGroup;

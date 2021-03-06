@@ -22,6 +22,7 @@ public class ServerPinger {
     private DataOutputStream dataOutputStream = null;
     private InputStream inputStream = null;
     private InputStreamReader inputStreamReader = null;
+    int tries = 0;
 
     /**
      * Pings Server and sets fields to returned values
@@ -76,8 +77,12 @@ public class ServerPinger {
             this.online = true;
             this.close();
         } catch (SocketTimeoutException e) {
-            e.printStackTrace();
-            System.out.println("[ServerPinger] Timed out while pinging " + adress + ":" + port + " after " + timeout + "ms");
+            if (this.tries < 5) {
+                this.tries++;
+                this.pingServer(adress, port, timeout);
+                return;
+            }
+            this.tries = 0;
         }
     }
 

@@ -5,8 +5,10 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter @AllArgsConstructor
-public class CloudPlayerQuitEvent extends Event {
+public class CloudPlayerQuitEvent extends Event implements Serializable {
 
     private final CloudPlayer cloudPlayer;
 

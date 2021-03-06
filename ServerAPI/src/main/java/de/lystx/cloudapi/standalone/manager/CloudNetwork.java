@@ -96,6 +96,16 @@ public class CloudNetwork {
         return list;
     }
 
+    public List<Service> getServices(ServiceType serviceType) {
+        List<Service> list = new LinkedList<>();
+        for (Service service : this.getServices()) {
+            if (service.getServiceGroup().getServiceType().equals(serviceType)) {
+                list.add(service);
+            }
+        }
+        return list;
+    }
+
     public List<Service> getServices(ServiceGroup serviceGroup) {
         try {
             return this.services.get(this.getServiceGroup(serviceGroup.getName()));

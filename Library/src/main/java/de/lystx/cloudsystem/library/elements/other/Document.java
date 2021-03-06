@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -315,6 +316,10 @@ public class Document {
 
     public <T> T getObject(String key, Class<T> tClass) {
         return this.getObject(this.getJsonObject(key), tClass);
+    }
+
+    public <T> T getObject(String key, Type type) {
+        return this.gson.fromJson(this.jsonObject.get(key), type);
     }
 
     public <T> T getObject(String key, T def) {
