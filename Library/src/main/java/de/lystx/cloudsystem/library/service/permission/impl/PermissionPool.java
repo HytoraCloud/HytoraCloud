@@ -184,6 +184,36 @@ public class PermissionPool implements Serializable {
         this.update();
     }
 
+
+    /**
+     * Returns the PermissionValidality from String
+     * @param data
+     * @return
+     */
+    public PermissionValidality formatValidality(String data) {
+        PermissionValidality validality;
+        if (data.equalsIgnoreCase("lifetime")) {
+            validality = PermissionValidality.LIFETIME;
+        } else {
+            if (data.toLowerCase().endsWith("s")) {
+                validality = PermissionValidality.SECOND;
+            } else if (data.toLowerCase().endsWith("min")) {
+                validality = PermissionValidality.MINUTE;
+            } else if (data.toLowerCase().endsWith("h")) {
+                validality = PermissionValidality.HOUR;
+            } else if (data.toLowerCase().endsWith("d")) {
+                validality = PermissionValidality.DAY;
+            } else if (data.toLowerCase().endsWith("w")) {
+                validality = PermissionValidality.WEEK;
+            } else if (data.toLowerCase().endsWith("m")) {
+                validality = PermissionValidality.MONTH;
+            } else {
+                validality = null;
+            }
+        }
+        return validality;
+    }
+
     /**
      * Gives a player a permissionGroup
      * @param playerName

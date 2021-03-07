@@ -203,55 +203,20 @@ public class PermsCommand {
 								return;
 							}
 							String data = args[5];
-							PermissionValidality validality;
-							String format;
-							if (data.equalsIgnoreCase("lifetime")) {
-								format = "lifetime";
-								validality = PermissionValidality.LIFETIME;
-
-								CloudAPI.getInstance().getPermissionPool().updatePermissionGroup(args[1], CloudAPI.getInstance().getPermissionPool().getPermissionGroupFromName(rang), -1, validality);
-								CloudAPI.getInstance().getPermissionPool().update();
-								if (ProxyServer.getInstance().getPlayer(uuid) != null) {
-									ProxyServer.getInstance().getPlayer(uuid).disconnect(CloudAPI.getInstance().getPrefix() + "§cPlease rejoin, you received a new rank!");
-								}
-								player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + args[1] + " §7is now member of group §b" + rang + " §8[§b" + validality + "§8]");
+							int time;
+							PermissionValidality validality = CloudAPI.getInstance().getPermissionPool().formatValidality(data);
+							if (validality == null) {
+								player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid timespan like §e1d §cor §e1y §cor §e1min§c!");
+								return;
+							} else if (validality == PermissionValidality.LIFETIME) {
+								time = -1;
 							} else {
-								if (data.toLowerCase().endsWith("s")) {
-									validality = PermissionValidality.SECOND;
-									format = "s";
-								} else if (data.toLowerCase().endsWith("min")) {
-									validality = PermissionValidality.MINUTE;
-									format = "min";
-								} else if (data.toLowerCase().endsWith("h")) {
-									validality = PermissionValidality.HOUR;
-									format = "h";
-								} else if (data.toLowerCase().endsWith("d")) {
-									validality = PermissionValidality.DAY;
-									format = "d";
-								} else if (data.toLowerCase().endsWith("w")) {
-									validality = PermissionValidality.WEEK;
-									format = "w";
-								} else if (data.toLowerCase().endsWith("m")) {
-									validality = PermissionValidality.MONTH;
-									format = "m";
-								} else {
-									player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid timespan like §e1d §cor §e1y §cor §e1min§c!");
-									return;
-								}
-								try {
-									Integer i = Integer.parseInt(args[5].split(format)[0]);
-									CloudAPI.getInstance().getPermissionPool().updatePermissionGroup(args[1], CloudAPI.getInstance().getPermissionPool().getPermissionGroupFromName(rang), i, validality);
-									CloudAPI.getInstance().getPermissionPool().update();
-									if (ProxyServer.getInstance().getPlayer(uuid) != null) {
-										ProxyServer.getInstance().getPlayer(uuid).disconnect(CloudAPI.getInstance().getPrefix() + "§cPlease rejoin, you received a new rank!");
-									}
-									player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + args[1] + " §7is now member of group §b" + rang + " §8[§b" + i + validality.name() + "§8]");
-
-								} catch (NumberFormatException e) {
-									player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a §evalid number §cfor the duration of the rank (in days)");
-								}
-
+								String str = data.replaceAll("[^\\d.]", "");
+								time = Integer.parseInt(str);
 							}
+							CloudAPI.getInstance().getPermissionPool().updatePermissionGroup(args[1], CloudAPI.getInstance().getPermissionPool().getPermissionGroupFromName(rang), time, validality);
+							CloudAPI.getInstance().getPermissionPool().update();
+							player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + args[1] + " §7is now member of group §b" + rang + " §8[§b" + validality.name() + "§8]");
 						} else {
 							help(player);
 						}

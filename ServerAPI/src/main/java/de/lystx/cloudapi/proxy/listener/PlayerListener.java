@@ -113,14 +113,15 @@ public class PlayerListener implements Listener {
         } else {
             e.setHasPermission(cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), e.getPermission()));
         }
-        System.out.println(e.getPermission() + " - " + e.hasPermission());
     }
 
     @EventHandler
     public void onCommand(ChatEvent event) {
         String message = event.getMessage();
         String player = ((ProxiedPlayer)event.getSender()).getName();
-        cloudAPI.sendPacket(new PacketCommunicationPlayerChat(player, message));
+
+        PacketCommunicationPlayerChat packet = new PacketCommunicationPlayerChat(player, message);
+        packet.unsafe().async().send(this.cloudAPI.getCloudClient());
     }
 
     @EventHandler
