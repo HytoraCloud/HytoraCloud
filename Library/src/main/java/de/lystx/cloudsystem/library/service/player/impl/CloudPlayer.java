@@ -3,7 +3,10 @@ package de.lystx.cloudsystem.library.service.player.impl;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.packets.communication.*;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.player.featured.CloudInventory;
+import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +15,7 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Getter @Setter @ToString
 public class CloudPlayer implements Serializable, CloudCommandSender {
@@ -38,6 +42,14 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      */
     public CloudPlayerData getCloudPlayerData() {
         return this.cloudPlayerData == null ? new DefaultCloudPlayerData(this.uniqueId, this.name, this.ipAddress) : this.cloudPlayerData;
+    }
+
+    /**
+     * Returns a CloudPlayer Inventory to manage stuff
+     * @return
+     */
+    public CloudPlayerInventory getInventory() {
+        return Constants.INVENTORIES.getOrDefault(this.uniqueId, new CloudPlayerInventory(this));
     }
 
     /**
@@ -81,13 +93,22 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
     }
 
     /**
+     * Opens an inventory to a player
+     * @param cloudInventory
+     */
+    public void openInventory(CloudInventory cloudInventory) {
+        PacketCommunicationOpenInventory packetCommunicationOpenInventory = new PacketCommunicationOpenInventory(this, cloudInventory);
+        Constants.EXECUTOR.sendPacket(packetCommunicationOpenInventory);
+    }
+
+    /**
      * Plays a Bukkit sound
      * @param sound
      * @param v1
      * @param v2
      */
-    public void playSound(String sound, float v1, float v2) {
-        PacketCommunicationPlaySound playSound = new PacketCommunicationPlaySound(this.name, sound, v1, v2);
+    public void playSound(Enum<?> sound, float v1, float v2) {
+        PacketCommunicationPlaySound playSound = new PacketCommunicationPlaySound(this.name, sound.name(), v1, v2);
         Constants.EXECUTOR.sendPacket(playSound);
     }
 

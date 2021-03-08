@@ -3,10 +3,12 @@ package de.lystx.cloudsystem.library.service.network.defaults;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.util.Constants;
 
 import java.io.Serializable;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public interface CloudExecutor extends Serializable {
 
@@ -20,6 +22,10 @@ public interface CloudExecutor extends Serializable {
             packet.unsafe().async = false;
             Executors.newCachedThreadPool().execute(() -> this.sendPacket(packet));
         }
+    }
+
+    default void sendPacket(Packet packet, Consumer<PacketState> consumer) {
+
     }
 
     /**

@@ -1,4 +1,4 @@
-package de.lystx.cloudapi.bukkit.listener;
+package de.lystx.cloudapi.bukkit.listener.cloud;
 
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.events.network.CloudServerNetworkUpdateEvent;

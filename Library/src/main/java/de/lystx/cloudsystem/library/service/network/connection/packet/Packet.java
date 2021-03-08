@@ -1,11 +1,14 @@
 package de.lystx.cloudsystem.library.service.network.connection.packet;
 
+import de.lystx.cloudsystem.library.CloudService;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
 
 public class Packet implements Serializable {
 
@@ -91,6 +94,37 @@ public class Packet implements Serializable {
          */
         public void send(CloudExecutor cloudExecutor) {
             cloudExecutor.sendPacket(Packet.this);
+        }
+
+        public void send(CloudExecutor cloudExecutor, Consumer<PacketState> consumer) {
+            cloudExecutor.sendPacket(Packet.this, consumer);
+        }
+
+        /**
+         * Sends a packet with {@link CloudService}
+         * @param cloudService
+         */
+        public void send(CloudService cloudService) {
+            cloudService.getCurrentExecutor().sendPacket(Packet.this);
+        }
+
+        public void send(CloudService cloudService, Consumer<PacketState> consumer) {
+            cloudService.getCurrentExecutor().sendPacket(Packet.this, consumer);
+        }
+
+        /**
+         * Not recommendet to use
+         * The {@link Constants#EXECUTOR} could be null
+         * or not defined yet!
+         */
+        @Deprecated
+        public void send() {
+            Constants.EXECUTOR.sendPacket(Packet.this);
+        }
+
+        @Deprecated
+        public void send(Consumer<PacketState> consumer) {
+            Constants.EXECUTOR.sendPacket(Packet.this, consumer);
         }
 
         /**

@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
 import de.lystx.cloudsystem.library.elements.packets.communication.*;
@@ -28,8 +29,9 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
             PacketCommunicationSendMessage packetPlayOutSendMessage = (PacketCommunicationSendMessage)packet;
             ProxyServer.getInstance().getPlayer(packetPlayOutSendMessage.getUuid()).sendMessage(packetPlayOutSendMessage.getMessage());
         } else if (packet instanceof PacketCommunicationFallback) {
+
             PacketCommunicationFallback fallback = (PacketCommunicationFallback) packet;
-            CloudAPI.getInstance().getCloudPlayers().get(fallback.getName()).fallback();
+            CloudProxy.getInstance().getHubManager().sendPlayerToFallback(CloudAPI.getInstance().getCloudPlayers().get(fallback.getName()));
         } else if (packet instanceof PacketCommunicationSendComponent) {
             PacketCommunicationSendComponent packetCommunicationSendComponent = (PacketCommunicationSendComponent)packet;
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetCommunicationSendComponent.getUuid());

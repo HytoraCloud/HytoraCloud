@@ -3,10 +3,14 @@ package de.lystx.cloudapi.proxy;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
+import de.lystx.cloudsystem.library.CloudService;
+import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
+import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
@@ -16,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-public class CloudProxy extends Plugin {
+public class CloudProxy extends Plugin implements CloudService {
 
     @Getter
     private static CloudProxy instance;
@@ -34,6 +38,46 @@ public class CloudProxy extends Plugin {
         this.hubManager = new HubManager();
         this.networkManager = new NetworkManager();
         this.services = new LinkedList<>();
+
+        this.bootstrap();
+    }
+
+    @Override
+    public void onDisable() {
+        this.shutdown();
+    }
+
+    /**
+     * Executes a Command as Console
+     * @param line
+     */
+    public void executeCommand(String line) {
+        ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), line);
+    }
+
+    /**
+     * Returns {@link ProxyConfig} from VsonObject
+     * see {@link CloudAPI#getService()}
+     * @return
+     */
+    public ProxyConfig getProxyConfig() {
+        return this.cloudAPI.getService().getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class);
+    }
+
+    /**
+     * Returns the current ProxyPort
+     * it iterates through all listeners
+     * @return Integer
+     */
+    public int getProxyPort() {
+        for (ListenerInfo listener : ProxyServer.getInstance().getConfig().getListeners()) {
+            return listener.getHost().getPort();
+        }
+        return -1;
+    }
+
+    @Override
+    public void bootstrap() {
 
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStartServer(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStopServer(this.cloudAPI));
@@ -67,25 +111,24 @@ public class CloudProxy extends Plugin {
     }
 
     @Override
-    public void onDisable() {
+    public void shutdown() {
         if (this.cloudAPI.getCloudClient().isConnected()) {
             this.cloudAPI.disconnect();
         }
     }
 
-    public void executeCommand(String line) {
-        ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), line);
+    @Override
+    public void sendPacket(Packet packet) {
+        this.cloudAPI.sendPacket(packet);
     }
 
-    public ProxyConfig getProxyConfig() {
-        return this.cloudAPI.getService().getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class);
+    @Override
+    public CloudExecutor getCurrentExecutor() {
+        return this.cloudAPI.getCurrentExecutor();
     }
 
-    public int getProxyPort() {
-        for (ListenerInfo listener : ProxyServer.getInstance().getConfig().getListeners()) {
-            return listener.getHost().getPort();
-        }
-        return -1;
+    @Override
+    public CloudType getType() {
+        return this.cloudAPI.getType();
     }
-
 }

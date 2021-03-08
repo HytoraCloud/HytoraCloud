@@ -5,8 +5,6 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
-import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
-import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateCloudSign;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInDeleteCloudSign;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
@@ -194,15 +192,16 @@ public class ServiceCommand {
         }
     }
 
-    public void help(CloudPlayer player) {
-        player.sendMessage("§bCloudService §7Help§8:");
-        player.sendMessage("§8§m--------------------------------------");
-        player.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
-        player.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
-        player.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
-        player.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
-        player.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
-        player.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
-        player.sendMessage("§8§m--------------------------------------");
+    public void help(CloudPlayer cloudPlayer) {
+        cloudPlayer.sendMessage("§bCloudService §7Help§8:");
+        cloudPlayer.sendMessage("§8§m--------------------------------------");
+        cloudPlayer.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
+        cloudPlayer.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
+        cloudPlayer.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
+        cloudPlayer.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
+        cloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
+        cloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
+        cloudPlayer.sendMessage("§8§m--------------------------------------");
+
     }
 }

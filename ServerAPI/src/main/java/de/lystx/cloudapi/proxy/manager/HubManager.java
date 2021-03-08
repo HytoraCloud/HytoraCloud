@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
 
@@ -48,11 +49,12 @@ public class HubManager {
     }
 
     public void sendPlayerToFallback(CloudPlayer player) {
+        ProxiedPlayer proxiedPlayer =  ProxyServer.getInstance().getPlayer(player.getName());
         if (this.getInfo(player) == null) {
-            player.kick(CloudAPI.getInstance().getPrefix() + "§cNo fallback was found!");
+            proxiedPlayer.disconnect(CloudAPI.getInstance().getPrefix() + "§cNo fallback was found!");
             return;
         }
-        player.connect(this.getInfo(player).getName());
+        proxiedPlayer.connect(this.getInfo(player));
     }
 
     public Fallback getHighestFallback(CloudPlayer player) {

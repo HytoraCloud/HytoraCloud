@@ -1,4 +1,4 @@
-package de.lystx.cloudapi.bukkit.listener;
+package de.lystx.cloudapi.bukkit.listener.other;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
@@ -34,7 +34,6 @@ public class NPCListener implements Listener {
     public NPCListener() {
         this.services = new HashMap<>();
     }
-
 
 
     @EventHandler
@@ -86,6 +85,12 @@ public class NPCListener implements Listener {
         this.services.remove(event.getPlayer().getUniqueId());
     }
 
+    /**
+     * Opens the Inventory for the given group
+     * @param player > Player to open to
+     * @param group > ServerGroup
+     * @return > Group Inventory
+     */
     public Inventory getInventory(Player player, String group) {
         Map<Integer, Service> serviceMap = new HashMap<>();
         NPCConfig config = CloudServer.getInstance().getNpcManager().getNpcConfig();
@@ -143,6 +148,13 @@ public class NPCListener implements Listener {
         return inventory;
     }
 
+    /**
+     * Returns the slot by an ItemStack
+     * in an given Inventory
+     * @param itemStack > Index to stop
+     * @param inventory > Inv to scan
+     * @return slot
+     */
     public int getSlot(ItemStack itemStack, Inventory inventory) {
         for (int i = 0; i < inventory.getSize(); i++) {
             if (inventory.getItem(i).equals(itemStack)) {
@@ -152,6 +164,13 @@ public class NPCListener implements Listener {
         return 0;
     }
 
+    /**
+     * Returns String with placeHolders
+     * @param input
+     * @param service
+     * @param serviceGroup
+     * @return
+     */
     public String replace(String input, Service service, ServiceGroup serviceGroup) {
         try {
             if (service != null) {

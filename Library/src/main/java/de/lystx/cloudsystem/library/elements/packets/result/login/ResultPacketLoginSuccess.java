@@ -27,6 +27,7 @@ public class ResultPacketLoginSuccess extends ResultPacket implements Serializab
         cloudLibrary.getService(CloudPlayerService.class).update(this.connection.getName(), cloudPlayer);
         cloudLibrary.reload();
 
-        return new VsonObject().append("cloudPlayer", cloudPlayer).append("allow", cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName()) != null);
+        VsonObject vsonObject = new VsonObject().append("allow", cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName()) != null);
+        return vsonObject;
     }
 }

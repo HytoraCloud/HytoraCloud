@@ -2,6 +2,11 @@ package de.lystx.cloudsystem.library.service.util;
 
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
+import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Constants {
 
@@ -14,6 +19,8 @@ public class Constants {
 
     public static boolean NEEDS_DEPENDENCIES;
     public static boolean JLINE_COMPLETER_INSTALLED;
+
+    public static final Map<UUID, CloudPlayerInventory> INVENTORIES = new HashMap<>();
 
     /**
      * Checks if dependencies are already loaded

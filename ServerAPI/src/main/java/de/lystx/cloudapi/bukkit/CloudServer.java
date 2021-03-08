@@ -2,17 +2,27 @@ package de.lystx.cloudapi.bukkit;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.command.ServiceCommand;
+import de.lystx.cloudapi.bukkit.command.StopCommand;
 import de.lystx.cloudapi.bukkit.events.other.BukkitEventEvent;
 import de.lystx.cloudapi.bukkit.handler.*;
-import de.lystx.cloudapi.bukkit.listener.*;
+import de.lystx.cloudapi.bukkit.listener.cloud.CloudListener;
+import de.lystx.cloudapi.bukkit.listener.other.NPCListener;
+import de.lystx.cloudapi.bukkit.listener.player.*;
 import de.lystx.cloudapi.bukkit.manager.labymod.LabyMod;
 import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
 import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
+import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.SkinFetcher;
 import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudapi.bukkit.manager.other.CloudManager;
 import de.lystx.cloudapi.bukkit.utils.CloudPermissibleBase;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
+import de.lystx.cloudsystem.library.CloudService;
+import de.lystx.cloudsystem.library.CloudType;
+import de.lystx.cloudsystem.library.enums.ServiceState;
+import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
+import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,11 +33,11 @@ import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 
 @Getter @Setter
-public class CloudServer extends JavaPlugin {
+public class CloudServer extends JavaPlugin implements CloudService {
 
     @Getter
     private static CloudServer instance;
@@ -40,8 +50,11 @@ public class CloudServer extends JavaPlugin {
     private SkinFetcher skinFetcher;
     private LabyMod labyMod;
     private boolean newVersion;
-    private boolean waitingForPlayer;
 
+    private boolean waitingForPlayer;
+    private int taskId;
+
+    public static final Map<UUID, PacketReader> PACKET_READERS = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -64,46 +77,8 @@ public class CloudServer extends JavaPlugin {
         } catch (Exception e){
             this.newVersion = true;
         }
-
-        // Registering PacketHandlers
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitServerUpdate(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitCloudPlayerHandler(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSubChannel(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerTPS(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitEvent(this.cloudAPI));
-
-        // Connecting to cloud and managing cloud stuff
-        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
-
-        if (this.cloudAPI.getProperties().has("waitingForPlayers")) {
-            this.waitingForPlayer = true;
-            this.cloudAPI.getScheduler().scheduleDelayedTask(() -> {
-                if (waitingForPlayer) {
-                    this.shutdown();
-                }
-            }, 1500L);
-        }
-
-        //Registering Events
-        this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        this.getServer().getPluginManager().registerEvents(new NPCListener(), this);
-        this.getServer().getPluginManager().registerEvents(new CommandListener(), this);
-
-        // Registering commands
-        this.cloudAPI.registerCommand(new ServiceCommand());
-
-        //Checking for fired events
-        for (HandlerList handler : HandlerList.getHandlerLists()) {
-            handler.register(new RegisteredListener(new EmptyListener(), (listener, event) -> {
-                if (event.getClass().getSimpleName().equalsIgnoreCase(BukkitEventEvent.class.getSimpleName())) {
-                    return;
-                }
-                Bukkit.getPluginManager().callEvent(new BukkitEventEvent(event));
-            }, EventPriority.NORMAL, this, false));
-        }
+        this.taskId = -1;
+        this.bootstrap();
     }
 
     @Override
@@ -121,31 +96,142 @@ public class CloudServer extends JavaPlugin {
         }
     }
 
+    /**
+     * Executes a Command from the console
+     * @param command
+     */
     public void executeCommand(String command) {
         Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
     }
 
+    @Override
+    public void bootstrap() {
+        // Registering PacketHandlers
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerInventory(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitServerUpdate(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitCloudPlayerHandler(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSubChannel(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerTPS(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitEvent(this.cloudAPI));
+
+        // Connecting to cloud and managing cloud stuff
+        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
+
+        //Start checking for players or stop server
+        this.startStopTimer();
+
+        //Registering Events
+        this.getServer().getPluginManager().registerEvents(new PlayerLoginListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerChatListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerSignListener(), this);
+        this.getServer().getPluginManager().registerEvents(new NPCListener(), this);
+
+        // Registering commands
+        this.cloudAPI.registerCommand(new ServiceCommand());
+        this.cloudAPI.registerCommand(new StopCommand());
+
+        //Checking for fired events
+        for (EventPriority value : EventPriority.values()) {
+            this.registerListener(value, true);
+            this.registerListener(value, false);
+        }
+    }
+
+    /**
+     * Registers Handler for {@link BukkitEventEvent}
+     * @param eventPriority
+     * @param ignore
+     */
+    public void registerListener(EventPriority eventPriority, boolean ignore) {
+        for (HandlerList handler : HandlerList.getHandlerLists()) {
+            handler.register(new RegisteredListener(new Listener(){}, (listener, event) -> {
+                if (event.getClass().getSimpleName().equalsIgnoreCase(BukkitEventEvent.class.getSimpleName())) {
+                    return;
+                }
+                Bukkit.getPluginManager().callEvent(new BukkitEventEvent(event));
+            }, eventPriority, this, ignore));
+        }
+    }
+
+    /**
+     * Starts counting to 5 Minutes
+     * If no player joins within the given time
+     * The server will stop due to no
+     * player being online
+     */
+    public void startStopTimer() {
+        if (!this.cloudAPI.getProperties().has("waitingForPlayers")) {
+            return;
+        }
+        this.waitingForPlayer = true;
+        this.taskId = this.cloudAPI.getScheduler().scheduleDelayedTask(() -> {
+            if (this.waitingForPlayer) {
+                this.shutdown();
+            }
+        }, 6000L).getId();
+    }
+
+    @Override
     public void shutdown() {
+        if (this.taskId != -1) {
+            this.cloudAPI.getScheduler().cancelTask(this.taskId);
+        }
         String msg = this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix());
-        List<Player> list = new LinkedList<>(Bukkit.getOnlinePlayers());
-        for (Player onlinePlayer : list) {
+        int size = Bukkit.getOnlinePlayers().size();
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             CloudPlayer player = cloudAPI.getCloudPlayers().get(onlinePlayer.getName());
             if (player != null) {
                 onlinePlayer.sendMessage(msg);
-                player.fallback();
+                if (CloudAPI.getInstance().getNetwork().getLobbies().size() == 1) {
+                    onlinePlayer.kickPlayer(msg);
+                } else {
+                    player.fallback();
+                }
             } else {
                 onlinePlayer.kickPlayer(msg);
             }
-
-            list.remove(onlinePlayer);
-            if (list.isEmpty()) {
-
-                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> CloudAPI.getInstance().shutdown(), 5L);
-                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(Bukkit::shutdown, 7L);
+            size--;
+            if (size <= 0) {
+                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
+                    this.cloudAPI.shutdown(new Consumer<PacketState>() {
+                        @Override
+                        public void accept(PacketState packetState) {
+                            if (packetState == PacketState.SUCCESS) {
+                                Bukkit.shutdown();
+                            } else {
+                                System.out.println("[CloudAPI] PacketPlayInStopServer couldn't be send! Stopping server was cancelled!");
+                            }
+                        }
+                    });
+                }, 5L);
             }
         }
     }
 
+    @Override
+    public void sendPacket(Packet packet) {
+        this.cloudAPI.sendPacket(packet);
+    }
+
+    @Override
+    public CloudExecutor getCurrentExecutor() {
+        return this.cloudAPI.getCurrentExecutor();
+    }
+
+    @Override
+    public CloudType getType() {
+        return CloudType.CLOUDAPI;
+    }
+
+    /**
+     * Injects the {@link CloudPermissibleBase} to the Player
+     * @param player
+     */
     public void updatePermissions(Player player) {
         if (!cloudAPI.getPermissionPool().isEnabled()) {
             return;

@@ -1,12 +1,15 @@
 package de.lystx.cloudsystem.library.service.network.defaults;
 
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
+import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.netty.NettyClient;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Setter @Getter
 public class CloudClient extends NettyClient implements CloudExecutor {
@@ -69,4 +72,8 @@ public class CloudClient extends NettyClient implements CloudExecutor {
         this.networkHandlers.add(networkHandler);
     }
 
+    @Override
+    public void sendPacket(Packet packet, Consumer<PacketState> consumer) {
+        super.sendPacket(packet, consumer);
+    }
 }

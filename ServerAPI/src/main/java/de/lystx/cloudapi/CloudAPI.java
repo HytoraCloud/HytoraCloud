@@ -7,6 +7,7 @@ import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.CloudService;
 import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
@@ -18,6 +19,7 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.Result;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
@@ -27,7 +29,9 @@ import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
+import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
@@ -48,7 +52,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @Getter @Setter
-public class CloudAPI {
+public class CloudAPI implements CloudService {
 
     private static CloudAPI instance;
 
@@ -94,42 +98,68 @@ public class CloudAPI {
         this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
         this.cloudClient.registerPacketHandler(new PacketHandlerCommunication(this));
 
-        Thread cloudClient = new Thread(() -> {
-            try {
-                this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketPlayInRegister(this.getService())));
-                this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
-            } catch (Exception e) {
-                System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
-                e.printStackTrace();
-                System.exit(0);
-            }
-        }, "hytoraCloud_cloudAPI");
-
-        cloudClient.start();
+        this.bootstrap();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
     }
 
+    /**
+     * Registers a Command
+     * @param commandObject
+     */
     public void registerCommand(Object commandObject) {
         this.commandService.registerCommand(commandObject);
     }
 
+    /**
+     * Unregisters a Command
+     * @param commandObject
+     */
     public void unregisterCommand(Object commandObject) {
         this.commandService.unregisterCommand(commandObject);
     }
 
+    /**
+     * Installs a Maven Library and loads it internally
+     * from a REPO of your choice
+     * @param groupId > The GroupID
+     * @param artifactId > The ArtifactID
+     * @param version > The Version
+     * @param repo > The Repository
+     */
     public void installMaven(String groupId, String artifactId, String version, Repository repo) {
         this.cloudLibrary.getLibraryService().install(groupId, artifactId, version, repo);
     }
 
+    /**
+     * This will stop the connection between client and Server
+     */
     public void disconnect() {
         this.cloudClient.disconnect();
     }
 
+    /**
+     * This will execute a Query
+     * but asynchronous
+     * @param resultPacket
+     * @param consumer
+     */
     public void executeAsyncQuery(ResultPacket resultPacket, Consumer<Result> consumer) {
         this.executorService.execute(() -> this.sendQuery(resultPacket).onResultSet(consumer));
     }
 
+    /**
+     * Sends a Query to the Cloud
+     * This will send a {@link ResultPacket} to the Cloud
+     * The Cloud will call the method {@link ResultPacket#read(CloudLibrary)}
+     * This method returns a VsonObject which will be put in a {@link Result}
+     * and will be send back to all services.
+     * If the UUID of the Result matches with the created UUID at the top
+     * The Main-Thread will continue and the Result can be returned!
+     *
+     * @param packet > The ResultPacket to send
+     * @return Result from CloudLibrary
+     */
     public Result sendQuery(ResultPacket packet) {
         Value<Result> value = new Value<>();
         UUID uuid = UUID.randomUUID();
@@ -146,7 +176,14 @@ public class CloudAPI {
                 }
             }
         });
-        this.sendPacket(packet.uuid(uuid));
+        this.sendPacket(packet.uuid(uuid), packetState -> {
+            if (packetState == PacketState.FAILED) {
+                Result r = new Result(uuid, new VsonObject());
+                r.setError(true);
+                value.setValue(r);
+                Thread.currentThread().interrupt();
+            }
+        });
         int count = 0;
 
         while (value.getValue() == null && count++ < 3000) {
@@ -165,48 +202,126 @@ public class CloudAPI {
         return value.getValue();
     }
 
+    @Override
+    public void bootstrap() {
+        Thread cloudClient = new Thread(() -> {
+            try {
+                this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketPlayInRegister(this.getService())));
+                this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
+            } catch (Exception e) {
+                System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
+                e.printStackTrace();
+                System.exit(0);
+            }
+        }, "hytoraCloud_cloudAPI");
+
+        cloudClient.start();
+    }
+
+    @Override
     public void shutdown() {
-        this.sendPacket(new PacketPlayInStopServer(this.getService()));
+        this.shutdown(null);
+    }
+
+    public void shutdown(Consumer<PacketState> consumer) {
+        this.sendPacket(new PacketPlayInStopServer(this.getService()), consumer);
         this.disconnect();
     }
 
+    /**
+     * Makes the Cloud execute a command
+     * @param command
+     */
     public void sendCommand(String command) {
         this.sendPacket(new PacketPlayInCommand(command));
     }
 
+
+    /**
+     * Sends a packet to the the cloudSystem
+     * Without consumer to call back
+     * @param packet
+     */
     public void sendPacket(Packet packet) {
+        this.sendPacket(packet, null);
+    }
+
+    /**
+     * Sends a packet with a consumer
+     * @param packet
+     * @param consumer
+     */
+    public void sendPacket(Packet packet, Consumer<PacketState> consumer) {
         if (packet.unsafe() != null && packet.unsafe().isAsync()) {
             this.executorService.execute(() -> this.sendPacket(packet));
             return;
         }
         if (packet.getClass().getName().toLowerCase().contains("de.lystx.cloudsystem.library.elements.packets")) {
-            this.cloudClient.sendPacket(packet);
+            this.cloudClient.sendPacket(packet, consumer);
         } else {
-            this.cloudClient.sendPacket(new CustomPacket(packet));
+            this.cloudClient.sendPacket(new CustomPacket(packet), consumer);
         }
     }
 
+    @Override
+    public CloudExecutor getCurrentExecutor() {
+        return this.cloudClient;
+    }
 
+    @Override
+    public CloudType getType() {
+        return CloudType.CLOUDAPI;
+    }
+
+    /**
+     * Calls an Event within the CloudLibrary
+     * @param event
+     */
     public void callEvent(Event event) {
         this.cloudLibrary.callEvent(event);
     }
 
+    /**
+     * Sends a message to the Cloud
+     * @param prefix > Prefix of the action | Will look like this -> [PREFIX]
+     * @param message > The message after the prefix
+     * @param showUpInConsole > If false it will only be logged
+     */
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
-        this.sendPacket(new PacketPlayInLog(prefix, message, showUpInConsole));
+        new PacketPlayInLog(prefix, message, showUpInConsole).unsafe().async().send(this.cloudClient);
     }
 
+    /**
+     * Sends a message to the cloudSystem
+     * @param prefix
+     * @param message
+     */
     public void messageCloud(String prefix, Object message) {
         this.messageCloud(prefix, String.valueOf(message), true);
     }
 
+    /**
+     * Returns current Service
+     * Loaded by Document getService()
+     * @return
+     */
     public Service getService() {
         return this.getDocument().getAs(Service.class);
     }
 
+    /**
+     * Loads Properties of this service
+     * @return SerializableDocument
+     */
     public SerializableDocument getProperties() {
         return this.getService().getProperties();
     }
 
+    /**
+     * Loads VsonObject of this Service
+     * By file > given by ServerStartup
+     * @return
+     */
     public VsonObject getDocument() {
         try {
             return new VsonObject(new File("./CLOUD/connection.json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
@@ -216,24 +331,48 @@ public class CloudAPI {
         return null;
     }
 
+    /**
+     * Returns Prefix of CloudSystem
+     * Getting from {{@link de.lystx.cloudsystem.library.service.config.impl.MessageConfig}}
+     * @return
+     */
     public String getPrefix() {
         return this.networkConfig.getMessageConfig().getPrefix().replace("&", "§");
     }
 
+    /**
+     * Returns instance of the CloudAPI
+     * @return
+     */
     public static CloudAPI getInstance() {
         return instance;
     }
 
+    /**
+     * Returns CloudProvided Scheduler
+     * @return
+     */
     public Scheduler getScheduler() {
         return this.cloudLibrary.getService(Scheduler.class);
     }
 
+    /**
+     * Returns statistics of Cloud by Query
+     * @return
+     */
     public Statistics getStatistics() {
         Statistics statistics = new Statistics();
         statistics.load(CloudAPI.getInstance().sendQuery(new ResultPacketStatistics()).getDocument());
         return statistics;
     }
 
+    /**
+     * Iterates through all the permissions of a player
+     * @param player > Name of the player
+     * @param uuid > UUID of the player
+     * @param ipAddress > IP of the player to set default Data if player not exists
+     * @param accept > Consumer<String> that accepts all the permissions
+     */
     public void updatePermissions(String player, UUID uuid, String ipAddress, Consumer<String> accept) {
         if (this.permissionPool == null || !this.permissionPool.isAvailable() ) {
             System.out.println("[CloudAPI] Couldn't update Permissions for " + player + " because PermissionPool is not available!");
@@ -284,22 +423,53 @@ public class CloudAPI {
     }
 
 
+    /**
+     * Updates the current Service
+     * @return current CloudAPI
+     */
     public CloudAPI update() {
+        if (this.getService().getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+            throw new UnsupportedOperationException("Can't update a ProxyService!");
+        }
         CloudServer.getInstance().getManager().update();
         return this;
     }
 
+    /**
+     * Sets the State of the Service
+     * @param serviceState
+     * @return current CloudAPI
+     */
     public CloudAPI setServiceState(ServiceState serviceState) {
+        if (this.getService().getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+            throw new UnsupportedOperationException("Can't change ServiceState of a ProxyService!");
+        }
         CloudServer.getInstance().getManager().setServiceState(serviceState);
         return this;
     }
 
+    /**
+     * Sets the max Players of this service
+     * @param maxPlayers
+     * @return current CloudAPI
+     */
     public CloudAPI setMaxPlayers(int maxPlayers) {
+        if (this.getService().getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+            throw new UnsupportedOperationException("Can't change maxPlayers of a ProxyService!");
+        }
         CloudServer.getInstance().getManager().setMaxPlayers(maxPlayers);
         return this;
     }
 
+    /**
+     * Sets the MOTD of the current service
+     * @param motd
+     * @return current CloudAPI
+     */
     public CloudAPI setMotd(String motd) {
+        if (this.getService().getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+            throw new UnsupportedOperationException("Can't change MOTD of a ProxyService!");
+        }
         CloudServer.getInstance().getManager().setMotd(motd);
         return this;
     }

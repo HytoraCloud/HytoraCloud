@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.network.netty;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutVerifyConnection;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
@@ -121,15 +122,27 @@ public class NettyClient {
      * If failed tries to send another 5 times then throws error
      * @param packet
      */
-    public void sendPacket(Packet packet) {
-        if (channel != null) {
+    public void sendPacket(Packet packet, Consumer<PacketState> consumer) {
 
+        ChannelFutureListener listener = channelFuture -> {
+            if (consumer == null) {
+                return;
+            }
+            if (channelFuture.isSuccess()) {
+                consumer.accept(PacketState.SUCCESS);
+            } else {
+                consumer.accept(PacketState.FAILED);
+            }
+        };
+
+        if (channel != null) {
             if (this.channel.eventLoop().inEventLoop()) {
-                channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                channel.writeAndFlush(packet).addListener(listener).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             } else {
                 try {
-                    this.channel.eventLoop().execute(() -> channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE));
+                    this.channel.eventLoop().execute(() -> channel.writeAndFlush(packet).addListener(listener).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE));
                 } catch (NullPointerException ignored) {
+                    consumer.accept(PacketState.FAILED);
                 }
             }
 
@@ -137,19 +150,24 @@ public class NettyClient {
             int tries = this.tries.getOrDefault(packet.getClass(), 0);
             tries += 1;
             if (tries >= 5) {
+                consumer.accept(PacketState.FAILED);
                 System.out.println("[NettyClient] Tried 5 times to send packet " + packet.getClass().getSimpleName() + " but connection refused!");
                 this.tries.remove(packet.getClass());
                 return;
             }
+            consumer.accept(PacketState.RETRY);
             this.tries.put(packet.getClass(), tries);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    sendPacket(packet);
+                    sendPacket(packet, consumer);
                 }
             }, 1000L);
         }
     }
 
+    public void sendPacket(Packet packet) {
+        this.sendPacket(packet, null);
+    }
 
 }

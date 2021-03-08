@@ -96,6 +96,16 @@ public class CloudNetwork {
         return list;
     }
 
+    public List<Service> getLobbies() {
+        List<Service> list = new LinkedList<>();
+        for (Service service : this.getServices()) {
+            if (service.getServiceGroup().isLobby() && service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
+                list.add(service);
+            }
+        }
+        return list;
+    }
+
     public List<Service> getServices(ServiceType serviceType) {
         List<Service> list = new LinkedList<>();
         for (Service service : this.getServices()) {
