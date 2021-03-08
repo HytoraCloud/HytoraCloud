@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
+import de.lystx.cloudapi.proxy.events.other.ProxyServerMotdRequestEvent;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInNetworkPing;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -13,6 +14,7 @@ import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -33,24 +35,30 @@ public class ProxyPingListener implements Listener {
     @EventHandler
     public void onProxyPing(ProxyPingEvent event) {
         try {
+            this.cloudAPI.sendPacket(new PacketPlayInNetworkPing());
             int port = event.getConnection().getVirtualHost().getPort();
             ServerPing ping = event.getResponse();
-            if (this.cloudAPI == null) {
-                ping.setDescription("§4CloudAPI is null!");
-                event.setResponse(ping);
-                return;
-            }
-            CloudAPI.getInstance().sendPacket(new PacketPlayInNetworkPing());
-            if (this.cloudAPI.getNetworkConfig() == null) {
-                ping.setDescription("§4NetworkConfig is null!");
-                event.setResponse(ping);
-                return;
-            }
+
             ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
             if (!proxyConfig.isEnabled()) {
                 return;
             }
             Motd motd = this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance() ? proxyConfig.getMotdMaintenance() : proxyConfig.getMotdNormal();
+            UUID uniqueId = CloudAPI.getInstance().getPermissionPool().fromIP(event.getConnection().getAddress().getAddress().getHostAddress());
+            if (uniqueId != null) {
+                CloudConnection cloudConnection = new CloudConnection(
+                        uniqueId,
+                        this.cloudAPI.getPermissionPool().tryName(uniqueId),
+                        event.getConnection().getAddress().getAddress().getHostAddress()
+                );
+                for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
+                    networkHandler.onNetworkPing(cloudConnection);
+                }
+                ProxyServerMotdRequestEvent proxyServerMotdRequestEvent = ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerMotdRequestEvent(cloudConnection));
+                if (proxyServerMotdRequestEvent.getMotd() != null) {
+                    motd = proxyServerMotdRequestEvent.getMotd();
+                }
+            }
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
                 ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', this.replace(motd.getVersionString(), port)), 2));
             }
@@ -79,18 +87,6 @@ public class ProxyPingListener implements Listener {
             }
         }
 
-        UUID uniqueId = CloudAPI.getInstance().getPermissionPool().fromIP(event.getConnection().getAddress().getAddress().getHostAddress());
-        if (uniqueId == null) {
-            return;
-        }
-        CloudConnection cloudConnection = new CloudConnection(
-                        uniqueId,
-                        CloudAPI.getInstance().getPermissionPool().tryName(uniqueId),
-                        event.getConnection().getAddress().getAddress().getHostAddress()
-                     );
-        for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-            networkHandler.onNetworkPing(cloudConnection);
-        }
     }
 
 

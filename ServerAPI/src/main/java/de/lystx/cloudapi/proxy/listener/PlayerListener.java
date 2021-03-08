@@ -1,14 +1,11 @@
 package de.lystx.cloudapi.proxy.listener;
 
-import com.google.gson.reflect.TypeToken;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.other.ProxyServerLoginFailEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
-import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketLoginRequest;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -37,7 +34,7 @@ public class PlayerListener implements Listener {
         CloudPlayer cloudPlayer = this.cloudAPI.getCloudPlayers().get(connection.getName());
 
         if (cloudPlayer == null) {
-            CloudPlayer cp = new CloudPlayer(connection.getName(), connection.getUuid(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName());
+            CloudPlayer cp = new CloudPlayer(connection.getName(), connection.getUniqueId(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName());
             PacketPlayInRegisterCloudPlayer packet = new PacketPlayInRegisterCloudPlayer(cp);
             packet.unsafe().async().send(cloudAPI.getCloudClient());
 
