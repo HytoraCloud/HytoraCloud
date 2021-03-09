@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter @Setter
+@Getter() @Setter
 public class CloudPlayerInventory implements Serializable {
 
     private CloudItem helmet, chestplate, leggings, boots;

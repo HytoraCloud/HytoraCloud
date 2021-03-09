@@ -42,7 +42,7 @@ public class WebServer {
                     VsonSettings.OVERRITE_VALUES,
                     VsonSettings.CREATE_FILE_IF_NOT_EXIST);
 
-            this.port = this.config.getInteger("port", 2217);
+            this.port = this.config.has("port") ? this.config.getInteger("port") : this.config.append("port", 2217).getInteger("port");
             this.enabled = this.config.getBoolean("enabled", true);
             this.whitelistedIps = this.config.has("whitelistedIps") ?
                     this.config.getList("whitelistedIps", String.class) :

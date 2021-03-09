@@ -38,7 +38,13 @@ public class ServiceProviderStop {
             if (screen.getThread().isAlive()) {
                 try {
                     screen.getThread().stop();
-                } catch (NullPointerException ignored) {}
+                } catch (Exception ignored) {
+                    /**
+                     * Thread might already be dead
+                     * Ignoring it and deleting the remaining
+                     * files and stopping screen
+                     */
+                }
             }
 
             if (service.getServiceGroup().isDynamic()) {
@@ -50,7 +56,9 @@ public class ServiceProviderStop {
                             FileUtils.forceDelete(file);
                         }
                     }
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                    //Ignoring because all Files will be deleted anyways
+                }
             } else {
                 this.cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> {
                     File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
@@ -58,7 +66,9 @@ public class ServiceProviderStop {
                         try {
                             FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
                             FileUtils.forceDelete(cloudAPI);
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                            //Ignoring because all Files will be deleted anyways
+                        }
                     }
                 }, 5L);
             }

@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.server.impl;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInUpdateServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
@@ -105,14 +106,14 @@ public class GroupService extends CloudService {
         try {
             VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.clear();
-            document.getFile().delete();
-            this.groups.remove(this.getGroup(serviceGroup.getName()));
             document.putAll(newServiceGroup);
-            this.groups.add(newServiceGroup);
             document.save();
+            this.groups.remove(this.getGroup(serviceGroup.getName()));
+            this.groups.add(newServiceGroup);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     /**

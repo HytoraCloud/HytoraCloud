@@ -202,7 +202,13 @@ public class CloudAPI implements CloudService {
         return value.getValue();
     }
 
-    @Override
+    /**
+     * This will boot up the {@link CloudAPI}
+     * It will start a new {@link Thread}
+     * which starts the CloudClient
+     * If no connection could be built up
+     * the serviec will stop
+     */
     public void bootstrap() {
         Thread cloudClient = new Thread(() -> {
             try {
@@ -233,7 +239,7 @@ public class CloudAPI implements CloudService {
      * @param command
      */
     public void sendCommand(String command) {
-        this.sendPacket(new PacketPlayInCommand(command));
+        new PacketPlayInCommand(command).unsafe().async().send(this);
     }
 
 
@@ -330,7 +336,6 @@ public class CloudAPI implements CloudService {
         }
         return null;
     }
-
     /**
      * Returns Prefix of CloudSystem
      * Getting from {{@link de.lystx.cloudsystem.library.service.config.impl.MessageConfig}}

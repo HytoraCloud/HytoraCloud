@@ -252,7 +252,15 @@ public class ServerService extends CloudService {
                     int id = idService.getFreeID(serviceGroup.getName());
                     int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
                     Service service = new Service(
-                            serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), ServiceState.LOBBY);
+                            serviceGroup.getName() + "-" + id,
+                            UUID.randomUUID(),
+                            serviceGroup,
+                            id,
+                            port,
+                            getCloudLibrary()
+                                    .getService(ConfigService.class)
+                                    .getNetworkConfig()
+                                    .getPort(), ServiceState.LOBBY);
                     this.startService(serviceGroup, service);
                 }
             }
@@ -267,32 +275,26 @@ public class ServerService extends CloudService {
      * @returns VsonObject response
      */
     public VsonObject startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
-        VsonObject document = new VsonObject();
         if (!this.getCloudLibrary().isRunning()) {
             return new VsonObject().append("message", "CloudLibrary isn't running anymore").append("sucess", false);
         }
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
-                document.append("message", "§cServiceGroup for §e" + serviceGroup.getName() + " §cwasn't found!");
-                document.append("sucess", false);
-                return document;
+                return new VsonObject().append("message", "§cServiceGroup for §e" + serviceGroup.getName() + " §cwasn't found!").append("sucess", false);
             }
         }
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            document.append("sucess", true);
-            return document;
+            return new VsonObject().append("sucess", true);
         }
         if (serviceGroup.getMaxServer() != -1 && this.getServices(serviceGroup).size() >= serviceGroup.getMaxServer()) {
-            document.append("message", "§cCouldn't start any services of §e" + serviceGroup.getName() + " §cbecause the maximum of services of this group is §e" + serviceGroup.getMaxServer() + "§c!");
-            document.append("sucess", false);
             this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
-            return document;
+            return new VsonObject().append("message", "§cCouldn't start any services of §e" + serviceGroup.getName() + " §cbecause the maximum of services of this group is §e" + serviceGroup.getMaxServer() + "§c!").append("sucess", false);
         }
         this.getCloudLibrary().sendPacket(new PacketPlayOutRegisterServer(service));
         if (service.getPort() <= 0) {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
             int id = this.idService.getFreeID(serviceGroup.getName());
-            service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, ((NetworkConfig) getCloudLibrary().getCustoms().get("networkConfig")).getPort(), service.getServiceState());
+            service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), service.getServiceState());
         }
         service.setProperties((properties == null ? new SerializableDocument() : properties));
         this.globalServices.add(service);
@@ -301,19 +303,16 @@ public class ServerService extends CloudService {
         this.services.put(serviceGroup, services);
 
         if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            return document;
+            return new VsonObject();
         }
+        this.actions.put(service.getName(), new Action());
         if (this.providerStart.autoStartService(service, properties)) {
             this.notifyStart(service);
             this.getCloudLibrary().getService(EventService.class).callEvent(new ServiceStartEvent(service));
             this.getCloudLibrary().sendPacket(new PacketPlayOutStartedServer(service));
-            this.actions.put(service.getName(), new Action());
-
-            document.append("message", "§aSuccess!");
-            document.append("service", service);
-            document.append("sucess", true);
+            return new VsonObject().append("sucess", true);
         }
-        return document;
+        return new VsonObject();
     }
 
     /**
@@ -377,17 +376,15 @@ public class ServerService extends CloudService {
             this.services.put(this.getGroup(service.getServiceGroup().getName()), services);
 
             if (!this.getCloudLibrary().getService(EventService.class).callEvent(new ServiceStopEvent(service))) {
-                this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
-                    if (this.providerStop.stopService(service)) {
-                        if (!newServices) {
-                            return;
-                        }
-                        this.needServices(service.getServiceGroup());
+                if (this.providerStop.stopService(service)) {
+                    if (!newServices) {
+                        return;
                     }
-                }, 3L);
+                    this.needServices(service.getServiceGroup());
+                }
             }
-        } catch (NullPointerException ignored) {
-            //Hier ist etwas schief gegangen
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
     }
 

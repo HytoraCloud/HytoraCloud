@@ -51,7 +51,6 @@ public class CloudServer extends JavaPlugin implements CloudService {
     private LabyMod labyMod;
     private boolean newVersion;
 
-    private boolean waitingForPlayer;
     private int taskId;
 
     public static final Map<UUID, PacketReader> PACKET_READERS = new HashMap<>();
@@ -101,10 +100,24 @@ public class CloudServer extends JavaPlugin implements CloudService {
      * @param command
      */
     public void executeCommand(String command) {
-        Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+        if (command.equalsIgnoreCase("stop") || command.equalsIgnoreCase("bukkit:stop")) {
+            this.shutdown();
+        } else {
+            Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+        }
     }
 
-    @Override
+    /**
+     * This will boot up the {@link CloudServer}
+     * It will first register all PacketHandlers
+     * Then a CloudListener for all specific CloudEvents
+     * will be registered in {@link de.lystx.cloudsystem.library.service.network.defaults.CloudClient}
+     * The next step it starts the stopping timer
+     * And last it manages the Bukkit stuff like
+     * registering {@link Listener}s, {@link org.bukkit.command.Command}s and
+     * CloudCommands with the {@link de.lystx.cloudsystem.library.service.command.base.Command} Annotation
+     * (+ it registers the listeners to fire the {@link BukkitEventEvent} )
+     */
     public void bootstrap() {
         // Registering PacketHandlers
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerInventory(this.cloudAPI));
@@ -158,7 +171,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
         }
     }
 
-    /**
+    /*
      * Starts counting to 5 Minutes
      * If no player joins within the given time
      * The server will stop due to no
@@ -168,21 +181,33 @@ public class CloudServer extends JavaPlugin implements CloudService {
         if (!this.cloudAPI.getProperties().has("waitingForPlayers")) {
             return;
         }
-        this.waitingForPlayer = true;
         this.taskId = this.cloudAPI.getScheduler().scheduleDelayedTask(() -> {
-            if (this.waitingForPlayer) {
+            if (Bukkit.getOnlinePlayers().size() <= 0) {
                 this.shutdown();
             }
         }, 6000L).getId();
     }
 
-    @Override
+    /**
+     * Iterates through all onlinePlayers
+     * if a fallback server exists the player
+     * will be fallbacked. If not the
+     * player will just be kicked
+     * If no players are remaining online
+     * the CloudAPI will disconnect and the
+     * BukkitServer will shut down
+     */
     public void shutdown() {
         if (this.taskId != -1) {
             this.cloudAPI.getScheduler().cancelTask(this.taskId);
         }
         String msg = this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix());
         int size = Bukkit.getOnlinePlayers().size();
+        if (size <= 0) {
+            this.shutdown0();
+            return;
+        }
+
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             CloudPlayer player = cloudAPI.getCloudPlayers().get(onlinePlayer.getName());
             if (player != null) {
@@ -197,23 +222,29 @@ public class CloudServer extends JavaPlugin implements CloudService {
             }
             size--;
             if (size <= 0) {
-                CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
-                    this.cloudAPI.shutdown(new Consumer<PacketState>() {
-                        @Override
-                        public void accept(PacketState packetState) {
-                            if (packetState == PacketState.SUCCESS) {
-                                Bukkit.shutdown();
-                            } else {
-                                System.out.println("[CloudAPI] PacketPlayInStopServer couldn't be send! Stopping server was cancelled!");
-                            }
-                        }
-                    });
-                }, 5L);
+                this.shutdown0();
             }
         }
     }
 
-    @Override
+
+    private void shutdown0() {
+        CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
+            this.cloudAPI.shutdown(packetState -> {
+                if (packetState == PacketState.SUCCESS) {
+                    Bukkit.shutdown();
+                } else {
+                    System.out.println("[CloudAPI] PacketPlayInStopServer couldn't be send! Stopping server was cancelled!");
+                }
+            });
+        }, 5L);
+    }
+
+    /**
+     * Refers to the {@link CloudAPI#sendPacket(Packet)} Method
+     * and sends the packet without consumer
+     * @param packet
+     */
     public void sendPacket(Packet packet) {
         this.cloudAPI.sendPacket(packet);
     }

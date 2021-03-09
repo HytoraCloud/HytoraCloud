@@ -21,7 +21,6 @@ public class CloudItem implements Serializable {
 
     private String skullOwner;
 
-
     /**
      * Constructs a CloudItem
      * @param material
@@ -30,6 +29,10 @@ public class CloudItem implements Serializable {
      */
     public CloudItem(Enum<?> material, short subid, int amount) {
         this(new LinkedList<>(), material.name(), amount, subid);
+    }
+
+    public CloudItem(String material, short subid, int amount) {
+        this(new LinkedList<>(), material, amount, subid);
     }
 
     /**
@@ -42,6 +45,10 @@ public class CloudItem implements Serializable {
         this(new LinkedList<>(), material.name(), amount, subid);
     }
 
+    public CloudItem(String material, int amount, short subid) {
+        this(new LinkedList<>(), material, amount, subid);
+    }
+
     /**
      * Constructs a CloudItem
      * @param material
@@ -49,6 +56,10 @@ public class CloudItem implements Serializable {
      */
     public CloudItem(Enum<?> material, short subid) {
         this(new LinkedList<>(), material.name(), 1, subid);
+    }
+
+    public CloudItem(String material, short subid) {
+        this(new LinkedList<>(), material, 1, subid);
     }
 
     /**
@@ -60,12 +71,19 @@ public class CloudItem implements Serializable {
         this(new LinkedList<>(), material.name(), amount, (short) 0);
     }
 
+    public CloudItem(String material, int amount) {
+        this(new LinkedList<>(), material, amount, (short) 0);
+    }
+
     /**
      * Constructs a CloudItem
      * @param material
      */
     public CloudItem(Enum<?> material) {
         this(new LinkedList<>(), material.name(), 1, (short) 0);
+    }
+    public CloudItem(String material) {
+        this(new LinkedList<>(), material, 1, (short) 0);
     }
 
     /**

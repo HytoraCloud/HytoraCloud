@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-@Getter @Setter @ToString
+@Getter @Setter @ToString(of = "name")
 public class CloudPlayer implements Serializable, CloudCommandSender {
 
     private final String name;

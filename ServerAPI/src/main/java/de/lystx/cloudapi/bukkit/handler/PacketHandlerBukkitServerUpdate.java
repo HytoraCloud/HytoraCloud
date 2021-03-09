@@ -38,8 +38,8 @@ public class PacketHandlerBukkitServerUpdate extends PacketHandlerAdapter {
                                 .replace("%group%", group.getName()));
                     }
                 }
-                CloudServer.getInstance().getManager().setMaxPlayers(newGroup.getMaxPlayers());
-                CloudServer.getInstance().getManager().update();
+                CloudAPI.getInstance().setMaxPlayers(newGroup.getMaxPlayers());
+                CloudAPI.getInstance().update();
             }
         } else if (packet instanceof PacketPlayInServiceStateChange) {
             PacketPlayInServiceStateChange packetPlayInServiceStateChange = (PacketPlayInServiceStateChange)packet;

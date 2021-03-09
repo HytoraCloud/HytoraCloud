@@ -96,7 +96,7 @@ public class CloudSystem extends CloudInstance {
 
     public void syncGroupsWithServices() {
         this.getService(GroupService.class).loadGroups();
-        for (List<Service> value : this.getService().getServices().values()) {
+        for (List<Service> value : new LinkedList<>(this.getService().getServices().values())) {
             for (Service s : value) {
                 s.setServiceGroup(this.getService(GroupService.class).getGroup(s.getServiceGroup().getName()));
                 CloudScreen cloudScreen = this.getService(ScreenService.class).getMap().get(s.getName());

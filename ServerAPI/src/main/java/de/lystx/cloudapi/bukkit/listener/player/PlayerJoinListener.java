@@ -24,7 +24,6 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
 
         //Player has joine server is not stopping
-        CloudServer.getInstance().setWaitingForPlayer(false); //Disables stopping server
         if (CloudServer.getInstance().getTaskId() != -1) {
             CloudAPI.getInstance().getScheduler().cancelTask(CloudServer.getInstance().getTaskId()); //Cancelling stop ask
         }
@@ -54,11 +53,9 @@ public class PlayerJoinListener implements Listener {
             }
 
             int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
-            double bukkitPercent = ((Bukkit.getMaxPlayers() / Bukkit.getOnlinePlayers().size()) * 100);
-            if (percent <= 100 && bukkitPercent >= percent) {
+
+            if (percent <= 100 && (((double) Bukkit.getOnlinePlayers().size()) / (double) Bukkit.getMaxPlayers()) * 100 >= percent) {
                 CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new SerializableDocument().append("waitingForPlayers", true));
-            } else {
-                player.sendMessage(percent + " - " + bukkitPercent + "%");
             }
 
             //NPCs injecting for InteractEvent
@@ -74,7 +71,7 @@ public class PlayerJoinListener implements Listener {
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
                             if (group == null) {
-                                CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cPlayer §e" + player.getName() + " §ccouldn't update permissionGroup");
+                                System.out.println("[CloudAPI] Couldn't update Nametag for " + player.getName() + "! His PermissionGroup couldn't be found!");
                                 return;
                             }
                             CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), onlinePlayer);
