@@ -9,7 +9,7 @@ HytoraCloud is used to manage all of your BungeeCord and Spigot servers together
 
 Compatible Network Softwares:
 
- -  Spigot : bukkit, paperSpigot
+ -  Spigot : bukkit, (paperSpigot in maintenance)
  -  BungeeCord: bungeeCord, waterFall
   
 Cloning project:
