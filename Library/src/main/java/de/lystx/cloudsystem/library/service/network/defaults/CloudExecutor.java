@@ -1,10 +1,9 @@
 package de.lystx.cloudsystem.library.service.network.defaults;
 
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
 import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
-import de.lystx.cloudsystem.library.service.util.Constants;
 
 import java.io.Serializable;
 import java.util.concurrent.Executors;
@@ -19,7 +18,7 @@ public interface CloudExecutor extends Serializable {
      */
     default void sendPacket(Packet packet) {
         if (packet.unsafe().isAsync()) {
-            packet.unsafe().async = false;
+            packet.unsafe().sync();
             Executors.newCachedThreadPool().execute(() -> this.sendPacket(packet));
         }
     }
@@ -29,7 +28,7 @@ public interface CloudExecutor extends Serializable {
     }
 
     /**
-     * Calls an Event with the {{@link de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent}}
+     * Calls an Event with the {{@link de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent}}
      * @param event
      */
     default void callEvent(Event event) {

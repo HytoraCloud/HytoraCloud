@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.service.network.netty;
 
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutVerifyConnection;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketOutVerifyConnection;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import io.netty.bootstrap.ServerBootstrap;
@@ -78,7 +78,7 @@ public class NettyServer {
                     }
                 });
                 registeredChannels.add(socketChannel);
-                socketChannel.writeAndFlush(new PacketPlayOutVerifyConnection(socketChannel.localAddress().getAddress().getHostAddress(), socketChannel.localAddress().getPort()));
+                socketChannel.writeAndFlush(new PacketOutVerifyConnection(socketChannel.localAddress().getAddress().getHostAddress(), socketChannel.localAddress().getPort()));
                 //System.out.println("[NettyServer] Initialized NettyClient > " + socketChannel);
             }
         });

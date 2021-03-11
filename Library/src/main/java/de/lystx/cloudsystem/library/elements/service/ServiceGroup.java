@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import io.vson.elements.object.Objectable;
 import io.vson.elements.object.VsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Getter @Setter @AllArgsConstructor
-public class ServiceGroup implements Serializable {
+public class ServiceGroup implements Serializable, Objectable<Service> {
 
     private final UUID uniqueId;
     private String name;

@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.receiver;
 
 import de.lystx.cloudsystem.global.CloudInstance;
-import de.lystx.cloudsystem.library.CloudType;
+import de.lystx.cloudsystem.library.elements.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverShutdown;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;

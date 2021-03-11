@@ -17,9 +17,8 @@ import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudapi.bukkit.manager.other.CloudManager;
 import de.lystx.cloudapi.bukkit.utils.CloudPermissibleBase;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
-import de.lystx.cloudsystem.library.CloudService;
-import de.lystx.cloudsystem.library.CloudType;
-import de.lystx.cloudsystem.library.enums.ServiceState;
+import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
+import de.lystx.cloudsystem.library.elements.enums.CloudType;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
@@ -34,7 +33,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudServer extends JavaPlugin implements CloudService {
@@ -89,7 +87,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");
         try {
             int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
-            Bukkit.getScheduler().cancelTask(animationScheduler);
+            CloudAPI.getInstance().getScheduler().cancelTask(animationScheduler);
         } catch (NullPointerException e) {
             System.out.println("[CloudAPI] Couldn't cancel task for SignUpdater!");
         }
@@ -129,6 +127,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerTPS(this.cloudAPI));
         this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitEvent(this.cloudAPI));
+        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerUpdate(this.cloudAPI));
 
         // Connecting to cloud and managing cloud stuff
         this.cloudAPI.getCloudClient().registerHandler(new CloudListener());

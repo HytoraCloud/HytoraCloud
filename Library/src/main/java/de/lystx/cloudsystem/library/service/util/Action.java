@@ -1,9 +1,15 @@
 package de.lystx.cloudsystem.library.service.util;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Action {
 
     private final Long before; //start time
+
+    @Getter @Setter
+    public String information;
 
     public Action() {
         this.before = System.currentTimeMillis();

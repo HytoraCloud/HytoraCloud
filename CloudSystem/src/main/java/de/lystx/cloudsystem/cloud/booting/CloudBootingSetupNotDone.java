@@ -4,10 +4,9 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.enums.Spigot;
+import de.lystx.cloudsystem.library.elements.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
-import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
@@ -17,8 +16,8 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
-import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
-import de.lystx.cloudsystem.library.service.setup.impl.DatabaseSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.CloudAbstractSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.DatabaseAbstractSetup;
 import de.lystx.cloudsystem.library.service.util.Action;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
@@ -49,7 +48,7 @@ public class CloudBootingSetupNotDone {
         cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cMight have to enter some values multiple times (If 3 times > Kill process and restart)");
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         cloudSystem.getService(CommandService.class).setActive(false);
-        CloudSetup cloudSetup = new CloudSetup();
+        CloudAbstractSetup cloudSetup = new CloudAbstractSetup();
         Value<Spigot> spigot = new Value<>();
         Value<String> bungeeCord = new Value<>();
 
@@ -120,7 +119,7 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");
                 cloudSystem.getConsole().getLogger().sendMessage("§9");
                 cloudSystem.getConsole().getLogger().sendMessage("§9");
-                DatabaseSetup databaseSetup = new DatabaseSetup();
+                DatabaseAbstractSetup databaseSetup = new DatabaseAbstractSetup();
                 databaseSetup.start(cloudSystem.getConsole(), ds -> {
                     VsonObject document1 = new VsonObject(VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST)
                             .append("type", setup.getDatabase().toUpperCase())

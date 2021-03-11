@@ -5,67 +5,53 @@ import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServ
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInRegisterCloudPlayer;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInUnregisterCloudPlayer;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceStateChange;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInServiceUpdate;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutRegisterServer;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStartedServer;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutStopServer;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutUpdateServiceGroup;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceStateChange;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutRegisterServer;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutStartedServer;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class PacketHandlerNetwork extends PacketHandlerAdapter {
 
     private final CloudAPI cloudAPI;
 
-    public PacketHandlerNetwork(CloudAPI cloudAPI) {
-        this.cloudAPI = cloudAPI;
-    }
-
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayOutStartedServer) {
-            Service service = ((PacketPlayOutStartedServer) packet).getService();
+        if (packet instanceof PacketOutStartedServer) {
+            Service service = ((PacketOutStartedServer) packet).getService();
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onServerQueue(service);
                 networkHandler.onServerUpdate(service);
             }
-        } else if (packet instanceof PacketPlayOutRegisterServer) {
-            Service service = ((PacketPlayOutRegisterServer) packet).getService();
+        } else if (packet instanceof PacketOutRegisterServer) {
+            Service service = ((PacketOutRegisterServer) packet).getService();
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onServerStart(service);
                 networkHandler.onServerUpdate(service);
             }
-        } else if (packet instanceof PacketPlayOutStopServer) {
-            Service service = ((PacketPlayOutStopServer) packet).getService();
+        } else if (packet instanceof PacketOutStopServer) {
+            Service service = ((PacketOutStopServer) packet).getService();
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onServerStop(service);
             }
-        } else if (packet instanceof PacketPlayOutUpdateServiceGroup) {
+        } else if ( packet instanceof PacketInServiceStateChange) {
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onGroupUpdate(((PacketPlayOutUpdateServiceGroup) packet).getServiceGroup());
-                for (Service service : cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(((PacketPlayOutUpdateServiceGroup) packet).getServiceGroup().getName()))) {
-                    networkHandler.onServerUpdate(service);
-                    networkHandler.onServerUpdate(service);
-                }
+                networkHandler.onServerUpdate(((PacketInServiceStateChange) packet).getService());
             }
-        } else if ( packet instanceof PacketPlayInServiceStateChange) {
+        } else if ( packet instanceof PacketInServiceUpdate) {
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onServerUpdate(((PacketPlayInServiceStateChange) packet).getService());
-            }
-        } else if ( packet instanceof PacketPlayInServiceUpdate) {
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onServerUpdate(((PacketPlayInServiceUpdate) packet).getService());
+                networkHandler.onServerUpdate(((PacketInServiceUpdate) packet).getService());
             }
         }
     }
-
 
     @PacketHandler
     public void handleEvent(PacketCallEvent packet) {

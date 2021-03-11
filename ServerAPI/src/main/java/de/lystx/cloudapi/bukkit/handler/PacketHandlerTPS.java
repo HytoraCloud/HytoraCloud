@@ -2,7 +2,7 @@ package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketTPS;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;
@@ -17,10 +17,10 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayOutTPS) {
-            PacketPlayOutTPS packetPlayOutTPS = (PacketPlayOutTPS)packet;
-            Service service = packetPlayOutTPS.getService();
-            if (packetPlayOutTPS.getTps() == null && service.getServiceGroup().getName().equalsIgnoreCase(cloudAPI.getService().getServiceGroup().getName())) {
+        if (packet instanceof PacketTPS) {
+            PacketTPS packetTPS = (PacketTPS)packet;
+            Service service = packetTPS.getService();
+            if (packetTPS.getTps() == null && service.getServiceGroup().getName().equalsIgnoreCase(cloudAPI.getService().getServiceGroup().getName())) {
                 String tps;
                 double[] arrayOfDouble = (double[]) Reflections.getField("recentTps","MinecraftServer","getServer");
                 if (arrayOfDouble == null) return;
@@ -30,7 +30,7 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
                 } else {
                     tps = "§cError";
                 }
-                PacketPlayOutTPS tps1 = new PacketPlayOutTPS(packetPlayOutTPS.getPlayer(), cloudAPI.getService(), tps);
+                PacketTPS tps1 = new PacketTPS(packetTPS.getPlayer(), cloudAPI.getService(), tps);
                 tps1.setSendBack(false);
                 cloudAPI.sendPacket(tps1);
             }

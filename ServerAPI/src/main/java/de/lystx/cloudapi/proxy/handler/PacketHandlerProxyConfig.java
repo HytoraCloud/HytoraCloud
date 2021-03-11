@@ -3,11 +3,12 @@ package de.lystx.cloudapi.proxy.handler;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.HubCommand;
 import de.lystx.cloudapi.proxy.events.network.ProxyServerPacketReceiveEvent;
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudapi.proxy.CloudProxy;
+import lombok.AllArgsConstructor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -16,21 +17,18 @@ import java.util.List;
 import java.util.Map;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
+@AllArgsConstructor
 public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
 
 
     private final CloudAPI cloudAPI;
 
-    public PacketHandlerProxyConfig(CloudAPI cloudAPI) {
-        this.cloudAPI = cloudAPI;
-    }
-
     @Override
     public void handle(Packet packet) {
         ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerPacketReceiveEvent(packet));
-        if (packet instanceof PacketPlayOutGlobalInfo) {
+        if (packet instanceof PacketOutGlobalInfo) {
             boolean mc = this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance();
-            PacketPlayOutGlobalInfo info = (PacketPlayOutGlobalInfo)packet;
+            PacketOutGlobalInfo info = (PacketOutGlobalInfo)packet;
             cloudAPI.setNetworkConfig(info.getNetworkConfig());
             if (mc != info.getNetworkConfig().getNetworkConfig().isMaintenance()) {
                 CloudProxy.getInstance().getNetworkManager().switchMaintenance(info.getNetworkConfig().getNetworkConfig().isMaintenance());

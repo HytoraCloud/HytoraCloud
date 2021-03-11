@@ -27,16 +27,9 @@ public class Document {
     public Document(File file) {
         this(new JsonObject(), file, null);
     }
+
     public Document(JsonObject object) {
         this(object, null, null);
-    }
-
-    public static Document fromVson(VsonObject vsonObject) {
-        Document document = new Document();
-        for (VsonMember vsonMember : vsonObject) {
-            document.append(vsonMember.getName(), vsonObject.getObject(vsonMember.getName()));
-        }
-        return document;
     }
 
     public Document(String input) {
@@ -82,7 +75,6 @@ public class Document {
         return this;
     }
 
-
     public Document append(String key, Boolean value) {
         this.jsonObject.addProperty(key, value);
         return this;
@@ -100,9 +92,9 @@ public class Document {
             }
             this.jsonObject.add(key, gson.toJsonTree(value));
         } catch (NullPointerException e){}
+
         return this;
     }
-
 
     public Document append(Object value) {
         if (value == null) {
@@ -117,7 +109,6 @@ public class Document {
         return this;
     }
 
-
     public List<String> keys() {
         List<String> c = new LinkedList<>();
         for (Map.Entry<String, JsonElement> x : this.jsonObject.entrySet())
@@ -126,7 +117,7 @@ public class Document {
     }
 
     public Set<Object> values() {
-        Set<Object> v = new HashSet<Object>();
+        Set<Object> v = new HashSet<>();
         for (Map.Entry<String, JsonElement> x : this.jsonObject.entrySet())
             v.add(x.getValue());
         return v;
@@ -233,8 +224,6 @@ public class Document {
         }
         return this.jsonObject.get(key).getAsShort();
     }
-
-
 
     public Document getDocument(String key, Document def) {
         if (this.has(key)) {

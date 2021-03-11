@@ -3,9 +3,8 @@ package de.lystx.cloudapi.bukkit.manager.npc;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
-import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateNPC;
-import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInRemoveNPC;
-import de.lystx.cloudsystem.library.elements.other.Document;
+import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInCreateNPC;
+import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInDeleteNPC;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
@@ -42,12 +41,12 @@ public class NPCManager {
                 .append("name", name)
                 .append("skin", skin)
                 .append("group", group);
-        CloudAPI.getInstance().sendPacket(new PacketPlayInCreateNPC(name + "_" + group + UUID.randomUUID(), document));
+        CloudAPI.getInstance().sendPacket(new PacketInCreateNPC(name + "_" + group + UUID.randomUUID(), document));
         this.updateNPCS();
     }
 
     public void deleteNPC(NPC npcV18R3V18R3) {
-        CloudAPI.getInstance().sendPacket(new PacketPlayInRemoveNPC(this.getKey(npcV18R3V18R3)));
+        CloudAPI.getInstance().sendPacket(new PacketInDeleteNPC(this.getKey(npcV18R3V18R3)));
     }
 
     public String getKey(NPC npcV18R3V18R3) {

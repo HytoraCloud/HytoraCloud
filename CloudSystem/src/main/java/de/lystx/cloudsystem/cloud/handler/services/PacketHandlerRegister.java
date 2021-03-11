@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.services;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInRegister;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -20,9 +20,9 @@ public class PacketHandlerRegister extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInRegister) {
-            PacketPlayInRegister packetPlayInRegister = (PacketPlayInRegister)packet;
-            Service service = packetPlayInRegister.getService();
+        if (packet instanceof PacketInRegister) {
+            PacketInRegister packetInRegister = (PacketInRegister)packet;
+            Service service = packetInRegister.getService();
             this.cloudSystem.getService().registerService(service);
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("startedServices");
             this.cloudSystem.reload();

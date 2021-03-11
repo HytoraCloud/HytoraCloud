@@ -7,10 +7,14 @@ import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class Constants {
 
     public static CloudExecutor EXECUTOR = null;
+    public static final Executor THREAD_POOL = Executors.newFixedThreadPool(1);
+
     public static PermissionPool PERMISSION_POOL = null;
 
     public static final String PASTE_SERVER_URL_DOCUMENTS = "https://paste.labymod.net/documents";

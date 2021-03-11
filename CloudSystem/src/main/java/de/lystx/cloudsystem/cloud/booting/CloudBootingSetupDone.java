@@ -15,7 +15,7 @@ import de.lystx.cloudsystem.cloud.handler.services.PacketHandlerRegister;
 import de.lystx.cloudsystem.cloud.handler.services.PacketHandlerServiceUpdate;
 import de.lystx.cloudsystem.cloud.handler.services.PacketHandlerStart;
 import de.lystx.cloudsystem.cloud.handler.services.PacketHandlerStopServer;
-import de.lystx.cloudsystem.library.Updater;
+import de.lystx.cloudsystem.library.elements.featured.updater.Updater;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.backup.BackupService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;

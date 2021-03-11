@@ -19,9 +19,9 @@ import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
-import de.lystx.cloudsystem.library.service.setup.impl.FallbackSetup;
-import de.lystx.cloudsystem.library.service.setup.impl.GroupSetup;
-import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.FallbackAbstractSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.GroupAbstractSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.PermissionGroupAbstractSetup;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -35,7 +35,7 @@ public class CreateCommand implements TabCompletable {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("group")) {
                 CloudSystem.getInstance().getService(CommandService.class).setActive(false);
-                new GroupSetup().start(CloudSystem.getInstance().getConsole(), setup -> {
+                new GroupAbstractSetup().start(CloudSystem.getInstance().getConsole(), setup -> {
                     CloudSystem.getInstance().getService(CommandService.class).setActive(true);
                     if (setup.isCancelled()) {
                         return;
@@ -79,7 +79,7 @@ public class CreateCommand implements TabCompletable {
                 });
             } else if (args[0].equalsIgnoreCase("fallback")) {
                 CloudSystem.getInstance().getService(CommandService.class).setActive(false);
-                new FallbackSetup().start(CloudSystem.getInstance().getConsole(), setup -> {
+                new FallbackAbstractSetup().start(CloudSystem.getInstance().getConsole(), setup -> {
                     CloudSystem.getInstance().getService(CommandService.class).setActive(true);
                     if (setup.isCancelled()) {
                         return;
@@ -104,7 +104,7 @@ public class CreateCommand implements TabCompletable {
                     sender.sendMessage("INFO", "§2Created Fallback §a" + fallback.getGroupName() + " §7| §bID " + fallback.getPriority() + " §7| §bPermission " + fallback.getPermission());
                 });
             } else if (args[0].equalsIgnoreCase("perms")) {
-                PermissionGroupSetup setup = new PermissionGroupSetup();
+                PermissionGroupAbstractSetup setup = new PermissionGroupAbstractSetup();
                 CloudSystem.getInstance().getService(CommandService.class).setActive(false);
                 setup.start(CloudSystem.getInstance().getConsole(), setup1 -> {
                     CloudSystem.getInstance().getService(CommandService.class).setActive(true);

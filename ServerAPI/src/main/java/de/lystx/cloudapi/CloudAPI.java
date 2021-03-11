@@ -7,20 +7,20 @@ import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.CloudService;
-import de.lystx.cloudsystem.library.CloudType;
+import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
+import de.lystx.cloudsystem.library.elements.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInCommand;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInLog;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInRegister;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInLogMessage;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInRegister;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInStopServer;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.Result;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.enums.ServiceState;
+import de.lystx.cloudsystem.library.elements.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
@@ -212,7 +212,7 @@ public class CloudAPI implements CloudService {
     public void bootstrap() {
         Thread cloudClient = new Thread(() -> {
             try {
-                this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketPlayInRegister(this.getService())));
+                this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketInRegister(this.getService())));
                 this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
             } catch (Exception e) {
                 System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
@@ -230,7 +230,7 @@ public class CloudAPI implements CloudService {
     }
 
     public void shutdown(Consumer<PacketState> consumer) {
-        this.sendPacket(new PacketPlayInStopServer(this.getService()), consumer);
+        this.sendPacket(new PacketInStopServer(this.getService()), consumer);
         this.disconnect();
     }
 
@@ -239,7 +239,7 @@ public class CloudAPI implements CloudService {
      * @param command
      */
     public void sendCommand(String command) {
-        new PacketPlayInCommand(command).unsafe().async().send(this);
+        new PacketCommand("null", command).unsafe().async().send(this);
     }
 
 
@@ -294,7 +294,7 @@ public class CloudAPI implements CloudService {
      * @param showUpInConsole > If false it will only be logged
      */
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
-        new PacketPlayInLog(prefix, message, showUpInConsole).unsafe().async().send(this.cloudClient);
+        new PacketInLogMessage(prefix, message, showUpInConsole).unsafe().async().send(this.cloudClient);
     }
 
     /**
@@ -312,7 +312,51 @@ public class CloudAPI implements CloudService {
      * @return
      */
     public Service getService() {
-        return this.getDocument().getAs(Service.class);
+
+        /*VsonObject vsonObject = this.getDocument();
+        VsonObject group = vsonObject.getVson("serviceGroup");
+
+        SerializableDocument properties = new SerializableDocument();
+        for (VsonMember vsonMember : group.getVson("values")) {
+            properties.append(vsonMember.getName(), group.getVson("values").getObject(vsonMember.getName()));
+        }
+
+        SerializableDocument props = new SerializableDocument();
+        for (VsonMember vsonMember : vsonObject.getVson("properties")) {
+            properties.append(vsonMember.getName(), vsonObject.getVson("properties").getObject(vsonMember.getName()));
+        }
+
+        ServiceGroup serviceGroup = new ServiceGroup(
+                UUID.fromString(group.getString("uniqueId")),
+                group.getString("name"),
+                group.getString("template"),
+                ServiceType.valueOf(group.getString("serviceType")),
+                group.getInteger("maxServer"),
+                group.getInteger("minServer"),
+                group.getInteger("maxRam"),
+                group.getInteger("minRam"),
+                group.getInteger("maxPlayers"),
+                group.getInteger("newServerPercent"),
+                group.getBoolean("maintenance"),
+                group.getBoolean("lobby"),
+                group.getBoolean("dynamic"),
+                properties
+        );
+        Service service = new Service(
+                vsonObject.getString("name"),
+                UUID.fromString(vsonObject.getString("uniqueId")),
+                serviceGroup,
+                vsonObject.getInteger("serviceID"),
+                vsonObject.getInteger("port"),
+                vsonObject.getInteger("cloudPort"),
+                ServiceState.valueOf(vsonObject.getString("serviceState"))
+        );
+        service.setProperties(props);
+
+        return service;
+        */
+
+       return this.getDocument().getAs(Service.class);
     }
 
     /**

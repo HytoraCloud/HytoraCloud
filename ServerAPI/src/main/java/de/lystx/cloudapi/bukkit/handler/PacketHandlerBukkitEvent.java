@@ -5,7 +5,7 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.events.player.CloudServerPlayerRankUpdateEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupAddEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
 import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

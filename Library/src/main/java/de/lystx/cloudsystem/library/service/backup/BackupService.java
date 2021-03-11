@@ -45,7 +45,7 @@ public class BackupService extends CloudService {
     public void load() {
         this.timeUnit = TimeUnit.valueOf(this.document.getString("timeUnit", "DAYS"));
         this.interval = this.document.getInteger("interval", 1);
-        this.enabled = this.document.getBoolean("enabled", true);
+        this.enabled = this.document.getBoolean("enabled", false);
         this.lastBackup = this.document.getLong("lastBackup", new Date().getTime());
         this.document.save();
     }
@@ -87,8 +87,8 @@ public class BackupService extends CloudService {
         this.lastBackup = new Date().getTime();
 
         File src = this.getCloudLibrary().getService(FileService.class).getCloudDirectory();
-        ZipHelper zipHelper = new ZipHelper(new File(src.toString() + ".zip"),  new File(getCloudLibrary().getService(FileService.class).getBackupDirectory(), name + "/"));
-        zipHelper.zip();
+        ZipHelper zipHelper = new ZipHelper();
+        zipHelper.zip(src, new File(getCloudLibrary().getService(FileService.class).getBackupDirectory(), name + ".zip"));
 
     }
 }

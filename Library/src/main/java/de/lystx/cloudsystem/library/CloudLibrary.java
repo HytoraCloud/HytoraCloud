@@ -2,9 +2,9 @@ package de.lystx.cloudsystem.library;
 
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.elements.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
@@ -15,6 +15,7 @@ import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
+import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
@@ -23,7 +24,7 @@ import de.lystx.cloudsystem.library.service.util.AuthManager;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.util.Loggers;
 import de.lystx.cloudsystem.library.service.util.TicksPerSecond;
-import de.lystx.cloudsystem.library.webserver.WebServer;
+import de.lystx.cloudsystem.library.elements.featured.webserver.WebServer;
 import lombok.Getter;
 import lombok.Setter;
 import org.fusesource.jansi.AnsiConsole;
@@ -35,7 +36,7 @@ import java.net.URLClassLoader;
 import java.util.*;
 
 @Getter
-public class CloudLibrary implements Serializable {
+public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.elements.interfaces.CloudService {
 
 
     public List<CloudService> cloudServices;
@@ -96,7 +97,7 @@ public class CloudLibrary implements Serializable {
      * @param type > PROXY or SPIGOT
      */
     public void sendSubMessage(String channel, String key, Document document, ServiceType type) {
-        this.getService(CloudNetworkService.class).sendPacket(new PacketCommunicationSubMessage(channel, key, document.toString(), type));
+        this.getService(CloudNetworkService.class).sendPacket(new PacketSubMessage(channel, key, document.toString(), type));
     }
 
     /**
@@ -175,15 +176,28 @@ public class CloudLibrary implements Serializable {
      */
     public void sendPacket(Packet packet) {}
 
+    @Override
+    public CloudExecutor getCurrentExecutor() {
+        return this.getService(CloudNetworkService.class).getCloudServer();
+    }
+
+    @Override
+    public CloudType getType() {
+        return CloudType.LIBRARY;
+    }
+
     /**
      * Raw method to reload
      */
     public void reload() { }
 
+    @Override
+    public void bootstrap() { }
+
     /**
      * Raw method to shutdown
      */
-    public void shutdown() { }
+    public void shutdown() {}
 
     /**
      * Raw method to reload NPCS

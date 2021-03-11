@@ -2,8 +2,8 @@ package de.lystx.cloudapi.proxy.command;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInTPS;
-import de.lystx.cloudsystem.library.enums.ServiceState;
+import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketTPS;
+import de.lystx.cloudsystem.library.elements.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
@@ -41,7 +41,7 @@ public class NetworkCommand {
             player.sendMessage("  §8➜ §bCommands §8┃ §7" + statistics.getStats().get("executedCommands").intValue());
             player.sendMessage("  §8➜ §bBooted §8┃ §7" + statistics.getStats().get("bootedUp").intValue());
             player.sendMessage("  §8➜ §bCPU Average §8┃ §7" + new DecimalFormat("##.##").format(((statistics.getStats().get("bootedUp") * 2) / statistics.getStats().get("allCPUUsage")) * 100));
-            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudAPI.getInstance().sendQuery(new PacketPlayInTPS()).getResult().getString("tps"));
+            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudAPI.getInstance().sendQuery(new ResultPacketTPS()).getResult().getString("tps"));
             player.sendMessage("§8§m--------------------------------------");
         } else {
             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");

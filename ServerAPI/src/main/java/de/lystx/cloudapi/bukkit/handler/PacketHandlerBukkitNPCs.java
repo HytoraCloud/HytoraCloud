@@ -2,7 +2,7 @@ package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
-import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
+import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutNPC;
 import de.lystx.cloudsystem.library.service.network.packet.enums.PacketPriority;
 import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ public class PacketHandlerBukkitNPCs {
     private final CloudAPI cloudAPI;
 
     @PacketHandler(priority = PacketPriority.HIGH)
-    public void handlePacket(PacketPlayOutNPCs packet) {
+    public void handlePacket(PacketOutNPC packet) {
         if (CloudServer.getInstance().isNewVersion()) {
             return;
         }

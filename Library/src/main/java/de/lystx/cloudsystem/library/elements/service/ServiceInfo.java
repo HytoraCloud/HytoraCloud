@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.elements.service;
 
-import de.lystx.cloudsystem.library.enums.ServiceState;
+import de.lystx.cloudsystem.library.elements.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
 import lombok.Getter;
@@ -19,6 +19,17 @@ public class ServiceInfo extends Service{
     private boolean online;
     private final List<CloudPlayer> onlinePlayers;
 
+    /**
+     * Creates the ServiceInfo
+     * @param name
+     * @param uniqueId
+     * @param serviceGroup
+     * @param serviceID
+     * @param port
+     * @param cloudPort
+     * @param serviceState
+     * @param onlinePlayers
+     */
     private ServiceInfo(String name, UUID uniqueId, ServiceGroup serviceGroup, int serviceID, int port, int cloudPort, ServiceState serviceState, List<CloudPlayer> onlinePlayers) {
         super(name, uniqueId, serviceGroup, serviceID, port, cloudPort, serviceState);
         this.serverPinger = new ServerPinger();

@@ -4,6 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
 import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketLoginSuccess;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
@@ -13,7 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 
 import java.util.NoSuchElementException;
 
@@ -39,7 +39,7 @@ public class PlayerJoinListener implements Listener {
                 Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cIt seems like you tried to connect directly to the service and not via a BungeeCord!"));
                 return;
             }
-
+            CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
             if (CloudServer.getInstance().getLabyMod() != null && CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
                 if (!CloudAPI.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
                     CloudServer.getInstance().getLabyMod().disableVoiceChat(player);

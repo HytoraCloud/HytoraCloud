@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.services;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInStopServer;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInStopServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
@@ -17,10 +17,10 @@ public class PacketHandlerStopServer extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInStopServer) {
+        if (packet instanceof PacketInStopServer) {
             try {
-                PacketPlayInStopServer packetPlayInStopServer = (PacketPlayInStopServer) packet;
-                Service service = packetPlayInStopServer.getService();
+                PacketInStopServer packetInStopServer = (PacketInStopServer) packet;
+                Service service = packetInStopServer.getService();
                 if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getName().equalsIgnoreCase(service.getName())) {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }

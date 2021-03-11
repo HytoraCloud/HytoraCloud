@@ -6,11 +6,14 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class ServiceProviderStop {
 
@@ -27,56 +30,45 @@ public class ServiceProviderStop {
      * @param service
      * @return
      */
-    public boolean stopService(Service service) {
+    public void stopService(Service service, Consumer<Service> consumer) {
         try {
             String serverName = service.getName();
             CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getMap().get(serverName);
             if (screen == null || screen.getServerDir() == null) {
-                return false;
-            }
-            screen.getProcess().destroy();
-            if (screen.getThread().isAlive()) {
-                try {
-                    screen.getThread().stop();
-                } catch (Exception ignored) {
-                    /**
-                     * Thread might already be dead
-                     * Ignoring it and deleting the remaining
-                     * files and stopping screen
-                     */
-                }
+                return;
             }
 
-            if (service.getServiceGroup().isDynamic()) {
-                try {
-                    for (File file : Objects.requireNonNull(screen.getServerDir().listFiles())) {
-                        if (file.isDirectory()) {
-                            FileUtils.deleteDirectory(file);
-                        } else {
-                            FileUtils.forceDelete(file);
-                        }
-                    }
-                } catch (IOException e) {
-                    //Ignoring because all Files will be deleted anyways
-                }
-            } else {
-                this.cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> {
-                    File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
-                    if (cloudAPI.exists()) {
+            screen.getProcess().destroy();
+            Scheduler.getInstance().scheduleDelayedTaskAsync(() -> {
+
+                Constants.THREAD_POOL.execute(() -> {
+                    if (service.getServiceGroup().isDynamic()) {
                         try {
-                            FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
-                            FileUtils.forceDelete(cloudAPI);
-                        } catch (Exception e) {
-                            //Ignoring because all Files will be deleted anyways
+                            FileUtils.deleteDirectory(screen.getServerDir());
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
+                        return;
                     }
-                }, 5L);
-            }
-            this.service.notifyStop(service);
-            this.cloudLibrary.getService(ScreenService.class).getMap().remove(screen.getName());
-            return true;
+
+                    File cloudAPI = new File(screen.getServerDir(), "plugins/CloudAPI.jar");
+                    if (!cloudAPI.exists()) {
+                        return;
+                    }
+                    try {
+                        FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
+                        FileUtils.forceDelete(cloudAPI);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                });
+                this.service.notifyStop(service);
+                this.cloudLibrary.getService(ScreenService.class).getMap().remove(screen.getName());
+                consumer.accept(service);
+            }, 3L);
         } catch (Exception e) {
-            return true;
+            e.printStackTrace();
         }
     }
 }

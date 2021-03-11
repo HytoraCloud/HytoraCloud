@@ -1,14 +1,11 @@
 package de.lystx.cloudapi.bukkit.manager.sign;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
-import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.enums.ServiceState;
+import de.lystx.cloudsystem.library.elements.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.SignGroup;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
@@ -22,7 +19,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.plugin.IllegalPluginAccessException;
 
 import java.io.IOException;
 import java.util.*;
@@ -53,92 +49,117 @@ public class SignUpdater {
         this.serverPinger = plugin.getServerPinger();
     }
 
+    /**
+     * Loads the repeat tick
+     * for the SignUpdater
+     * and executes the {@link SignUpdater#update()} Method
+     */
     public void run() {
         long repeat = plugin.getSignLayOut().getRepeatTick();
-        animationScheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(CloudServer.getInstance(), () -> {
-            try {
+        this.animationScheduler = this.cloudAPI.getScheduler().scheduleRepeatingTask(this::update, 0, repeat).getId();
+    }
 
-                freeSigns.clear();
-                cloudSigns.clear();
+    /**
+     * Iterates through all
+     * online services
+     * and executes the {@link SignUpdater#update(Service)} Method
+     * Also increases the animationsTick by 1 until its max
+     * then resets it to 0
+     */
+    public void update() {
 
-                List<Service> services = new ArrayList<>();
+        try {
 
-                for (ServiceGroup globalServerGroup : cloudAPI.getNetwork().getServiceGroups()) {
-                    String groupName = globalServerGroup.getName();
-                    services.clear();
-                    for (Service service : this.cloudAPI.getNetwork().getServices()) {
-                        if (service.getServiceGroup().getName().equalsIgnoreCase(groupName) && !service.getServiceState().equals(ServiceState.INGAME) && !service.getServiceState().equals(ServiceState.OFFLINE)) {
-                            services.add(service);
-                        }
+            this.freeSigns.clear();
+            this.cloudSigns.clear();
+
+            for (ServiceGroup globalServerGroup : cloudAPI.getNetwork().getServiceGroups()) {
+                for (Service service : cloudAPI.getNetwork().getServices(globalServerGroup)) {
+                    if (!service.getServiceState().equals(ServiceState.INGAME) && !service.getServiceState().equals(ServiceState.OFFLINE)) {
+                        this.update(service);
                     }
-                    if (services.isEmpty()) {
-                        return;
-                    }
-
-                    services.forEach(current -> {
-                        if (current.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
-                            return;
-                        }
-                        int serverId = current.getServiceID();
-                        SignGroup signGroup = this.createSignGroup(groupName);
-                        if (signGroup == null) {
-                            this.cloudAPI.messageCloud(CloudAPI.getInstance().getService().getName(), "SignSystem didnt find any signs!", false);
-                            return;
-                        }
-                        HashMap<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
-
-                        CloudSign cloudSign = signs.get(serverId);
-                        cloudSigns.put(cloudSign, current);
-
-                        if (this.freeSigns.containsKey(groupName)) {
-                            Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(groupName);
-                            onlineSigns.put(serverId, cloudSign);
-                            this.freeSigns.replace(groupName, onlineSigns);
-                        } else {
-                            Map<Integer, CloudSign> onlineSins = new HashMap<>();
-                            onlineSins.put(serverId, cloudSign);
-                            this.freeSigns.put(groupName, onlineSins);
-                        }
-
-                        this.setOfflineSigns(groupName, current, this.freeSigns);
-                        if (cloudSign != null) {
-                            Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()), cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
-
-                            if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
-                                return;
-                            }
-                            try {
-                                serverPinger.pingServer(current.getHost(), current.getPort(), 20);
-                            } catch (IOException exception) {
-                                System.out.println("[CloudAPI] Connection from service " + current.getName() + " ("  + current.getHost() + ":" + current.getPort() + ") refused...");
-                            }
-                            Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
-                            if (!blockAt.getType().equals(Material.WALL_SIGN)) {
-                                return;
-                            }
-                            Sign sign = (Sign) blockAt.getState();
-                            this.signUpdate(sign, current, serverPinger);
-                            sign.update();
-                        }
-                    });
                 }
-
-                if(animationsTick >= CloudServer.getInstance().getSignManager().getSignLayOut().getAnimationTick()) {
-                    animationsTick = 0;
-                    return;
-                }
-
-                this.animationsTick++;
-            } catch (IllegalPluginAccessException e) {
-                e.printStackTrace();
             }
-        }, 0, repeat);
+
+            if (this.animationsTick >= CloudServer.getInstance().getSignManager().getSignLayOut().getAnimationTick()) {
+                this.animationsTick = 0;
+                return;
+            }
+
+            this.animationsTick++;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Updates Sign for a single {@link Service}
+     * @param current > Service to update
+     */
+    public void update(Service current) {
+        if (current.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+            //Proxys do not have signs
+            return;
+        }
+
+        SignGroup signGroup = this.createSignGroup(current.getServiceGroup().getName());
+        if (signGroup == null) {
+            this.cloudAPI.messageCloud(CloudAPI.getInstance().getService().getName(), "SignSystem didnt find any signs!", false);
+            return;
+        }
+        HashMap<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
+
+        CloudSign cloudSign = signs.get(current.getServiceID());
+        cloudSigns.put(cloudSign, current);
+
+        if (this.freeSigns.containsKey(current.getServiceGroup().getName())) {
+            Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(current.getServiceGroup().getName());
+            onlineSigns.put(current.getServiceID(), cloudSign);
+            this.freeSigns.replace(current.getServiceGroup().getName(), onlineSigns);
+        } else {
+            Map<Integer, CloudSign> onlineSins = new HashMap<>();
+            onlineSins.put(current.getServiceID(), cloudSign);
+            this.freeSigns.put(current.getServiceGroup().getName(), onlineSins);
+        }
+
+        this.setOfflineSigns(current.getServiceGroup().getName(), current, this.freeSigns); //Sets offline signs for current group
+
+        if (cloudSign != null) {
+            Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()), cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
+
+            if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
+                return;
+            }
+            try {
+                serverPinger.pingServer(current.getHost(), current.getPort(), 20);
+            } catch (IOException exception) {
+                System.out.println("[CloudAPI] Connection from service " + current.getName() + " ("  + current.getHost() + ":" + current.getPort() + ") refused...");
+            }
+            Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
+            if (!blockAt.getType().equals(Material.WALL_SIGN)) {
+                return;
+            }
+            Sign sign = (Sign) blockAt.getState();
+            this.signUpdate(sign, current, serverPinger);
+            sign.update();
+        }
+    }
+
+    /**
+     * If service stopped within Scheduler repeat
+     * to update sign directly
+     * @param name
+     */
     public void removeService(String name) {
-
+        this.update(CloudAPI.getInstance().getNetwork().getService(name));
     }
 
+    /**
+     * Creates a SignGroup for a
+     * Group
+     * @param name > Group String
+     * @return
+     */
     public SignGroup createSignGroup(String name) {
         SignGroup signGroup = new SignGroup(name.toUpperCase());
         HashMap<Integer, CloudSign> map = new HashMap<>();
@@ -153,6 +174,13 @@ public class SignUpdater {
         return signGroup;
     }
 
+    /**
+     * Sets the offline signs
+     * and updates them
+     * @param group
+     * @param service
+     * @param freeSigns
+     */
     public void setOfflineSigns(String group, Service service, Map<String, Map<Integer, CloudSign>> freeSigns) {
         this.getOfflineSigns(group, freeSigns).forEach(cloudSign -> {
             Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
@@ -161,19 +189,19 @@ public class SignUpdater {
             }
             Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
 
-            if (!blockAt.getType().equals(Material.WALL_SIGN)) return;
-            if (blockAt.getType().equals(Material.AIR)) return;
+            if (!blockAt.getType().equals(Material.WALL_SIGN) || blockAt.getType().equals(Material.AIR)) {
+                return;
+            }
 
             Sign sign = (Sign) blockAt.getState();
             if (cloudAPI.getNetwork().getServiceGroup(group) != null && cloudAPI.getNetwork().getServiceGroup(group).isMaintenance()) {
-                cloudSigns.put(cloudSign, service);
+                this.cloudSigns.put(cloudSign, service);
                 this.signUpdate(sign, service, null);
                 return;
             }
             VsonArray array = CloudServer.getInstance().getSignManager().getSignLayOut().getOfflineLayOut();
             VsonObject jsonObject;
-
-            if(animationsTick >= CloudServer.getInstance().getSignManager().getSignLayOut().getAnimationTick()) {
+            if (animationsTick >= CloudServer.getInstance().getSignManager().getSignLayOut().getAnimationTick()) {
                 animationsTick = 0;
                 jsonObject = (VsonObject) array.get(0);
             } else {
@@ -188,6 +216,12 @@ public class SignUpdater {
 
     }
 
+    /**
+     * Returns offline SIgns
+     * @param name
+     * @param freeSigns
+     * @return
+     */
     public List<CloudSign> getOfflineSigns(String name, Map<String, Map<Integer, CloudSign>> freeSigns) {
 
         Set<Integer> allSigns = this.createSignGroup(name).getCloudSignHashMap().keySet();
@@ -196,7 +230,6 @@ public class SignUpdater {
         if (onlineSigns.size() == allSigns.size()) {
             return new LinkedList<>();
         } else {
-
             for (Integer onlineSign : onlineSigns) {
                 allSigns.remove(onlineSign);
             }
@@ -214,7 +247,12 @@ public class SignUpdater {
         }
     }
 
-
+    /**
+     * Updates a Sign
+     * @param sign
+     * @param service
+     * @param serverPinger
+     */
     public void signUpdate(Sign sign, Service service, ServerPinger serverPinger) {
         VsonObject jsonObject;
         ServiceState state ;
@@ -236,6 +274,11 @@ public class SignUpdater {
     }
 
 
+    /**
+     * Sets block behind sign
+     * @param location
+     * @param state
+     */
     public void setBlock(Location location, ServiceState state) {
         Block signBlock = location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         Sign bukkitSign = (Sign) signBlock.getState();
@@ -272,6 +315,13 @@ public class SignUpdater {
     }
 
 
+    /**
+     * Replaces all PlaceHolders
+     * @param line
+     * @param service
+     * @param serverPinger
+     * @return
+     */
     public String replace(String line, Service service, ServerPinger serverPinger) {
 
         ServiceGroup group = service.getServiceGroup();
@@ -288,14 +338,24 @@ public class SignUpdater {
                 line = line.replace("%online%", serverPinger.getPlayers() + "");
                 line = line.replace("%max%", serverPinger.getMaxplayers() + "");
             }
-        } catch (NullPointerException e){}
+        } catch (NullPointerException ignored){}
         return line;
     }
 
+    /**
+     * GEts Service by Sign
+     * @param cloudSign
+     * @return
+     */
     public Service getService(CloudSign cloudSign) {
         return cloudSigns.get(cloudSign);
     }
 
+    /**
+     * Returns {@link CloudSign} by {@link Location}
+     * @param location
+     * @return
+     */
     public CloudSign getCloudSign(Location location) {
         for (CloudSign cloudSign : CloudServer.getInstance().getSignManager().getCloudSigns()) {
 

@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.handler.other;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInGetLog;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInGetLog;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -30,14 +30,14 @@ public class PacketHandlerLog extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInGetLog) {
-            PacketPlayInGetLog packetPlayInGetLog = (PacketPlayInGetLog)packet;
-            Service service = packetPlayInGetLog.getService();
+        if (packet instanceof PacketInGetLog) {
+            PacketInGetLog packetInGetLog = (PacketInGetLog)packet;
+            Service service = packetInGetLog.getService();
             Service getSafe = cloudSystem.getService().getService(service.getName());
             if (getSafe == null) {
                 return;
             }
-            CloudPlayer cloudPlayer = cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayInGetLog.getPlayer());
+            CloudPlayer cloudPlayer = cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetInGetLog.getPlayer());
             if (cloudPlayer == null) {
                 return;
             }

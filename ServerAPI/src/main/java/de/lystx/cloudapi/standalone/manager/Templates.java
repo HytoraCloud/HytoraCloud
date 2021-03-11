@@ -1,30 +1,37 @@
 package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInCopyTemplate;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInCreateTemplate;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInCopyTemplate;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInCreateTemplate;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 
-@Getter @Setter
+@Getter @Setter @AllArgsConstructor
 public class Templates {
 
     private final CloudAPI cloudAPI;
 
-    public Templates(CloudAPI cloudAPI) {
-        this.cloudAPI = cloudAPI;
-    }
-
+    /**
+     * Copies a server into a specific Template
+     * @param server
+     * @param template
+     */
     public void copy(String server, String template) {
-        PacketPlayInCopyTemplate packetPlayInCopyTemplate = new PacketPlayInCopyTemplate(this.cloudAPI.getNetwork().getService(server), template);
-        CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInCopyTemplate);
+        PacketInCopyTemplate packetInCopyTemplate = new PacketInCopyTemplate(this.cloudAPI.getNetwork().getService(server), template);
+        CloudAPI.getInstance().getCloudClient().sendPacket(packetInCopyTemplate);
     }
 
+    /**
+     * Creates a Template for a group
+     * @param group
+     * @param template
+     */
     public void create(ServiceGroup group, String template) {
-        PacketPlayInCreateTemplate packetPlayInCreateTemplate = new PacketPlayInCreateTemplate(group, template);
-        CloudAPI.getInstance().getCloudClient().sendPacket(packetPlayInCreateTemplate);
+        PacketInCreateTemplate packetInCreateTemplate = new PacketInCreateTemplate(group, template);
+        CloudAPI.getInstance().getCloudClient().sendPacket(packetInCreateTemplate);
     }
 
 }

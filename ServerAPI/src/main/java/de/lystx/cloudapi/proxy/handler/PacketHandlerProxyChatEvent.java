@@ -2,7 +2,7 @@ package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.player.ProxyServerChatEvent;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerChat;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketPlayerChat;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.AllArgsConstructor;
@@ -17,13 +17,13 @@ public class PacketHandlerProxyChatEvent extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketCommunicationPlayerChat) {
-            PacketCommunicationPlayerChat packetCommunicationPlayerChat = (PacketCommunicationPlayerChat)packet;
-            CloudPlayer cloudPlayer = cloudAPI.getCloudPlayers().get(packetCommunicationPlayerChat.getPlayer());
+        if (packet instanceof PacketPlayerChat) {
+            PacketPlayerChat packetPlayerChat = (PacketPlayerChat)packet;
+            CloudPlayer cloudPlayer = cloudAPI.getCloudPlayers().get(packetPlayerChat.getPlayer());
             if (cloudPlayer == null) {
                 return;
             }
-            ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerChatEvent(cloudPlayer, packetCommunicationPlayerChat.getMessage()));
+            ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerChatEvent(cloudPlayer, packetPlayerChat.getMessage()));
         }
     }
 }

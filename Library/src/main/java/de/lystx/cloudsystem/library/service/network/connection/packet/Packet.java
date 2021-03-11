@@ -1,11 +1,10 @@
 package de.lystx.cloudsystem.library.service.network.connection.packet;
 
-import de.lystx.cloudsystem.library.CloudService;
+import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.function.Consumer;
@@ -79,7 +78,7 @@ public class Packet implements Serializable {
     @Getter
     public class Unsafe implements Serializable {
 
-        public boolean async; //Wheter the packet should be send sync or async
+        protected boolean async; //Wheter the packet should be send sync or async
 
         /**
          * Creates the unsafe packet
@@ -133,6 +132,15 @@ public class Packet implements Serializable {
          */
         public Unsafe async() {
             this.async = true;
+            return this;
+        }
+
+        /**
+         * Makes Packet sending sync
+         * @return current Packet
+         */
+        public Unsafe sync() {
+            this.async = false;
             return this;
         }
     }

@@ -42,8 +42,10 @@ public class Scheduler extends CloudService {
 	 * @param id
 	 */
 	public void cancelTask(Task id) {
-		id.setCancelled(true);
-		schedulerMap.remove(id.getId());
+		if (id != null) {
+			id.setCancelled(true);
+			schedulerMap.remove(id.getId());
+		}
 	}
 
 	/**

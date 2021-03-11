@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.elements.packets;
 
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunication;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCommunication;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.Getter;
 

@@ -82,9 +82,7 @@ public class Statistics implements Serializable {
      */
     public VsonObject toVson() {
         VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
-        this.stats.forEach((key, i) -> {
-            document.append(key, (double)i);
-        });
+        this.stats.forEach((key, i) -> document.append(key, (double)i));
         return document;
     }
 

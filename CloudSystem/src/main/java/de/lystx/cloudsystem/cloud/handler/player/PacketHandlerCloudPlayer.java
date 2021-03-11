@@ -4,8 +4,8 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCallEvent;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationUpdateCloudPlayer;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.*;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -33,12 +33,12 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInRegisterCloudPlayer) {
-            PacketPlayInRegisterCloudPlayer packetPlayInRegisterCloudPlayer = (PacketPlayInRegisterCloudPlayer) packet;
-            CloudPlayer cloudPlayer = packetPlayInRegisterCloudPlayer.getCloudPlayer();
+        if (packet instanceof PacketInRegisterPlayer) {
+            PacketInRegisterPlayer packetInRegisterPlayer = (PacketInRegisterPlayer) packet;
+            CloudPlayer cloudPlayer = packetInRegisterPlayer.getCloudPlayer();
             Constants.EXECUTOR.callEvent(new CloudPlayerJoinEvent(cloudPlayer));
             cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerDataOrDefault(cloudPlayer.getName()));
-            if (packetPlayInRegisterCloudPlayer.isSendMessage()) {
+            if (packetInRegisterPlayer.isSendMessage()) {
                 if (!list.contains(cloudPlayer.getName())) {
                     list.add(cloudPlayer.getName());
                 } else {
@@ -64,16 +64,16 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
            // this.cloudSystem.reload();
 
-        } else if (packet instanceof PacketPlayInPlayerExecuteCommand) {
+        } else if (packet instanceof PacketInPlayerExecuteCommand) {
 
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
 
-        } else if (packet instanceof PacketPlayInNetworkPing) {
+        } else if (packet instanceof PacketInNetworkPing) {
 
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("pings");
 
-        } else if (packet instanceof PacketCommunicationUpdateCloudPlayer) {
-            PacketCommunicationUpdateCloudPlayer player = (PacketCommunicationUpdateCloudPlayer)packet;
+        } else if (packet instanceof PacketUpdatePlayer) {
+            PacketUpdatePlayer player = (PacketUpdatePlayer)packet;
             PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
             permissionPool.updatePlayerData(player.getName(), player.getNewCloudPlayer().getCloudPlayerData());
             cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
@@ -81,12 +81,12 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
             this.cloudSystem.getService(CloudPlayerService.class).update(player.getName(), player.getNewCloudPlayer());
             this.cloudSystem.reload();
 
-       } else if (packet instanceof PacketPlayInUnregisterCloudPlayer) {
-            PacketPlayInUnregisterCloudPlayer packetPlayInUnregisterCloudPlayer = (PacketPlayInUnregisterCloudPlayer)packet;
+       } else if (packet instanceof PacketInUnregisterPlayer) {
+            PacketInUnregisterPlayer packetInUnregisterPlayer = (PacketInUnregisterPlayer)packet;
             CloudPlayer cloudPlayer = this
                     .cloudSystem
                     .getService(CloudPlayerService.class)
-                    .getOnlinePlayer(packetPlayInUnregisterCloudPlayer.getName());
+                    .getOnlinePlayer(packetInUnregisterPlayer.getName());
             if (cloudPlayer != null) {
                 Constants.EXECUTOR.callEvent(new CloudPlayerQuitEvent(cloudPlayer));
                 this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);

@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.other;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInReload;
 import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 
 
@@ -14,7 +14,7 @@ public class PacketHandlerReload  {
     }
 
     @PacketHandler
-    public void handleReload(PacketPlayInReload reload) {
+    public void handleReload(PacketInReload reload) {
         this.cloudSystem.reload();
         this.cloudSystem.reloadNPCS();
         cloudSystem.syncGroupsWithServices();

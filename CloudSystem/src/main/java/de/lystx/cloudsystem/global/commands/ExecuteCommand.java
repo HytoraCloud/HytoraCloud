@@ -1,9 +1,8 @@
 package de.lystx.cloudsystem.global.commands;
 
-import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutExecuteCommand;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketCommand;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
@@ -32,7 +31,7 @@ public class ExecuteCommand implements TabCompletable {
             for (int i = 1; i < args.length; i++) {
                 sb.append(args[i]).append(" ");
             }
-            cloudInstance.sendPacket(new PacketPlayOutExecuteCommand(service.getName(), sb.toString()));
+            cloudInstance.sendPacket(new PacketCommand(service.getName(), sb.toString()));
             sender.sendMessage("COMMAND", "§7The command §b" + sb.toString() + " §7was sent to the server §2" + service.getName());
         } else {
             sender.sendMessage("COMMAND", "§cexecute <server> <command>");

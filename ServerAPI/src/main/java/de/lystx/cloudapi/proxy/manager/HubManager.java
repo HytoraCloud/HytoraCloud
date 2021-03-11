@@ -20,6 +20,13 @@ public class HubManager {
         this.cloudAPI = CloudAPI.getInstance();
     }
 
+    /**
+     * Sends player to LobbyServer
+     * with hubMessage if
+     * already on hub!
+     * @param player
+     * @return
+     */
     public boolean send(CloudPlayer player) {
         if (isFallback(player)) {
             String message = this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix());
@@ -33,6 +40,12 @@ public class HubManager {
         }
     }
 
+    /**
+     * Returns {@link ServerInfo} of
+     * Fallback for {@link CloudPlayer}
+     * @param player
+     * @return
+     */
     public ServerInfo getInfo(CloudPlayer player) {
         try {
             Fallback fallback = this.getHighestFallback(player);
@@ -48,6 +61,11 @@ public class HubManager {
         }
     }
 
+    /**
+     * Sends a player to a
+     * random Lobby-Server
+     * @param player
+     */
     public void sendPlayerToFallback(CloudPlayer player) {
         ProxiedPlayer proxiedPlayer =  ProxyServer.getInstance().getPlayer(player.getName());
         if (this.getInfo(player) == null) {
@@ -57,12 +75,23 @@ public class HubManager {
         proxiedPlayer.connect(this.getInfo(player));
     }
 
+    /**
+     * Gets Fallback with highest
+     * ID (Example sorting 1, 2, 3)
+     * @param player
+     * @return
+     */
     public Fallback getHighestFallback(CloudPlayer player) {
         List<Fallback> list = this.getFallbacks(player);
         list.sort(Comparator.comparingInt(Fallback::getPriority));
         return list.get(list.size() - 1) == null ? cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback() : list.get(list.size() - 1);
     }
 
+    /**
+     * Checks if player is fallback
+     * @param player
+     * @return
+     */
     public boolean isFallback(CloudPlayer player) {
         for (Fallback fallback : this.getFallbacks(player)) {
             if (player.getServerGroup().equalsIgnoreCase(fallback.getGroupName())) {
@@ -72,7 +101,14 @@ public class HubManager {
         return false;
     }
 
-
+    /**
+     * Iterates through all Fallbacks
+     * if permission of fallback is null
+     * or player has fallback permission
+     * adds it to a list
+     * @param player
+     * @return
+     */
     public List<Fallback> getFallbacks(CloudPlayer player) {
         List<Fallback> list = new LinkedList<>();
         list.add(cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback());

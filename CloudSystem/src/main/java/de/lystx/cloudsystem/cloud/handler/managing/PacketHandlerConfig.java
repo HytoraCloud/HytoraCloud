@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.cloud.handler.managing;
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInNetworkConfig;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInNetworkConfig;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -18,10 +18,10 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInNetworkConfig) {
-            PacketPlayInNetworkConfig packetPlayInNetworkConfig = (PacketPlayInNetworkConfig)packet;
+        if (packet instanceof PacketInNetworkConfig) {
+            PacketInNetworkConfig packetInNetworkConfig = (PacketInNetworkConfig)packet;
             boolean mc = this.cloudSystem.getService(ConfigService.class).getNetworkConfig().getNetworkConfig().isMaintenance();
-            NetworkConfig config = packetPlayInNetworkConfig.getNetworkConfig();
+            NetworkConfig config = packetInNetworkConfig.getNetworkConfig();
             this.cloudSystem.getService(ConfigService.class).setNetworkConfig(config);
             this.cloudSystem.getService(ConfigService.class).save();
             this.cloudSystem.getService(ConfigService.class).reload();

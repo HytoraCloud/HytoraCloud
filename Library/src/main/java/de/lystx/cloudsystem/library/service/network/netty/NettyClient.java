@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.service.network.netty;
 
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutVerifyConnection;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketOutVerifyConnection;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
@@ -74,7 +74,7 @@ public class NettyClient {
                             channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
                                 @Override
                                 public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
-                                    if (packet instanceof PacketPlayOutVerifyConnection && !established && consumerConnection != null) {
+                                    if (packet instanceof PacketOutVerifyConnection && !established && consumerConnection != null) {
                                         established = true;
                                         consumerConnection.accept(NettyClient.this);
                                     }

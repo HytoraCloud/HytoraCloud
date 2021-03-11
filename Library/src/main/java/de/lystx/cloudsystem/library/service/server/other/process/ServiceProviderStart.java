@@ -1,10 +1,11 @@
 package de.lystx.cloudsystem.library.service.server.other.process;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.CloudType;
+import de.lystx.cloudsystem.library.elements.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.elements.enums.Spigot;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
@@ -13,6 +14,8 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
+import de.lystx.cloudsystem.library.service.server.other.ServerService;
+import de.lystx.cloudsystem.library.service.util.Action;
 import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
 
@@ -43,16 +46,31 @@ public class ServiceProviderStart {
      * @param propertiess > Properties for service
      * @return if success
      */
-    public boolean autoStartService(Service service, SerializableDocument propertiess) {
+    public boolean autoStartService(ServerService serverService, Service service, SerializableDocument propertiess) {
 
-        /*NetworkInfo networkInfo = new NetworkInfo();
+        /*
+        NetworkInfo networkInfo = new NetworkInfo();
         int maxCPU = 0;
         int memory = networkInfo.getUsedMemory(cloudLibrary.getService(ServerService.class).getRealOnlineServices());
 
         if (networkInfo.getCPUUsage() >= memory + service.getServiceGroup().getMaxRam()) {
             cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cThere is no more CPU available to start a new service! Max: §e" + maxCPU + " §c, Current: §e" + networkInfo.getCPUUsage());
             return false;
-        }*/
+        }
+        */
+
+        if (!new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), "spigot.jar").exists() || !new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar").exists()) {
+            cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cCouldn't start Service §e" + service.getName() + " §cbecause either §espigot.jar §cor §ebungeeCord.jar §cwas found!");
+            cloudLibrary.getConsole().getLogger().sendMessage("INFO", "§7Downloading §7default §9BungeeCord §7and default §eSpigot-1.8.8§h...");
+
+            Action action = serverService.getActions().getOrDefault(service.getName(), new Action());
+            action.setInformation("Downloaded BungeeCord & Spigot");
+            serverService.getActions().put(service.getName(), action);
+            cloudLibrary.getService(FileService.class).download("https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
+            cloudLibrary.getService(FileService.class).download(Spigot.V1_8_8.getUrl(), new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
+            this.autoStartService(serverService, service, propertiess);
+            return false;
+        }
         try {
             cloudLibrary.getService(TemplateService.class).createTemplate(new File(template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate()), service.getServiceGroup());
             File templateLocation = new File(this.template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");

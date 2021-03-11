@@ -35,7 +35,7 @@ public class SignManager {
         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
             return;
         }
-        Bukkit.getScheduler().cancelTask(this.signUpdater.getAnimationScheduler());
+        CloudAPI.getInstance().getScheduler().cancelTask(this.signUpdater.getAnimationScheduler());
         CloudAPI.getInstance().getExecutorService().submit(() -> this.signUpdater.run());
     }
 }

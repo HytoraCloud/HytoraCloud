@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.commands;
 
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInUpdateServiceGroup;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInUpdateServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
@@ -93,7 +93,7 @@ public class EditCommand  {
                 return;
             }
 
-            CloudSystem.getInstance().sendPacket(new PacketPlayInUpdateServiceGroup(newGroup));
+            CloudSystem.getInstance().sendPacket(new PacketInUpdateServiceGroup(newGroup));
             CloudSystem.getInstance().getService(GroupService.class).updateGroup(group, newGroup);
             sender.sendMessage("INFO", "§7Changed value §2" + key + " §7to §a" + value + " §7for group §b" + group.getName());
         } else {

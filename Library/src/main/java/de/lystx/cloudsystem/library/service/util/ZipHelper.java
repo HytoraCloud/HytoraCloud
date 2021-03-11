@@ -1,142 +1,81 @@
+
 package de.lystx.cloudsystem.library.service.util;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.net.URI;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
-/**
- * Coded By CryCodes
- * Class: ZipHelper
- * Date : 16.08.2020
- * Time : 20:38
- * Project: LiptonCloud 2.0
- */
 
 public class ZipHelper {
 
-    private final File src;
-    private final File dest;
-
-    private final ArrayList<File> files;
-
     /**
-     * Constructor
-     *
-     * @param src
-     *            The File/Directory to be zipped
-     * @param dest
-     *            The Destination of the zipped file/directory
+     * Adds a file to a zpfile
+     * @param base
+     * @param filePath
+     * @param outZipStream
+     * @throws IOException
      */
-    public ZipHelper(File src, File dest) {
-        this.src = src;
-        this.dest = dest;
-        this.files = new ArrayList<>();
-    }
-
-    /**
-     * Starts the Zip process
-     *
-     * @return The Location of the zipped file
-     */
-    public File zip() {
-        this.getAllFiles(this.src);
-
-        try {
-            FileOutputStream fos = new FileOutputStream(this.dest);
-            ZipOutputStream zos = new ZipOutputStream(fos);
-
-            for (File file : this.files) {
-                if (file.isDirectory()) {
-                    continue;
-                }
-                FileInputStream fis = new FileInputStream(file);
-                String zipPath = file.getCanonicalPath().substring(this.src.getCanonicalPath().length() + 1);
-                ZipEntry entry = new ZipEntry(zipPath);
-                zos.putNextEntry(entry);
-
-                byte[] bytes = new byte[1024];
-                int ln;
-                while ((ln = fis.read(bytes)) >= 0) {
-                    zos.write(bytes, 0, ln);
-                }
-
-                zos.closeEntry();
-                fis.close();
+    private void addFileToZip(File base, String filePath, ZipOutputStream outZipStream) throws IOException {
+        try (FileInputStream inputStream = new FileInputStream(new File(base, filePath)); ) {
+            int BUFFER_SIZE_BYTES = 1024;
+            byte[] buffer = new byte[BUFFER_SIZE_BYTES];
+            outZipStream.putNextEntry(new ZipEntry(filePath));
+            int bytes_read;
+            while ((bytes_read = inputStream.read(buffer)) > 0) {
+                outZipStream.write(buffer, 0, bytes_read);
             }
-
-            zos.close();
-            fos.close();
-            return this.dest;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
-
-    /**
-     * Unzips a File
-     *
-     * @return The Directory the file got extracted to
-     */
-    public File unzip() {
-        byte[] buffer = new byte[1024];
-        try {
-            if (!this.dest.exists()) {
-                this.dest.mkdir();
-            }
-
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(this.src));
-            ZipEntry ze = zis.getNextEntry();
-
-            while (ze != null) {
-                String fileName = ze.getName();
-                File newFile = new File(this.dest, fileName);
-                new File(newFile.getParent()).mkdirs();
-
-                // deepcode ignore PT: F
-                FileOutputStream fos = new FileOutputStream(newFile);
-
-                int ln;
-                while ((ln = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, ln);
-                }
-
-                fos.close();
-                ze = zis.getNextEntry();
-            }
-
-            zis.closeEntry();
-            zis.close();
-
-            return this.dest;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        } finally {
+            outZipStream.closeEntry();
         }
     }
 
     /**
-     * Adds all Files/Directories of a Directory to the File list
-     *
-     * @param dir The Directory
+     * Adds a directory to a zipFile
+     * @param base
+     * @param directory
+     * @param outZipStream
+     * @throws IOException
      */
-    private void getAllFiles(File dir) {
-        for (File file : Objects.requireNonNull(dir.listFiles())) {
-            if (file.toString().contains("backup")) {
+    private void addDirectoryToZip(File base, String directory, ZipOutputStream outZipStream) throws IOException {
+        File fullPath = new File(base, directory).getAbsoluteFile();
+        URI baseURI = base.toURI();
+
+        String[] fileNames = fullPath.list();
+        for (String fileName : fileNames) {
+            File file = new File(fullPath, fileName);
+            if (!file.exists()) {
                 continue;
             }
-            this.files.add(file);
-            if (file.isDirectory()) {
-                this.getAllFiles(file);
+            String relativePath = baseURI.relativize(file.toURI()).getPath();
+            if (file.isFile()) {
+                addFileToZip(base, relativePath, outZipStream);
+            } else if (file.isDirectory()) {
+                addDirectoryToZip(base, relativePath, outZipStream);
             }
         }
     }
 
+    /**
+     * Main method to zip a directory
+     * @param directory
+     * @param outFile
+     * @throws IOException
+     */
+    public void zip(File directory, File outFile) {
+        try {
+            int BUFFER_OUTPUT_STREAM = 256 * 1024;
+            try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile), BUFFER_OUTPUT_STREAM);
+                 ZipOutputStream outZipStream = new ZipOutputStream(outputStream); ) {
+                addDirectoryToZip(directory, ".", outZipStream);
+                outZipStream.flush();
+                outZipStream.finish();
+            }
+        } catch (IOException ignored) {
+
+        }
+    }
 }

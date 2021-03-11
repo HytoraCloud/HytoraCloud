@@ -1,10 +1,9 @@
 package de.lystx.cloudsystem.receiver.handler;
 
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutVerifyConnection;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketOutVerifyConnection;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLoginResult;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
-import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.util.Decision;
@@ -18,7 +17,7 @@ public class ReceiverPacketHandlerLogin {
 
 
     @PacketHandler
-    public void handleVerify(PacketPlayOutVerifyConnection packet) {
+    public void handleVerify(PacketOutVerifyConnection packet) {
 
     }
 

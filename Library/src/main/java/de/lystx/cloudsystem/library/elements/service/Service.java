@@ -1,8 +1,8 @@
 package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
-import de.lystx.cloudsystem.library.enums.ServiceState;
-import io.vson.elements.object.VsonObject;
+import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import io.vson.elements.object.Objectable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Getter @Setter @ToString
-public class Service implements Serializable {
+public class Service implements Serializable, Objectable<Service> {
 
     private final String name;
     private final UUID uniqueId;
@@ -42,7 +42,5 @@ public class Service implements Serializable {
         this.cloudPort = cloudPort;
         this.host = "127.0.0.1";
         this.serviceState = serviceState;
-
     }
-
 }

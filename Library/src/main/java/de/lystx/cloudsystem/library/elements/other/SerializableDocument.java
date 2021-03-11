@@ -9,7 +9,8 @@ import java.io.Serializable;
 import java.util.*;
 
 @Getter
-/**
+
+/*
  * Can be send in packets
  * Map is serializable
  * Document uses Gson which isn't

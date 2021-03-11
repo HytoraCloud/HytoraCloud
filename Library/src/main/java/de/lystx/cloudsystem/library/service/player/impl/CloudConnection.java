@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationKick;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketKickPlayer;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class CloudConnection implements Serializable {
      * @param reason
      */
     public void disconnect(String reason) {
-        Constants.EXECUTOR.sendPacket(new PacketCommunicationKick(this.name, reason));
+        Constants.EXECUTOR.sendPacket(new PacketKickPlayer(this.name, reason));
     }
 
     /**

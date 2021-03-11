@@ -1,8 +1,7 @@
 package de.lystx.cloudapi.bukkit.listener.player;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudapi.bukkit.CloudServer;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketPlayInPlayerExecuteCommand;
+import de.lystx.cloudsystem.library.elements.packets.in.player.PacketInPlayerExecuteCommand;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import org.bukkit.Bukkit;
@@ -28,7 +27,7 @@ public class PlayerChatListener implements Listener {
             }
             CloudAPI.getInstance().getCommandService().execute(cloudPlayer, true, event.getMessage());
         }
-        CloudAPI.getInstance().sendPacket(new PacketPlayInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
+        CloudAPI.getInstance().sendPacket(new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 
 

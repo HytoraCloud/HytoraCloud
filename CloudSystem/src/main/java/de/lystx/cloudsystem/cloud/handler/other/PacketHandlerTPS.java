@@ -1,8 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.other;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketPlayOutTPS;
-import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketTPS;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -18,13 +17,13 @@ public class PacketHandlerTPS extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayOutTPS) {
-            PacketPlayOutTPS packetPlayOutTPS = (PacketPlayOutTPS)packet;
-            if (packetPlayOutTPS.getTps() == null) {
+        if (packet instanceof PacketTPS) {
+            PacketTPS packetTPS = (PacketTPS)packet;
+            if (packetTPS.getTps() == null) {
                 return;
             }
-            CloudPlayer cloudPlayer = cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetPlayOutTPS.getPlayer());
-            cloudPlayer.sendMessage("  §8» §b" + packetPlayOutTPS.getService().getName() + " §8┃ §7" + packetPlayOutTPS.getTps());
+            CloudPlayer cloudPlayer = cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(packetTPS.getPlayer());
+            cloudPlayer.sendMessage("  §8» §b" + packetTPS.getService().getName() + " §8┃ §7" + packetTPS.getTps());
         }
     }
 }

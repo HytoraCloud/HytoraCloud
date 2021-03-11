@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.player;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunication;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCommunication;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;

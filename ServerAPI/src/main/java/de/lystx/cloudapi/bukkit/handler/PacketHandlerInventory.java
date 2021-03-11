@@ -2,8 +2,8 @@ package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.utils.Item;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationOpenInventory;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationPlayerInventoryUpdate;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketOpenInventory;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketInventoryUpdate;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
@@ -26,8 +26,8 @@ public class PacketHandlerInventory extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet rawPacket) {
-        if (rawPacket instanceof PacketCommunicationOpenInventory) {
-            PacketCommunicationOpenInventory packet = (PacketCommunicationOpenInventory)rawPacket;
+        if (rawPacket instanceof PacketOpenInventory) {
+            PacketOpenInventory packet = (PacketOpenInventory)rawPacket;
             CloudInventory inventory = packet.getCloudInventory();
             CloudPlayer player = CloudAPI.getInstance().getCloudPlayers().get(packet.getCloudPlayer().getName());
             Player bukkitPlayer = Bukkit.getPlayer(player.getName());
@@ -40,7 +40,7 @@ public class PacketHandlerInventory extends PacketHandlerAdapter {
 
 
     @PacketHandler
-    public void handle(PacketCommunicationPlayerInventoryUpdate packet) {
+    public void handle(PacketInventoryUpdate packet) {
         CloudPlayerInventory playerInventory = packet.getPlayerInventory();
         CloudPlayer player = CloudAPI.getInstance().getCloudPlayers().get(packet.getCloudPlayer().getName());
         Player bukkitPlayer = Bukkit.getPlayer(player.getName());

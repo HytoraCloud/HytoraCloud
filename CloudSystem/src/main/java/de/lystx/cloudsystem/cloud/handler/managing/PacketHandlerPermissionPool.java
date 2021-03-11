@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.handler.managing;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInPermissionPool;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInPermissionPool;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
@@ -19,9 +19,9 @@ public class PacketHandlerPermissionPool extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInPermissionPool) {
-            PacketPlayInPermissionPool packetPlayInPermissionPool = (PacketPlayInPermissionPool)packet;
-            PermissionPool permissionPool = packetPlayInPermissionPool.getPermissionPool();
+        if (packet instanceof PacketInPermissionPool) {
+            PacketInPermissionPool packetInPermissionPool = (PacketInPermissionPool)packet;
+            PermissionPool permissionPool = packetInPermissionPool.getPermissionPool();
             this.cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
             this.cloudSystem.getService(PermissionService.class).save();
             this.cloudSystem.getService(PermissionService.class).load();

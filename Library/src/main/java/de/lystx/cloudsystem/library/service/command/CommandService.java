@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.service.command;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketPlayOutExecuteCommand;
+import de.lystx.cloudsystem.library.elements.packets.out.service.PacketCommand;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.command.CommandInfo;
@@ -133,7 +133,7 @@ public final class CommandService extends CloudService {
                 } else if (line.equalsIgnoreCase("shutdown")) {
                     this.getCloudLibrary().getService(ServerService.class).stopService(this.getCloudLibrary().getService(ServerService.class).getService(this.getCloudLibrary().getScreenPrinter().getScreen().getName()));
                 } else {
-                    this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketPlayOutExecuteCommand(this.getCloudLibrary().getScreenPrinter().getScreen().getName(), line));
+                    this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketCommand(this.getCloudLibrary().getScreenPrinter().getScreen().getName(), line));
                 }
                 return;
             }

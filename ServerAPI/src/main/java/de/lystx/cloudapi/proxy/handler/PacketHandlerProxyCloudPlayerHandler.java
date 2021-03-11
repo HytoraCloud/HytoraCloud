@@ -4,8 +4,9 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
-import de.lystx.cloudsystem.library.elements.packets.communication.*;
+import de.lystx.cloudsystem.library.elements.packets.both.*;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.*;
@@ -13,44 +14,40 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
-@Getter
+@Getter @AllArgsConstructor
 public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
 
 
     private final CloudAPI cloudAPI;
 
-    public PacketHandlerProxyCloudPlayerHandler(CloudAPI cloudAPI) {
-        this.cloudAPI = cloudAPI;
-    }
-
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketCommunicationSendMessage) {
-            PacketCommunicationSendMessage packetPlayOutSendMessage = (PacketCommunicationSendMessage)packet;
+        if (packet instanceof PacketSendMessage) {
+            PacketSendMessage packetPlayOutSendMessage = (PacketSendMessage)packet;
             ProxyServer.getInstance().getPlayer(packetPlayOutSendMessage.getUuid()).sendMessage(packetPlayOutSendMessage.getMessage());
-        } else if (packet instanceof PacketCommunicationFallback) {
+        } else if (packet instanceof PacketFallback) {
 
-            PacketCommunicationFallback fallback = (PacketCommunicationFallback) packet;
+            PacketFallback fallback = (PacketFallback) packet;
             CloudProxy.getInstance().getHubManager().sendPlayerToFallback(CloudAPI.getInstance().getCloudPlayers().get(fallback.getName()));
-        } else if (packet instanceof PacketCommunicationSendComponent) {
-            PacketCommunicationSendComponent packetCommunicationSendComponent = (PacketCommunicationSendComponent)packet;
-            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetCommunicationSendComponent.getUuid());
+        } else if (packet instanceof PacketSendComponent) {
+            PacketSendComponent packetSendComponent = (PacketSendComponent)packet;
+            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetSendComponent.getUuid());
             if (player == null) {
                 return;
             }
-            CloudComponent cloudComponent = packetCommunicationSendComponent.getCloudComponent();
+            CloudComponent cloudComponent = packetSendComponent.getCloudComponent();
             player.sendMessage(this.fromCloud(cloudComponent));
 
-        } else if (packet instanceof PacketCommunicationSendToServer) {
-            PacketCommunicationSendToServer server = (PacketCommunicationSendToServer) packet;
+        } else if (packet instanceof PacketConnectServer) {
+            PacketConnectServer server = (PacketConnectServer) packet;
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(server.getName());
             ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(server.getServer());
             if (serverInfo == null) {
                 return;
             }
             player.connect(serverInfo);
-        } else if (packet instanceof PacketCommunicationKick) {
-            PacketCommunicationKick kick = (PacketCommunicationKick)packet;
+        } else if (packet instanceof PacketKickPlayer) {
+            PacketKickPlayer kick = (PacketKickPlayer)packet;
             ProxyServer.getInstance().getPlayer(kick.getName()).disconnect(kick.getReason());
         }
     }

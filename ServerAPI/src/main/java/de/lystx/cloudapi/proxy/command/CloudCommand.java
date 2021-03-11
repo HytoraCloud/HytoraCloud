@@ -3,9 +3,9 @@ package de.lystx.cloudapi.proxy.command;
 import com.google.common.collect.ImmutableList;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.Updater;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInTPS;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInReload;
+import de.lystx.cloudsystem.library.elements.featured.updater.Updater;
+import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketTPS;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInReload;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
@@ -13,10 +13,8 @@ import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacke
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
-import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import net.md_5.bungee.api.ProxyServer;
@@ -35,11 +33,11 @@ public class CloudCommand implements TabCompletable {
             if (player.hasPermission("cloudsystem.command")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("rl") || args[0].equalsIgnoreCase("reload")) {
-                        CloudAPI.getInstance().getCloudClient().sendPacket(new PacketPlayInReload());
+                        CloudAPI.getInstance().getCloudClient().sendPacket(new PacketInReload());
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");
                     } else if (args[0].equalsIgnoreCase("tps")) {
 
-                        String format = CloudAPI.getInstance().sendQuery(new PacketPlayInTPS()).getResult().getString("tps");
+                        String format = CloudAPI.getInstance().sendQuery(new ResultPacketTPS()).getResult().getString("tps");
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§6TPS§8: §b" + format);
 
                     } else if (args[0].equalsIgnoreCase("stats")) {

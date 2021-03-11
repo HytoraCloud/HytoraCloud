@@ -2,11 +2,11 @@ package de.lystx.cloudsystem.global;
 
 import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.CloudType;
-import de.lystx.cloudsystem.library.Updater;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInShutdown;
-import de.lystx.cloudsystem.library.elements.packets.out.PacketPlayOutGlobalInfo;
-import de.lystx.cloudsystem.library.elements.packets.out.other.PacketPlayOutNPCs;
+import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.elements.featured.updater.Updater;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInShutdown;
+import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
+import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutNPC;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
@@ -28,7 +28,7 @@ import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import de.lystx.cloudsystem.library.service.util.LogService;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;
-import de.lystx.cloudsystem.library.webserver.WebServer;
+import de.lystx.cloudsystem.library.elements.featured.webserver.WebServer;
 import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
 
@@ -101,7 +101,7 @@ public class CloudInstance extends CloudLibrary {
 
 
     public void reloadNPCS() {
-        this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutNPCs(this.getService(NPCService.class).getNPCConfig(), this.getService(NPCService.class).getDocument()));
+        this.getService(CloudNetworkService.class).sendPacket(new PacketOutNPC(this.getService(NPCService.class).getNPCConfig(), this.getService(NPCService.class).getDocument()));
     }
 
     public void reload() {
@@ -109,7 +109,7 @@ public class CloudInstance extends CloudLibrary {
             this.getService(ServerService.class).setServiceGroups(this.getService(GroupService.class).getGroups());
             this.getService(ConfigService.class).reload();
 
-            this.getService(CloudNetworkService.class).sendPacket(new PacketPlayOutGlobalInfo(
+            this.getService(CloudNetworkService.class).sendPacket(new PacketOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
                     this.getService(ServerService.class).getServices(),
                     this.getService(PermissionService.class).getPermissionPool(),
@@ -123,7 +123,7 @@ public class CloudInstance extends CloudLibrary {
     }
     public void shutdown() {
         if (this.cloudType.equals(CloudType.CLOUDSYSTEM) && this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            this.sendPacket(new PacketPlayInShutdown());
+            this.sendPacket(new PacketInShutdown());
         }
         this.setRunning(false);
         this.getConsole().interrupt();

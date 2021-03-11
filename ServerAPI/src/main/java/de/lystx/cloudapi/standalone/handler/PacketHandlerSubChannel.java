@@ -2,7 +2,7 @@ package de.lystx.cloudapi.standalone.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
-import de.lystx.cloudsystem.library.elements.packets.communication.PacketCommunicationSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +15,8 @@ public class PacketHandlerSubChannel extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketCommunicationSubMessage) {
-            PacketCommunicationSubMessage subMessage = (PacketCommunicationSubMessage)packet;
+        if (packet instanceof PacketSubMessage) {
+            PacketSubMessage subMessage = (PacketSubMessage)packet;
             for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onDocumentReceive(subMessage.getChannel(), subMessage.getKey(), subMessage.getDocument(), subMessage.getType());
             }

@@ -2,8 +2,8 @@ package de.lystx.cloudsystem.cloud.handler.managing;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInCreateNPC;
-import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketPlayInRemoveNPC;
+import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInCreateNPC;
+import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInDeleteNPC;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 
@@ -17,14 +17,14 @@ public class PacketHandlerNPC extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInCreateNPC) {
-            PacketPlayInCreateNPC packetPlayInCreateNPC = (PacketPlayInCreateNPC)packet;
-            this.cloudSystem.getService(NPCService.class).append(packetPlayInCreateNPC.getKey(), packetPlayInCreateNPC.getVsonObject());
+        if (packet instanceof PacketInCreateNPC) {
+            PacketInCreateNPC packetInCreateNPC = (PacketInCreateNPC)packet;
+            this.cloudSystem.getService(NPCService.class).append(packetInCreateNPC.getKey(), packetInCreateNPC.getVsonObject());
             this.cloudSystem.getService(NPCService.class).save();
             this.cloudSystem.getService(NPCService.class).load();
             this.cloudSystem.reloadNPCS();
-        } else if (packet instanceof PacketPlayInRemoveNPC) {
-            this.cloudSystem.getService(NPCService.class).remove(((PacketPlayInRemoveNPC) packet).getKey());
+        } else if (packet instanceof PacketInDeleteNPC) {
+            this.cloudSystem.getService(NPCService.class).remove(((PacketInDeleteNPC) packet).getKey());
             this.cloudSystem.getService(NPCService.class).save();
             this.cloudSystem.getService(NPCService.class).load();
             this.cloudSystem.reloadNPCS();

@@ -3,8 +3,8 @@ package de.lystx.cloudapi.proxy;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
-import de.lystx.cloudsystem.library.CloudService;
-import de.lystx.cloudsystem.library.CloudType;
+import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
+import de.lystx.cloudsystem.library.elements.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;
@@ -98,8 +98,7 @@ public class CloudProxy extends Plugin implements CloudService {
         this.cloudAPI.registerCommand(new CloudCommand());
         this.cloudAPI.registerCommand(new HubCommand());
         this.cloudAPI.registerCommand(new ListCommand());
-        this.cloudAPI.registerCommand(new WhereAmICommand());
-        this.cloudAPI.registerCommand(new WhereIsCommand());
+        this.cloudAPI.registerCommand(new WhereCommands());
         this.cloudAPI.registerCommand(new PermsCommand());
         this.cloudAPI.registerCommand(new NetworkCommand());
 

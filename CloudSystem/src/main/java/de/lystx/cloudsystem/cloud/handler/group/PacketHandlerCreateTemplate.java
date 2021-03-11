@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.handler.group;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketPlayInCopyTemplate;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInCopyTemplate;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
@@ -17,14 +17,14 @@ public class PacketHandlerCreateTemplate extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketPlayInCopyTemplate) {
-            PacketPlayInCopyTemplate packetPlayInCopyTemplate = (PacketPlayInCopyTemplate)packet;
-            Service service = packetPlayInCopyTemplate.getService();
+        if (packet instanceof PacketInCopyTemplate) {
+            PacketInCopyTemplate packetInCopyTemplate = (PacketInCopyTemplate)packet;
+            Service service = packetInCopyTemplate.getService();
             Service get = this.cloudSystem.getService().getService(service.getName());
             if (get == null) {
                 return;
             }
-            this.cloudSystem.getService(TemplateService.class).copy(get, packetPlayInCopyTemplate.getTemplate());
+            this.cloudSystem.getService(TemplateService.class).copy(get, packetInCopyTemplate.getTemplate());
         }
     }
 }

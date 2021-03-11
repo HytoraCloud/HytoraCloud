@@ -24,13 +24,10 @@ public class CloudScreenPrinter {
     private Scanner reader;
     private boolean inScreen;
 
-    private final ExecutorService executorService;
-
     public CloudScreenPrinter(CloudConsole colouredConsoleProvider, CloudLibrary hytoraLibrary) {
         this.colouredConsoleProvider = colouredConsoleProvider;
         this.hytoraLibrary = hytoraLibrary;
         this.cachedLines = new LinkedHashMap<>();
-        this.executorService = Executors.newFixedThreadPool(1);
     }
 
     /**

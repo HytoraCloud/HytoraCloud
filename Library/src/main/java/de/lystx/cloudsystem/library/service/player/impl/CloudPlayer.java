@@ -1,21 +1,18 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
-import de.lystx.cloudsystem.library.elements.packets.communication.*;
+import de.lystx.cloudsystem.library.elements.packets.both.*;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
-import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.featured.CloudInventory;
 import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;
 import de.lystx.cloudsystem.library.service.util.Constants;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 @Getter @Setter @ToString(of = "name")
 public class CloudPlayer implements Serializable, CloudCommandSender {
@@ -56,7 +53,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * Updates a player and all his data
      */
     public void update() {
-        Constants.EXECUTOR.sendPacket(new PacketCommunicationUpdateCloudPlayer(this.name, this));
+        Constants.EXECUTOR.sendPacket(new PacketUpdatePlayer(this.name, this));
     }
 
     /**
@@ -79,7 +76,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param message
      */
     public void sendMessage(String message) {
-        PacketCommunicationSendMessage sendMessage = new PacketCommunicationSendMessage(this.uniqueId, message);
+        PacketSendMessage sendMessage = new PacketSendMessage(this.uniqueId, message);
         Constants.EXECUTOR.sendPacket(sendMessage);
     }
 
@@ -88,7 +85,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param cloudComponent
      */
     public void sendComponent(CloudComponent cloudComponent) {
-        PacketCommunicationSendComponent sendMessage = new PacketCommunicationSendComponent(this.uniqueId, cloudComponent);
+        PacketSendComponent sendMessage = new PacketSendComponent(this.uniqueId, cloudComponent);
         Constants.EXECUTOR.sendPacket(sendMessage);
     }
 
@@ -97,8 +94,8 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param cloudInventory
      */
     public void openInventory(CloudInventory cloudInventory) {
-        PacketCommunicationOpenInventory packetCommunicationOpenInventory = new PacketCommunicationOpenInventory(this, cloudInventory);
-        Constants.EXECUTOR.sendPacket(packetCommunicationOpenInventory);
+        PacketOpenInventory packetOpenInventory = new PacketOpenInventory(this, cloudInventory);
+        Constants.EXECUTOR.sendPacket(packetOpenInventory);
     }
 
     /**
@@ -108,7 +105,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param v2
      */
     public void playSound(Enum<?> sound, float v1, float v2) {
-        PacketCommunicationPlaySound playSound = new PacketCommunicationPlaySound(this.name, sound.name(), v1, v2);
+        PacketPlaySound playSound = new PacketPlaySound(this.name, sound.name(), v1, v2);
         Constants.EXECUTOR.sendPacket(playSound);
     }
 
@@ -118,7 +115,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param subtitle
      */
     public void sendTitle(String title, String subtitle) {
-        PacketCommunicationSendTitle sendTitle = new PacketCommunicationSendTitle(this.name, title, subtitle);
+        PacketSendTitle sendTitle = new PacketSendTitle(this.name, title, subtitle);
         Constants.EXECUTOR.sendPacket(sendTitle);
     }
 
@@ -126,7 +123,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * Sends to fallback
      */
     public void fallback() {
-        PacketCommunicationFallback fallback = new PacketCommunicationFallback(this.name);
+        PacketFallback fallback = new PacketFallback(this.name);
         Constants.EXECUTOR.sendPacket(fallback);
     }
 
@@ -135,7 +132,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param server
      */
     public void connect(String server) {
-        PacketCommunicationSendToServer sendToServer = new PacketCommunicationSendToServer(this.name, server);
+        PacketConnectServer sendToServer = new PacketConnectServer(this.name, server);
         Constants.EXECUTOR.sendPacket(sendToServer);
     }
 

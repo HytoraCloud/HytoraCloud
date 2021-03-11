@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.receiver.booting;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
-import de.lystx.cloudsystem.library.service.setup.impl.ReceiverSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.ReceiverAbstractSetup;
 import de.lystx.cloudsystem.receiver.Receiver;
 import lombok.Getter;
 
@@ -25,7 +25,7 @@ public class ReceiverBootingSetupNotDone {
         receiver.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cPort might have to enter multiple times (If 3 times > Kill process and restart)");
         receiver.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         receiver.getService(CommandService.class).setActive(false);
-        new ReceiverSetup().start(receiver.getConsole(), setup -> {
+        new ReceiverAbstractSetup().start(receiver.getConsole(), setup -> {
             receiver.getService(CommandService.class).setActive(true);
             if (setup.isCancelled()) {
                 receiver.getConsole().getLogger().sendMessage("ERROR", "§cYou are not allowed to cancel this setup!");

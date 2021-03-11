@@ -1,9 +1,8 @@
 package de.lystx.cloudsystem.global.commands;
 
-import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.enums.Spigot;
+import de.lystx.cloudsystem.library.elements.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.command.command.TabCompletable;

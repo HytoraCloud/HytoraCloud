@@ -1,7 +1,8 @@
 package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketPlayInGetLog;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInGetLog;
+import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketCloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -24,11 +25,23 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
         this.cloudPlayers = new LinkedList<>();
     }
 
-
+    /**
+     * Sends the log from a
+     * {@link Service} to a {@link CloudPlayer}
+     *
+     * @param cloudPlayer
+     * @param service
+     */
     public void sendLog(CloudPlayer cloudPlayer, Service service) {
-        this.cloudAPI.sendPacket(new PacketPlayInGetLog(service, cloudPlayer.getName()));
+        new PacketInGetLog(service, cloudPlayer.getName()).unsafe().async().send(this.cloudAPI);
     }
 
+    /**
+     * Returns all {@link CloudPlayer}s from a
+     * ServiceGroup by Name
+     * @param group
+     * @return
+     */
     public List<CloudPlayer> getPlayersOnGroup(String group) {
        List<CloudPlayer> list = new LinkedList<>();
        for (CloudPlayer cp : this.cloudPlayers) {
@@ -39,6 +52,11 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
         return list;
     }
 
+    /**
+     * Returns {@link CloudPlayer}s on a {@link Service}
+     * @param server
+     * @return
+     */
     public List<CloudPlayer> getPlayersOnServer(String server) {
        List<CloudPlayer> list = new LinkedList<>();
        for (CloudPlayer cp : this.cloudPlayers) {
@@ -49,44 +67,79 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
         return list;
     }
 
+    /**
+     * Returns Integer of players on Group
+     * @param groupName
+     * @return
+     */
     public int getOnGroup(String groupName) {
         return this.getPlayersOnGroup(groupName).size();
     }
 
+    /**
+     * Returns Intger of players on Group
+     * @param serverName
+     * @return
+     */
     public int getOnServer(String serverName) {
          return this.getPlayersOnServer(serverName).size();
     }
 
+    /**
+     * Updates a {@link CloudPlayer}
+     * @param newPlayer
+     */
     public void update(CloudPlayer newPlayer) {
         CloudPlayer cloudPlayer = this.get(newPlayer.getName());
         this.cloudPlayers.set(this.cloudPlayers.indexOf(cloudPlayer), newPlayer);
     }
 
+    /**
+     * Returns a cached {@link CloudPlayer}
+     * by Name
+     * @param name
+     * @return
+     */
     public CloudPlayer get(String name) {
         return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-
+    /**
+     * Returns a cached {@link CloudPlayer}
+     * by UUID
+     * @param uuid
+     * @return
+     */
     public CloudPlayer get(UUID uuid) {
         return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getUniqueId().equals(uuid)).findFirst().orElse(null);
     }
 
+    /**
+     * Returns {@link CloudPlayer} directly
+     * from Cloud with {@link CloudAPI#sendQuery(ResultPacket)}
+     * by Name
+     * @param name
+     * @return
+     */
     public CloudPlayer getByQuery(String name) {
-        Value<CloudPlayer> value = new Value<>(null);
-        this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name)).onResultSet(result -> {
-            value.setValue(result.getDocument().getObject("cloudPlayer", CloudPlayer.class));
-        });
-        return value.getValue();
+        return this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name)).getResult().getObject("cloudPlayer", CloudPlayer.class);
     }
 
+    /**
+     * Returns {@link CloudPlayer} directly
+     * from Cloud with {@link CloudAPI#sendQuery(ResultPacket)}
+     * by UUID
+     * @param uuid
+     * @return
+     */
     public CloudPlayer getByQuery(UUID uuid) {
-        Value<CloudPlayer> value = new Value<>(null);
-        this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uuid)).onResultSet(result -> {
-            value.setValue(result.getDocument().getObject("cloudPlayer", CloudPlayer.class));
-        });
-        return value.getValue();
+        return this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uuid)).getResult().getObject("cloudPlayer", CloudPlayer.class);
     }
 
+    /**
+     * Returns all {@link CloudPlayer}s
+     * @return
+     */
     public List<CloudPlayer> getAll() {
         return cloudPlayers;
     }
