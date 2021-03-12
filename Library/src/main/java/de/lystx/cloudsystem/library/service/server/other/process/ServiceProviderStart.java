@@ -248,7 +248,7 @@ public class ServiceProviderStart {
                     "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
                     "-jar",
                     jarFile,
-                    service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT) ? "nogui" : "");
+                    service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : "");
 
             new Thread(() -> {
                 processBuilder.directory(serverLocation);

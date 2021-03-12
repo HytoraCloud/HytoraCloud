@@ -220,15 +220,13 @@ public class CloudNetwork {
      * @param consumer
      */
     public void getServiceAsync(String name, Consumer<Service> consumer) {
-        this.cloudAPI.getExecutorService().submit(new Callable<Service>() {
-            @Override
-            public Service call() throws Exception {
-                Service service = cloudAPI.sendQuery(new ResultPacketService(name)).getResultAs(Service.class);
-                consumer.accept(service);
-                return service;
-            }
+        this.cloudAPI.getExecutorService().submit(() -> {
+            Service service = cloudAPI.sendQuery(new ResultPacketService(name)).getResultAs(Service.class);
+            consumer.accept(service);
+            return service;
         });
     }
+
     /**
      * Gets a {@link ServiceGroup} asynchronous
      * the {@link Consumer} will be called if the
@@ -239,13 +237,10 @@ public class CloudNetwork {
      */
 
     public void getServiceGroupAsync(String name, Consumer<ServiceGroup> consumer) {
-        this.cloudAPI.getExecutorService().submit(new Callable<ServiceGroup>() {
-            @Override
-            public ServiceGroup call() throws Exception {
-                ServiceGroup service = cloudAPI.sendQuery(new ResultPacketServiceGroup(name)).getResultAs(ServiceGroup.class);
-                consumer.accept(service);
-                return service;
-            }
+        this.cloudAPI.getExecutorService().submit(() -> {
+            ServiceGroup service = cloudAPI.sendQuery(new ResultPacketServiceGroup(name)).getResultAs(ServiceGroup.class);
+            consumer.accept(service);
+            return service;
         });
     }
 

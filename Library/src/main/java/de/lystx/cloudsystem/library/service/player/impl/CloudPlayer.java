@@ -151,7 +151,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param serviceGroup
      */
     public void connectRandom(ServiceGroup serviceGroup) {
-        this.connect(serviceGroup.getName());
+        this.connectRandom(serviceGroup.getName());
     }
 
     /**

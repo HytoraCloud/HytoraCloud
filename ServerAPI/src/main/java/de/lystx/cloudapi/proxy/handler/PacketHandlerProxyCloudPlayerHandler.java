@@ -16,6 +16,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
 import java.util.List;
+import java.util.Random;
 
 @Getter @AllArgsConstructor
 public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
@@ -50,11 +51,13 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
             }
             player.connect(serverInfo);
         } else if (packet instanceof PacketConnectGroup) {
-            PacketConnectGroup group = (PacketConnectGroup) packet;
-            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(group.getName());
+            final PacketConnectGroup group = (PacketConnectGroup) packet;
+            final ProxiedPlayer player = ProxyServer.getInstance().getPlayer(group.getName());
 
-            List<Service> service = CloudAPI.getInstance().getNetwork().getServices(CloudAPI.getInstance().getNetwork().getServiceGroup(group.getGroup()));
+            final List<Service> services = CloudAPI.getInstance().getNetwork().getServices(CloudAPI.getInstance().getNetwork().getServiceGroup(group.getGroup()));
+            final Service service = services.get(new Random().nextInt(services.size()));
 
+            player.connect(ProxyServer.getInstance().getServerInfo(service.getName()));
         } else if (packet instanceof PacketKickPlayer) {
             PacketKickPlayer kick = (PacketKickPlayer)packet;
             ProxyServer.getInstance().getPlayer(kick.getName()).disconnect(kick.getReason());

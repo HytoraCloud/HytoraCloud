@@ -43,4 +43,9 @@ public class Service implements Serializable, Objectable<Service> {
         this.host = "127.0.0.1";
         this.serviceState = serviceState;
     }
+
+
+    public boolean isInstanceOf(ServiceType serviceType) {
+        return this.serviceGroup.getServiceType().equals(serviceType);
+    }
 }

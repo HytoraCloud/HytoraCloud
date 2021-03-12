@@ -133,7 +133,7 @@ public class ServiceCommand {
                                 signBlock.setLine(3, "§8§m------");
                                 signBlock.update(true);
                                 CloudServer.getInstance().getSignManager().getCloudSigns().add(sign);
-                                CloudAPI.getInstance().sendPacket(new PacketInCreateSign(sign));
+                                new PacketInCreateSign(sign).unsafe().send(CloudAPI.getInstance());
                                 new PacketInServiceUpdate(CloudAPI.getInstance().getService()).unsafe().async().send(CloudAPI.getInstance());
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
                             } else {
@@ -208,11 +208,5 @@ public class ServiceCommand {
         cloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
         cloudPlayer.sendMessage("§8§m--------------------------------------");
 
-        CloudAPI.getInstance().getNetwork().getServiceGroupAsync("Lobby", new Consumer<ServiceGroup>() {
-            @Override
-            public void accept(ServiceGroup serviceGroup) {
-                cloudPlayer.connectRandom(serviceGroup);
-            }
-        });
     }
 }

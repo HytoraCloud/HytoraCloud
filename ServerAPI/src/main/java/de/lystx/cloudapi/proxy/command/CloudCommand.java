@@ -18,8 +18,6 @@ import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -60,10 +58,15 @@ public class CloudCommand implements TabCompletable {
                     } else if (args[0].equalsIgnoreCase("shutdown")) {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Cloud will be shut down in §e3 Seconds§8...");
                         CloudAPI.getInstance().setJoinable(false);
-                        for (ProxiedPlayer proxiedPlayer : ProxyServer.getInstance().getPlayers()) {
-                            proxiedPlayer.disconnect(new TextComponent(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!"));
+
+                        int size = CloudAPI.getInstance().getCloudPlayers().getAll().size();
+                        for (CloudPlayer cloudPlayer : CloudAPI.getInstance().getCloudPlayers()) {
+                            cloudPlayer.kick(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!");
+                            size--;
+                            if (size <= 0) {
+                                CloudAPI.getInstance().getNetwork().shutdownCloud();
+                            }
                         }
-                        CloudAPI.getInstance().getNetwork().shutdownCloud();
                     } else {
                         this.help(player);
                     }
@@ -77,13 +80,17 @@ public class CloudCommand implements TabCompletable {
                         }
 
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start a new service of group §a" + group.getName() + "§8...");
-                        CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname)).onDocumentSet(document -> {
-                            String message = document.getString("message");
-                            if (!document.getBoolean("sucess", false)) {
-                                player.sendMessage(CloudAPI.getInstance().getPrefix() + message);
-                            }
-                        });
+                        try {
+                            CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname)).onDocumentSet(document -> {
+                                String message = document.getString("message");
+                                if (!document.getBoolean("sucess", false)) {
+                                    player.sendMessage(CloudAPI.getInstance().getPrefix() + message);
+                                }
+                            });
 
+                        } catch (NullPointerException e) {
+                            //Ignoring everything went well
+                        }
 
                     } else if (args[0].equalsIgnoreCase("log")) {
                         String s = args[1];
