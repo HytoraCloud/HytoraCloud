@@ -29,7 +29,7 @@ public class MavenLibrary {
      */
     public void install(String url) {
         if (!new File(this.libraryService.getDirectory(), path()).exists()) {
-            System.out.println("[Libraries] Downloading dependency for " + groupId + ":" + artifactId + " - " + version + " [" + url + "]");
+            System.out.println("[Libraries] Downloading " + groupId + ":" + artifactId + " Library (Version: " + this.version + ")");
             try {
                 if (!Files.exists(this.getPath())) {
                     Path parent = this.getPath().getParent();

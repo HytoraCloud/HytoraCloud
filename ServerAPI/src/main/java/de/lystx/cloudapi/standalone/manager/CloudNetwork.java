@@ -6,6 +6,8 @@ import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.in.service.*;
+import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacketService;
+import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacketServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.*;
 import de.lystx.cloudsystem.library.elements.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
@@ -15,6 +17,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudNetwork {
@@ -204,6 +209,44 @@ public class CloudNetwork {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets a {@link Service} asynchronous
+     * the {@link Consumer} will be called if the
+     * service is get
+     *
+     * @param name
+     * @param consumer
+     */
+    public void getServiceAsync(String name, Consumer<Service> consumer) {
+        this.cloudAPI.getExecutorService().submit(new Callable<Service>() {
+            @Override
+            public Service call() throws Exception {
+                Service service = cloudAPI.sendQuery(new ResultPacketService(name)).getResultAs(Service.class);
+                consumer.accept(service);
+                return service;
+            }
+        });
+    }
+    /**
+     * Gets a {@link ServiceGroup} asynchronous
+     * the {@link Consumer} will be called if the
+     * service is get
+     *
+     * @param name
+     * @param consumer
+     */
+
+    public void getServiceGroupAsync(String name, Consumer<ServiceGroup> consumer) {
+        this.cloudAPI.getExecutorService().submit(new Callable<ServiceGroup>() {
+            @Override
+            public ServiceGroup call() throws Exception {
+                ServiceGroup service = cloudAPI.sendQuery(new ResultPacketServiceGroup(name)).getResultAs(ServiceGroup.class);
+                consumer.accept(service);
+                return service;
+            }
+        });
     }
 
     /**

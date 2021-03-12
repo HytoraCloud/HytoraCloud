@@ -4,16 +4,86 @@ import com.sun.management.OperatingSystemMXBean;
 import de.lystx.cloudsystem.library.elements.service.Service;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class NetworkInfo {
+
+    private long total;
+    private long free;
+    private long used;
+    private int mb;
+    private boolean calculated;
 
     /**
      * CPU | General
      * @return CPU Usage
      */
     public double getCPUUsage() {
-        return this.getOperatingSystemMX().getSystemCpuLoad() * 100;
+        long nanoBefore = System.nanoTime();
+        long cpuBefore = this.getOperatingSystemMX().getProcessCpuTime();
+
+        long cpuAfter = this.getOperatingSystemMX().getProcessCpuTime();
+        long nanoAfter = System.nanoTime();
+
+        long percent;
+        if (nanoAfter > nanoBefore) {
+            percent = ((cpuAfter - cpuBefore) * 100L) / (nanoAfter - nanoBefore);
+        } else {
+            percent = 0;
+        }
+
+        return percent;
+    }
+
+
+    public void calculate() {
+        Runtime runtime = Runtime.getRuntime();
+
+        this.mb = 1024 * 1024;
+
+        this.total = runtime.totalMemory();
+        this.free = runtime.freeMemory();
+        this.used = this.total - this.free;
+        this.calculated = true;
+    }
+
+    public long getTotalMemory() {
+        if (!this.calculated) {
+            try {
+                throw new IllegalAccessException("Could not access this information because NetworkInfo#calculate() wasn't called!");
+            } catch (IllegalAccessException ignored) { }
+        }
+        return total / mb;
+    }
+
+    public long getUsedMemory() {
+        return this.getOperatingSystemMX().getCommittedVirtualMemorySize();
+    }
+
+    public long getFreeMemory() {
+        return this.getOperatingSystemMX().getFreePhysicalMemorySize();
+    }
+
+    public double getUsedCPU() {
+        if (!this.calculated) {
+            try {
+                throw new IllegalAccessException("Could not access this information because NetworkInfo#calculate() wasn't called!");
+            } catch (IllegalAccessException ignored) { }
+        }
+        return ((double) used / (double) total) * 100;
+    }
+
+    public double getFreeCPU() {
+        if (!this.calculated) {
+            try {
+                throw new IllegalAccessException("Could not access this information because NetworkInfo#calculate() wasn't called!");
+            } catch (IllegalAccessException ignored) { }
+        }
+        return ((double) free / (double) total) * 100;
     }
 
     /**

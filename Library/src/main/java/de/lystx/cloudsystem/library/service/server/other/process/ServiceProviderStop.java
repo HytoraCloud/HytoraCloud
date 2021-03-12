@@ -32,15 +32,13 @@ public class ServiceProviderStop {
      */
     public void stopService(Service service, Consumer<Service> consumer) {
         try {
-            String serverName = service.getName();
-            CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getMap().get(serverName);
+            CloudScreen screen = this.cloudLibrary.getService(ScreenService.class).getMap().get(service.getName());
             if (screen == null || screen.getServerDir() == null) {
                 return;
             }
-
+            screen.getThread().stop();
             screen.getProcess().destroy();
             Scheduler.getInstance().scheduleDelayedTaskAsync(() -> {
-
                 Constants.THREAD_POOL.execute(() -> {
                     if (service.getServiceGroup().isDynamic()) {
                         try {

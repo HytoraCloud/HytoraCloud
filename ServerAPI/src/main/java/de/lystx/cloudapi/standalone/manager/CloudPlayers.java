@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 
 @Setter
@@ -102,6 +103,24 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public CloudPlayer get(String name) {
         return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    /**
+     * Returns a Stream {@link CloudPlayer}
+     * @param name
+     * @return
+     */
+    public Stream<CloudPlayer> getAsStream(String name) {
+        return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getName().equalsIgnoreCase(name));
+    }
+
+    /**
+     * Returns a Stream {@link CloudPlayer}
+     * @param uuid
+     * @return
+     */
+    public Stream<CloudPlayer> getAsStream(UUID uuid) {
+        return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getUniqueId().equals(uuid));
     }
 
     /**

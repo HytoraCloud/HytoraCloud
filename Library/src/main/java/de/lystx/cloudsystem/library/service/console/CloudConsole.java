@@ -94,8 +94,8 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     }
 
     @Override
-    public void sendMessage(String message) {
-        this.logger.sendMessage(message);
+    public void sendMessage(Object message) {
+        this.logger.sendMessage(message.toString());
     }
 
     @Override

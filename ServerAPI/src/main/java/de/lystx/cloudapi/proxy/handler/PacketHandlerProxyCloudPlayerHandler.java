@@ -5,6 +5,7 @@ import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
 import de.lystx.cloudsystem.library.elements.packets.both.*;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +14,8 @@ import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
+
+import java.util.List;
 
 @Getter @AllArgsConstructor
 public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
@@ -46,6 +49,12 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
                 return;
             }
             player.connect(serverInfo);
+        } else if (packet instanceof PacketConnectGroup) {
+            PacketConnectGroup group = (PacketConnectGroup) packet;
+            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(group.getName());
+
+            List<Service> service = CloudAPI.getInstance().getNetwork().getServices(CloudAPI.getInstance().getNetwork().getServiceGroup(group.getGroup()));
+
         } else if (packet instanceof PacketKickPlayer) {
             PacketKickPlayer kick = (PacketKickPlayer)packet;
             ProxyServer.getInstance().getPlayer(kick.getName()).disconnect(kick.getReason());

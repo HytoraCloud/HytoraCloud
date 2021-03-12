@@ -64,6 +64,8 @@ public class NPCListener implements Listener {
         if (player.getOpenInventory() != null && !serviceMap.isEmpty()) {
             event.setCancelled(true);
             if (event.getCurrentItem().getType().equals(Material.valueOf(CloudServer.getInstance().getNpcManager().getNpcConfig().getItemType()))) {
+
+
                 CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
                 if (cloudPlayer == null) {
                     player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cCouldn't find you in global CloudPlayers!");

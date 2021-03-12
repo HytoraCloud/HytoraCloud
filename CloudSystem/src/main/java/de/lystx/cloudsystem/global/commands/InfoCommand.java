@@ -29,7 +29,7 @@ public class InfoCommand implements TabCompletable {
         if (args.length == 1) {
             switch (args[0]) {
                 case "servers":
-                    sender.sendMessage("INFO", "SERVERS (ONLINE) : ");
+                    sender.sendMessage("INFO", "Online Servers : ");
                     for (Service serverMeta : cloudInstance.getService().getGlobalServices()) {
                         if (cloudInstance.getService().getService(serverMeta.getName()) == null) {
                             continue;
@@ -41,12 +41,12 @@ public class InfoCommand implements TabCompletable {
                     }
                     return;
                 case "groups":
-                    sender.sendMessage("INFO", "GROUPS: ");
+                    sender.sendMessage("INFO", "Groups: ");
                     for (ServiceGroup serverGroupMeta : cloudInstance.getService(GroupService.class).getGroups())
                         sender.sendMessage("INFO", "NAME: " + serverGroupMeta.getName() + " | TEMPLATE: " + serverGroupMeta.getTemplate());
                     return;
                 case "proxys":
-                    sender.sendMessage("INFO", "PROXYS: ");
+                    sender.sendMessage("INFO", "Proxies: ");
                     for (Service serverMeta : cloudInstance.getService().getGlobalServices()) {
                         if (cloudInstance.getService().getService(serverMeta.getName()) == null) {
                             continue;
@@ -58,18 +58,19 @@ public class InfoCommand implements TabCompletable {
                     }
             }
         } else {
-            NetworkInfo networkInfo = new NetworkInfo();
             DecimalFormat format = new DecimalFormat("##.#");
+            NetworkInfo networkInfo = new NetworkInfo();
+            networkInfo.calculate();
+
             sender.sendMessage("INFO", "§7----------------------------------");
-            sender.sendMessage("INFO", "§bNewest version §a: §f" + (Updater.isUpToDate() ? "§aYes": "§cNo"));
             sender.sendMessage("INFO", "§bVersion §a: §f" + Updater.getCloudVersion());
             sender.sendMessage("INFO", "§bCPU-Usage §a: §f" + format.format(networkInfo.getCPUUsage()) + "%");
-            sender.sendMessage("INFO", "§bSystem Memory §a: §f" + format.format(networkInfo.getSystemMemory()) + "/?");
             sender.sendMessage("INFO", "§bInternal CPU-Usage §a: §f" + format.format(networkInfo.getInternalCPUUsage()) + "%");
-            sender.sendMessage("INFO", "§bMX OS §a: §f" + networkInfo.getOperatingSystemMX().getName());
+            sender.sendMessage("INFO", "§bServer CPU §f: §a" + format.format(networkInfo.getUsedCPU()) + "%§h/§c" + format.format(networkInfo.getFreeCPU()));
+            sender.sendMessage("INFO", "§bServer Memory §f: §a" + format.format(networkInfo.getUsedMemory()) + "§h/§c" + format.format(networkInfo.getFreeMemory()) + " §h(§eTotal§8h: §7" + format.format(networkInfo.getTotalMemory()) + "§h)");
+
             sender.sendMessage("INFO", "§bTPS §a: §f" + networkInfo.formatTps(cloudInstance.getTicksPerSecond().getTPS()));
-            sender.sendMessage("INFO", "§bCloud-Host §a: §f" + cloudInstance.getService(ConfigService.class).getNetworkConfig().getHost());
-            sender.sendMessage("INFO", "§bCloud-Port §a: §f" + cloudInstance.getService(ConfigService.class).getNetworkConfig().getPort());
+            sender.sendMessage("INFO", "§bConnection §a: §f" + cloudInstance.getService(ConfigService.class).getNetworkConfig().getHost() + ":" + cloudInstance.getService(ConfigService.class).getNetworkConfig().getPort());
             sender.sendMessage("INFO", "§7----------------------------------");
             sender.sendMessage("INFO", "§9info <servers> §7| §bLists all servers");
             sender.sendMessage("INFO", "§9info <groups> §7| §bLists all groups");
@@ -77,6 +78,7 @@ public class InfoCommand implements TabCompletable {
             sender.sendMessage("INFO", "§9info §7| §bLists all infos");
         }
     }
+
 
     @Override
     public List<String> onTabComplete(CloudLibrary cloudLibrary, String[] args) {

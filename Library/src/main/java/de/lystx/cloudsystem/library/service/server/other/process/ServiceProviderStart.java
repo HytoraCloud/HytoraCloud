@@ -177,7 +177,7 @@ public class ServiceProviderStart {
                     eula.write("eula=true");
                     eula.flush();
                     eula.close();
-                } catch (IOException exception) {
+                } catch (IOException ignored) {
 
                 } finally {
                     if (eula != null) {
@@ -249,13 +249,19 @@ public class ServiceProviderStart {
                     "-jar",
                     jarFile,
                     service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT) ? "nogui" : "");
-            processBuilder.directory(serverLocation);
-            Process process = processBuilder.start();
-            CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());
-            this.cloudLibrary.getService(Scheduler.class).scheduleDelayedTask(() -> {
+
+            new Thread(() -> {
+                processBuilder.directory(serverLocation);
+                Process process = null;
+                try {
+                    process = processBuilder.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());
                 this.cloudLibrary.getService(ScreenService.class).getMap().put(cloudScreen.getName(), cloudScreen);
                 cloudScreen.start();
-            }, 3L);
+            }, "service_starter_" + service.getName()).start();
             return true;
         } catch (IOException e) {
             e.printStackTrace();

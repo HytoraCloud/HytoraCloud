@@ -51,7 +51,7 @@ public interface CloudCommandSender {
      * Sends message
      * @param message
      */
-    void sendMessage(String message);
+    void sendMessage(Object message);
 
     /**
      * Sends component

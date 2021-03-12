@@ -2,6 +2,8 @@ package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.packets.both.*;
+import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.player.featured.CloudInventory;
@@ -75,8 +77,8 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * Sends a message
      * @param message
      */
-    public void sendMessage(String message) {
-        PacketSendMessage sendMessage = new PacketSendMessage(this.uniqueId, message);
+    public void sendMessage(Object message) {
+        PacketSendMessage sendMessage = new PacketSendMessage(this.uniqueId, message.toString());
         Constants.EXECUTOR.sendPacket(sendMessage);
     }
 
@@ -134,6 +136,31 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
     public void connect(String server) {
         PacketConnectServer sendToServer = new PacketConnectServer(this.name, server);
         Constants.EXECUTOR.sendPacket(sendToServer);
+    }
+
+    /**
+     * Connects to a {@link Service}
+     * @param service
+     */
+    public void connect(Service service) {
+        this.connect(service.getName());
+    }
+
+    /**
+     * Sends player to a random service
+     * @param serviceGroup
+     */
+    public void connectRandom(ServiceGroup serviceGroup) {
+        this.connect(serviceGroup.getName());
+    }
+
+    /**
+     * Sends player to a random service
+     * @param serviceGroup
+     */
+    public void connectRandom(String serviceGroup) {
+        PacketConnectGroup sendToGroup = new PacketConnectGroup(this.name, serviceGroup);
+        Constants.EXECUTOR.sendPacket(sendToGroup);
     }
 
     /**

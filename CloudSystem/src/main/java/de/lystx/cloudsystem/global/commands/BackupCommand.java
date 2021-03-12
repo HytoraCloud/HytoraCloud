@@ -1,6 +1,5 @@
 package de.lystx.cloudsystem.global.commands;
 
-import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.service.backup.BackupService;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;

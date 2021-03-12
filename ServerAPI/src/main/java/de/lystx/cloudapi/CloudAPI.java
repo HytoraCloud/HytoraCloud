@@ -214,6 +214,7 @@ public class CloudAPI implements CloudService {
             try {
                 this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketInRegister(this.getService())));
                 this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
+
             } catch (Exception e) {
                 System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
                 e.printStackTrace();
@@ -241,7 +242,6 @@ public class CloudAPI implements CloudService {
     public void sendCommand(String command) {
         new PacketCommand("null", command).unsafe().async().send(this);
     }
-
 
     /**
      * Sends a packet to the the cloudSystem
