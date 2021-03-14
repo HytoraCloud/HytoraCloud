@@ -4,7 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;

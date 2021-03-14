@@ -64,7 +64,7 @@ public class ServiceProviderStop {
                 this.service.notifyStop(service);
                 this.cloudLibrary.getService(ScreenService.class).getMap().remove(screen.getName());
                 consumer.accept(service);
-            }, 3L);
+            }, 5L);
         } catch (Exception e) {
             e.printStackTrace();
         }

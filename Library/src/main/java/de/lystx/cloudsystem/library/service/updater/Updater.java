@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.elements.featured.updater;
+package de.lystx.cloudsystem.library.service.updater;
 
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.console.progressbar.ProgressBar;
@@ -120,7 +120,7 @@ public class Updater {
      * @return current version of cloud
      */
     public static String getCloudVersion() {
-        return "BETA-1.6.9";
+        return "BETA-1.7.1";
     }
 
     /**

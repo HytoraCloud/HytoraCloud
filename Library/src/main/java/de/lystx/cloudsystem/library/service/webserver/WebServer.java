@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.elements.featured.webserver;
+package de.lystx.cloudsystem.library.service.webserver;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;

@@ -5,7 +5,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceS
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInUpdateServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import io.vson.elements.object.VsonObject;
 import lombok.AllArgsConstructor;

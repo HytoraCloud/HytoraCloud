@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.elements.service;
 
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
 import lombok.Getter;

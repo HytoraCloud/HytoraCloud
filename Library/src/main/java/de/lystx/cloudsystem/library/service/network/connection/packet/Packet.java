@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.function.Consumer;
 
 public class Packet implements Serializable {

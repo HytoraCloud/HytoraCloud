@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import io.vson.elements.object.Objectable;
 import lombok.Getter;
 import lombok.Setter;

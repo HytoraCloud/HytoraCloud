@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.global.commands;
 
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.featured.updater.Updater;
+import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;

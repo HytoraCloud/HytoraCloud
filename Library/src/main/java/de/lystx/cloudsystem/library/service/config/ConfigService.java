@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.service.config;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;

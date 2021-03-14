@@ -18,7 +18,7 @@ import de.lystx.cloudapi.bukkit.manager.other.CloudManager;
 import de.lystx.cloudapi.bukkit.utils.CloudPermissibleBase;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;

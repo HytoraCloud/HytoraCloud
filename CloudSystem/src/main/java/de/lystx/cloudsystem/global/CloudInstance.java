@@ -2,8 +2,8 @@ package de.lystx.cloudsystem.global;
 
 import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
-import de.lystx.cloudsystem.library.elements.featured.updater.Updater;
+import de.lystx.cloudsystem.library.enums.CloudType;
+import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInShutdown;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutNPC;
@@ -28,7 +28,7 @@ import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import de.lystx.cloudsystem.library.service.util.LogService;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;
-import de.lystx.cloudsystem.library.elements.featured.webserver.WebServer;
+import de.lystx.cloudsystem.library.service.webserver.WebServer;
 import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
 

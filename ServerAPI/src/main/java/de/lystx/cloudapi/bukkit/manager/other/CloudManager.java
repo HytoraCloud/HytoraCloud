@@ -4,7 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceStateChange;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;

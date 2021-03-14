@@ -1,6 +1,7 @@
 package de.lystx.cloudapi.proxy.listener;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import de.lystx.cloudapi.CloudAPI;
@@ -26,16 +27,18 @@ public class ProxyPingListener implements Listener {
 
     private final CloudAPI cloudAPI;
     private int nullPointers;
+    private int pings;
 
     public ProxyPingListener() {
         this.cloudAPI = CloudAPI.getInstance();
         this.nullPointers = 0;
+        this.pings = 0;
     }
 
     @EventHandler
     public void onProxyPing(ProxyPingEvent event) {
         try {
-            this.cloudAPI.sendPacket(new PacketInNetworkPing());
+            new PacketInNetworkPing().unsafe().async().send(this.cloudAPI);
             int port = event.getConnection().getVirtualHost().getPort();
             ServerPing ping = event.getResponse();
 
@@ -43,7 +46,10 @@ public class ProxyPingListener implements Listener {
             if (!proxyConfig.isEnabled()) {
                 return;
             }
-            Motd motd = this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance() ? proxyConfig.getMotdMaintenance() : proxyConfig.getMotdNormal();
+            Motd motd = this.newMotd();
+            if (!motd.isEnabled()) {
+                return;
+            }
             UUID uniqueId = CloudAPI.getInstance().getPermissionPool().fromIP(event.getConnection().getAddress().getAddress().getHostAddress());
             if (uniqueId != null) {
                 CloudConnection cloudConnection = new CloudConnection(
@@ -89,8 +95,24 @@ public class ProxyPingListener implements Listener {
 
     }
 
+    public Motd newMotd() {
+        Motd motd;
+        List<Motd> motds;
+        if (this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance()) {
+            motds = CloudProxy.getInstance().getProxyConfig().getMotdMaintenance();
+        } else {
+            motds = CloudProxy.getInstance().getProxyConfig().getMotdMaintenance();
+        }
 
-
+        try {
+            motd = motds.get(this.pings);
+            this.pings++;
+        } catch (Exception e) {
+            this.pings = 0;
+            motd = motds.get(this.pings);
+        }
+        return motd;
+    }
 
     public String replace(String string, int port) {
         Service service = CloudAPI.getInstance().getNetwork().getProxy(port);

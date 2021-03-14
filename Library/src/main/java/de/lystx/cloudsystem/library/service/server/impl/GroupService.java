@@ -1,13 +1,14 @@
 package de.lystx.cloudsystem.library.service.server.impl;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.file.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
+import io.vson.elements.VsonArray;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -42,6 +43,32 @@ public class GroupService extends CloudService {
                         if (!document.has("values")) {
                             document.append("values", new SerializableDocument());
                             document.save();
+                        } else {
+                            final VsonObject values = document.getVson("values", VsonSettings.OVERRITE_VALUES);
+                            if (values.has("proxyConfig")) {
+                                final VsonObject proxyConfig = values.getVson("proxyConfig", VsonSettings.OVERRITE_VALUES);
+                                if (!proxyConfig.get("motdMaintenance").isArray()) {
+                                    final VsonObject vson = proxyConfig.getVson("motdMaintenance", VsonSettings.OVERRITE_VALUES);
+                                    VsonArray vsonArray = new VsonArray().append(vson);
+                                    proxyConfig.append("motdMaintenance", vsonArray);
+                                }
+                                if (!proxyConfig.get("motdNormal").isArray()) {
+                                    final VsonObject vson = proxyConfig.getVson("motdNormal", VsonSettings.OVERRITE_VALUES);
+                                    VsonArray vsonArray = new VsonArray().append(vson);
+                                    proxyConfig.append("motdNormal", vsonArray);
+                                }
+                                if (!proxyConfig.get("tabList").isArray()) {
+                                    final VsonObject vson = proxyConfig.getVson("tabList", VsonSettings.OVERRITE_VALUES);
+                                    VsonArray vsonArray = new VsonArray().append(vson);
+                                    proxyConfig.append("tabList", vsonArray);
+                                }
+                                if (!proxyConfig.has("tabListDelay")) {
+                                    proxyConfig.append("tabListDelay", 20L);
+                                }
+                                values.append("proxyConfig", proxyConfig);
+                                document.append("values", values);
+                                document.save();
+                            }
                         }
                         this.groups.add(document.getAs(ServiceGroup.class));
                     } catch (IOException e) {

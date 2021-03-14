@@ -9,7 +9,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.service.*;
 import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacketService;
 import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacketServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.*;
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -17,8 +17,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 @Getter @Setter

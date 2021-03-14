@@ -3,7 +3,7 @@ package de.lystx.cloudapi.proxy.command;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketTPS;
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;

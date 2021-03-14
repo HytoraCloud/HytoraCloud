@@ -1,16 +1,15 @@
 package de.lystx.cloudsystem.library.service.server.other.process;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.elements.enums.Spigot;
+import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
@@ -142,7 +141,7 @@ public class ServiceProviderStart {
                         "  - disabledcommandhere\n" +
                         "servers:\n" +
                         "  Lobby-1:\n" +
-                        "    motd: '" + config.getMotdMaintenance().getFirstLine() + "'\n" +
+                        "    motd: '" + "MOTD" + "'\n" +
                         "    address: '127.0.0.1:" + this.cloudLibrary.getService(ConfigService.class).getNetworkConfig().getNetworkConfig().getServerStartPort() + "'\n" +
                         "    restricted: false\n" +
                         "listeners:\n" +

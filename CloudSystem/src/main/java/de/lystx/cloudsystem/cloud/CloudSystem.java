@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.cloud.handler.ReceiverManager;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.cloud.commands.PlayerCommand;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.CloudServiceType;

@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.elements.enums;
+package de.lystx.cloudsystem.library.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

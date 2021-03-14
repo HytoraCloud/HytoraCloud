@@ -4,7 +4,7 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.elements.enums.Spigot;
+import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;

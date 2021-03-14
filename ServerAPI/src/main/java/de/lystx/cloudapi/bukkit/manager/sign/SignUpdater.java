@@ -5,7 +5,7 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.SignGroup;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;

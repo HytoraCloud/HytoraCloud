@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.receiver.booting;
 
-import de.lystx.cloudsystem.library.elements.featured.updater.Updater;
+import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLogin;
 import de.lystx.cloudsystem.library.service.config.ConfigService;

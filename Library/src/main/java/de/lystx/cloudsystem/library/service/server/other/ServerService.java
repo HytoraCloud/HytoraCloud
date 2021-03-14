@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.service.server.other;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.enums.CloudType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
@@ -11,7 +11,7 @@ import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutStopSe
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.elements.enums.ServiceState;
+import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;

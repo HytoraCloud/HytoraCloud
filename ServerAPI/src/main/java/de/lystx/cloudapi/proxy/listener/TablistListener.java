@@ -3,15 +3,9 @@ package de.lystx.cloudapi.proxy.listener;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
-import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
-import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
+import de.lystx.cloudapi.proxy.events.player.ProxyServerPlayerNetworkJoinEvent;
+import de.lystx.cloudapi.proxy.events.player.ProxyServerPlayerNetworkQuitEvent;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
-import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -20,62 +14,30 @@ import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.util.List;
+
 public class TablistListener implements Listener {
 
     private final CloudAPI cloudAPI;
+    private int tabInits = 0;
 
     public TablistListener() {
         this.cloudAPI = CloudAPI.getInstance();
-        this.cloudAPI.getCloudClient().registerHandler(new NetworkHandler() {
-            @Override
-            public void onServerStart(Service service) {}
-
-            @Override
-            public void onServerQueue(Service service) { }
-
-            @Override
-            public void onServerStop(Service service) {}
-
-            @Override
-            public void onServerUpdate(Service service) {}
-
-            @Override
-            public void onGroupUpdate(ServiceGroup group) { }
-
-            @Override
-            public void onPlayerJoin(CloudPlayer cloudPlayer) {
-                doUpdate();
-            }
-
-            @Override
-            public void onServerChange(CloudPlayer cloudPlayer, String server) {}
-
-            @Override
-            public void onPlayerQuit(CloudPlayer cloudPlayer) {
-                doUpdate();
-            }
-
-            @Override
-            public void onNetworkPing(CloudConnection connectionUUID) {}
-
-            @Override
-            public void onDocumentReceive(String channel, String key, Document document, ServiceType type) {}
-        });
     }
 
     public void updateTab() {
-        ProxyConfig proxyConfig = this.cloudAPI.getService().getServiceGroup().getValues().has("proxyConfig") ? this.cloudAPI.getService().getServiceGroup().getValues().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
-        TabList tabList = proxyConfig.getTabList();
+        ProxyServer.getInstance().getPlayers().forEach(this::updateTab);
+    }
+
+    public void updateTab(ProxiedPlayer player) {
+        TabList tabList = this.newTabList();
         if (!CloudProxy.getInstance().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
             return;
         }
-        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-            player.setTabHeader(
-                    new TextComponent(this.replace(tabList.getHeader(), player)),
-                    new TextComponent(this.replace(tabList.getFooter(), player))
-            );
-        }
-
+        player.setTabHeader(
+                new TextComponent(this.replace(tabList.getHeader(), player)),
+                new TextComponent(this.replace(tabList.getFooter(), player))
+        );
     }
 
     public String replace(String string, ProxiedPlayer player) {
@@ -100,15 +62,46 @@ public class TablistListener implements Listener {
         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(this::updateTab, 5L);
     }
 
+    public TabList newTabList() {
+        TabList tabList;
+        List<TabList> tabLists = CloudProxy.getInstance().getProxyConfig().getTabList();
+        if (tabLists.size() == 1) {
+            return tabLists.get(0);
+        }
+        try {
+            tabList = tabLists.get(this.tabInits);
+            this.tabInits++;
+        } catch (Exception e) {
+            this.tabInits = 0;
+            tabList = tabLists.get(this.tabInits);
+        }
+        return tabList;
+    }
+
     @EventHandler
     public void on(ServerConnectedEvent e) {
         this.doUpdate();
     }
 
+    @EventHandler
+    public void on(ProxyServerPlayerNetworkJoinEvent event) {
+        this.doUpdate();
+    }
 
     @EventHandler
-    public void on(PlayerDisconnectEvent e) {
+    public void on(ProxyServerPlayerNetworkQuitEvent event) {
         this.doUpdate();
+    }
+
+    @EventHandler
+    public void on(PostLoginEvent event) {
+        if (CloudProxy.getInstance().getProxyConfig().getTabList().size() > 1) {
+            this.cloudAPI.getScheduler().scheduleRepeatingTask(
+                    () -> updateTab(event.getPlayer()),
+                    CloudProxy.getInstance().getProxyConfig().getTabListDelay(),
+                    CloudProxy.getInstance().getProxyConfig().getTabListDelay()
+            );
+        }
     }
 
 }
