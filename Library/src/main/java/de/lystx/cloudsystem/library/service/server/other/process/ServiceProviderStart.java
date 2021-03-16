@@ -9,13 +9,14 @@ import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.util.Action;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -46,17 +47,6 @@ public class ServiceProviderStart {
      * @return if success
      */
     public boolean autoStartService(ServerService serverService, Service service, SerializableDocument propertiess) {
-
-        /*
-        NetworkInfo networkInfo = new NetworkInfo();
-        int maxCPU = 0;
-        int memory = networkInfo.getUsedMemory(cloudLibrary.getService(ServerService.class).getRealOnlineServices());
-
-        if (networkInfo.getCPUUsage() >= memory + service.getServiceGroup().getMaxRam()) {
-            cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cThere is no more CPU available to start a new service! Max: §e" + maxCPU + " §c, Current: §e" + networkInfo.getCPUUsage());
-            return false;
-        }
-        */
 
         if (!new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), "spigot.jar").exists() || !new File(cloudLibrary.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar").exists()) {
             cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cCouldn't start Service §e" + service.getName() + " §cbecause either §espigot.jar §cor §ebungeeCord.jar §cwas found!");
@@ -218,11 +208,12 @@ public class ServiceProviderStart {
             }
             File cloud = new File(serverLocation + "/CLOUD/");
             cloud.mkdirs();
-            VsonObject document = new VsonObject();
+            VsonObject document = new VsonObject(new File(cloud, "connection.json"), VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.putAll(service);
-            document.save(new File(cloud, "connection.json"));
+            document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            document.save();
 
-            ProcessBuilder processBuilder = new ProcessBuilder(
+            String[] command = new String[]{
                     "java",
                     "-XX:+UseG1GC",
                     "-XX:MaxGCPauseMillis=50",
@@ -247,20 +238,15 @@ public class ServiceProviderStart {
                     "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
                     "-jar",
                     jarFile,
-                    service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : "");
+                    service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : ""
+            };
 
-            new Thread(() -> {
-                processBuilder.directory(serverLocation);
-                Process process = null;
-                try {
-                    process = processBuilder.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            Threader.getInstance().startProcess(command, serverLocation, process -> {
                 CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());
-                this.cloudLibrary.getService(ScreenService.class).getMap().put(cloudScreen.getName(), cloudScreen);
+                cloudLibrary.getService(ScreenService.class).getMap().put(cloudScreen.getScreenName(), cloudScreen);
                 cloudScreen.start();
-            }, "service_starter_" + service.getName()).start();
+            });
+
             return true;
         } catch (IOException e) {
             e.printStackTrace();

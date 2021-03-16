@@ -36,10 +36,8 @@ public class Reflections {
 
     public static <T> void invokeUnsafe(Object invoke, String methodName, Class<?>[] classes, Class<T> tClass, Object... args) {
         int max = classes.length;
-        Class[] cl = new Class[classes.length + 1];
-        for (int i = 0; i < classes.length; i++) {
-            cl[i] = classes[i];
-        }
+        Class<?>[] cl = new Class[classes.length + 1];
+        System.arraycopy(classes, 0, cl, 0, classes.length);
         cl[max] = tClass;
         try {
             invoke.getClass().getMethod(methodName, cl).invoke(invoke, args);

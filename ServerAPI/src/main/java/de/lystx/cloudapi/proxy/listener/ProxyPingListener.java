@@ -3,6 +3,7 @@ package de.lystx.cloudapi.proxy.listener;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
@@ -57,9 +58,8 @@ public class ProxyPingListener implements Listener {
                         this.cloudAPI.getPermissionPool().tryName(uniqueId),
                         event.getConnection().getAddress().getAddress().getHostAddress()
                 );
-                for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                    networkHandler.onNetworkPing(cloudConnection);
-                }
+                this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onNetworkPing(cloudConnection));
+
                 ProxyServerMotdRequestEvent proxyServerMotdRequestEvent = ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerMotdRequestEvent(cloudConnection));
                 if (proxyServerMotdRequestEvent.getMotd() != null) {
                     motd = proxyServerMotdRequestEvent.getMotd();
@@ -73,9 +73,9 @@ public class ProxyPingListener implements Listener {
                 String[] playerInfo = (motd.getProtocolString().replace("||", "-_-")).split("-_-");
 
                 ServerPing.PlayerInfo[] playerInfos = new ServerPing.PlayerInfo[playerInfo.length];
-                for (short i = 0; i < playerInfos.length; i++) {
+                IntStream.range(0, playerInfos.length).forEach(i -> {
                     playerInfos[i] = new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(playerInfo[i].replace("-_-", ""), port)), UUID.randomUUID());
-                }
+                });
                 ping.setPlayers(new ServerPing.Players(proxyConfig.getMaxPlayers(), CloudAPI.getInstance().getCloudPlayers().getAll().size(), playerInfos));
 
             }
@@ -101,7 +101,7 @@ public class ProxyPingListener implements Listener {
         if (this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance()) {
             motds = CloudProxy.getInstance().getProxyConfig().getMotdMaintenance();
         } else {
-            motds = CloudProxy.getInstance().getProxyConfig().getMotdMaintenance();
+            motds = CloudProxy.getInstance().getProxyConfig().getMotdNormal();
         }
 
         try {

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,12 +12,12 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 @Getter @Setter
-public class CloudScreen {
+public class CloudScreen extends Thread{
 
     private final Thread thread;
     private final Process process;
     private final File serverDir;
-    private final String name;
+    private final String screenName;
     private final List<String> cachedLines;
 
     private InputStream inputStream;
@@ -29,14 +28,15 @@ public class CloudScreen {
     private CloudScreenPrinter screenPrinter;
     private CloudConsole cloudConsole;
 
-    public CloudScreen(Thread thread, Process process, File serverDir, String name) {
+    public CloudScreen(Thread thread, Process process, File serverDir, String screenName) {
         this.thread = thread;
         this.process = process;
         this.serverDir = serverDir;
-        this.name = name;
+        this.screenName = screenName;
         this.cachedLines = new LinkedList<>();
         this.running = false;
     }
+
 
     /**
      * Starts the screen printing
@@ -44,7 +44,7 @@ public class CloudScreen {
      * if (true) > Prints line
      * And caches line
      */
-    public void start() {
+    public void run() {
         this.running = true;
         this.inputStream = process.getInputStream();
         this.reader = new Scanner(inputStream);
@@ -56,8 +56,8 @@ public class CloudScreen {
                 }
                 this.cachedLines.add(line);
                 if (screenPrinter != null && cloudConsole != null && screenPrinter.getScreen() != null) {
-                    if (screenPrinter.getScreen().getName().equalsIgnoreCase(this.name)) {
-                        this.cloudConsole.getLogger().sendMessage("§9[§b" + this.name + "§9]§f " + line);
+                    if (screenPrinter.getScreen().getScreenName().equalsIgnoreCase(this.screenName)) {
+                        this.cloudConsole.getLogger().sendMessage("§9[§b" + this.screenName + "§9]§f " + line);
                     }
                 }
             } catch (NoSuchElementException e) {
@@ -65,11 +65,4 @@ public class CloudScreen {
             }
         }
     }
-
-    public void stop() throws IOException {
-        /**
-         * Empty method beacuse it crashed
-         */
-    }
-
 }

@@ -32,7 +32,7 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
         } else if (packet instanceof PacketFallback) {
 
             PacketFallback fallback = (PacketFallback) packet;
-            CloudProxy.getInstance().getHubManager().sendPlayerToFallback(CloudAPI.getInstance().getCloudPlayers().get(fallback.getName()));
+            CloudProxy.getInstance().getHubManager().sendPlayerToFallback(ProxyServer.getInstance().getPlayer(fallback.getName()));
         } else if (packet instanceof PacketSendComponent) {
             PacketSendComponent packetSendComponent = (PacketSendComponent)packet;
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetSendComponent.getUuid());
@@ -86,10 +86,7 @@ public class PacketHandlerProxyCloudPlayerHandler extends PacketHandlerAdapter {
 
             }
         });
-
-        for (CloudComponent component : cloudComponent.getCloudComponents()) {
-            textComponent.addExtra(this.fromCloud(component));
-        }
+        cloudComponent.getCloudComponents().forEach(component -> textComponent.addExtra(this.fromCloud(component)));
         return textComponent;
     }
 }

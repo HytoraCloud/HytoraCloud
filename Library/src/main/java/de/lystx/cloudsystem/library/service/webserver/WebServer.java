@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.library.service.webserver;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.FileFormat;
 import io.vson.enums.VsonSettings;

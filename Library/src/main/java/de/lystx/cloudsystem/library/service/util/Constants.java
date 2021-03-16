@@ -1,10 +1,13 @@
 package de.lystx.cloudsystem.library.service.util;
 
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -16,6 +19,8 @@ public class Constants {
     public static final Executor THREAD_POOL = Executors.newFixedThreadPool(1);
 
     public static PermissionPool PERMISSION_POOL = null;
+
+    public static final PermissionGroup DEFAULT_PERMISSION_GROUP = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new SerializableDocument());
 
     public static final String PASTE_SERVER_URL_DOCUMENTS = "https://paste.labymod.net/documents";
     public static final String PASTE_SERVER_URL = "https://paste.labymod.net/";

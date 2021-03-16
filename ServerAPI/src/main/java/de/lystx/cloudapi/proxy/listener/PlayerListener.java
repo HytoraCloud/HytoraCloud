@@ -126,7 +126,7 @@ public class PlayerListener implements Listener {
         try {
             ProxiedPlayer player = event.getPlayer();
             if (player.getServer() == null || player.getServer().getInfo() == null || player.getServer().getInfo().getName() == null) {
-                ServerInfo serverInfo = CloudProxy.getInstance().getHubManager().getInfo(CloudAPI.getInstance().getCloudPlayers().get(player.getName()));
+                ServerInfo serverInfo = CloudProxy.getInstance().getHubManager().getInfo(player);
                 if (serverInfo == null) {
                     player.disconnect(CloudAPI.getInstance().getPrefix() + "§cNo fallback-server was found!");
                     return;

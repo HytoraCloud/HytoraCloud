@@ -20,10 +20,7 @@ public class PacketHandlerProxyStop extends PacketHandlerAdapter {
             PacketOutStopServer packetOutStopServer = (PacketOutStopServer)packet;
             Service service = packetOutStopServer.getService();
             if (service.getName().equalsIgnoreCase(cloudAPI.getService().getName())) {
-
-                for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-                    player.disconnect(this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix()));
-                }
+                ProxyServer.getInstance().getPlayers().forEach(player ->  player.disconnect(this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix())));
                 this.cloudAPI.getScheduler().scheduleDelayedTask(ProxyServer.getInstance()::stop, 1L);
             }
         }

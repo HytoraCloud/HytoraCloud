@@ -116,7 +116,6 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
         //NETWORK
         this.libraryService.install("io.netty", "netty-all", "4.1.44.Final", Repository.CENTRAL);
-        this.libraryService.install("io.netty", "netty-all", "4.0.0.CR1", Repository.CENTRAL);
 
         //Logging and Console
         this.libraryService.install("jline", "jline", "2.14.6", Repository.CENTRAL);

@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.library.service.serverselector.sign;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.DefaultSignLayout;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.SignLayOut;

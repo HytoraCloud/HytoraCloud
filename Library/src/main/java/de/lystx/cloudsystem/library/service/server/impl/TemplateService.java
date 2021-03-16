@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import io.vson.elements.object.VsonObject;

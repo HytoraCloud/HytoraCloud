@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 @Getter @Setter
 public class NPCManager {
@@ -54,13 +55,10 @@ public class NPCManager {
     }
 
     public NPC getNPC(Location location) {
-        for (NPC npcV18R3V18R3 : this.npcs.keySet()) {
-            Location loc = npcV18R3V18R3.getLocation();
-            if (loc.getBlockX() == location.getBlockX() && loc.getBlockY() == location.getBlockY() && loc.getBlockZ() == location.getBlockZ()) {
-                return npcV18R3V18R3;
-            }
-        }
-        return null;
+        return this.npcs.keySet().stream().filter(npc -> {
+            Location loc = npc.getLocation();
+            return loc.getBlockX() == location.getBlockX() && loc.getBlockY() == location.getBlockY() && loc.getBlockZ() == location.getBlockZ();
+        }).findFirst().orElse(null);
     }
 
 
@@ -77,18 +75,16 @@ public class NPCManager {
             return;
         }
         if (!join) {
-            for (NPC npc : this.npcs.keySet()) {
-                npc.destroy(player);
-            }
+            this.npcs.keySet().forEach(npc -> npc.destroy(player));
         }
-        for (String key : document.keys()) {
+        document.keys().forEach(key -> {
             VsonObject doc = document.getVson(key);
             VsonObject loc = doc.getVson("location", new VsonObject());
             if (loc.isEmpty()) {
-                continue;
+                return;
             }
             if (!loc.getString("world").equalsIgnoreCase(player.getWorld().getName())) {
-                continue;
+                return;
             }
             Location location = new Location(Bukkit.getWorld(loc.getString("world")), loc.getDouble("x"), loc.getDouble("y"), loc.getDouble("z"),
                     loc.getFloat("yaw"), loc.getFloat("pitch"));
@@ -100,6 +96,6 @@ public class NPCManager {
             this.groupNPCS.put(npc, group);
             npc.setSkin(skin);
             npc.spawn(player);
-        }
+        });
     }
 }

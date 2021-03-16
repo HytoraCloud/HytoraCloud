@@ -33,23 +33,18 @@ public class PacketHandlerNetwork extends PacketHandlerAdapter {
             }
         } else if (packet instanceof PacketOutRegisterServer) {
             Service service = ((PacketOutRegisterServer) packet).getService();
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> {
                 networkHandler.onServerStart(service);
                 networkHandler.onServerUpdate(service);
-            }
+            });
         } else if (packet instanceof PacketOutStopServer) {
             Service service = ((PacketOutStopServer) packet).getService();
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onServerStop(service);
-            }
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onServerStop(service));
         } else if ( packet instanceof PacketInServiceStateChange) {
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onServerUpdate(((PacketInServiceStateChange) packet).getService());
-            }
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onServerUpdate(((PacketInServiceStateChange) packet).getService()));
         } else if ( packet instanceof PacketInServiceUpdate) {
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onServerUpdate(((PacketInServiceUpdate) packet).getService());
-            }
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onServerUpdate(((PacketInServiceUpdate) packet).getService()));
+
         }
     }
 
@@ -57,25 +52,19 @@ public class PacketHandlerNetwork extends PacketHandlerAdapter {
     public void handleEvent(PacketCallEvent packet) {
         if (packet.getEvent() instanceof CloudPlayerJoinEvent) {
             CloudPlayerJoinEvent joinEvent = (CloudPlayerJoinEvent) packet.getEvent();
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onPlayerJoin(joinEvent.getCloudPlayer());
-            }
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onPlayerJoin(joinEvent.getCloudPlayer()));
             CloudAPI.getInstance().getCloudPlayers().getAll().add(joinEvent.getCloudPlayer());
         } else if (packet.getEvent() instanceof CloudPlayerChangeServerEvent) {
             CloudPlayerChangeServerEvent serverEvent = (CloudPlayerChangeServerEvent)packet.getEvent();
             CloudPlayer cloudPlayer = serverEvent.getCloudPlayer();
             cloudPlayer.setServer(serverEvent.getNewServer());
 
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onServerChange(cloudPlayer, serverEvent.getNewServer());
-            }
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onServerChange(cloudPlayer, serverEvent.getNewServer()));
 
             CloudAPI.getInstance().getCloudPlayers().update(cloudPlayer);
         } else if (packet.getEvent() instanceof CloudPlayerQuitEvent) {
             CloudPlayerQuitEvent quitEvent = (CloudPlayerQuitEvent) packet.getEvent();
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onPlayerQuit(quitEvent.getCloudPlayer());
-            }
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onPlayerQuit(quitEvent.getCloudPlayer()));
             CloudAPI.getInstance().getCloudPlayers().getAll().remove(CloudAPI.getInstance().getCloudPlayers().get(quitEvent.getCloudPlayer().getName()));
         }
     }

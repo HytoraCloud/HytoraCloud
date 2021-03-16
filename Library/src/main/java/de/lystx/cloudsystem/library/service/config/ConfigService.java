@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;

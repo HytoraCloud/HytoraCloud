@@ -44,12 +44,12 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      * @return
      */
     public List<CloudPlayer> getPlayersOnGroup(String group) {
-       List<CloudPlayer> list = new LinkedList<>();
-       for (CloudPlayer cp : this.cloudPlayers) {
-           if (cp.getServerGroup().equalsIgnoreCase(group)) {
-              list.add(cp);
-           }
-        }
+        List<CloudPlayer> list = new LinkedList<>();
+        this.cloudPlayers.forEach(cloudPlayer -> {
+            if (cloudPlayer.getServerGroup().equalsIgnoreCase(group)) {
+                list.add(cloudPlayer);
+            }
+        });
         return list;
     }
 
@@ -60,11 +60,11 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public List<CloudPlayer> getPlayersOnServer(String server) {
        List<CloudPlayer> list = new LinkedList<>();
-       for (CloudPlayer cp : this.cloudPlayers) {
-           if (cp.getServer().equalsIgnoreCase(server)) {
-              list.add(cp);
-           }
-        }
+        this.cloudPlayers.forEach(cloudPlayer -> {
+            if (cloudPlayer.getServer().equalsIgnoreCase(server)) {
+                list.add(cloudPlayer);
+            }
+        });
         return list;
     }
 
@@ -171,9 +171,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
 
     @Override
     public void forEach(Consumer<? super CloudPlayer> action) {
-        for (CloudPlayer cloudPlayer : this.getAll()) {
-            action.accept(cloudPlayer);
-        }
+        this.getAll().forEach(action);
     }
 
     @Override

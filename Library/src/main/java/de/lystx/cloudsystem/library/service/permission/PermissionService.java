@@ -6,8 +6,7 @@ import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
-import de.lystx.cloudsystem.library.service.file.FileService;
-import de.lystx.cloudsystem.library.service.permission.impl.DefaultPermissionGroup;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
@@ -66,8 +65,8 @@ public class PermissionService extends CloudService {
         this.permissionPool.getPlayerCache().clear();
         this.permissionPool.getPermissionGroups().clear();
         if (!this.file.exists()) {
-            VsonObject vsonObject = new VsonObject(VsonSettings.SAFE_TREE_OBJECTS);
-            PermissionGroup defaultGroup = new DefaultPermissionGroup();
+            VsonObject vsonObject = new VsonObject(VsonSettings.SAFE_TREE_OBJECTS, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+            PermissionGroup defaultGroup = Constants.DEFAULT_PERMISSION_GROUP;
             PermissionGroup adminGroup = new PermissionGroup(
                     "Admin",
                     0,
@@ -103,7 +102,7 @@ public class PermissionService extends CloudService {
             return;
         }
         try {
-            VsonObject vsonObject = new VsonObject(file, VsonSettings.OVERRITE_VALUES);
+            VsonObject vsonObject = new VsonObject(file, VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             for (String key : vsonObject.keys()) {
                 if (key.equalsIgnoreCase("enabled")) {
                     enabled = vsonObject.getBoolean(key);

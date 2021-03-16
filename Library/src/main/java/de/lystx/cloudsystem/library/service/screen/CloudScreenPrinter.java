@@ -9,8 +9,6 @@ import lombok.Getter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Getter
 public class CloudScreenPrinter {
@@ -49,12 +47,8 @@ public class CloudScreenPrinter {
         if (this.screen == null) {
             return;
         }
-        this.hytoraLibrary.getConsole().getLogger().sendMessage("INFO", "§cYou left the §esession §cof the service §e" + this.screen.getName() + "§c!");
-        try {
-            this.screen.stop();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.hytoraLibrary.getConsole().getLogger().sendMessage("INFO", "§cYou left the §esession §cof the service §e" + this.screen.getScreenName() + "§c!");
+        this.screen.stop();
         this.screen = null;
         this.inputStream = null;
         this.reader = null;

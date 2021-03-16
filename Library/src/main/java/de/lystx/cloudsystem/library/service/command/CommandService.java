@@ -131,9 +131,9 @@ public final class CommandService extends CloudService {
                 if (line.equalsIgnoreCase("sc leave") || line.equalsIgnoreCase("screen leave") || line.equalsIgnoreCase("leave") || line.equalsIgnoreCase("-l") || line.equalsIgnoreCase("quit")) {
                     this.getCloudLibrary().getScreenPrinter().quitCurrentScreen();
                 } else if (line.equalsIgnoreCase("shutdown")) {
-                    this.getCloudLibrary().getService(ServerService.class).stopService(this.getCloudLibrary().getService(ServerService.class).getService(this.getCloudLibrary().getScreenPrinter().getScreen().getName()));
+                    this.getCloudLibrary().getService(ServerService.class).stopService(this.getCloudLibrary().getService(ServerService.class).getService(this.getCloudLibrary().getScreenPrinter().getScreen().getScreenName()));
                 } else {
-                    this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketCommand(this.getCloudLibrary().getScreenPrinter().getScreen().getName(), line));
+                    this.getCloudLibrary().getService(CloudNetworkService.class).sendPacket(new PacketCommand(this.getCloudLibrary().getScreenPrinter().getScreen().getScreenName(), line));
                 }
                 return;
             }

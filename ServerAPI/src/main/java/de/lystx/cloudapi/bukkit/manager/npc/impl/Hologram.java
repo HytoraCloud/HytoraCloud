@@ -19,12 +19,12 @@ import java.util.Random;
 
 public class Hologram {
 
-    private Location location;
-    private List<HoloLine> lines;
-    private List<Player> loadedPlayers;
+    private final Location location;
+    private final List<HoloLine> lines;
+    private final List<Player> loadedPlayers;
     private Integer id;
     private String name;
-    private HologramManager hologramManager = new HologramManager();
+    private final HologramManager hologramManager = new HologramManager();
 
     public Hologram(Location location) {
         this.lines = new ArrayList<>();
@@ -274,12 +274,11 @@ public class Hologram {
     public interface HoloLine {
         Object[] getSpawnPackets(Location paramLocation);
 
-        @SuppressWarnings("rawtypes")
         Object[] getDespawnPackets();
     }
 
 
-    public class HologramManager {
+    public static class HologramManager {
         private HashMap<Player, List<Hologram>> playerHolograms = new HashMap<>();
 
         public void addPlayerToHologram(Player player, Hologram hologram) {

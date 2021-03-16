@@ -9,6 +9,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.Date;
@@ -37,9 +38,7 @@ public class PermsCommand {
 					player.sendMessage("§8» §bLastLogin §8● §7" + CloudAPI.getInstance().getPermissionPool().getFormat().format(new Date(data.getLastLogin())) + " §8«");
 					player.sendMessage("§8» §bStatus §8● §7" + (cloudPlayer != null ? "§aOnline" : "§cOffline") +" §8«");
 					player.sendMessage("§8» §bPermissionGroups§8:");
-					for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
-						player.sendMessage("  §8» §b" + permissionEntry.getPermissionGroup() + " §8● §7" + (permissionEntry.getValidTime().trim().isEmpty() ? "Lifetime": permissionEntry.getValidTime()) +" §8«");
-					}
+					data.getPermissionEntries().forEach(permissionEntry -> player.sendMessage("  §8» §b" + permissionEntry.getPermissionGroup() + " §8● §7" + (permissionEntry.getValidTime().trim().isEmpty() ? "Lifetime": permissionEntry.getValidTime()) +" §8«"));
 					player.sendMessage("§8» §bSpecial-perms §8● §7" + data.getPermissions());
 					player.sendMessage("§8");
 					player.sendMessage("§8§m--------------------------------------");
@@ -52,9 +51,10 @@ public class PermsCommand {
 						player.sendMessage("§bGroups§8:");
 						player.sendMessage("§8§m--------------------------------------");
 						player.sendMessage("§8");
-						for (PermissionGroup group : CloudAPI.getInstance().getPermissionPool().getPermissionGroups()) {
+						CloudAPI.getInstance().getPermissionPool().getPermissionGroups().forEach(group -> {
 							player.sendMessage("§8» §b" + group.getName() + " §8┃ §bID§8: §7" + group.getId() + "§8┃ §bPrefix§8: §7" + group.getPrefix() + "§8┃ §bSuffix§8: §7" + group.getSuffix() + "§8┃ §bDisplay§8: §7" + group.getDisplay());
-						}
+
+						});
 						player.sendMessage("§8");
 						player.sendMessage("§8§m--------------------------------------");
 						return;
@@ -71,15 +71,15 @@ public class PermsCommand {
 						player.sendMessage("§8» §bId §8● §7" + group.getId() +" §8«");
 						player.sendMessage("§8» §bPermissions §8● §7" + group.getPermissions() +" §8«");
 						StringBuilder message = new StringBuilder("§7");
-						int check = 0;
-						for (String inheritance : group.getInheritances()) {
-							check++;
-							if (group.getInheritances().size() > check) {
+						Value<Integer> integerValue = new Value<>();
+						group.getInheritances().forEach(inheritance -> {
+							integerValue.increase();
+							if (group.getInheritances().size() > integerValue.getValue()) {
 								message.append(inheritance).append("§8, §7");
 							} else {
 								message.append(inheritance);
 							}
-						}
+						});
 						player.sendMessage("§8» §bInheritances §8● §7" + message.toString() +" §8«");
 						player.sendMessage("§8");
 						player.sendMessage("§8§m--------------------------------------");

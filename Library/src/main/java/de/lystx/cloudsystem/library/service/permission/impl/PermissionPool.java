@@ -102,7 +102,7 @@ public class PermissionPool implements Serializable {
         } catch (Exception e) {
             //Ignoring
         }
-        return new DefaultPermissionGroup();
+        return Constants.DEFAULT_PERMISSION_GROUP;
     }
 
     /**

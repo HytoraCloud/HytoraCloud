@@ -11,8 +11,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class ServiceProviderStop {
@@ -62,7 +60,7 @@ public class ServiceProviderStop {
 
                 });
                 this.service.notifyStop(service);
-                this.cloudLibrary.getService(ScreenService.class).getMap().remove(screen.getName());
+                this.cloudLibrary.getService(ScreenService.class).getMap().remove(screen.getScreenName());
                 consumer.accept(service);
             }, 5L);
         } catch (Exception e) {

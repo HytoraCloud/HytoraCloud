@@ -55,7 +55,7 @@ public class CloudManager {
             e.printStackTrace();
         }
         try {
-            VsonObject vsonObject = new VsonObject(new File("./CLOUD/connection.json"), VsonSettings.OVERRITE_VALUES);
+            VsonObject vsonObject = new VsonObject(new File("./CLOUD/connection.json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             vsonObject.append("serviceState", this.serviceState);
             vsonObject.save();
         } catch (IOException e) {

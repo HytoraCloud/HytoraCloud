@@ -105,9 +105,7 @@ public class NPCListener implements Listener {
         if (config.isCorners()) {
             ItemStack glass = new Item(Material.STAINED_GLASS_PANE, (short) 7).setNoName().build();
 
-            IntStream.range(0, 8).forEach(i -> {
-                inventory.setItem(i, glass);
-            });
+            IntStream.range(0, 8).forEach(i -> inventory.setItem(i, glass));
 
             for (int s = 8; s < (inventory.getSize() - 9); s += 9) {
                 int lastSlot = s + 1;

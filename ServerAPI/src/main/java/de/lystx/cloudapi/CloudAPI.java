@@ -312,50 +312,6 @@ public class CloudAPI implements CloudService {
      * @return
      */
     public Service getService() {
-
-        /*VsonObject vsonObject = this.getDocument();
-        VsonObject group = vsonObject.getVson("serviceGroup");
-
-        SerializableDocument properties = new SerializableDocument();
-        for (VsonMember vsonMember : group.getVson("values")) {
-            properties.append(vsonMember.getName(), group.getVson("values").getObject(vsonMember.getName()));
-        }
-
-        SerializableDocument props = new SerializableDocument();
-        for (VsonMember vsonMember : vsonObject.getVson("properties")) {
-            properties.append(vsonMember.getName(), vsonObject.getVson("properties").getObject(vsonMember.getName()));
-        }
-
-        ServiceGroup serviceGroup = new ServiceGroup(
-                UUID.fromString(group.getString("uniqueId")),
-                group.getString("name"),
-                group.getString("template"),
-                ServiceType.valueOf(group.getString("serviceType")),
-                group.getInteger("maxServer"),
-                group.getInteger("minServer"),
-                group.getInteger("maxRam"),
-                group.getInteger("minRam"),
-                group.getInteger("maxPlayers"),
-                group.getInteger("newServerPercent"),
-                group.getBoolean("maintenance"),
-                group.getBoolean("lobby"),
-                group.getBoolean("dynamic"),
-                properties
-        );
-        Service service = new Service(
-                vsonObject.getString("name"),
-                UUID.fromString(vsonObject.getString("uniqueId")),
-                serviceGroup,
-                vsonObject.getInteger("serviceID"),
-                vsonObject.getInteger("port"),
-                vsonObject.getInteger("cloudPort"),
-                ServiceState.valueOf(vsonObject.getString("serviceState"))
-        );
-        service.setProperties(props);
-
-        return service;
-        */
-
        return this.getDocument().getAs(Service.class);
     }
 
@@ -432,15 +388,15 @@ public class CloudAPI implements CloudService {
 
         List<PermissionEntry> entries = new LinkedList<>(data.getPermissionEntries());
 
-        boolean changed = false;
+        Value<Boolean> booleanValue = new Value<>(false);
         try {
-            for (PermissionEntry permissionEntry : entries) {
+            entries.forEach(permissionEntry -> {
                 PermissionGroup permissionGroup = permissionPool.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
                 if (!this.permissionPool.isRankValid(player, permissionGroup)) {
-                    changed = true;
+                    booleanValue.setValue(true);
                     permissionPool.removePermissionGroup(player, permissionGroup);
                 }
-            }
+            });
         } catch (ConcurrentModificationException | UnsupportedOperationException e) {
             e.printStackTrace();
         }
@@ -449,26 +405,22 @@ public class CloudAPI implements CloudService {
             data.setUuid(uuid);
             data.setIpAddress(ipAddress);
         }
-        if (changed) {
+        if (booleanValue.getValue()) {
             data.setPermissionEntries(entries);
             permissionPool.updatePlayerData(player, data);
             permissionPool.update();
         }
         List<String> permissions = new LinkedList<>();
-        for (PermissionEntry entry : entries) {
+        entries.forEach(entry -> {
             PermissionGroup group = permissionPool.getPermissionGroupFromName(entry.getPermissionGroup());
             if (group == null) {
-                continue;
+                return;
             }
             permissions.addAll(group.getPermissions());
-            for (String i : group.getInheritances()) {
-                permissions.addAll(permissionPool.getPermissionGroupFromName(i).getPermissions());
-            }
-        }
+            group.getInheritances().forEach(i -> permissions.addAll(permissionPool.getPermissionGroupFromName(i).getPermissions()));
+        });
         permissions.addAll(data.getPermissions());
-        for (String permission : permissions) {
-            accept.accept(permission);
-        }
+        permissions.forEach(accept);
     }
 
 

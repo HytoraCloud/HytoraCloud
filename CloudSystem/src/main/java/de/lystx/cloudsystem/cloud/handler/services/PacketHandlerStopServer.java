@@ -21,7 +21,7 @@ public class PacketHandlerStopServer extends PacketHandlerAdapter {
             try {
                 PacketInStopServer packetInStopServer = (PacketInStopServer) packet;
                 Service service = packetInStopServer.getService();
-                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getName().equalsIgnoreCase(service.getName())) {
+                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getScreenName().equalsIgnoreCase(service.getName())) {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }
                 this.cloudSystem.getService().stopService(this.cloudSystem.getService().getService(service.getName()));

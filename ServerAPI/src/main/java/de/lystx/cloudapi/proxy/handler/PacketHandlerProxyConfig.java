@@ -39,21 +39,21 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
                 CloudAPI.getInstance().unregisterCommand(new HubCommand());
             }
             Map<ServiceGroup, List<Service>> services = info.getServices();
-            for (List<Service> value : services.values()) {
-                for (Service service : value) {
+            services.values().forEach(value -> {
+                value.forEach(service -> {
                     CloudProxy.getInstance().getServices().add(service);
                     if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
                         ServerInfo i = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress("127.0.0.1", service.getPort()), "CloudService", false);
                         ProxyServer.getInstance().getServers().put(service.getName(), i);
                     }
-                }
-            }
-            for (Service service : CloudProxy.getInstance().getServices()) {
+                });
+            });
+            CloudProxy.getInstance().getServices().forEach(service -> {
                 if (CloudAPI.getInstance().getNetwork().getService(service.getName()) == null) {
                     CloudProxy.getInstance().getServices().remove(service);
                     ProxyServer.getInstance().getServers().remove(service.getName());
                 }
-            }
+            });
         }
     }
 }

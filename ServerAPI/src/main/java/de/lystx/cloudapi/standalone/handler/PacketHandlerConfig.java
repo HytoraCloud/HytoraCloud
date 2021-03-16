@@ -27,11 +27,6 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
 
             Constants.PERMISSION_POOL = this.cloudAPI.getPermissionPool();
 
-            this.cloudAPI.getNetwork().getServices(ServiceType.PROXY).forEach(service -> {
-                if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
-                    this.cloudAPI.getNetwork().getProxies().put(service.getPort(), service.getName());
-                }
-            });
         }
     }
 }

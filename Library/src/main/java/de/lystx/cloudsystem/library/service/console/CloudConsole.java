@@ -23,6 +23,7 @@ public class CloudConsole extends Thread implements CloudCommandSender {
         this.logger = logger;
         this.buffer = buffer;
         this.commandManager = commandManager;
+        this.setDaemon(true);
         this.start();
     }
 
@@ -54,8 +55,10 @@ public class CloudConsole extends Thread implements CloudCommandSender {
      * Clears screen
      */
     public void clearScreen() {
-        for (int i = 0; i < 100; i++) {
-            System.out.println(" ");
+        try {
+            this.logger.getConsoleReader().clearScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

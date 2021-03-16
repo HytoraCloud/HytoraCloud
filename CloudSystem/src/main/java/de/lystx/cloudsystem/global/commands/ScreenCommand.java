@@ -1,7 +1,6 @@
 package de.lystx.cloudsystem.global.commands;
 
 
-import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -52,7 +51,7 @@ public class ScreenCommand implements TabCompletable {
                     this.screenPrinter.create(screen);
                     try {
                         for (String cachedLine : screen.getCachedLines()) {
-                            sender.sendMessage("§9[§b" + screen.getName() + "§9]§f " + cachedLine);
+                            sender.sendMessage("§9[§b" + screen.getScreenName() + "§9]§f " + cachedLine);
                         }
                     } catch (ConcurrentModificationException ignored) {}
                 } else {

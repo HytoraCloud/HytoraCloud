@@ -14,23 +14,12 @@
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
         <repository>
-            <id>minecraft-repo</id>
-            <url>https://www.your-repo.net</url>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-
     </repositories>
     <artifactId>ServerAPI</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>net.jitse</groupId>
-            <artifactId>npclib-api</artifactId>
-            <version>2.9-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>de.lystx.cloudsystem</groupId>
             <artifactId>Library</artifactId>
@@ -39,8 +28,15 @@
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.8.8</version>
+            <artifactId>spigot-api</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.md-5</groupId>

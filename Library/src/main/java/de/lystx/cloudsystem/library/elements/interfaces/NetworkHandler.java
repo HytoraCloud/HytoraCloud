@@ -61,9 +61,9 @@ public interface NetworkHandler {
 
     /**
      * Called when network is pinged (only works on bungeeCord)
-     * @param connectionUUID
+     * @param connection
      */
-    default void onNetworkPing(CloudConnection connectionUUID) {}
+    default void onNetworkPing(CloudConnection connection) {}
 
     /**
      * Called when subChannel received message

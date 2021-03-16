@@ -19,9 +19,9 @@ public class PacketHandlerProxyStopServer extends PacketHandlerAdapter {
         if (packet instanceof PacketOutStopServer) {
             PacketOutStopServer stopServerPacketProxy = (PacketOutStopServer)packet;
             ProxyServer.getInstance().getServers().remove(stopServerPacketProxy.getService().getName());
-            for (ProxiedPlayer current : ProxyServer.getInstance().getPlayers()) {
-                CloudProxy.getInstance().getNetworkManager().sendStopServerMessage(current, stopServerPacketProxy.getService().getName());
-            }
+            ProxyServer.getInstance().getPlayers().forEach(player -> {
+                CloudProxy.getInstance().getNetworkManager().sendStopServerMessage(player, stopServerPacketProxy.getService().getName());
+            });
         }
     }
 }

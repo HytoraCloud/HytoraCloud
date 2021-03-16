@@ -126,14 +126,9 @@ public class NametagManager {
                 Reflections.setField(packet, "h", contents);
             }
             if (players == null) {
-                for (Player t : Bukkit.getOnlinePlayers())
-                    this.sendPacket(t, packet);
-                  //  ((CraftPlayer)t).getHandle().playerConnection.sendPacket(packet);
+                Bukkit.getOnlinePlayers().forEach(t -> this.sendPacket(t, packet));
             } else {
-                for (Player p : players) {
-                    this.sendPacket(p, packet);
-                    //((CraftPlayer)p).getHandle().playerConnection.sendPacket(packet);
-                }
+                players.forEach(t -> this.sendPacket(t, packet));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -206,14 +201,9 @@ public class NametagManager {
                 Reflections.setField(packet, "h", contents);
             }
             if (players == null) {
-                for (Player t : Bukkit.getOnlinePlayers())
-                    this.sendPacket(t, packet);
-                    //((CraftPlayer)t).getHandle().playerConnection.sendPacket(packet);
+                Bukkit.getOnlinePlayers().forEach(t -> this.sendPacket(t, packet));
             } else {
-                for (Player p : players) {
-                    this.sendPacket(p, packet);
-                    //((CraftPlayer)p).getHandle().playerConnection.sendPacket(packet);
-                }
+                players.forEach(t -> this.sendPacket(t, packet));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -15,7 +15,7 @@ import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.FallbackConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;

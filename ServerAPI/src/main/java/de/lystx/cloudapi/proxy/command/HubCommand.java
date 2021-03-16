@@ -11,7 +11,7 @@ public class HubCommand {
 
     @Command(name = "hub", description = "Sends you to hub", aliases = {"lobby", "l", "leave"})
     public void execute(CloudCommandSender commandSender, String[] args) {
-        ProxyServerHubCommandEvent.Result result = CloudProxy.getInstance().getHubManager().send((CloudPlayer) commandSender) ? ProxyServerHubCommandEvent.Result.SUCCESS : ProxyServerHubCommandEvent.Result.ALREADY_ON_LOBBY;
+        ProxyServerHubCommandEvent.Result result = CloudProxy.getInstance().getHubManager().send(ProxyServer.getInstance().getPlayer(commandSender.getName())) ? ProxyServerHubCommandEvent.Result.SUCCESS : ProxyServerHubCommandEvent.Result.ALREADY_ON_LOBBY;
         ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerHubCommandEvent(ProxyServer.getInstance().getPlayer(commandSender.getUniqueId()), result));
     }
 }

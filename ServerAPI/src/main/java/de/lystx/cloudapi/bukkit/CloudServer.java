@@ -226,7 +226,9 @@ public class CloudServer extends JavaPlugin implements CloudService {
         }
     }
 
-
+    /**
+     * Shuts down the server
+     */
     private void shutdown0() {
         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
             this.cloudAPI.shutdown(packetState -> {

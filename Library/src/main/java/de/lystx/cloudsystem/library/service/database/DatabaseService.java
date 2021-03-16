@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.database.impl.Files;
 import de.lystx.cloudsystem.library.service.database.impl.MongoDB;
 import de.lystx.cloudsystem.library.service.database.impl.MySQL;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;

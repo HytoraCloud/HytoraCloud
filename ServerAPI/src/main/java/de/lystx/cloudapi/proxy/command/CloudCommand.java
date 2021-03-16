@@ -17,10 +17,12 @@ import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class CloudCommand implements TabCompletable {
 
@@ -59,14 +61,14 @@ public class CloudCommand implements TabCompletable {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Cloud will be shut down in §e3 Seconds§8...");
                         CloudAPI.getInstance().setJoinable(false);
 
-                        int size = CloudAPI.getInstance().getCloudPlayers().getAll().size();
-                        for (CloudPlayer cloudPlayer : CloudAPI.getInstance().getCloudPlayers()) {
+                        Value<Integer> integerValue = new Value<>(CloudAPI.getInstance().getCloudPlayers().getAll().size());
+                        CloudAPI.getInstance().getCloudPlayers().forEach(cloudPlayer -> {
                             cloudPlayer.kick(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!");
-                            size--;
-                            if (size <= 0) {
+                            integerValue.decrease();
+                            if (integerValue.getValue() <= 0) {
                                 CloudAPI.getInstance().getNetwork().shutdownCloud();
                             }
-                        }
+                        });
                     } else {
                         this.help(player);
                     }
@@ -167,14 +169,14 @@ public class CloudCommand implements TabCompletable {
                                 return;
                             }
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start §b" + id + " §7new services of group §a" + group.getName() + "§8...");
-                            for (int i = 0; i < id; i++) {
+                            IntStream.range(0, id).forEach(i -> {
                                 CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname)).onDocumentSet(document -> {
                                     String message = document.getString("message");
                                     if (!document.getBoolean("sucess", false)) {
                                         player.sendMessage(CloudAPI.getInstance().getPrefix() + message);
                                     }
                                 });
-                            }
+                            });
                         } catch (NumberFormatException e) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid number!");
                         }
@@ -278,17 +280,13 @@ public class CloudCommand implements TabCompletable {
 
     public List<String> getServices() {
         List<String> list = new LinkedList<>();
-        for (Service service : CloudAPI.getInstance().getNetwork().getServices()) {
-            list.add(service.getName());
-        }
+        CloudAPI.getInstance().getNetwork().getServices().forEach(service -> list.add(service.getName()));
         return list;
     }
 
     public List<String> getGroups() {
         List<String> list = new LinkedList<>();
-        for (ServiceGroup service : CloudAPI.getInstance().getNetwork().getServiceGroups()) {
-            list.add(service.getName());
-        }
+        CloudAPI.getInstance().getNetwork().getServiceGroups().forEach(service -> list.add(service.getName()));
         return list;
     }
 

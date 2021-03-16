@@ -25,6 +25,36 @@ public class Value<T> {
         this.value = value;
     }
 
+    public void increase() {
+        if (value instanceof Integer) {
+            Integer integer = (Integer) this.value;
+            integer++;
+            this.value = (T) integer;
+        } else {
+            throw new UnsupportedOperationException("Can't increase value of type " + this.value.getClass().getSimpleName());
+        }
+    }
+
+    public void change() {
+        if (value instanceof Boolean) {
+            Boolean aBoolean = (Boolean) this.value;
+            aBoolean = !aBoolean;
+            this.value = (T) aBoolean;
+        } else {
+            throw new UnsupportedOperationException("Can't increase value of type " + this.value.getClass().getSimpleName());
+        }
+    }
+
+    public void decrease() {
+        if (value instanceof Integer) {
+            Integer integer = (Integer) this.value;
+            integer--;
+            this.value = (T) integer;
+        } else {
+            throw new UnsupportedOperationException("Can't decrease value of type " + this.value.getClass().getSimpleName());
+        }
+    }
+
     /**
      * Returns value
      * @return

@@ -5,7 +5,9 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudapi.proxy.events.player.ProxyServerPlayerNetworkJoinEvent;
 import de.lystx.cloudapi.proxy.events.player.ProxyServerPlayerNetworkQuitEvent;
+import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutUpdateTabList;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
+import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
 import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -23,6 +25,8 @@ public class TablistListener implements Listener {
 
     public TablistListener() {
         this.cloudAPI = CloudAPI.getInstance();
+
+        this.cloudAPI.getCloudClient().registerPacketHandler(this);
     }
 
     public void updateTab() {
@@ -49,6 +53,10 @@ public class TablistListener implements Listener {
                     .replace("&", "§")
                     .replace("%max_players%", String.valueOf(CloudProxy.getInstance().getProxyConfig().getMaxPlayers()))
                     .replace("%online_players%", String.valueOf(i))
+                    .replace("%id%", this.cloudAPI.getNetwork().getService(player.getServer().getInfo().getName()).getServiceID() + "")
+                    .replace("%group%", this.cloudAPI.getNetwork().getService(player.getServer().getInfo().getName()).getServiceGroup().getName() + "")
+                    .replace("%rank%", this.cloudAPI.getPermissionPool().getHighestPermissionGroup(player.getName()).getName())
+                    .replace("%rank_color%", this.cloudAPI.getPermissionPool().getHighestPermissionGroup(player.getName()).getDisplay())
                     .replace("%proxy%", CloudAPI.getInstance().getNetwork().getProxy(
                             CloudProxy.getInstance().getProxyPort()
                     ).getName())
@@ -76,6 +84,11 @@ public class TablistListener implements Listener {
             tabList = tabLists.get(this.tabInits);
         }
         return tabList;
+    }
+
+    @PacketHandler
+    public void handle(PacketOutUpdateTabList packet) {
+        this.doUpdate();
     }
 
     @EventHandler

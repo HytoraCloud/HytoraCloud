@@ -17,9 +17,7 @@ public class PacketHandlerSubChannel extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketSubMessage) {
             PacketSubMessage subMessage = (PacketSubMessage)packet;
-            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
-                networkHandler.onDocumentReceive(subMessage.getChannel(), subMessage.getKey(), subMessage.getDocument(), subMessage.getType());
-            }
+            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onDocumentReceive(subMessage.getChannel(), subMessage.getKey(), subMessage.getDocument(), subMessage.getType()));
         }
     }
 }

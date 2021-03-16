@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.enums.Spigot;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.command.command.TabCompletable;
-import de.lystx.cloudsystem.library.service.file.FileService;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.util.Action;
 import lombok.AllArgsConstructor;
 import org.apache.commons.io.FileUtils;

@@ -4,6 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.impl.fallback.Fallback;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -27,7 +28,7 @@ public class HubManager {
      * @param player
      * @return
      */
-    public boolean send(CloudPlayer player) {
+    public boolean send(ProxiedPlayer player) {
         if (isFallback(player)) {
             String message = this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix());
             if (!message.trim().isEmpty()) {
@@ -46,7 +47,7 @@ public class HubManager {
      * @param player
      * @return
      */
-    public ServerInfo getInfo(CloudPlayer player) {
+    public ServerInfo getInfo(ProxiedPlayer player) {
         try {
             Fallback fallback = this.getHighestFallback(player);
             Service service;
@@ -65,15 +66,14 @@ public class HubManager {
     /**
      * Sends a player to a
      * random Lobby-Server
-     * @param player
+     * @param proxiedPlayer
      */
-    public void sendPlayerToFallback(CloudPlayer player) {
-        ProxiedPlayer proxiedPlayer =  ProxyServer.getInstance().getPlayer(player.getName());
-        if (this.getInfo(player) == null) {
+    public void sendPlayerToFallback(ProxiedPlayer proxiedPlayer) {
+        if (this.getInfo(proxiedPlayer) == null) {
             proxiedPlayer.disconnect(CloudAPI.getInstance().getPrefix() + "§cNo fallback was found!");
             return;
         }
-        proxiedPlayer.connect(this.getInfo(player));
+        proxiedPlayer.connect(this.getInfo(proxiedPlayer));
     }
 
     /**
@@ -82,7 +82,7 @@ public class HubManager {
      * @param player
      * @return
      */
-    public Fallback getHighestFallback(CloudPlayer player) {
+    public Fallback getHighestFallback(ProxiedPlayer player) {
         List<Fallback> list = this.getFallbacks(player);
         list.sort(Comparator.comparingInt(Fallback::getPriority));
         return list.get(list.size() - 1) == null ? cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback() : list.get(list.size() - 1);
@@ -93,13 +93,14 @@ public class HubManager {
      * @param player
      * @return
      */
-    public boolean isFallback(CloudPlayer player) {
-        for (Fallback fallback : this.getFallbacks(player)) {
-            if (player.getServerGroup().equalsIgnoreCase(fallback.getGroupName())) {
-                return true;
+    public boolean isFallback(ProxiedPlayer player) {
+        Value<Boolean> booleanValue = new Value<>(false);
+        this.getFallbacks(player).forEach(fallback -> {
+            if (player.getServer().getInfo().getName().split("-")[0].equalsIgnoreCase(fallback.getGroupName())) {
+                booleanValue.setValue(true);
             }
-        }
-        return false;
+        });
+        return booleanValue.getValue();
     }
 
     /**
@@ -110,14 +111,14 @@ public class HubManager {
      * @param player
      * @return
      */
-    public List<Fallback> getFallbacks(CloudPlayer player) {
+    public List<Fallback> getFallbacks(ProxiedPlayer player) {
         List<Fallback> list = new LinkedList<>();
         list.add(cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback());
-        for (Fallback fallback : cloudAPI.getNetworkConfig().getFallbackConfig().getFallbacks()) {
+        cloudAPI.getNetworkConfig().getFallbackConfig().getFallbacks().forEach(fallback -> {
             if (cloudAPI.getPermissionPool().hasPermission(player.getName(), fallback.getPermission()) || fallback.getPermission().trim().isEmpty() || fallback.getPermission() == null) {
                 list.add(fallback);
             }
-        }
+        });
         return list;
     }
 

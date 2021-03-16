@@ -13,6 +13,7 @@ import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,12 +25,10 @@ public class CloudNetwork {
 
     private final CloudAPI cloudAPI;
     private Map<ServiceGroup, List<Service>> services;
-    private Map<Integer, String> proxies;
 
     public CloudNetwork(CloudAPI cloudAPI) {
         this.cloudAPI = cloudAPI;
         this.services = new HashMap<>();
-        this.proxies = new HashMap<>();
     }
 
     /**
@@ -38,12 +37,7 @@ public class CloudNetwork {
      * @return
      */
     public ServiceGroup getServiceGroup(String groupName) {
-        for (ServiceGroup group : this.services.keySet()) {
-            if (group.getName().equalsIgnoreCase(groupName)) {
-                return group;
-            }
-        }
-        return null;
+        return this.services.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
     }
 
     /**
@@ -60,7 +54,7 @@ public class CloudNetwork {
      * @return
      */
     public Service getProxy(Integer port) {
-        return this.getService(this.proxies.get(port));
+        return this.getServices().stream().filter(service -> service.getPort() == port).findFirst().orElse(null);
     }
 
     /**
@@ -121,13 +115,7 @@ public class CloudNetwork {
      */
     public List<Service> getServices() {
         List<Service> list = new LinkedList<>();
-        for (List<Service> value : this.services.values()) {
-            for (Service service : value) {
-                if (list.stream().filter(s -> s.getName().equalsIgnoreCase(service.getName())).findFirst().orElse(null) == null) {
-                    list.add(service);
-                }
-            }
-        }
+        this.services.values().forEach(list::addAll);
         return list;
     }
 
@@ -139,14 +127,14 @@ public class CloudNetwork {
      */
     public List<Service> getServices(ServiceState serviceState) {
         List<Service> list = new LinkedList<>();
-        for (Service service : this.getServices()) {
+        this.getServices().forEach(service -> {
             if (!service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
-                continue;
+                return;
             }
             if (service.getServiceState().equals(serviceState)) {
                 list.add(service);
             }
-        }
+        });
         return list;
     }
 
@@ -156,11 +144,11 @@ public class CloudNetwork {
      */
     public List<Service> getLobbies() {
         List<Service> list = new LinkedList<>();
-        for (Service service : this.getServices()) {
+        this.getServices().forEach(service -> {
             if (service.getServiceGroup().isLobby() && service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
                 list.add(service);
             }
-        }
+        });
         return list;
     }
 
@@ -171,11 +159,11 @@ public class CloudNetwork {
      */
     public List<Service> getServices(ServiceType serviceType) {
         List<Service> list = new LinkedList<>();
-        for (Service service : this.getServices()) {
+        this.getServices().forEach(service -> {
             if (service.getServiceGroup().getServiceType().equals(serviceType)) {
                 list.add(service);
             }
-        }
+        });
         return list;
     }
 
@@ -199,14 +187,11 @@ public class CloudNetwork {
      * @return
      */
     public Service getService(String name) {
-        for (List<Service> value : this.services.values()) {
-            for (Service service : value) {
-                if (service.getName().equalsIgnoreCase(name)) {
-                    return service;
-                }
-            }
-        }
-        return null;
+        Value<Service> serviceValue = new Value<>();
+        this.services.values().forEach(value -> {
+            serviceValue.setValue(value.stream().filter(service -> service.getName().equalsIgnoreCase(name)).findFirst().orElse(null));
+        });
+        return serviceValue.getValue();
     }
 
     /**
@@ -280,9 +265,7 @@ public class CloudNetwork {
      * @param group
      */
     public void stopServices(ServiceGroup group) {
-        for (Service service : this.services.get(this.getServiceGroup(group.getName()))) {
-            this.stopService(service);
-        }
+        this.services.get(this.getServiceGroup(group.getName())).forEach(this::stopService);
     }
 
     /**

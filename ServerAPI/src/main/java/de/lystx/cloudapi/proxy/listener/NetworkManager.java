@@ -15,12 +15,12 @@ public class NetworkManager {
         if (!to) {
             return;
         }
-        for (CloudPlayer cloudPlayer : CloudAPI.getInstance().getCloudPlayers()) {
+        CloudAPI.getInstance().getCloudPlayers().forEach(cloudPlayer -> {
             if (!CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().contains(cloudPlayer.getName()) && !cloudPlayer.hasPermission("cloudsystem.network.maintenance")) {
                 cloudPlayer.createConnection().disconnect(
                         CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix()));
             }
-        }
+        });
     }
 
 
