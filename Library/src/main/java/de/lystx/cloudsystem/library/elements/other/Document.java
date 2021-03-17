@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.elements.other;
 import com.google.gson.*;
 import io.vson.elements.object.VsonMember;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -323,7 +324,7 @@ public class Document {
     }
 
     public VsonObject toVson() {
-        VsonObject vsonObject = new VsonObject();
+        VsonObject vsonObject = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
         for (String key : this.keys()) {
             vsonObject.append(key, this.get(key));
         }

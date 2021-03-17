@@ -111,9 +111,7 @@ public class GroupService extends CloudService {
             document.clear();
             this.groups.remove(this.getGroup(serviceGroup.getName()));
             this.getCloudLibrary().getService(TemplateService.class).deleteTemplates(serviceGroup);
-            this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
-                document.getFile().delete();
-            }, 40L);
+            this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> document.getFile().delete(), 40L);
         } catch (IOException e) {
             e.printStackTrace();
         }

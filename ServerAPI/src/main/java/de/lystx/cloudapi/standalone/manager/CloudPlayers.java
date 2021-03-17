@@ -6,6 +6,9 @@ import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketCloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.throwable.Try;
+import de.lystx.cloudsystem.library.service.throwable.TryCatch;
+import de.lystx.cloudsystem.library.service.util.Handler;
 import de.lystx.cloudsystem.library.service.util.Value;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +95,11 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public void update(CloudPlayer newPlayer) {
         CloudPlayer cloudPlayer = this.get(newPlayer.getName());
-        this.cloudPlayers.set(this.cloudPlayers.indexOf(cloudPlayer), newPlayer);
+        try {
+            this.cloudPlayers.set(this.cloudPlayers.indexOf(cloudPlayer), newPlayer);
+        } catch (IndexOutOfBoundsException ignored) {
+            //Ignoring on Server change
+        }
     }
 
     /**

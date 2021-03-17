@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.service.config.impl.labymod.LabyModConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
 import io.vson.elements.object.Objectable;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,7 @@ public class NetworkConfig implements Serializable, Objectable {
      * @return VsonObject
      */
     public static VsonObject defaultConfig() {
-        return new VsonObject()
+        return new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST)
                 .append("host", "127.0.0.1")
                 .append("port", 2131)
                 .append("useWrapper", false)

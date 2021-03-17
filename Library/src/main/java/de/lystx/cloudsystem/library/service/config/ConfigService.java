@@ -59,6 +59,8 @@ public class ConfigService extends CloudService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.vsonObject.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+        this.vsonObject.getVsonSettings().add(VsonSettings.OVERRITE_VALUES);
     }
 
     /**
@@ -70,6 +72,8 @@ public class ConfigService extends CloudService {
         } else {
             this.vsonObject.putAll(this.receiverInfo);
         }
+        this.vsonObject.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+        this.vsonObject.getVsonSettings().add(VsonSettings.OVERRITE_VALUES);
         this.vsonObject.save();
     }
 }

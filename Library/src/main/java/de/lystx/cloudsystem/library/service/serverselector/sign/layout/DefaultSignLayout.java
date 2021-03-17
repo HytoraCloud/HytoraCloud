@@ -2,16 +2,16 @@ package de.lystx.cloudsystem.library.service.serverselector.sign.layout;
 
 import io.vson.elements.VsonArray;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 
 
 public class DefaultSignLayout extends VsonObject {
-
 
     /**
      * Returns new Default SignLayOut
      */
     public DefaultSignLayout() {
-
+        super(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
         VsonArray loadingLayouts = new VsonArray();
         VsonObject loading1 = new VsonObject();
         VsonObject loading2 = new VsonObject();
@@ -65,4 +65,5 @@ public class DefaultSignLayout extends VsonObject {
                 )
         );
     }
+
 }

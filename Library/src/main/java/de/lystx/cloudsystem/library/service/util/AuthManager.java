@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.service.util;
 
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -18,7 +19,7 @@ public class AuthManager {
      */
     public void createKey() {
         if (!this.keyFile.exists()) {
-            VsonObject document = new VsonObject();
+            VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             document.append("key", UUID.randomUUID().toString() + "_" + UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString());
             document.save(this.keyFile);
         }
@@ -31,7 +32,7 @@ public class AuthManager {
     public String getKey() {
         if (this.keyFile.exists()) {
             try {
-                VsonObject document = new VsonObject(this.keyFile);
+                VsonObject document = new VsonObject(this.keyFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
                 return document.getString("key");
             } catch (IOException e) {
                 e.printStackTrace();

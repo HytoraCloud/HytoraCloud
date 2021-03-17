@@ -50,7 +50,7 @@ public class SignService extends CloudService {
             }
         }
         if (!this.signFile.exists()) {
-            new VsonObject().save(this.signFile);
+            new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST).save(this.signFile);
         }
     }
 

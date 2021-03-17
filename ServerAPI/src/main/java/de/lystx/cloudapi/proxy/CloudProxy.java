@@ -28,7 +28,6 @@ public class CloudProxy extends Plugin implements CloudService {
     private CloudAPI cloudAPI;
     private HubManager hubManager;
     private NetworkManager networkManager;
-    private List<Service> services;
 
     @Override
     public void onEnable() {
@@ -37,7 +36,6 @@ public class CloudProxy extends Plugin implements CloudService {
         this.cloudAPI = new CloudAPI();
         this.hubManager = new HubManager();
         this.networkManager = new NetworkManager();
-        this.services = new LinkedList<>();
 
         this.bootstrap();
     }

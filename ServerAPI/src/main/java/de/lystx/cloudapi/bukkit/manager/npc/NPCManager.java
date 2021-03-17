@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInC
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInDeleteNPC;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -27,11 +28,11 @@ public class NPCManager {
     public NPCManager() {
         this.npcs = new HashMap<>();
         this.groupNPCS = new HashMap<>();
-        this.document = new VsonObject();
+        this.document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
     }
 
     public void createNPC(Location location, String name, String group, String skin) {
-        VsonObject document = new VsonObject()
+        VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST)
                 .append("location", new VsonObject()
                         .append("x", location.getX())
                         .append("y", location.getY())
@@ -78,7 +79,7 @@ public class NPCManager {
             this.npcs.keySet().forEach(npc -> npc.destroy(player));
         }
         document.keys().forEach(key -> {
-            VsonObject doc = document.getVson(key);
+            VsonObject doc = document.getVson(key, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             VsonObject loc = doc.getVson("location", new VsonObject());
             if (loc.isEmpty()) {
                 return;

@@ -113,6 +113,7 @@ public class ServiceProviderStart {
 
                 ProxyConfig config = service.getServiceGroup().getValues().has("proxyConfig") ? service.getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
                 FileWriter writer = new FileWriter(serverLocation + "/config.yml");
+
                 writer.write("player_limit: " + config.getMaxPlayers() + "\n" +
                         "permissions:\n" +
                         "  default: []\n" +
@@ -210,7 +211,6 @@ public class ServiceProviderStart {
             cloud.mkdirs();
             VsonObject document = new VsonObject(new File(cloud, "connection.json"), VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.putAll(service);
-            document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.save();
 
             String[] command = new String[]{

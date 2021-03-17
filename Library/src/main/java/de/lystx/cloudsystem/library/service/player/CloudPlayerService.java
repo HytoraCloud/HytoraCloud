@@ -8,6 +8,7 @@ import de.lystx.cloudsystem.library.service.database.CloudDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
 import java.util.*;
@@ -50,7 +51,7 @@ public class CloudPlayerService extends CloudService {
      * @return VsonObject
      */
     public VsonObject toDocument() {
-        return new VsonObject().append("players", this.onlinePlayers);
+        return new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST).append("players", this.onlinePlayers);
     }
 
     /**

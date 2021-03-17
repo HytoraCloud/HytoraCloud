@@ -27,33 +27,36 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerPacketReceiveEvent(packet));
         if (packet instanceof PacketOutGlobalInfo) {
+
             boolean mc = this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance();
             PacketOutGlobalInfo info = (PacketOutGlobalInfo)packet;
+
             cloudAPI.setNetworkConfig(info.getNetworkConfig());
+
             if (mc != info.getNetworkConfig().getNetworkConfig().isMaintenance()) {
                 CloudProxy.getInstance().getNetworkManager().switchMaintenance(info.getNetworkConfig().getNetworkConfig().isMaintenance());
             }
+
             if (info.getNetworkConfig().getNetworkConfig().isHubCommand()) {
                 CloudAPI.getInstance().registerCommand(new HubCommand());
             } else {
                 CloudAPI.getInstance().unregisterCommand(new HubCommand());
             }
-            Map<ServiceGroup, List<Service>> services = info.getServices();
-            services.values().forEach(value -> {
-                value.forEach(service -> {
-                    CloudProxy.getInstance().getServices().add(service);
-                    if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
-                        ServerInfo i = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress("127.0.0.1", service.getPort()), "CloudService", false);
-                        ProxyServer.getInstance().getServers().put(service.getName(), i);
-                    }
-                });
-            });
-            CloudProxy.getInstance().getServices().forEach(service -> {
-                if (CloudAPI.getInstance().getNetwork().getService(service.getName()) == null) {
-                    CloudProxy.getInstance().getServices().remove(service);
-                    ProxyServer.getInstance().getServers().remove(service.getName());
+
+            info.getServices().values().forEach(value -> value.forEach(service -> {
+                if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
+                    ServerInfo serverInfo = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress("127.0.0.1", service.getPort()), "CloudService", false);
+                    ProxyServer.getInstance().getServers().put(service.getName(), serverInfo);
+                }
+            }));
+
+            ProxyServer.getInstance().getServers().values().forEach(serverInfo -> {
+                Service service = CloudAPI.getInstance().getNetwork().getService(serverInfo.getName());
+                if (service == null) {
+                    ProxyServer.getInstance().getServers().remove(serverInfo.getName());
                 }
             });
+
         }
     }
 }

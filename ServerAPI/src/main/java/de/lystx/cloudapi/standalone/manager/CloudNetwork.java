@@ -187,11 +187,14 @@ public class CloudNetwork {
      * @return
      */
     public Service getService(String name) {
-        Value<Service> serviceValue = new Value<>();
-        this.services.values().forEach(value -> {
-            serviceValue.setValue(value.stream().filter(service -> service.getName().equalsIgnoreCase(name)).findFirst().orElse(null));
-        });
-        return serviceValue.getValue();
+        for (List<Service> value : this.services.values()) {
+            for (Service service : value) {
+                if (service.getName().equalsIgnoreCase(name)) {
+                    return service;
+                }
+            }
+        }
+        return null;
     }
 
     /**

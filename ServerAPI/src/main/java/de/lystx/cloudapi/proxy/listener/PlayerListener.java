@@ -30,6 +30,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void handlePreLogin(LoginEvent event) {
+
         CloudConnection connection = new CloudConnection(event.getConnection().getUniqueId(), event.getConnection().getName(), event.getConnection().getAddress().getAddress().getHostAddress());
         CloudPlayer cloudPlayer = this.cloudAPI.getCloudPlayers().get(connection.getName());
 
