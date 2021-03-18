@@ -1,9 +1,9 @@
 
-package de.lystx.cloudsystem.library.service.event.raw;
+package de.lystx.cloudsystem.library.service.event;
 
 
 
-import de.lystx.cloudsystem.library.service.event.enums.Priority;
+import de.lystx.cloudsystem.library.enums.Priority;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,6 +14,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SubscribeEvent {
 
-    Priority priority() default Priority.NORMAL;
+    Priority value() default Priority.NORMAL;
 
 }

@@ -6,10 +6,9 @@ import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.event.raw.Event;
+import de.lystx.cloudsystem.library.service.event.Event;
 import de.lystx.cloudsystem.library.service.lib.LibraryService;
 import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
@@ -20,7 +19,7 @@ import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
-import de.lystx.cloudsystem.library.service.util.AuthManager;
+import de.lystx.cloudsystem.library.service.io.AuthManager;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.util.Loggers;
 import de.lystx.cloudsystem.library.service.util.TicksPerSecond;
@@ -82,8 +81,8 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
         this.cloudServer = new CloudServer(this.host, this.port);
         this.cloudClient = new CloudClient(this.host, this.port);
 
-        this.cloudServices.add(new Scheduler(this, "Scheduler", CloudServiceType.UTIL));
-        this.cloudServices.add(new EventService(this, "Event", CloudServiceType.MANAGING));
+        this.cloudServices.add(new Scheduler(this, "Scheduler", CloudService.CloudServiceType.UTIL));
+        this.cloudServices.add(new EventService(this, "Event", CloudService.CloudServiceType.MANAGING));
 
         this.authManager = new AuthManager(new File("auth.json"));
         this.ticksPerSecond = new TicksPerSecond(this);
@@ -110,6 +109,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
         this.libraryService.install("org.apache.httpcomponents", "httpcore", "4.3.2", Repository.CENTRAL);
         this.libraryService.install("commons-io", "commons-io", "2.6", Repository.CENTRAL);
         this.libraryService.install("commons-logging", "commons-logging", "1.2", Repository.CENTRAL);
+        this.libraryService.install("commons-lang", "commons-lang", "2.5", Repository.CENTRAL);
         this.libraryService.install("org.slf4j", "slf4j-api", "1.7.25", Repository.CENTRAL);
         this.libraryService.install("org.apache.logging.log4j", "log4j-api", "2.5", Repository.CENTRAL);
         this.libraryService.install("log4j", "log4j", "1.2.17", Repository.CENTRAL);

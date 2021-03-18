@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 @Getter @Setter @ToString
@@ -17,7 +19,7 @@ public class Service implements Serializable, Objectable<Service> {
     private final UUID uniqueId;
     private final int serviceID;
     private final int port;
-    private final String host;
+    private String host;
     private final int cloudPort;
     private final ServiceState serviceState;
     private SerializableDocument properties;
@@ -40,7 +42,11 @@ public class Service implements Serializable, Objectable<Service> {
         this.serviceID = serviceID;
         this.port = port;
         this.cloudPort = cloudPort;
-        this.host = "127.0.0.1";
+        try {
+            this.host = (InetAddress.getLocalHost().getHostAddress());
+        } catch (UnknownHostException e) {
+            this.host = ("127.0.0.1");
+        }
         this.serviceState = serviceState;
     }
 

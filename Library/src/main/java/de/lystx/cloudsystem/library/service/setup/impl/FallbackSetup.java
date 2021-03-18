@@ -5,7 +5,7 @@ import de.lystx.cloudsystem.library.service.setup.Setup;
 import lombok.Getter;
 
 @Getter
-public class FallbackAbstractSetup extends AbstractSetup<FallbackAbstractSetup> {
+public class FallbackSetup extends AbstractSetup<FallbackSetup> {
 
     @Setup(id = 1, question = "For which group is this fallback?")
     private String name;

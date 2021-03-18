@@ -2,11 +2,10 @@ package de.lystx.cloudsystem.library.service.backup;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
-import de.lystx.cloudsystem.library.service.util.ZipHelper;
+import de.lystx.cloudsystem.library.service.io.Zip;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -87,8 +86,8 @@ public class BackupService extends CloudService {
         this.lastBackup = new Date().getTime();
 
         File src = this.getCloudLibrary().getService(FileService.class).getCloudDirectory();
-        ZipHelper zipHelper = new ZipHelper();
-        zipHelper.zip(src, new File(getCloudLibrary().getService(FileService.class).getBackupDirectory(), name + ".zip"));
+        Zip zip = new Zip();
+        zip.zip(src, new File(getCloudLibrary().getService(FileService.class).getBackupDirectory(), name + ".zip"));
 
     }
 }

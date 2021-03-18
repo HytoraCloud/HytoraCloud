@@ -13,7 +13,6 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.event.EventService;
@@ -159,6 +158,9 @@ public class ServerService extends CloudService {
         List<Service> services = this.getServices(service.getServiceGroup());
         services.remove(service);
         Service newService = new Service(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), state);
+        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+            service.setHost("127.0.0.1");
+        }
         services.add(newService);
         this.services.put(service.getServiceGroup(), services);
     }
@@ -181,7 +183,9 @@ public class ServerService extends CloudService {
                 int port = serviceGroup.getServiceType().equals(ServiceType.SPIGOT) ? this.portService.getFreePort() : this.portService.getFreeProxyPort();
 
                 Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : getCloudLibrary().getService(ConfigService.class).getReceiverInfo().getPort(), ServiceState.LOBBY);
-
+                if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+                    service.setHost("127.0.0.1");
+                }
                 if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT)) {
                     if (serviceGroup.isLobby()) {
                         this.lobbies.add(service);
@@ -261,6 +265,9 @@ public class ServerService extends CloudService {
                                     .getService(ConfigService.class)
                                     .getNetworkConfig()
                                     .getPort(), ServiceState.LOBBY);
+                    if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+                        service.setHost("127.0.0.1");
+                    }
                     this.startService(serviceGroup, service);
                 }
             }
@@ -295,6 +302,9 @@ public class ServerService extends CloudService {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
             int id = this.idService.getFreeID(serviceGroup.getName());
             service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), service.getServiceState());
+        }
+        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+            service.setHost("127.0.0.1");
         }
         service.setProperties((properties == null ? new SerializableDocument() : properties));
         this.globalServices.add(service);
@@ -343,6 +353,9 @@ public class ServerService extends CloudService {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
         Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), ServiceState.LOBBY);
+        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+            service.setHost("127.0.0.1");
+        }
         return this.startService(serviceGroup, service, properties);
     }
 
@@ -365,11 +378,31 @@ public class ServerService extends CloudService {
         }
         try {
             this.getCloudLibrary().sendPacket(new PacketOutStopServer(service));
-            this.idService.removeID(service.getServiceGroup().getName(), service.getServiceID());
-            this.portService.removeProxyPort(service.getPort());
-            this.portService.removePort(service.getPort());
+            try {
+                this.idService.removeID(
+                        service
+                                .getServiceGroup()
+                                .getName(),
+                        service
+                                .getServiceID()
+                );
+                this.portService.removeProxyPort(
+                        service.getPort()
+                );
+                this.portService.removePort(
+                        service.getPort()
+                );
+            } catch (NullPointerException e) {
+                //Ignoring Ubuntu Error
+            }
 
-            List<Service> services = this.services.get(this.getGroup(service.getServiceGroup().getName()));
+            List<Service> services = this.services.get(
+                    this.getGroup(
+                            service
+                                    .getServiceGroup()
+                                    .getName()
+                    )
+            );
             Service remove = this.getService(service.getName());
             if (services == null) services = new LinkedList<>();
             services.remove(remove);
@@ -397,7 +430,7 @@ public class ServerService extends CloudService {
         }
         List<String> already = new LinkedList<>();
         for (ServiceGroup serviceGroup : this.services.keySet()) {
-            if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
+            if (this.getCloudLibrary().getService(GroupService.class) != null && this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
                 continue;
             }
             if (!already.contains(serviceGroup.getName())) {

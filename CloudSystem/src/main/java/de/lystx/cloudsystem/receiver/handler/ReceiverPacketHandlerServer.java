@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.receiver.handler;
 
 import de.lystx.cloudsystem.library.elements.packets.in.service.*;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.receiver.Receiver;
 import lombok.AllArgsConstructor;

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public abstract class AbstractSetup<T> {
 
     private final Map<Field, Setup> setupParts = new HashMap<>();
-    private int current = 43084380;
+    private int current = 1;
     private CloudConsole cloudConsole;
     private boolean cancelled;
     private boolean skipped;
@@ -28,14 +28,12 @@ public abstract class AbstractSetup<T> {
      * @param consumer
      */
     public void start(CloudConsole scanner, Consumer<T> consumer) {
+        this.consumer = consumer;
+        this.cloudConsole = scanner;
+
         scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("SETUP", "§aIf you want to setup just type §2'cancel'§a!");
-        this.consumer = consumer;
-        this.cloudConsole = scanner;
-        this.current = 1;
-        this.cancelled = false;
-        this.skipped = false;
 
         for (Field field : getClass().getDeclaredFields()) {
             if (field.getAnnotation(Setup.class) != null) {
@@ -50,6 +48,7 @@ public abstract class AbstractSetup<T> {
         this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
 
         while (this.current < this.setupParts.size() + 1) {
+            this.cloudConsole.setCurrentSetup(this);
             try {
                 String line = this.cloudConsole.getLogger().getConsoleReader().readLine(ConsoleColor.formatColorString(this.cloudConsole.getPrefix()));
                 if (line != null) {
@@ -60,6 +59,7 @@ public abstract class AbstractSetup<T> {
                 e.printStackTrace();
             }
         }
+        this.cloudConsole.setCurrentSetup(null);
         this.consumer.accept((T) this);
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractSetup<T> {
                 return;
             }
             if (lastAnswer.equalsIgnoreCase("cancel")) {
-                this.cloudConsole.getLogger().sendMessage("SETUP", "§cThe current was §ecancelled§c!");
+                this.cloudConsole.getLogger().sendMessage("SETUP", "§cThe current setup was §ecancelled§c!");
                 this.cancelled = true;
                 this.current += 10000;
                 return;

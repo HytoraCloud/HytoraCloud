@@ -48,7 +48,9 @@ public class ReceiverBootingSetupDone {
                 receiver.getCloudClient().onConnectionEstablish(nettyClient -> {
                     nettyClient.getPacketAdapter().registerAdapter(new ReceiverPacketHandlerLogin(receiver));
                     nettyClient.getPacketAdapter().registerAdapter(new ReceiverPacketHandlerShutdown(receiver));
+                    nettyClient.getPacketAdapter().registerAdapter(new ReceiverPacketHandlerConfig(receiver));
                     nettyClient.getPacketAdapter().registerAdapter(new ReceiverPacketHandlerServer(receiver));
+                    nettyClient.getPacketAdapter().registerAdapter(new ReceiverPacketHandlerFiles(receiver));
                     nettyClient.sendPacket(new PacketReceiverLogin(receiver.getService(ConfigService.class).getReceiverInfo(), receiver.getAuthManager().getKey()));
                 });
                 receiver.getCloudClient().connect(info.getIpAddress(), info.getPort());

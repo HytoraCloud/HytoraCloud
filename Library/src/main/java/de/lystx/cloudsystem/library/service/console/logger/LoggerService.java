@@ -2,7 +2,6 @@ package de.lystx.cloudsystem.library.service.console.logger;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.CloudCompleter;
 import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;

@@ -61,8 +61,15 @@ public class ServiceProviderStart {
             return false;
         }
         try {
-            cloudLibrary.getService(TemplateService.class).createTemplate(new File(template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate()), service.getServiceGroup());
+            if (cloudLibrary.getService(TemplateService.class) != null) {
+                cloudLibrary.getService(TemplateService.class).createTemplate(new File(template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate()), service.getServiceGroup());
+
+            }
             File templateLocation = new File(this.template, service.getServiceGroup().getName() + "/" + service.getServiceGroup().getTemplate() + "/");
+            if (!templateLocation.exists()) {
+                cloudLibrary.getConsole().getLogger().sendMessage("ERROR", "§cCouldn't start service §e" + service.getName() + " §cbecause Template does not exist!");
+                return false;
+            }
             File serverLocation = new File(
                     service.getServiceGroup().isDynamic() ?
                             (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ?

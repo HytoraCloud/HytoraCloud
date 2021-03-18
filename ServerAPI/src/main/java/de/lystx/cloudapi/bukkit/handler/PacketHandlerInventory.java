@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.elements.packets.both.PacketOpenInventory;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketInventoryUpdate;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.cloudsystem.library.service.player.featured.CloudInventory;
 import de.lystx.cloudsystem.library.service.player.featured.CloudItem;
 import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;

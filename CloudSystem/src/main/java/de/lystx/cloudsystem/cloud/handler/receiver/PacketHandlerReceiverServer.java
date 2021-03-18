@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.handler.receiver;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

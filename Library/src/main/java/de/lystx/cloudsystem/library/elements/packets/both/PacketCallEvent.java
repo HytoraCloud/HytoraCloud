@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.elements.packets.both;
 
-import de.lystx.cloudsystem.library.service.event.raw.Event;
+import de.lystx.cloudsystem.library.service.event.Event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

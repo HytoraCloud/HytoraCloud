@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.library.service.setup.Setup;
 import lombok.Getter;
 
 @Getter
-public class GroupAbstractSetup extends AbstractSetup<GroupAbstractSetup> {
+public class GroupSetup extends AbstractSetup<GroupSetup> {
 
     @Setup(id = 1, question = "How should this group be named?")
     private String serverName;

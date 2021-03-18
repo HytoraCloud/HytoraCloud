@@ -23,4 +23,12 @@ public abstract class CloudService  {
         this.type = type;
     }
 
+    public enum CloudServiceType {
+        UTIL,
+        MANAGING,
+        NETWORK,
+        CONFIG,
+        FETCHER,
+        OTHER;
+    }
 }

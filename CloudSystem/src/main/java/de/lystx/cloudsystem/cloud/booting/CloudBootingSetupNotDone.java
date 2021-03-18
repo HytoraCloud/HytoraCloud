@@ -16,14 +16,17 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionValidality;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
-import de.lystx.cloudsystem.library.service.setup.impl.CloudAbstractSetup;
-import de.lystx.cloudsystem.library.service.setup.impl.DatabaseAbstractSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
+import de.lystx.cloudsystem.library.service.setup.impl.DatabaseSetup;
+import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.service.util.Action;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class CloudBootingSetupNotDone {
@@ -44,11 +47,11 @@ public class CloudBootingSetupNotDone {
                 "/____/\\___/\\__/\\__,_/ .___/ \n" +
                 "                   /_/      \n");
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
-        cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cSetup crashes if trying to use history (arrow keys)");
-        cloudSystem.getConsole().getLogger().sendMessage("KNOWN-BUG", "§7» §cMight have to enter some values multiple times (If 3 times > Kill process and restart)");
+        cloudSystem.getConsole().getLogger().sendMessage("INFO", "§7» §b" + Updater.getCloudVersion());
+        cloudSystem.getConsole().getLogger().sendMessage("INFO", "§7» §b" + new SimpleDateFormat("hh:mm:ss").format(new Date()));
         cloudSystem.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         cloudSystem.getService(CommandService.class).setActive(false);
-        CloudAbstractSetup cloudSetup = new CloudAbstractSetup();
+        CloudSetup cloudSetup = new CloudSetup();
         Value<Spigot> spigot = new Value<>();
         Value<String> bungeeCord = new Value<>();
 
@@ -119,7 +122,7 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");
                 cloudSystem.getConsole().getLogger().sendMessage("§9");
                 cloudSystem.getConsole().getLogger().sendMessage("§9");
-                DatabaseAbstractSetup databaseSetup = new DatabaseAbstractSetup();
+                DatabaseSetup databaseSetup = new DatabaseSetup();
                 databaseSetup.start(cloudSystem.getConsole(), ds -> {
                     VsonObject document1 = new VsonObject(VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST)
                             .append("type", setup.getDatabase().toUpperCase())
@@ -142,6 +145,7 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getService(FileService.class).download(spigot.getValue().getUrl(), new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
 
                 cloudSystem.getService(FileService.class).download(bungeeCord.getValue().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
+
                 cloudSystem.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
 
                 cloudSystem.getConsole().sendMessage("INFO", "§aDownloading newest §2Spigot §aand §2BungeeCord §atook §h[§e" + action.getMS() + "s§h]");

@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.server.other.process;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.service.scheduler.Schedule;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -42,7 +43,7 @@ public class ServiceProviderStop {
                         try {
                             FileUtils.deleteDirectory(screen.getServerDir());
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            //Ignoring
                         }
                         return;
                     }
@@ -55,7 +56,7 @@ public class ServiceProviderStop {
                         FileUtils.deleteDirectory(new File(screen.getServerDir(), "CLOUD"));
                         FileUtils.forceDelete(cloudAPI);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        //Ingoring
                     }
 
                 });

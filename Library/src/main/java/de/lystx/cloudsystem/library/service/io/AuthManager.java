@@ -1,5 +1,8 @@
-package de.lystx.cloudsystem.library.service.util;
+package de.lystx.cloudsystem.library.service.io;
 
+import de.lystx.cloudsystem.library.service.random.Random;
+import de.lystx.cloudsystem.library.service.random.RandomString;
+import de.lystx.cloudsystem.library.service.server.other.process.Threader;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.AllArgsConstructor;
@@ -7,7 +10,6 @@ import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 @Getter @AllArgsConstructor
 public class AuthManager {
@@ -20,8 +22,12 @@ public class AuthManager {
     public void createKey() {
         if (!this.keyFile.exists()) {
             VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
-            document.append("key", UUID.randomUUID().toString() + "_" + UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString());
-            document.save(this.keyFile);
+            Threader.getInstance().execute(() -> {
+                for (int i = 0; i < 100; i++) {
+                    document.append(Random.current().getString().next(3) + i, Random.current().getString().next(200));
+                }
+                document.save(this.keyFile);
+            });
         }
     }
 
@@ -32,8 +38,12 @@ public class AuthManager {
     public String getKey() {
         if (this.keyFile.exists()) {
             try {
+                StringBuilder stringBuilder = new StringBuilder();
                 VsonObject document = new VsonObject(this.keyFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
-                return document.getString("key");
+                for (String key : document.keys()) {
+                    stringBuilder.append(document.getString(key)).append("@");
+                }
+                return stringBuilder.toString();
             } catch (IOException e) {
                 e.printStackTrace();
             }

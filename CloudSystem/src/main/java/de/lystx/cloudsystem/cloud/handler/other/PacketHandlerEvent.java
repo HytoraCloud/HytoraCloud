@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.cloud.handler.other;
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

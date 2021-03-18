@@ -61,14 +61,14 @@ public class CloudCommand implements TabCompletable {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Cloud will be shut down in §e3 Seconds§8...");
                         CloudAPI.getInstance().setJoinable(false);
 
-                        Value<Integer> integerValue = new Value<>(CloudAPI.getInstance().getCloudPlayers().getAll().size());
-                        CloudAPI.getInstance().getCloudPlayers().forEach(cloudPlayer -> {
+                        int i = CloudAPI.getInstance().getCloudPlayers().getAll().size();
+                        for (CloudPlayer cloudPlayer : CloudAPI.getInstance().getCloudPlayers()) {
                             cloudPlayer.kick(CloudAPI.getInstance().getPrefix() + "§cNetwork was §eshut down!");
-                            integerValue.decrease();
-                            if (integerValue.getValue() <= 0) {
+                             i--;
+                            if (i <= 0) {
                                 CloudAPI.getInstance().getNetwork().shutdownCloud();
                             }
-                        });
+                        }
                     } else {
                         this.help(player);
                     }
@@ -169,14 +169,15 @@ public class CloudCommand implements TabCompletable {
                                 return;
                             }
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start §b" + id + " §7new services of group §a" + group.getName() + "§8...");
-                            IntStream.range(0, id).forEach(i -> {
+                            for (int i = 0; i < id; i++) {
+
                                 CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname)).onDocumentSet(document -> {
                                     String message = document.getString("message");
                                     if (!document.getBoolean("sucess", false)) {
                                         player.sendMessage(CloudAPI.getInstance().getPrefix() + message);
                                     }
                                 });
-                            });
+                            }
                         } catch (NumberFormatException e) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cPlease provide a valid number!");
                         }

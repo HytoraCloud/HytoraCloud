@@ -9,7 +9,7 @@ import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.*;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;

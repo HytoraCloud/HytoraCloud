@@ -6,27 +6,32 @@ import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
+import de.lystx.cloudsystem.library.service.setup.AbstractSetup;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.*;
 
-@Getter
+@Getter @Setter
 public class CloudConsole extends Thread implements CloudCommandSender {
 
     private final LoggerService logger;
     private final CommandService commandManager;
     private final String buffer;
+    private AbstractSetup<?> currentSetup;
+    private boolean active;
 
     public CloudConsole(LoggerService logger, CommandService commandManager, String buffer) {
         this.logger = logger;
         this.buffer = buffer;
         this.commandManager = commandManager;
+        this.active = true;
+        this.currentSetup = null;
         this.setDaemon(true);
         this.start();
     }
-
 
     /**
      * Starts Thread
@@ -38,11 +43,14 @@ public class CloudConsole extends Thread implements CloudCommandSender {
                 String line;
                 if (!Constants.NEEDS_DEPENDENCIES) {
                     if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
-                        if (line.trim().isEmpty()) {
-                            continue;
+                        if (!line.trim().isEmpty()) {
+                            this.logger.getConsoleReader().setPrompt("");
+                            if (currentSetup != null) {
+                                currentSetup.next(line);
+                            } else {
+                                this.commandManager.execute(line, this);
+                            }
                         }
-                        this.logger.getConsoleReader().setPrompt("");
-                        this.commandManager.execute(line, this);
                     }
                 }
             } catch (IOException e) {

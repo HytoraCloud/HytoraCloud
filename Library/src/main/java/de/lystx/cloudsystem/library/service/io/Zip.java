@@ -1,5 +1,5 @@
 
-package de.lystx.cloudsystem.library.service.util;
+package de.lystx.cloudsystem.library.service.io;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipHelper {
+public class Zip {
 
     /**
      * Adds a file to a zpfile

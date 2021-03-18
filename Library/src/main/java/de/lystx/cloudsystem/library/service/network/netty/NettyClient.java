@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.elements.packets.out.PacketOutVerifyConnecti
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
+import de.lystx.cloudsystem.library.service.network.netty.filetransfer.FileClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
@@ -38,12 +39,14 @@ public class NettyClient {
     private Consumer<NettyClient> consumerConnection;
     private boolean established;
 
+
     public NettyClient(String hostname, int port) {
         this.host = hostname;
         this.port = port;
         this.packetAdapter = new PacketAdapter();
         this.tries = new HashMap<>();
         this.established = false;
+
     }
 
     /**

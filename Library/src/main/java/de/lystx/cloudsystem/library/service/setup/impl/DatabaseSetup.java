@@ -5,7 +5,7 @@ import de.lystx.cloudsystem.library.service.setup.Setup;
 import lombok.Getter;
 
 @Getter
-public class DatabaseAbstractSetup extends AbstractSetup<DatabaseAbstractSetup> {
+public class DatabaseSetup extends AbstractSetup<DatabaseSetup> {
 
     @Setup(question = "What's the host of your database?", id = 1)
     private String host;

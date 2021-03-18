@@ -4,11 +4,9 @@ package de.lystx.cloudsystem.library.service.event;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
-import de.lystx.cloudsystem.library.service.event.raw.Event;
-import de.lystx.cloudsystem.library.service.event.raw.EventMethod;
-import de.lystx.cloudsystem.library.service.event.raw.SubscribeEvent;
+import de.lystx.cloudsystem.library.service.util.ObjectMethod;
 import lombok.Getter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -16,7 +14,7 @@ import java.util.*;
 @Getter
 public class EventService extends CloudService {
 
-    private final Map<Object, List<EventMethod>> registeredClasses;
+    private final Map<Object, List<ObjectMethod<SubscribeEvent>>> registeredClasses;
 
     public EventService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
         super(cloudLibrary, name, cloudType);
@@ -28,7 +26,7 @@ public class EventService extends CloudService {
      * @param o
      */
     public void registerEvent(Object o) {
-        List<EventMethod> eventMethods = new ArrayList<>();
+        List<ObjectMethod<SubscribeEvent>> eventMethods = new ArrayList<>();
 
         for (Method m : o.getClass().getDeclaredMethods()) {
             SubscribeEvent annotation = m.getAnnotation(SubscribeEvent.class);
@@ -37,11 +35,11 @@ public class EventService extends CloudService {
                 Class<?> parameterType = m.getParameterTypes()[0];
 
                 m.setAccessible(true);
-                eventMethods.add(new EventMethod(o, m, parameterType, annotation));
+                eventMethods.add(new ObjectMethod<>(o, m, parameterType, annotation));
             }
         }
 
-        eventMethods.sort(Comparator.comparingInt(em -> em.getAnnotation().priority().getValue()));
+        eventMethods.sort(Comparator.comparingInt(em -> em.getAnnotation().value().getValue()));
         registeredClasses.put(o, eventMethods);
     }
 
@@ -61,7 +59,7 @@ public class EventService extends CloudService {
     public boolean callEvent(Event event) {
         try {
             registeredClasses.forEach((object, methodList) -> {
-                for (EventMethod em : methodList) {
+                for (ObjectMethod<SubscribeEvent> em : methodList) {
                     if (em.getEvent().equals(event.getClass())) {
                         try {
                             em.getMethod().invoke(em.getInstance(), event);

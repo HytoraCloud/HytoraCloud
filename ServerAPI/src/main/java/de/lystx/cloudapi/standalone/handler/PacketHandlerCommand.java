@@ -5,7 +5,7 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketCommand;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -2,7 +2,6 @@ package de.lystx.cloudsystem.library.service.serverselector.sign;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
 import de.lystx.cloudsystem.library.service.serverselector.sign.layout.DefaultSignLayout;
@@ -40,8 +39,8 @@ public class SignService extends CloudService {
     public void load() {
         this.cloudSigns = new LinkedList<>();
         if (!this.layOutFile.exists()) {
-            new DefaultSignLayout().save(this.layOutFile);
-            this.signLayOut = new SignLayOut(new DefaultSignLayout());
+            new DefaultSignLayout(VsonSettings.CREATE_FILE_IF_NOT_EXIST).save(this.layOutFile);
+            this.signLayOut = new SignLayOut(new DefaultSignLayout(VsonSettings.CREATE_FILE_IF_NOT_EXIST));
         } else {
             try {
                 this.signLayOut = new SignLayOut(new VsonObject(this.layOutFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES));

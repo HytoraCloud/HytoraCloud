@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 @Getter @Setter @AllArgsConstructor
-public class NetworkConfig implements Serializable, Objectable {
+public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
 
     private String host;
     private Integer port;
@@ -36,8 +36,8 @@ public class NetworkConfig implements Serializable, Objectable {
      */
     public static VsonObject defaultConfig() {
         return new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST)
-                .append("host", "127.0.0.1")
-                .append("port", 2131)
+                .append("host", 0)
+                .append("port", 1401)
                 .append("useWrapper", false)
                 .append("setupDone", false)
                 .append("autoUpdater", false)

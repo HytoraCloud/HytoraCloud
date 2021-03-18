@@ -51,9 +51,9 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
     public SerializableDocument append(Object value) {
         this.clear();
         JsonObject jsonObject = new Gson().toJsonTree(value).getAsJsonObject();
-        jsonObject.keySet().forEach(key -> {
+        for (String key : jsonObject.keySet()) {
             this.put(key, jsonObject.get(key));
-        });
+        }
         return this;
     }
 
@@ -135,7 +135,9 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
      */
     public Document toDocument() {
         Document document = new Document();
-        this.forEach(document::append);
+        for (String s : this.keySet()) {
+            document.append(s, this.get(s));
+        }
         return document;
     }
 

@@ -21,11 +21,10 @@ import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketStatistics;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
-import de.lystx.cloudsystem.library.service.event.raw.Event;
+import de.lystx.cloudsystem.library.service.event.Event;
 import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -82,7 +81,7 @@ public class CloudAPI implements CloudService {
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool(cloudLibrary);
         this.templates = new Templates(this);
-        this.commandService = new CommandService(this.cloudLibrary, "Command", CloudServiceType.MANAGING);
+        this.commandService = new CommandService(this.cloudLibrary, "Command", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING);
 
         Constants.EXECUTOR = this.cloudClient;
         Constants.PERMISSION_POOL = this.permissionPool;

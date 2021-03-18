@@ -3,11 +3,11 @@ package de.lystx.cloudsystem.global;
 import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
+import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInShutdown;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutNPC;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
@@ -40,13 +40,13 @@ public class CloudInstance extends CloudLibrary {
     public CloudInstance(CloudType cloudType) {
         super(cloudType);
 
-        this.cloudServices.add(new CommandService(this, "Command", CloudServiceType.MANAGING));
-        this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudServiceType.UTIL));
+        this.cloudServices.add(new CommandService(this, "Command", CloudService.CloudServiceType.MANAGING));
+        this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.CloudServiceType.UTIL));
         this.console = new CloudConsole(this.getService(LoggerService.class), this.getService(CommandService.class), System.getProperty("user.name"));
 
         this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
-        this.cloudServices.add(new FileService(this, "File", CloudServiceType.CONFIG));
+        this.cloudServices.add(new FileService(this, "File", CloudService.CloudServiceType.CONFIG));
 
 
         if (cloudType.equals(CloudType.CLOUDSYSTEM)) {
@@ -55,12 +55,12 @@ public class CloudInstance extends CloudLibrary {
             this.webServer.start();
         }
 
-        this.cloudServices.add(new ConfigService(this, "Config", CloudServiceType.CONFIG));
-        this.cloudServices.add(new LogService(this, "Logging", CloudServiceType.UTIL));
+        this.cloudServices.add(new ConfigService(this, "Config", CloudService.CloudServiceType.CONFIG));
+        this.cloudServices.add(new LogService(this, "Logging", CloudService.CloudServiceType.UTIL));
 
 
-        this.cloudServices.add(new ScreenService(this, "Screens", CloudServiceType.MANAGING));
-        this.cloudServices.add(new EventService(this, "Event", CloudServiceType.MANAGING));
+        this.cloudServices.add(new ScreenService(this, "Screens", CloudService.CloudServiceType.MANAGING));
+        this.cloudServices.add(new EventService(this, "Event", CloudService.CloudServiceType.MANAGING));
 
         this.getService(CommandService.class).registerCommand(new ShutdownCommand(this));
         this.getService(CommandService.class).registerCommand(new HelpCommand(this));
@@ -138,8 +138,11 @@ public class CloudInstance extends CloudLibrary {
         if (this.getService(ModuleService.class) != null) {
             this.getService(ModuleService.class).shutdown();
         }
-        this.getService(StatisticsService.class).getStatistics().add("allCPUUsage", new NetworkInfo().getCPUUsage());
 
+        if (this.getService(ModuleService.class) != null) {
+            this.getService(StatisticsService.class).getStatistics().add("allCPUUsage", new NetworkInfo().getCPUUsage());
+
+        }
         this.getService(Scheduler.class).scheduleDelayedTask(() -> {
             try {
                 FileUtils.deleteDirectory(this.getService(FileService.class).getDynamicServerDirectory());

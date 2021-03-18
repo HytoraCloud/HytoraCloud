@@ -2,14 +2,18 @@ package de.lystx.cloudsystem.cloud.handler;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
+import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverFiles;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLoginResult;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
+import de.lystx.cloudsystem.library.service.io.FileService;
+import de.lystx.cloudsystem.library.service.io.Zip;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
-import de.lystx.cloudsystem.library.service.util.Decision;
+import de.lystx.cloudsystem.library.enums.Decision;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -49,8 +53,24 @@ public class ReceiverManager {
                 }
             }
         }
+        this.sendFilesToReceivers();
         cloudSystem.getService(CloudNetworkService.class).sendPacket(new PacketReceiverLoginResult(receiverInfo, decision, this.cloudSystem.getService(GroupService.class).getGroups()));
     }
+
+
+    public void sendFilesToReceivers() {
+        FileService fs = this.cloudSystem.getService(FileService.class);
+
+        new Zip().zip(fs.getTemplatesDirectory(), new File("templates.zip"));
+
+        PacketReceiverFiles packetReceiverFiles = new PacketReceiverFiles(
+                new File(fs.getVersionsDirectory(), "spigot.jar"),
+                new File(fs.getVersionsDirectory(), "bungeeCord.jar"),
+                new File("templates.zip")
+        );
+        //this.cloudSystem.sendPacket(packetReceiverFiles);
+    }
+
 
     /**
      * Tries to unregister a Receiver
@@ -65,6 +85,9 @@ public class ReceiverManager {
         }
         this.receivers.remove(safe);
         cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§7The Receiver §c" + receiverInfo.getName() + " §7has disconnected from §bHytoraCloud§h!");
+        if (this.receivers.size() >= 1) {
+            this.sendFilesToReceivers();
+        }
     }
 
     /**

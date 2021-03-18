@@ -2,8 +2,8 @@ package de.lystx.cloudsystem.library.service.network.connection.adapter;
 
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketMethod;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
+import de.lystx.cloudsystem.library.service.util.ObjectMethod;
 import lombok.Getter;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,7 +14,7 @@ import java.util.*;
 public class PacketAdapter {
 
     private final List<PacketHandlerAdapter> registeredHandlers;
-    private final Map<Object, List<PacketMethod>> registeredClasses;
+    private final Map<Object, List<ObjectMethod<PacketHandler>>> registeredClasses;
 
     public PacketAdapter() {
         this.registeredHandlers = new LinkedList<>();
@@ -29,7 +29,7 @@ public class PacketAdapter {
         if (adapterHandler instanceof PacketHandlerAdapter) {
             this.registeredHandlers.add((PacketHandlerAdapter) adapterHandler);
         }
-        List<PacketMethod> packetMethods = new ArrayList<>();
+        List<ObjectMethod<PacketHandler>> packetMethods = new ArrayList<>();
 
         for (Method m : adapterHandler.getClass().getDeclaredMethods()) {
             PacketHandler annotation = m.getAnnotation(PacketHandler.class);
@@ -37,11 +37,11 @@ public class PacketAdapter {
                 Class<?> parameterType = m.getParameterTypes()[0];
 
                 m.setAccessible(true);
-                packetMethods.add(new PacketMethod(adapterHandler, m, parameterType, annotation));
+                packetMethods.add(new ObjectMethod<>(adapterHandler, m, parameterType, annotation));
             }
         }
 
-        packetMethods.sort(Comparator.comparingInt(em -> em.getAnnotation().priority().getValue()));
+        packetMethods.sort(Comparator.comparingInt(em -> em.getAnnotation().value().getValue()));
         this.registeredClasses.put(adapterHandler, packetMethods);
     }
 
@@ -64,7 +64,7 @@ public class PacketAdapter {
     public void handelAdapterHandler(Packet packet) {
         try {
             registeredClasses.forEach((object, methodList) -> {
-                for (PacketMethod em : methodList) {
+                for (ObjectMethod<PacketHandler> em : methodList) {
                     PacketHandler packetHandler = em.getAnnotation();
                     if (packet instanceof CustomPacket && !packetHandler.transformTo().equals(Packet.class)) {
                         Packet examplePacket = packet.document().getObject("packet", packetHandler.transformTo());

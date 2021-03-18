@@ -10,8 +10,8 @@ public class DefaultSignLayout extends VsonObject {
     /**
      * Returns new Default SignLayOut
      */
-    public DefaultSignLayout() {
-        super(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+    public DefaultSignLayout(VsonSettings... vsonSettings) {
+        super(vsonSettings);
         VsonArray loadingLayouts = new VsonArray();
         VsonObject loading1 = new VsonObject();
         VsonObject loading2 = new VsonObject();

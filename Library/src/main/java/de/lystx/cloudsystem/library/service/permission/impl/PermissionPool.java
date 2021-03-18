@@ -452,14 +452,14 @@ public class PermissionPool implements Serializable {
                 for (File file : Objects.requireNonNull(directory.listFiles())) {
                     try {
                         String uuid = file.getName().split("\\.")[0];
-                        if (!isUUID(uuid) || UUIDService.getName(UUID.fromString(uuid)) == null) {
+                        if (!isUUID(uuid) || UUIDService.getInstance().getName(UUID.fromString(uuid)) == null) {
                             file.delete();
                         }
                     } catch (NullPointerException e) {
                         file.delete();
                     }
                 }
-            } catch (NullPointerException | IOException e) {
+            } catch (NullPointerException e) {
             }
         }, "async_uuid_clear_cache").start();
     }
@@ -498,7 +498,7 @@ public class PermissionPool implements Serializable {
      * @return
      */
     public UUID tryUUID(String name) {
-        return this.getUUID(name) == null ? UUIDService.getUUID(name) : this.getUUID(name);
+        return this.getUUID(name) == null ? UUIDService.getInstance().getUUID(name) : this.getUUID(name);
     }
 
     /**
@@ -521,11 +521,7 @@ public class PermissionPool implements Serializable {
      * @return
      */
     public String tryName(UUID uuid) {
-        try {
-            return this.getName(uuid) == null ? UUIDService.getName(uuid) : this.getName(uuid);
-        } catch (IOException e) {
-            return null;
-        }
+        return this.getName(uuid) == null ? UUIDService.getInstance().getName(uuid) : this.getName(uuid);
     }
 
     private String getName(UUID uuid) {

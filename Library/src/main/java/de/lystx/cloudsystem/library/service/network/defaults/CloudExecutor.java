@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.service.network.defaults;
 
 import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
-import de.lystx.cloudsystem.library.service.event.raw.Event;
+import de.lystx.cloudsystem.library.service.event.Event;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 

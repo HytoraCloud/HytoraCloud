@@ -1,10 +1,9 @@
 package de.lystx.cloudsystem.library.service.module;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.service.command.command.CommandInfo;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.event.raw.Event;
+import de.lystx.cloudsystem.library.service.event.Event;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;

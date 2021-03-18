@@ -3,7 +3,7 @@ package de.lystx.cloudapi.bukkit.handler;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

@@ -5,7 +5,6 @@ import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.CloudServiceType;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import io.vson.elements.VsonArray;
@@ -90,6 +89,7 @@ public class GroupService extends CloudService {
         try {
             VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.putAll(serviceGroup);
+            document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.save();
             this.groups.add(serviceGroup);
             this.getCloudLibrary().getService(TemplateService.class).createTemplate(serviceGroup);
@@ -131,6 +131,7 @@ public class GroupService extends CloudService {
             VsonObject document = new VsonObject(new File(this.getCloudLibrary().getService(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"), VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.clear();
             document.putAll(newServiceGroup);
+            document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
             document.save();
             this.groups.remove(this.getGroup(serviceGroup.getName()));
             this.groups.add(newServiceGroup);

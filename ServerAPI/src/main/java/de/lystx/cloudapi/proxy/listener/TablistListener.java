@@ -7,7 +7,7 @@ import de.lystx.cloudapi.proxy.events.player.ProxyServerPlayerNetworkJoinEvent;
 import de.lystx.cloudapi.proxy.events.player.ProxyServerPlayerNetworkQuitEvent;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutUpdateTabList;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.TabList;
-import de.lystx.cloudsystem.library.service.network.packet.raw.PacketHandler;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.cloudsystem.library.service.util.Value;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;

@@ -1,10 +1,8 @@
 package de.lystx.cloudsystem.library.service.module.loader;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.event.EventService;
-import de.lystx.cloudsystem.library.service.event.raw.Event;
 import de.lystx.cloudsystem.library.service.module.Module;
 import de.lystx.cloudsystem.library.service.module.ModuleInfo;
 import de.lystx.cloudsystem.library.service.module.ModuleService;

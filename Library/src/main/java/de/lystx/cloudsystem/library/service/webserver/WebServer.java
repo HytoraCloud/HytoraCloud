@@ -13,10 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class WebServer {
@@ -45,7 +42,7 @@ public class WebServer {
             this.enabled = this.config.getBoolean("enabled", true);
             this.whitelistedIps = this.config.has("whitelistedIps") ?
                     this.config.getList("whitelistedIps", String.class) :
-                    this.config.append("whitelistedIps", Collections.singletonList("127.0.0.1")).getList("whitelistedIps", String.class);
+                    this.config.append("whitelistedIps", Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1S")).getList("whitelistedIps", String.class);
             this.config.save();
             try {
                 this.handlers = new HashMap<>();
@@ -89,14 +86,23 @@ public class WebServer {
      * @param document
      */
     public void update(String web, VsonObject document) {
+        this.update(web, document.toString(FileFormat.JSON));
+    }
+
+    /**
+     * Raw method to update
+     * a string to a webRoute
+     * @param web
+     * @param content
+     */
+    public void update(String web, String content) {
         String finalWeb = (web.startsWith("/") ? web : "/" + web);
         this.remove(web);
         this.server.createContext(finalWeb, httpExchange -> {
             if (this.whitelistedIps.contains(httpExchange.getLocalAddress().getAddress().getHostAddress())) {
-                String response = document.toString(FileFormat.JSON);
-                httpExchange.sendResponseHeaders(200, response.length());
+                httpExchange.sendResponseHeaders(200, content.length());
                 OutputStream os = httpExchange.getResponseBody();
-                os.write(response.getBytes());
+                os.write(content.getBytes());
                 os.close();
             } else {
                 String response = new VsonObject().append("response", "Your ip is not allowed to view this content!").toString(FileFormat.JSON);

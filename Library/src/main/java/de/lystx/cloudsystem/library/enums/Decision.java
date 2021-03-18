@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.service.util;
+package de.lystx.cloudsystem.library.enums;
 
 import java.io.Serializable;
 

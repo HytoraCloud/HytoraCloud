@@ -5,9 +5,9 @@ import de.lystx.cloudsystem.library.service.setup.Setup;
 import lombok.Getter;
 
 @Getter
-public class CloudAbstractSetup extends AbstractSetup<CloudAbstractSetup> {
+public class CloudSetup extends AbstractSetup<CloudSetup> {
 
-    @Setup(question = "What's the ip of this CloudSystem? (Use : 127.0.0.1) ", id = 1, forbiddenAnswers = {"localhost", "0"})
+    @Setup(question = "What's the ip of this CloudSystem? (If u do not use Multiroot ; Use : 0) ", changeAnswers = {"localhost->0", "127.0.0.1->0"}, id = 1, onlyAnswers = {"localhost", "0", "127.0.0.1"})
     private String hostname;
 
     @Setup(question = "On which port should this CloudSystem run?", id = 2, forbiddenAnswers = {"0", "25565"})

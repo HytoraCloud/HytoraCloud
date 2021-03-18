@@ -1,5 +1,5 @@
 
-package de.lystx.cloudsystem.library.service.event.raw;
+package de.lystx.cloudsystem.library.service.event;
 
 import lombok.Getter;
 import lombok.Setter;
