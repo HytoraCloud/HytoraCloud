@@ -31,10 +31,9 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
 
         CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
-        
 
-        CloudAPI.getInstance().executeAsyncQuery(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName()), document -> {
-            if (!document.getDocument().getBoolean("allow", true)) {
+        CloudAPI.getInstance().sendQuery(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName()), document -> {
+            if (!document.getResult()) {
                 event.setJoinMessage(null);
                 Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cIt seems like you tried to connect directly to the service and not via a BungeeCord!"));
                 return;

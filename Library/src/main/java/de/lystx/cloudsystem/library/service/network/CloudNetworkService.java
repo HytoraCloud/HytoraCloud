@@ -4,9 +4,12 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
+
+import java.util.function.Consumer;
 
 @Getter
 public class CloudNetworkService extends CloudService {
@@ -23,8 +26,16 @@ public class CloudNetworkService extends CloudService {
      * Sends a packet
      * @param packet
      */
+    public void sendPacket(Packet packet, Consumer<PacketState> stateConsumer) {
+        this.cloudServer.sendPacket(packet, stateConsumer);
+    }
+
+    /**
+     * Sends a packet
+     * @param packet
+     */
     public void sendPacket(Packet packet) {
-        this.cloudServer.sendPacket(packet);
+        this.sendPacket(packet, null);
     }
 
     /**

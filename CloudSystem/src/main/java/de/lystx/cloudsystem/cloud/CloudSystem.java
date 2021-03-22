@@ -56,7 +56,6 @@ public class CloudSystem extends CloudInstance implements CloudService {
 
         this.cloudServices.add(new StatisticsService(this, "Stats", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.UTIL));
         this.cloudServices.add(new GroupService(this, "Groups", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
-        this.cloudServices.add(new TemplateService(this, "Templates", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new PermissionService(this, "Permissions", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new SignService(this, "Signs", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new NPCService(this, "NPCs", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
@@ -124,11 +123,6 @@ public class CloudSystem extends CloudInstance implements CloudService {
         this.getService(StatisticsService.class).save();
         this.getService(SignService.class).save();
         this.getService(NPCService.class).save();
-    }
-
-    @Override
-    public void sendPacket(Packet packet) {
-        this.getService(CloudNetworkService.class).sendPacket(packet);
     }
 
     @Override

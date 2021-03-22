@@ -9,7 +9,7 @@ import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 
 @Getter
-public class ResultPacketStartService extends ResultPacket {
+public class ResultPacketStartService extends ResultPacket<VsonObject> {
 
 
     private final String group;

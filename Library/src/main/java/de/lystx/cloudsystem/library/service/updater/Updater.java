@@ -120,7 +120,7 @@ public class Updater {
      * @return current version of cloud
      */
     public static String getCloudVersion() {
-        return "BETA-1.7.3";
+        return "BETA-1.7.4";
     }
 
     /**
@@ -172,14 +172,7 @@ public class Updater {
         OutputStream outputStream;
 
         try {
-            ProgressBarStyle style;
-            if (!System.getProperty("os.name").toLowerCase().contains("win")) {
-                style = ProgressBarStyle.COLORFUL_UNICODE_BLOCK;
-            } else {
-                style = ProgressBarStyle.UNICODE_BLOCK;
-            }
-            ProgressBar pb = new ProgressBar(task, 100, 1000, System.err, style, "", 1, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
-
+            ProgressBar pb = new ProgressBar(task, 100, 1000, System.err, ProgressBarStyle.ASCII, "", 1, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
             URL url = new URL(search);
             String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
             URLConnection con = url.openConnection();

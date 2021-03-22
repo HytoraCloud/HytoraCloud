@@ -45,7 +45,7 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
 
             info.getServices().values().forEach(value -> value.forEach(service -> {
                 if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
-                    ServerInfo serverInfo = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress("127.0.0.1", service.getPort()), "CloudService", false);
+                    ServerInfo serverInfo = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()), "CloudService", false);
                     ProxyServer.getInstance().getServers().put(service.getName(), serverInfo);
                 }
             }));

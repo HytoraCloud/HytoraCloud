@@ -16,9 +16,13 @@ public class PacketHandlerResult extends PacketHandlerAdapter {
     @Override
     public void handle(Packet packet) {
         if (packet instanceof ResultPacket) {
-            ResultPacket resultPacket = (ResultPacket)packet;
-            resultPacket.setResult(new Result(resultPacket.getUniqueId(), resultPacket.read(cloudSystem)));
-            cloudSystem.sendPacket(resultPacket);
+            ResultPacket<Object> resultPacket = (ResultPacket<Object>)packet;
+
+            Result<Object> result = new Result<>(resultPacket.getUniqueId(), resultPacket.read(cloudSystem));
+
+            resultPacket.setResult(result);
+            resultPacket.unsafe().async().send(cloudSystem);
+
         }
     }
 }

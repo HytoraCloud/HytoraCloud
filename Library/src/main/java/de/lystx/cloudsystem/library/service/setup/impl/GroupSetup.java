@@ -42,5 +42,8 @@ public class GroupSetup extends AbstractSetup<GroupSetup> {
     @Setup(id = 11, question = "How many players may be online at maximum ?", forbiddenAnswers = {"0"})
     private int maxPlayers;
 
+    @Setup(id = 12, question = "On which Receiver should this group run ? (Use Internal for this CloudSystem)", changeAnswers = {"internal->InternalReceiver"})
+    private String receiver;
+
 
 }

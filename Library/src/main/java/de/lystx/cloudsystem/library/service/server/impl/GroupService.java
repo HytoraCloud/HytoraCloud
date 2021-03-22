@@ -7,6 +7,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import io.vson.elements.VsonArray;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -39,6 +40,10 @@ public class GroupService extends CloudService {
                 if (file.getName().endsWith(".json")) {
                     try {
                         VsonObject document = new VsonObject(file, VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+                        if (!document.has("receiver")) {
+                            document.append("receiver", Constants.INTERNAL_RECEIVER);
+                            document.save();
+                        }
                         if (!document.has("values")) {
                             document.append("values", new SerializableDocument());
                             document.save();

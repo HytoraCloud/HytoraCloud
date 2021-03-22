@@ -8,6 +8,9 @@ import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInCreateSign;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInDeleteSign;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
+import de.lystx.cloudsystem.library.elements.packets.result.Result;
+import de.lystx.cloudsystem.library.elements.packets.result.ResultPacketDebug;
+import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketCloudPlayer;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
@@ -21,6 +24,7 @@ import org.bukkit.block.Sign;
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ServiceCommand {
 
@@ -146,6 +150,7 @@ public class ServiceCommand {
                         for (ServiceState value : ServiceState.values()) {
                             if (value.name().equalsIgnoreCase(name)) {
                                 cont = true;
+                                break;
                             }
                         }
                         if (!cont) {

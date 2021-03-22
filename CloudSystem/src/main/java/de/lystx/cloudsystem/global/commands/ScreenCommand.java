@@ -41,19 +41,24 @@ public class ScreenCommand implements TabCompletable {
                 String serverName = args[0];
                 CloudScreen screen = cloudInstance.getService(ScreenService.class).getMap().get(serverName);
                 if (screen != null) {
-                    if (screen.getCachedLines().isEmpty()) {
-                        sender.sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
-                        return;
-                    }
-                    screen.setCloudConsole(cloudInstance.getConsole());
-                    screen.setScreenPrinter(screenPrinter);
-                    sender.sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
-                    this.screenPrinter.create(screen);
-                    try {
-                        for (String cachedLine : screen.getCachedLines()) {
-                            sender.sendMessage("§9[§b" + screen.getScreenName() + "§9]§f " + cachedLine);
+                    if (screen.isRunningOnThisCloudInstance()) {
+                        if (screen.getCachedLines().isEmpty()) {
+                            sender.sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
+                            return;
                         }
-                    } catch (ConcurrentModificationException ignored) {}
+                        screen.setCloudConsole(cloudInstance.getConsole());
+                        screen.setScreenPrinter(screenPrinter);
+                        sender.sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
+                        this.screenPrinter.create(screen);
+                        try {
+                            for (String cachedLine : screen.getCachedLines()) {
+                                sender.sendMessage("§9[§b" + screen.getScreenName() + "§9]§f " + cachedLine);
+                            }
+                        } catch (ConcurrentModificationException ignored) {
+                        }
+                    } else {
+                        cloudInstance.getConsole().getLogger().sendMessage("ERROR", "§cCan not display Screen from other §eCloudInstance§c! Will be added in next update!");
+                    }
                 } else {
                     sender.sendMessage("ERROR", "§cThe service §e" + serverName + " §cis not online!");
                 }

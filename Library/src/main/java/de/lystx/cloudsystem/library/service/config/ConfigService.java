@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter @Setter
 public class ConfigService extends CloudService {
@@ -38,7 +40,10 @@ public class ConfigService extends CloudService {
                 if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
                     this.vsonObject.putAll(NetworkConfig.defaultConfig());
                 } else {
-                    this.vsonObject.putAll(new ReceiverInfo("Receiver-1", "127.0.0.1", 0, false));
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("proxyStartPort", 25565);
+                    map.put("serverStartPort", 30000);
+                    this.vsonObject.putAll(new ReceiverInfo("Receiver-1", "127.0.0.1", 0, false, map));
                 }
                 this.vsonObject.save();
                 if (tries <= 10) {
@@ -50,10 +55,15 @@ public class ConfigService extends CloudService {
             }
             if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
                 this.receiverInfo = null;
+                if (vsonObject.has("useWrapper")) {
+                    vsonObject.remove("useWrapper");
+                    vsonObject.save();
+                }
                this.networkConfig = vsonObject.getAs(NetworkConfig.class);
             } else {
                 this.receiverInfo = vsonObject.getAs(ReceiverInfo.class);
                 this.networkConfig = null;
+                this.getCloudLibrary().getCustoms().put("receiverInfo", this.receiverInfo);
             }
         } catch (IOException e) {
             e.printStackTrace();

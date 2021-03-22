@@ -2,7 +2,6 @@ package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import io.vson.elements.object.Objectable;
-import io.vson.elements.object.VsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +16,7 @@ public class ServiceGroup implements Serializable, Objectable<Service> {
     private String name;
     private String template;
     private final ServiceType serviceType;
+    private String receiver;
     private int maxServer;
     private int minServer;
     private int maxRam;
@@ -28,11 +28,12 @@ public class ServiceGroup implements Serializable, Objectable<Service> {
     private boolean dynamic;
     private SerializableDocument values;
 
-    public ServiceGroup(UUID uniqueId, String name, String template, ServiceType serviceType, int maxServer, int minServer, int maxRam, int minRam, int maxPlayers, int newServerPercent, boolean maintenance, boolean lobby, boolean dynamic) {
+    public ServiceGroup(UUID uniqueId, String name, String template, ServiceType serviceType, String receiver, int maxServer, int minServer, int maxRam, int minRam, int maxPlayers, int newServerPercent, boolean maintenance, boolean lobby, boolean dynamic) {
         this.uniqueId = uniqueId;
         this.name = name;
         this.template = template;
         this.serviceType = serviceType;
+        this.receiver = receiver;
         this.maxServer = maxServer;
         this.minServer = minServer;
         this.maxRam = maxRam;

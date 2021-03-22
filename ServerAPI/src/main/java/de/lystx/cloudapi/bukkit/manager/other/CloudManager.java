@@ -36,6 +36,10 @@ public class CloudManager {
         this.motd = Bukkit.getMotd();
     }
 
+    /**
+     * Method to update all Fields of a CloudService
+     * Updates {@link ServiceState}, Motd, Maximum Players
+     */
     public void update() {
         try {
             Object playerlist = Reflections.getCraftBukkitClass("CraftServer").getDeclaredMethod("getHandle", null).invoke(Bukkit.getServer(), null);

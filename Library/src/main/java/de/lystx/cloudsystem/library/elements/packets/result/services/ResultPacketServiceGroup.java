@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter @AllArgsConstructor
-public class ResultPacketServiceGroup extends ResultPacket {
+public class ResultPacketServiceGroup extends ResultPacket<VsonObject> {
 
     private final String name;
 

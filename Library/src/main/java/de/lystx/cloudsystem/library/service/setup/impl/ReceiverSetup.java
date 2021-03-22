@@ -16,7 +16,6 @@ public class ReceiverSetup extends AbstractSetup<ReceiverSetup> {
     @Setup(question = "What's the name of this Receiver ?", id = 3, forbiddenAnswers = {""})
     private String name;
 
-
     @Setup(question = "What Proxy Software do you prefer ? (WATERFALL, BUNGEECORD)", id = 4, onlyAnswers = {"BUNGEECORD", "WATERFALL"})
     private String bungeeCordType;
 

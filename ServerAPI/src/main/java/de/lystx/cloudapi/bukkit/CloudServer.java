@@ -39,7 +39,6 @@ public class CloudServer extends JavaPlugin implements CloudService {
 
     @Getter
     private static CloudServer instance;
-    private CloudAPI cloudAPI;
 
     private CloudManager manager;
     private SignManager signManager;
@@ -58,8 +57,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
         instance = this;
 
         //Initializing Objects
-        this.cloudAPI = new CloudAPI();
-        this.manager = new CloudManager(this.cloudAPI);
+        this.manager = new CloudManager(CloudAPI.getInstance());
         this.signManager = new SignManager(this);
         this.nametagManager = new NametagManager();
         this.skinFetcher = new SkinFetcher();
@@ -70,7 +68,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
             Class.forName("net.minecraft.server.v1_8_R3.Packet");
             this.npcManager = new NPCManager();
             this.newVersion = false;
-            this.labyMod = new LabyMod(this.cloudAPI);
+            this.labyMod = new LabyMod(CloudAPI.getInstance());
         } catch (Exception e){
             this.newVersion = true;
         }
@@ -80,8 +78,8 @@ public class CloudServer extends JavaPlugin implements CloudService {
 
     @Override
     public void onDisable() {
-        if (this.cloudAPI.getCloudClient().isConnected()) {
-            this.cloudAPI.disconnect();
+        if (CloudAPI.getInstance().getCloudClient().isConnected()) {
+            CloudAPI.getInstance().disconnect();
         }
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LABYMOD");
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");
@@ -118,19 +116,19 @@ public class CloudServer extends JavaPlugin implements CloudService {
      */
     public void bootstrap() {
         // Registering PacketHandlers
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerInventory(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitServerUpdate(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitCloudPlayerHandler(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitSubChannel(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerTPS(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerBukkitEvent(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerUpdate(this.cloudAPI));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerInventory(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitServerUpdate(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitCloudPlayerHandler(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitSubChannel(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerTPS(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitEvent(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerUpdate(CloudAPI.getInstance()));
 
         // Connecting to cloud and managing cloud stuff
-        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
+        CloudAPI.getInstance().getCloudClient().registerHandler(new CloudListener());
 
         //Start checking for players or stop server
         this.startStopTimer();
@@ -144,8 +142,8 @@ public class CloudServer extends JavaPlugin implements CloudService {
         this.getServer().getPluginManager().registerEvents(new NPCListener(), this);
 
         // Registering commands
-        this.cloudAPI.registerCommand(new ServiceCommand());
-        this.cloudAPI.registerCommand(new StopCommand());
+        CloudAPI.getInstance().registerCommand(new ServiceCommand());
+        CloudAPI.getInstance().registerCommand(new StopCommand());
 
         //Checking for fired events
         for (EventPriority value : EventPriority.values()) {
@@ -177,10 +175,10 @@ public class CloudServer extends JavaPlugin implements CloudService {
      * player being online
      */
     public void startStopTimer() {
-        if (!this.cloudAPI.getProperties().has("waitingForPlayers")) {
+        if (!CloudAPI.getInstance().getProperties().has("waitingForPlayers")) {
             return;
         }
-        this.taskId = this.cloudAPI.getScheduler().scheduleDelayedTask(() -> {
+        this.taskId = CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
             if (Bukkit.getOnlinePlayers().size() <= 0) {
                 this.shutdown();
             }
@@ -198,9 +196,9 @@ public class CloudServer extends JavaPlugin implements CloudService {
      */
     public void shutdown() {
         if (this.taskId != -1) {
-            this.cloudAPI.getScheduler().cancelTask(this.taskId);
+            CloudAPI.getInstance().getScheduler().cancelTask(this.taskId);
         }
-        String msg = this.cloudAPI.getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", this.cloudAPI.getPrefix());
+        String msg = CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", CloudAPI.getInstance().getPrefix());
         int size = Bukkit.getOnlinePlayers().size();
         if (size <= 0) {
             this.shutdown0();
@@ -208,7 +206,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
         }
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            CloudPlayer player = cloudAPI.getCloudPlayers().get(onlinePlayer.getName());
+            CloudPlayer player = CloudAPI.getInstance().getCloudPlayers().get(onlinePlayer.getName());
             if (player != null) {
                 onlinePlayer.sendMessage(msg);
                 if (CloudAPI.getInstance().getNetwork().getLobbies().size() == 1) {
@@ -231,7 +229,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
      */
     private void shutdown0() {
         CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
-            this.cloudAPI.shutdown(packetState -> {
+            CloudAPI.getInstance().shutdown(packetState -> {
                 if (packetState == PacketState.SUCCESS) {
                     Bukkit.shutdown();
                 } else {
@@ -247,12 +245,12 @@ public class CloudServer extends JavaPlugin implements CloudService {
      * @param packet
      */
     public void sendPacket(Packet packet) {
-        this.cloudAPI.sendPacket(packet);
+        CloudAPI.getInstance().sendPacket(packet);
     }
 
     @Override
     public CloudExecutor getCurrentExecutor() {
-        return this.cloudAPI.getCurrentExecutor();
+        return CloudAPI.getInstance().getCurrentExecutor();
     }
 
     @Override
@@ -265,7 +263,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
      * @param player
      */
     public void updatePermissions(Player player) {
-        if (!cloudAPI.getPermissionPool().isEnabled()) {
+        if (!CloudAPI.getInstance().getPermissionPool().isEnabled()) {
             return;
         }
         try {

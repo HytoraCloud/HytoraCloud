@@ -5,9 +5,7 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -49,6 +47,10 @@ public class Threader {
 
     public void execute(Runnable runnable) {
         EXECUTOR_SERVICE.submit(runnable);
+    }
+
+    public <T> Future<T> futureExecute(Callable<T> callable) {
+        return EXECUTOR_SERVICE.submit(callable);
     }
 
     public void execute(Runnable runnable, long delay) {

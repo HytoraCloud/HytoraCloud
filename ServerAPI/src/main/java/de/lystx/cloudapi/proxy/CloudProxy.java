@@ -25,7 +25,6 @@ public class CloudProxy extends Plugin implements CloudService {
     @Getter
     private static CloudProxy instance;
 
-    private CloudAPI cloudAPI;
     private HubManager hubManager;
     private NetworkManager networkManager;
 
@@ -33,7 +32,6 @@ public class CloudProxy extends Plugin implements CloudService {
     public void onEnable() {
         instance = this;
 
-        this.cloudAPI = new CloudAPI();
         this.hubManager = new HubManager();
         this.networkManager = new NetworkManager();
 
@@ -59,7 +57,7 @@ public class CloudProxy extends Plugin implements CloudService {
      * @return
      */
     public ProxyConfig getProxyConfig() {
-        return this.cloudAPI.getService().getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class);
+        return CloudAPI.getInstance().getService().getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class);
     }
 
     /**
@@ -77,14 +75,14 @@ public class CloudProxy extends Plugin implements CloudService {
     @Override
     public void bootstrap() {
 
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStartServer(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStopServer(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyConfig(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyCloudPlayerHandler(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyStop(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyChatEvent(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerPacketHandler(new PacketHandlerProxyEvent(this.cloudAPI));
-        this.cloudAPI.getCloudClient().registerHandler(new CloudListener());
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyStartServer(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyStopServer(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyConfig(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyCloudPlayerHandler(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyStop(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyChatEvent(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyEvent(CloudAPI.getInstance()));
+        CloudAPI.getInstance().getCloudClient().registerHandler(new CloudListener());
 
         this.getProxy().getPluginManager().registerListener(this, new ProxyPingListener());
         this.getProxy().getPluginManager().registerListener(this, new TablistListener());
@@ -93,15 +91,15 @@ public class CloudProxy extends Plugin implements CloudService {
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerConnectListener());
 
-        this.cloudAPI.registerCommand(new CloudCommand());
-        this.cloudAPI.registerCommand(new HubCommand());
-        this.cloudAPI.registerCommand(new ListCommand());
-        this.cloudAPI.registerCommand(new WhereCommands());
-        this.cloudAPI.registerCommand(new PermsCommand());
-        this.cloudAPI.registerCommand(new NetworkCommand());
+        CloudAPI.getInstance().registerCommand(new CloudCommand());
+        CloudAPI.getInstance().registerCommand(new HubCommand());
+        CloudAPI.getInstance().registerCommand(new ListCommand());
+        CloudAPI.getInstance().registerCommand(new WhereCommands());
+        CloudAPI.getInstance().registerCommand(new PermsCommand());
+        CloudAPI.getInstance().registerCommand(new NetworkCommand());
 
         if (this.getProxyConfig() == null) {
-            this.cloudAPI.messageCloud(this.cloudAPI.getService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
+            CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
             System.out.println("[CloudAPI] Couldn't find ProxyConfig!");
         }
 
@@ -109,23 +107,23 @@ public class CloudProxy extends Plugin implements CloudService {
 
     @Override
     public void shutdown() {
-        if (this.cloudAPI.getCloudClient().isConnected()) {
-            this.cloudAPI.disconnect();
+        if (CloudAPI.getInstance().getCloudClient().isConnected()) {
+            CloudAPI.getInstance().disconnect();
         }
     }
 
     @Override
     public void sendPacket(Packet packet) {
-        this.cloudAPI.sendPacket(packet);
+        CloudAPI.getInstance().sendPacket(packet);
     }
 
     @Override
     public CloudExecutor getCurrentExecutor() {
-        return this.cloudAPI.getCurrentExecutor();
+        return CloudAPI.getInstance().getCurrentExecutor();
     }
 
     @Override
     public CloudType getType() {
-        return this.cloudAPI.getType();
+        return CloudAPI.getInstance().getType();
     }
 }

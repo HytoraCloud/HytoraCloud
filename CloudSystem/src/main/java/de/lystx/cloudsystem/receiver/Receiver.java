@@ -31,6 +31,10 @@ public class Receiver extends CloudInstance {
         }
      }
 
+    @Override
+    public CloudType getType() {
+        return CloudType.RECEIVER;
+    }
 
     @Override
     public void reload() {}

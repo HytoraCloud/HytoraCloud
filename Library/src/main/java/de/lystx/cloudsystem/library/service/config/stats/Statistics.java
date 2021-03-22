@@ -23,6 +23,11 @@ public class Statistics implements Serializable {
         this.stats = new HashMap<>();
     }
 
+    public Statistics(VsonObject document) {
+        this();
+        this.load(document);
+    }
+
     /**
      * Loads stats
      */

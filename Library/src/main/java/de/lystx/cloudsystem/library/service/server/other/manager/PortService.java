@@ -1,6 +1,5 @@
 package de.lystx.cloudsystem.library.service.server.other.manager;
 
-import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import lombok.Getter;
 
 import java.util.LinkedList;
@@ -11,10 +10,11 @@ public class PortService {
 
     private final List<String> portlist;
     private final List<String> proxyPortList;
-    private final NetworkConfig networkConfig;
+    private final int proxyPort, serverPort;
 
-    public PortService(NetworkConfig networkConfig) {
-        this.networkConfig = networkConfig;
+    public PortService(int proxyPort, int serverPort) {
+        this.proxyPort = proxyPort;
+        this.serverPort = serverPort;
         this.portlist = new LinkedList<>();
         this.proxyPortList = new LinkedList<>();
     }
@@ -32,7 +32,7 @@ public class PortService {
      * @return
      */
     public int getFreePort() {
-        for (int i = this.networkConfig.getNetworkConfig().getServerStartPort(); i < (this.networkConfig.getNetworkConfig().getServerStartPort() + 300000);) {
+        for (int i = this.serverPort; i < (this.serverPort + 300000);) {
             if (this.portlist.contains(String.valueOf(i))) {
                 i++;
                 continue;
@@ -48,7 +48,7 @@ public class PortService {
      * @return
      */
     public int getFreeProxyPort() {
-        for (int i = this.networkConfig.getNetworkConfig().getProxyStartPort(); i < (this.networkConfig.getNetworkConfig().getProxyStartPort() + 300000);) {
+        for (int i = this.proxyPort; i < (this.proxyPort + 300000);) {
             if (this.proxyPortList.contains(String.valueOf(i))) {
                 i++;
                 continue;

@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 @Getter @Setter
-public class CloudScreen extends Thread{
+public class CloudScreen extends Thread {
 
     private final Thread thread;
     private final Process process;
@@ -28,6 +28,8 @@ public class CloudScreen extends Thread{
     private CloudScreenPrinter screenPrinter;
     private CloudConsole cloudConsole;
 
+    private boolean runningOnThisCloudInstance;
+
     public CloudScreen(Thread thread, Process process, File serverDir, String screenName) {
         this.thread = thread;
         this.process = process;
@@ -35,6 +37,16 @@ public class CloudScreen extends Thread{
         this.screenName = screenName;
         this.cachedLines = new LinkedList<>();
         this.running = false;
+        this.runningOnThisCloudInstance = true;
+    }
+
+    /**
+     * Declares that this screen is running
+     * on another CloudInstance for example
+     * another Receiver
+     */
+    public void notRunningOnThisInstance() {
+        this.runningOnThisCloudInstance = false;
     }
 
 

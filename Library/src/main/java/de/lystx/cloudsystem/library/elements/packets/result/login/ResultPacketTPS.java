@@ -9,11 +9,10 @@ import lombok.Getter;
 import java.io.Serializable;
 
 @Getter
-public class ResultPacketTPS extends ResultPacket implements Serializable {
-
-
+public class ResultPacketTPS extends ResultPacket<String> implements Serializable {
     @Override
-    public VsonObject read(CloudLibrary cloudLibrary) {
-        return new VsonObject().append("tps", new NetworkInfo().formatTps(cloudLibrary.getTicksPerSecond().getTPS()));
+    public String read(CloudLibrary cloudLibrary) {
+        return new NetworkInfo().formatTps(cloudLibrary.getTicksPerSecond().getTPS());
     }
+
 }

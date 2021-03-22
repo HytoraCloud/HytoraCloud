@@ -25,7 +25,7 @@ public class EditCommand  {
             }
             String key = args[1];
             String value = args[2];
-            ServiceGroup newGroup = new ServiceGroup(group.getUniqueId(), group.getName(), group.getTemplate(), group.getServiceType(), group.getMaxServer(), group.getMinServer(), group.getMaxRam(), group.getMinRam(), group.getMaxPlayers(), group.getNewServerPercent(), group.isMaintenance(), group.isLobby(), group.isDynamic());
+            ServiceGroup newGroup = new ServiceGroup(group.getUniqueId(), group.getName(), group.getTemplate(), group.getServiceType(), group.getReceiver(), group.getMaxServer(), group.getMinServer(), group.getMaxRam(), group.getMinRam(), group.getMaxPlayers(), group.getNewServerPercent(), group.isMaintenance(), group.isLobby(), group.isDynamic());
             if (key.equalsIgnoreCase("maintenance") || key.equalsIgnoreCase("mc")) {
                 try {
                     newGroup.setMaintenance(Boolean.parseBoolean(value));

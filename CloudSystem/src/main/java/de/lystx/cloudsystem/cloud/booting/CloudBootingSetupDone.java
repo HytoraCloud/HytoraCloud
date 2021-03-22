@@ -58,7 +58,6 @@ public class CloudBootingSetupDone {
 
         Constants.EXECUTOR = cloudSystem.getService(CloudNetworkService.class).getCloudServer();
 
-        FileService fs = cloudSystem.getService(FileService.class);
         cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.CloudServiceType.NETWORK, cloudSystem.getService(GroupService.class).getGroups()));
 
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerRegister(cloudSystem));

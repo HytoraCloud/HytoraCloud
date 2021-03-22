@@ -3,6 +3,7 @@ package de.lystx.cloudapi.proxy.command;
 import com.google.common.collect.ImmutableList;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.packets.result.ResultPacketDebug;
 import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketTPS;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInReload;
@@ -37,7 +38,7 @@ public class CloudCommand implements TabCompletable {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");
                     } else if (args[0].equalsIgnoreCase("tps")) {
 
-                        String format = CloudAPI.getInstance().sendQuery(new ResultPacketTPS()).getResult().getString("tps");
+                        String format = CloudAPI.getInstance().sendQuery(new ResultPacketTPS()).getResult();
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§6TPS§8: §b" + format);
 
                     } else if (args[0].equalsIgnoreCase("stats")) {

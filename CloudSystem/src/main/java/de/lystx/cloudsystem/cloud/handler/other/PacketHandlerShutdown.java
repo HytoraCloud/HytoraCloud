@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.other;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInShutdown;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketShutdown;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
@@ -16,7 +16,7 @@ public class PacketHandlerShutdown extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet instanceof PacketInShutdown) {
+        if (packet instanceof PacketShutdown) {
             this.cloudSystem.shutdown();
         }
     }

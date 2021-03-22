@@ -13,4 +13,7 @@ public class ReverseMap<K, V> extends HashMap<K, V> {
         return null;
     }
 
+    public <T> T getObject(String key, Class<T> tClass) {
+        return (T) this.get(key);
+    }
 }

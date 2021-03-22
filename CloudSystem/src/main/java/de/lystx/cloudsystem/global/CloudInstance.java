@@ -4,8 +4,9 @@ import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.updater.Updater;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInShutdown;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketShutdown;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutNPC;
 import de.lystx.cloudsystem.library.service.command.CommandService;
@@ -58,7 +59,7 @@ public class CloudInstance extends CloudLibrary {
         this.cloudServices.add(new ConfigService(this, "Config", CloudService.CloudServiceType.CONFIG));
         this.cloudServices.add(new LogService(this, "Logging", CloudService.CloudServiceType.UTIL));
 
-
+        this.cloudServices.add(new TemplateService(this, "Templates", CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new ScreenService(this, "Screens", CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new EventService(this, "Event", CloudService.CloudServiceType.MANAGING));
 
@@ -71,10 +72,9 @@ public class CloudInstance extends CloudLibrary {
         this.getService(CommandService.class).registerCommand(new StopCommand(this));
         this.getService(CommandService.class).registerCommand(new InfoCommand(this));
         this.getService(CommandService.class).registerCommand(new RunCommand(this));
-        if (this.getService(ConfigService.class).getNetworkConfig() != null && this.getCloudType().equals(CloudType.CLOUDSYSTEM) && !this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            this.getService(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
-            this.getService(CommandService.class).registerCommand(new DownloadCommand(this));
-        }
+
+        this.getService(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
+        this.getService(CommandService.class).registerCommand(new DownloadCommand(this));
 
         this.getService(CommandService.class).registerCommand(new UpdateCommand(this));
         this.getService(CommandService.class).registerCommand(new LogCommand(this));
@@ -122,9 +122,7 @@ public class CloudInstance extends CloudLibrary {
         }
     }
     public void shutdown() {
-        if (this.cloudType.equals(CloudType.CLOUDSYSTEM) && this.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            this.sendPacket(new PacketInShutdown());
-        }
+        this.sendPacket(new PacketShutdown());
         this.setRunning(false);
         this.getConsole().interrupt();
 

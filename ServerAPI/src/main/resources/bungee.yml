@@ -1,7 +1,7 @@
 author: Lystx
 name: CloudAPI
 main: de.lystx.cloudapi.proxy.CloudProxy
-version: 1.0
+version: 1.7.3
 load: STARTUP
 description: ServerAPI for HytoraCloud
 

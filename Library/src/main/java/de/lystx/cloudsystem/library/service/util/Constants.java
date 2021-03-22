@@ -17,6 +17,7 @@ public class Constants {
 
     public static CloudExecutor EXECUTOR = null;
     public static final Executor THREAD_POOL = Executors.newFixedThreadPool(1);
+    public static final String INTERNAL_RECEIVER = "InternalReceiver";
 
     public static PermissionPool PERMISSION_POOL = null;
 

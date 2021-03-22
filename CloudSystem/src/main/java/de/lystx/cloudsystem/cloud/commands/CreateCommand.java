@@ -61,6 +61,7 @@ public class CreateCommand implements TabCompletable {
                             setup.getServerName(),
                             "default",
                             ServiceType.valueOf(setup.getType().toUpperCase()),
+                            setup.getReceiver(),
                             setup.getMaxyServer(),
                             setup.getMinServer(),
                             setup.getMaxMem(),

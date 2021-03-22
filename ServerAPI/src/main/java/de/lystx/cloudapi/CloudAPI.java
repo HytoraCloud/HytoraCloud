@@ -35,6 +35,8 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.server.other.process.Threader;
+import de.lystx.cloudsystem.library.service.util.Acceptable;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
@@ -46,8 +48,10 @@ import lombok.Setter;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 @Getter @Setter
@@ -102,6 +106,7 @@ public class CloudAPI implements CloudService {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
     }
 
+
     /**
      * Registers a Command
      * @param commandObject
@@ -140,11 +145,11 @@ public class CloudAPI implements CloudService {
     /**
      * This will execute a Query
      * but asynchronous
-     * @param resultPacket
+     * @param packet
      * @param consumer
      */
-    public void executeAsyncQuery(ResultPacket resultPacket, Consumer<Result> consumer) {
-        this.executorService.execute(() -> this.sendQuery(resultPacket).onResultSet(consumer));
+    public <T> void sendQuery(ResultPacket<T> packet, Consumer<Result<T>> consumer) {
+        this.executorService.execute(() -> this.sendQuery(packet).onResultSet(consumer));
     }
 
     /**
@@ -159,28 +164,28 @@ public class CloudAPI implements CloudService {
      * @param packet > The ResultPacket to send
      * @return Result from CloudLibrary
      */
-    public Result sendQuery(ResultPacket packet) {
-        Value<Result> value = new Value<>();
+    public <T> Result<T> sendQuery(ResultPacket<T> packet) {
+        Value<Result<T>> value = new Value<>();
         UUID uuid = UUID.randomUUID();
 
+        this.sendPacket(packet.uuid(uuid), packetState -> {
+            if (packetState == PacketState.FAILED) {
+                Result<T> r = new Result<>(uuid, null);
+                r.setThrowable(new IllegalAccessError("Could not create Query for " + packet.getClass().getSimpleName() + " because PacketState returned " + PacketState.FAILED.name() + "!"));
+                value.setValue(r);
+                Thread.currentThread().interrupt();
+            }
+        });
         this.cloudClient.registerPacketHandler(new PacketHandlerAdapter() {
             @Override
             public void handle(Packet packet) {
                 if (packet instanceof ResultPacket) {
-                    ResultPacket resultPacket = (ResultPacket)packet;
+                    ResultPacket<T> resultPacket = (ResultPacket<T>)packet;
                     if (uuid.equals(resultPacket.getUniqueId())) {
                         value.setValue(resultPacket.getResult());
                         cloudClient.getPacketAdapter().unregisterAdapter(this);
                     }
                 }
-            }
-        });
-        this.sendPacket(packet.uuid(uuid), packetState -> {
-            if (packetState == PacketState.FAILED) {
-                Result r = new Result(uuid, new VsonObject());
-                r.setError(true);
-                value.setValue(r);
-                Thread.currentThread().interrupt();
             }
         });
         int count = 0;
@@ -194,11 +199,21 @@ public class CloudAPI implements CloudService {
             }
         }
         if (count >= 2999) {
-            Result r = new Result(uuid, new VsonObject());
-            r.setError(true);
+            Result<T> r = new Result<>(uuid, null);
+            r.setThrowable(new TimeoutException("Request timed out!"));
             value.setValue(r);
         }
         return value.getValue();
+    }
+
+    /**
+     * This will lead to {@link Threader#execute(Runnable)}
+     * to execute something in a thread created with
+     * a {@link java.util.concurrent.ThreadFactory}
+     * @param runnable
+     */
+    public void execute(Runnable runnable) {
+        Threader.getInstance().execute(runnable);
     }
 
     /**
@@ -209,19 +224,16 @@ public class CloudAPI implements CloudService {
      * the serviec will stop
      */
     public void bootstrap() {
-        Thread cloudClient = new Thread(() -> {
+        Threader.getInstance().execute(() -> {
             try {
                 this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketInRegister(this.getService())));
                 this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
-
             } catch (Exception e) {
                 System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
                 e.printStackTrace();
                 System.exit(0);
             }
-        }, "hytoraCloud_cloudAPI");
-
-        cloudClient.start();
+        });
     }
 
     @Override
@@ -248,7 +260,7 @@ public class CloudAPI implements CloudService {
      * @param packet
      */
     public void sendPacket(Packet packet) {
-        this.sendPacket(packet, null);
+        this.sendPacket(packet, (Consumer<PacketState>) null);
     }
 
     /**
@@ -266,6 +278,27 @@ public class CloudAPI implements CloudService {
         } else {
             this.cloudClient.sendPacket(new CustomPacket(packet), consumer);
         }
+    }
+
+    /**
+     * Sends a packet and auto
+     * registers a PacketHandler which unregisters if the
+     * {@link Acceptable} returns true
+     * @param packet
+     * @param packetHandler
+     */
+    public void sendPacket(Packet packet, Acceptable<Packet> packetHandler) {
+        if (packetHandler != null) {
+            this.cloudClient.registerPacketHandler(new PacketHandlerAdapter() {
+                @Override
+                public void handle(Packet packet) {
+                    if (packetHandler.isAccepted(packet)) {
+                        cloudClient.getPacketAdapter().unregisterAdapter(this);
+                    }
+                }
+            });
+        }
+        this.sendPacket(packet);
     }
 
     @Override
@@ -349,6 +382,9 @@ public class CloudAPI implements CloudService {
      * @return
      */
     public static CloudAPI getInstance() {
+        if (instance == null) {
+            instance = new CloudAPI();
+        }
         return instance;
     }
 
@@ -365,9 +401,7 @@ public class CloudAPI implements CloudService {
      * @return
      */
     public Statistics getStatistics() {
-        Statistics statistics = new Statistics();
-        statistics.load(CloudAPI.getInstance().sendQuery(new ResultPacketStatistics()).getDocument());
-        return statistics;
+        return CloudAPI.getInstance().sendQuery(new ResultPacketStatistics()).getResult();
     }
 
     /**

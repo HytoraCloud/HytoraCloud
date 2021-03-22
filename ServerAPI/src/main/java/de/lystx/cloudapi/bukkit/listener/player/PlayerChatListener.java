@@ -25,9 +25,9 @@ public class PlayerChatListener implements Listener {
                 proxiedPlayer.kickPlayer(CloudAPI.getInstance().getPrefix() + "§cYou couldn't be found in CloudPlayers! Please rejoin");
                 return;
             }
-            CloudAPI.getInstance().getCommandService().execute(cloudPlayer, true, event.getMessage());
+            CloudAPI.getInstance().execute(() -> CloudAPI.getInstance().getCommandService().execute(cloudPlayer, true, event.getMessage()));
         }
-        CloudAPI.getInstance().sendPacket(new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
+        new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()).unsafe().async().send(CloudAPI.getInstance());
     }
 
 

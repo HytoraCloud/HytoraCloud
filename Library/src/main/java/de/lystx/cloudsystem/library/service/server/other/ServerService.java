@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.service.server.other;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
@@ -21,11 +22,13 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
+import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.server.other.manager.IDService;
 import de.lystx.cloudsystem.library.service.server.other.manager.PortService;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStart;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStop;
 import de.lystx.cloudsystem.library.service.util.Action;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -50,7 +53,7 @@ public class ServerService extends CloudService {
     private boolean startUp;
 
     private final IDService idService;
-    private final PortService portService;
+    private PortService portService;
 
     private final ServiceProviderStart providerStart;
     private final ServiceProviderStop providerStop;
@@ -70,8 +73,13 @@ public class ServerService extends CloudService {
         this.cloudProxies = new LinkedList<>();
 
         this.idService = new IDService();
-        this.portService = new PortService(cloudLibrary.getService(ConfigService.class).getNetworkConfig());
-
+        if (cloudLibrary.getType().equals(CloudType.CLOUDSYSTEM)) {
+            NetworkConfig networkConfig = cloudLibrary.getService(ConfigService.class).getNetworkConfig();
+            this.portService = new PortService(networkConfig.getNetworkConfig().getProxyStartPort(), networkConfig.getNetworkConfig().getServerStartPort());
+        } else {
+            ReceiverInfo receiverInfo = cloudLibrary.getCustoms().getObject("receiverInfo", ReceiverInfo.class);
+            this.portService = new PortService(Integer.parseInt((receiverInfo.getValues().get("proxyStartPort") + "").split("\\.")[0]), Integer.parseInt((receiverInfo.getValues().get("serverStartPort") + "").split("\\.")[0]));
+        }
         FileService fs = cloudLibrary.getService(FileService.class);
         this.providerStart = new ServiceProviderStart(cloudLibrary, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory());
         this.providerStop = new ServiceProviderStop(cloudLibrary, this);
@@ -108,9 +116,7 @@ public class ServerService extends CloudService {
      * @param service
      */
     public void notifyStart(Service service) {
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            return;
-        }
+
         List<Service> list = this.getServices(service.getServiceGroup());
         if (!list.contains(service)) {
             list.add(service);
@@ -122,7 +128,7 @@ public class ServerService extends CloudService {
         if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
             return;
         }
-        this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7is §equeued §7| §bID " + service.getServiceID() + " §7| §bPort " + service.getPort() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name() );
+        this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7is §aqueued §7| §e" + service.getServiceGroup().getReceiver() + " §7| §bID " + service.getServiceID() + " §7| §bPort " + service.getPort() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name() );
 
     }
 
@@ -131,9 +137,7 @@ public class ServerService extends CloudService {
      * @param service
      */
     public void notifyStop(Service service) {
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            return;
-        }
+
         List<Service> services = this.services.get(service.getServiceGroup());
         Service remove = this.getService(service.getName());
         if (services == null) services = new LinkedList<>();
@@ -158,8 +162,10 @@ public class ServerService extends CloudService {
         List<Service> services = this.getServices(service.getServiceGroup());
         services.remove(service);
         Service newService = new Service(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), state);
-        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM)) {
             service.setHost("127.0.0.1");
+        } else {
+            service.setHost(getCloudLibrary().getCustoms().getObject("receiverInfo", ReceiverInfo.class).getIpAddress());
         }
         services.add(newService);
         this.services.put(service.getServiceGroup(), services);
@@ -173,18 +179,41 @@ public class ServerService extends CloudService {
     }
 
     /**
+     * Checks if {@link ServiceGroup} is allowed
+     * to start on this receiver
+     * @param serviceGroup
+     * @return
+     */
+    public boolean isRightReceiver(ServiceGroup serviceGroup) {
+        if (getCloudLibrary().getType().equals(CloudType.RECEIVER)) {
+            ReceiverInfo info = getCloudLibrary().getCustoms().getObject("receiverInfo", ReceiverInfo.class);
+            return serviceGroup.getReceiver().equalsIgnoreCase(info.getName());
+        } else if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM)) {
+            return serviceGroup.getReceiver().equalsIgnoreCase(Constants.INTERNAL_RECEIVER);
+        }
+        return true;
+    }
+
+    /**
      * Starts services from list
      * @param serviceGroups
      */
     public void startServices(List<ServiceGroup> serviceGroups) {
         for (ServiceGroup serviceGroup : serviceGroups) {
+            if (!this.isRightReceiver(serviceGroup)) {
+                continue;
+            }
+            this.getCloudLibrary().getService(TemplateService.class).createTemplate(serviceGroup);
             for (int i = 0; i < serviceGroup.getMinServer(); i++) {
                 int id = this.idService.getFreeID(serviceGroup.getName());
                 int port = serviceGroup.getServiceType().equals(ServiceType.SPIGOT) ? this.portService.getFreePort() : this.portService.getFreeProxyPort();
 
                 Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : getCloudLibrary().getService(ConfigService.class).getReceiverInfo().getPort(), ServiceState.LOBBY);
-                if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+
+                if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM)) {
                     service.setHost("127.0.0.1");
+                } else {
+                    service.setHost(getCloudLibrary().getCustoms().getObject("receiverInfo", ReceiverInfo.class).getIpAddress());
                 }
                 if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT)) {
                     if (serviceGroup.isLobby()) {
@@ -232,14 +261,10 @@ public class ServerService extends CloudService {
 
         this.getCloudLibrary().sendPacket(new PacketOutRegisterServer(service).setAction(action.getMS()));
         this.actions.remove(service.getName());
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            return;
-        }
         if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
             return;
         }
         this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§aChannel §7[§a" + service.getName() + "@" + service.getUniqueId() + "§7] §aconnected §7[§2" + action.getMS() + "s" + (action.getInformation() != null ? " + " + action.getInformation() : "") + "§7]");
-
     }
 
     /**
@@ -248,6 +273,9 @@ public class ServerService extends CloudService {
      */
     public void needServices(ServiceGroup serviceGroup) {
         if (!this.getCloudLibrary().isRunning()) {
+            return;
+        }
+        if (!this.isRightReceiver(serviceGroup)) {
             return;
         }
         this.getCloudLibrary().getService(Scheduler.class).scheduleDelayedTask(() -> {
@@ -265,8 +293,11 @@ public class ServerService extends CloudService {
                                     .getService(ConfigService.class)
                                     .getNetworkConfig()
                                     .getPort(), ServiceState.LOBBY);
-                    if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+
+                    if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM)) {
                         service.setHost("127.0.0.1");
+                    } else {
+                        service.setHost(getCloudLibrary().getCustoms().getObject("receiverInfo", ReceiverInfo.class).getIpAddress());
                     }
                     this.startService(serviceGroup, service);
                 }
@@ -282,6 +313,9 @@ public class ServerService extends CloudService {
      * @returns VsonObject response
      */
     public VsonObject startService(ServiceGroup serviceGroup, Service service, SerializableDocument properties) {
+        if (!this.isRightReceiver(serviceGroup)) {
+            return new VsonObject();
+        }
         if (!this.getCloudLibrary().isRunning()) {
             return new VsonObject().append("message", "CloudLibrary isn't running anymore").append("sucess", false);
         }
@@ -289,9 +323,6 @@ public class ServerService extends CloudService {
             if (this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
                 return new VsonObject().append("message", "§cServiceGroup for §e" + serviceGroup.getName() + " §cwasn't found!").append("sucess", false);
             }
-        }
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            return new VsonObject().append("sucess", true);
         }
         if (serviceGroup.getMaxServer() != -1 && this.getServices(serviceGroup).size() >= serviceGroup.getMaxServer()) {
             this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
@@ -303,8 +334,11 @@ public class ServerService extends CloudService {
             int id = this.idService.getFreeID(serviceGroup.getName());
             service = new Service(serviceGroup.getName() + "-" + id, service.getUniqueId(), serviceGroup, id, port, getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort(), service.getServiceState());
         }
-        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+
+        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM)) {
             service.setHost("127.0.0.1");
+        } else {
+            service.setHost(getCloudLibrary().getCustoms().getObject("receiverInfo", ReceiverInfo.class).getIpAddress());
         }
         service.setProperties((properties == null ? new SerializableDocument() : properties));
         this.globalServices.add(service);
@@ -312,9 +346,6 @@ public class ServerService extends CloudService {
         services.add(service);
         this.services.put(serviceGroup, services);
 
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            return new VsonObject();
-        }
         this.actions.put(service.getName(), new Action());
         if (this.providerStart.autoStartService(this, service, properties)) {
             this.notifyStart(service);
@@ -353,8 +384,11 @@ public class ServerService extends CloudService {
         int id = this.idService.getFreeID(serviceGroup.getName());
         int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
         Service service = new Service(serviceGroup.getName() + "-" + id, UUID.randomUUID(), serviceGroup, id, port, getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) ? getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort() : ((NetworkConfig)getCloudLibrary().getCustoms().get("networkConfig")).getPort(), ServiceState.LOBBY);
-        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM) && !getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+
+        if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM)) {
             service.setHost("127.0.0.1");
+        } else {
+            service.setHost(getCloudLibrary().getCustoms().getObject("receiverInfo", ReceiverInfo.class).getIpAddress());
         }
         return this.startService(serviceGroup, service, properties);
     }
@@ -373,7 +407,7 @@ public class ServerService extends CloudService {
      * @param newServices > Should new services start if needed
      */
     public void stopService(Service service, boolean newServices) {
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (!this.isRightReceiver(service.getServiceGroup())) {
             return;
         }
         try {
@@ -425,9 +459,7 @@ public class ServerService extends CloudService {
      * Stops all services
      */
     public void stopServices() {
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-            return;
-        }
+
         List<String> already = new LinkedList<>();
         for (ServiceGroup serviceGroup : this.services.keySet()) {
             if (this.getCloudLibrary().getService(GroupService.class) != null && this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
@@ -465,7 +497,7 @@ public class ServerService extends CloudService {
      * @param newOnes > Should new ones start
      */
     public void stopServices(ServiceGroup serviceGroup, boolean newOnes) {
-        if (this.getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
+        if (!this.isRightReceiver(serviceGroup)) {
             return;
         }
         Value<Integer> count = new Value<>(this.getServices(serviceGroup).size());

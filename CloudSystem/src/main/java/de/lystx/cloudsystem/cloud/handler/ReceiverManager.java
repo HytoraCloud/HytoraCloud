@@ -39,18 +39,14 @@ public class ReceiverManager {
         if (this.getReceiver(receiverInfo.getName()) != null) {
             decision = null;
         } else {
-            if (!cloudSystem.getService(ConfigService.class).getNetworkConfig().isUseWrapper()) {
-                decision = Decision.MAYBE;
+            if (cloudSystem.getAuthManager().getKey().equalsIgnoreCase(loginKey)) {
+                decision = Decision.TRUE;
+                cloudSystem.reload();
+                this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§aReceiver §h[§2" + receiverInfo.getName() + "@" + UUID.randomUUID() + "§h] §aconnected!");
+                this.receivers.add(receiverInfo);
             } else {
-                if (cloudSystem.getAuthManager().getKey().equalsIgnoreCase(loginKey)) {
-                    decision = Decision.TRUE;
-                    cloudSystem.reload();
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§aReceiver §h[§2" + receiverInfo.getName() + "@" + UUID.randomUUID() + "§h] §aconnected!");
-                    this.receivers.add(receiverInfo);
-                } else {
-                    decision = Decision.FALSE;
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cReceiver §e" + receiverInfo.getName() + " §cprovided a wrong key and couldn't connect!");
-                }
+                decision = Decision.FALSE;
+                this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§cReceiver §e" + receiverInfo.getName() + " §cprovided a wrong key and couldn't connect!");
             }
         }
         this.sendFilesToReceivers();
@@ -60,8 +56,6 @@ public class ReceiverManager {
 
     public void sendFilesToReceivers() {
         FileService fs = this.cloudSystem.getService(FileService.class);
-
-        new Zip().zip(fs.getTemplatesDirectory(), new File("templates.zip"));
 
         PacketReceiverFiles packetReceiverFiles = new PacketReceiverFiles(
                 new File(fs.getVersionsDirectory(), "spigot.jar"),

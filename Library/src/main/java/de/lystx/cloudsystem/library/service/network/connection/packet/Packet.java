@@ -3,8 +3,10 @@ package de.lystx.cloudsystem.library.service.network.connection.packet;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
+import de.lystx.cloudsystem.library.service.server.other.process.Threader;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -17,6 +19,9 @@ public class Packet implements Serializable {
     //Document serialisation via String
     protected String document = "{}";
     private Unsafe unsafe = null;
+
+    @Getter @Setter
+    private PacketState state = PacketState.NULL;
 
     /**
      * Appends a value to the packet document
@@ -105,11 +110,11 @@ public class Packet implements Serializable {
          * @param cloudService
          */
         public void send(CloudService cloudService) {
-            cloudService.getCurrentExecutor().sendPacket(Packet.this);
+            Threader.getInstance().execute(() -> cloudService.getCurrentExecutor().sendPacket(Packet.this));
         }
 
         public void send(CloudService cloudService, Consumer<PacketState> consumer) {
-            cloudService.getCurrentExecutor().sendPacket(Packet.this, consumer);
+            Threader.getInstance().execute(() -> cloudService.getCurrentExecutor().sendPacket(Packet.this, consumer));
         }
 
         /**
@@ -119,11 +124,13 @@ public class Packet implements Serializable {
          */
         @Deprecated
         public void send() {
-            Constants.EXECUTOR.sendPacket(Packet.this);
+            Threader.getInstance().execute(() -> Constants.EXECUTOR.sendPacket(Packet.this));
+            ;
         }
 
         @Deprecated
         public void send(Consumer<PacketState> consumer) {
+            Threader.getInstance().execute(() -> Constants.EXECUTOR.sendPacket(Packet.this, consumer));
             Constants.EXECUTOR.sendPacket(Packet.this, consumer);
         }
 

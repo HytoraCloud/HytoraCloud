@@ -26,7 +26,7 @@ public class SignManager {
         this.cloudSigns = new LinkedList<>();
         this.signLayOut = new SignLayOut();
         this.serverPinger = new ServerPinger();
-        this.signUpdater = new SignUpdater(this, cloudAPIBukkit.getCloudAPI());
+        this.signUpdater = new SignUpdater(this, CloudAPI.getInstance());
         this.run();
     }
 
@@ -36,6 +36,6 @@ public class SignManager {
             return;
         }
         CloudAPI.getInstance().getScheduler().cancelTask(this.signUpdater.getAnimationScheduler());
-        CloudAPI.getInstance().getExecutorService().submit(() -> this.signUpdater.run());
+        CloudAPI.getInstance().getExecutorService().execute(() -> this.signUpdater.run());
     }
 }

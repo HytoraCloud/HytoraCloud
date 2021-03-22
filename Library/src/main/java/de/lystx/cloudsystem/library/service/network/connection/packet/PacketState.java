@@ -7,7 +7,8 @@ import lombok.Getter;
 public enum PacketState {
 
     SUCCESS("§a"), //The packet was sent succesfully
-    FAILED("§4"), //The packet couldn't be send
+    FAILED("§c"), //The packet couldn't be send
+    NULL("§4"), //Something was null
     RETRY("§6"); //The packet will be send another 5 times
 
 

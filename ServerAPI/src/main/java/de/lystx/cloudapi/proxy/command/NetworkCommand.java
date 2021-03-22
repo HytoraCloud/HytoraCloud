@@ -41,7 +41,7 @@ public class NetworkCommand {
             player.sendMessage("  §8➜ §bCommands §8┃ §7" + statistics.getStats().get("executedCommands").intValue());
             player.sendMessage("  §8➜ §bBooted §8┃ §7" + statistics.getStats().get("bootedUp").intValue());
             player.sendMessage("  §8➜ §bCPU Average §8┃ §7" + new DecimalFormat("##.##").format(((statistics.getStats().get("bootedUp") * 2) / statistics.getStats().get("allCPUUsage")) * 100));
-            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudAPI.getInstance().sendQuery(new ResultPacketTPS()).getResult().getString("tps"));
+            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudAPI.getInstance().sendQuery(new ResultPacketTPS()).getResult());
             player.sendMessage("§8§m--------------------------------------");
         } else {
             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");

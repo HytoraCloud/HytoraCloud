@@ -13,7 +13,7 @@ import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.Value;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -207,7 +207,7 @@ public class CloudNetwork {
      */
     public void getServiceAsync(String name, Consumer<Service> consumer) {
         this.cloudAPI.getExecutorService().submit(() -> {
-            Service service = cloudAPI.sendQuery(new ResultPacketService(name)).getResultAs(Service.class);
+            Service service = cloudAPI.sendQuery(new ResultPacketService(name)).getResult().getAs(Service.class);
             consumer.accept(service);
             return service;
         });
@@ -260,7 +260,7 @@ public class CloudNetwork {
      * Stops the Cloud
      */
     public void shutdownCloud() {
-        this.cloudAPI.sendPacket(new PacketInShutdown());
+        this.cloudAPI.sendPacket(new PacketShutdown());
     }
 
     /**

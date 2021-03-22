@@ -3,6 +3,8 @@ package de.lystx.cloudsystem.library;
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.result.Result;
+import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
@@ -12,7 +14,9 @@ import de.lystx.cloudsystem.library.service.event.Event;
 import de.lystx.cloudsystem.library.service.lib.LibraryService;
 import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
+import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
@@ -20,10 +24,9 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.io.AuthManager;
-import de.lystx.cloudsystem.library.service.util.Constants;
-import de.lystx.cloudsystem.library.service.util.Loggers;
-import de.lystx.cloudsystem.library.service.util.TicksPerSecond;
+import de.lystx.cloudsystem.library.service.util.*;
 import de.lystx.cloudsystem.library.service.webserver.WebServer;
+import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.fusesource.jansi.AnsiConsole;
@@ -39,7 +42,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
 
     public List<CloudService> cloudServices;
-    protected Map<String, Object> customs;
+    protected ReverseMap<String, Object> customs;
 
     protected String host;
     protected Integer port;
@@ -72,7 +75,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
             this.installDefaultLibraries();
         }
         this.cloudType = cloudType;
-        this.customs = new HashMap<>();
+        this.customs = new ReverseMap<>();
         this.cloudServices = new LinkedList<>();
         this.host = "127.0.0.1";
         this.port = 2131;
@@ -148,7 +151,8 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
 
     /**
-     * Calls an Event
+     * Calls an Event with the
+     * {@link de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent}
      * @param event
      */
     public void callEvent(Event event) {
@@ -156,9 +160,12 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
     }
 
     /**
-     * @param tClass
-     * @param <T>
-     * @return service from Class
+     * This Method iterates through all registered
+     * {@link CloudService}s and checks if the given class
+     * matches the parameter class
+     *
+     * @param tClass the class to get the service of
+     * @return Service searched by class
      */
     public <T> T getService(Class<T> tClass) {
         for (CloudService cloudService : this.cloudServices) {
@@ -169,6 +176,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
         return null;
     }
 
+
     /**
      * Raw method to send packet
      * @param packet
@@ -177,7 +185,11 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
     @Override
     public CloudExecutor getCurrentExecutor() {
-        return this.getService(CloudNetworkService.class).getCloudServer();
+        if (this.cloudType == CloudType.CLOUDSYSTEM) {
+            return this.getService(CloudNetworkService.class).getCloudServer();
+        } else {
+            return this.cloudClient;
+        }
     }
 
     @Override

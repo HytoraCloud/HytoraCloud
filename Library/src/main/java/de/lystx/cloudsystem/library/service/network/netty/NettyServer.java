@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.network.netty;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutVerifyConnection;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
@@ -23,6 +24,7 @@ import lombok.Setter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter @Setter
 public class NettyServer {
@@ -104,15 +106,32 @@ public class NettyServer {
      * @param packet
      */
     public void sendPacket(Packet packet) {
-        for (Channel registeredChannel : registeredChannels) {
-            registeredChannel.writeAndFlush(packet).addListener((ChannelFutureListener) channelFuture -> {
-                if (channelFuture.isSuccess()) {
-                    return;
-                }
-                // System.out.println("[NettyServer] Couldn't send following packet > " + packet.getClass().getSimpleName());
-            });
-        }
+        this.sendPacket(packet, null);
     }
 
+
+    /**
+     * Sends packet
+     * @param packet
+     */
+    public void sendPacket(Packet packet, Consumer<PacketState> consumer) {
+        ChannelFutureListener listener = channelFuture -> {
+            if (consumer == null) {
+                return;
+            }
+            try {
+                if (channelFuture.isSuccess()) {
+                    consumer.accept(PacketState.SUCCESS);
+                } else {
+                    consumer.accept(PacketState.FAILED);
+                }
+            } catch (NullPointerException e) {
+                consumer.accept(PacketState.NULL);
+            }
+        };
+        for (Channel registeredChannel : this.registeredChannels) {
+            registeredChannel.writeAndFlush(packet).addListener(listener);
+        }
+    }
 
 }

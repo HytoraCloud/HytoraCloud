@@ -2,10 +2,12 @@ package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInGetLog;
+import de.lystx.cloudsystem.library.elements.packets.result.Result;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketCloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import io.vson.elements.object.VsonObject;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,11 +46,11 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public List<CloudPlayer> getPlayersOnGroup(String group) {
         List<CloudPlayer> list = new LinkedList<>();
-        this.cloudPlayers.forEach(cloudPlayer -> {
+        for (CloudPlayer cloudPlayer : this.cloudPlayers) {
             if (cloudPlayer.getServerGroup().equalsIgnoreCase(group)) {
                 list.add(cloudPlayer);
             }
-        });
+        }
         return list;
     }
 
@@ -59,11 +61,11 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public List<CloudPlayer> getPlayersOnServer(String server) {
        List<CloudPlayer> list = new LinkedList<>();
-        this.cloudPlayers.forEach(cloudPlayer -> {
+        for (CloudPlayer cloudPlayer : this.cloudPlayers) {
             if (cloudPlayer.getServer().equalsIgnoreCase(server)) {
                 list.add(cloudPlayer);
             }
-        });
+        }
         return list;
     }
 
@@ -140,22 +142,22 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      * Returns {@link CloudPlayer} directly
      * from Cloud with {@link CloudAPI#sendQuery(ResultPacket)}
      * by Name
+     * x asynchronous x
      * @param name
-     * @return
      */
-    public CloudPlayer getByQuery(String name) {
-        return this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name)).getResult().getObject("cloudPlayer", CloudPlayer.class);
+    public void getAsync(String name, Consumer<CloudPlayer> consumer) {
+        this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name), vsonObjectResult -> consumer.accept(vsonObjectResult.getResult().getObject("cloudPlayer", CloudPlayer.class)));
     }
 
     /**
      * Returns {@link CloudPlayer} directly
      * from Cloud with {@link CloudAPI#sendQuery(ResultPacket)}
      * by UUID
+     * x asynchronous x
      * @param uuid
-     * @return
      */
-    public CloudPlayer getByQuery(UUID uuid) {
-        return this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uuid)).getResult().getObject("cloudPlayer", CloudPlayer.class);
+    public void getAsync(UUID uuid, Consumer<CloudPlayer> consumer) {
+        this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uuid), vsonObjectResult -> consumer.accept(vsonObjectResult.getResult().getObject("cloudPlayer", CloudPlayer.class)));
     }
 
     /**

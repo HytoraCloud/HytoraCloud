@@ -10,15 +10,37 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * This class is used to get
+ * real-time information from any CloudInstance
+ * to another CloudInstance
+ *
+ * Modifires : {@link UUID} and {@link Result}
+ *
+ * A random UUID will be created for the {@link ResultPacket}
+ * and the method {@link ResultPacket#read(CloudLibrary)} will be called
+ * if the Packet is handled on the other CloudInstance
+ * and returns the GenericType of this Packet
+ */
 @Getter @Setter
-public abstract class ResultPacket extends Packet implements Serializable {
+public abstract class ResultPacket<R> extends Packet implements Serializable {
 
     protected UUID uniqueId;
-    protected Result result;
+    protected Result<R> result;
 
-    public abstract VsonObject read(CloudLibrary cloudLibrary);
+    /**
+     * Returns GenericType of this Packet
+     * @param cloudLibrary
+     * @return
+     */
+    public abstract R read(CloudLibrary cloudLibrary);
 
-    public ResultPacket uuid(UUID uuid) {
+    /**
+     * Sets the UUID of this ResultPacket
+     * @param uuid
+     * @return
+     */
+    public ResultPacket<R> uuid(UUID uuid) {
         this.setUniqueId(uuid);
         return this;
     }

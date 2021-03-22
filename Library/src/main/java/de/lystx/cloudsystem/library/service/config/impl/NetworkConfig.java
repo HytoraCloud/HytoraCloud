@@ -20,7 +20,6 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
 
     private String host;
     private Integer port;
-    private boolean useWrapper;
     private boolean setupDone;
     private boolean autoUpdater;
 
@@ -38,7 +37,6 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
         return new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST)
                 .append("host", 0)
                 .append("port", 1401)
-                .append("useWrapper", false)
                 .append("setupDone", false)
                 .append("autoUpdater", false)
                 .append("networkConfig", new GlobalProxyConfig(

@@ -4,7 +4,6 @@ import de.lystx.cloudsystem.library.elements.packets.out.PacketOutVerifyConnecti
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
-import de.lystx.cloudsystem.library.service.network.netty.filetransfer.FileClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;

@@ -63,18 +63,22 @@ public class ServerPinger {
             final String string = new String(chars);
 
             final String[] data;
-            if (string.startsWith("§")) {
-                data = string.split("\u0000");
-                motd = data[3];
-                players = Integer.parseInt(data[4]);
-                maxplayers = Integer.parseInt(data[5]);
-            } else {
-                data = string.split("§");
-                motd = data[0];
-                players = Integer.parseInt(data[1]);
-                maxplayers = Integer.parseInt(data[2]);
+            try {
+                if (string.startsWith("§")) {
+                    data = string.split("\u0000");
+                    motd = data[3];
+                    players = Integer.parseInt(data[4]);
+                    maxplayers = Integer.parseInt(data[5]);
+                } else {
+                    data = string.split("§");
+                    motd = data[0];
+                    players = Integer.parseInt(data[1]);
+                    maxplayers = Integer.parseInt(data[2]);
+                }
+                this.online = true;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                //e.printStackTrace(); --> Ignoring because it just re-pings
             }
-            this.online = true;
             this.close();
         } catch (SocketTimeoutException e) {
             if (this.tries < 5) {
