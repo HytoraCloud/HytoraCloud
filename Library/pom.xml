@@ -17,6 +17,11 @@
             <version>8.0.23</version>
         </dependency>
         <dependency>
+            <groupId>com.arangodb</groupId>
+            <artifactId>arangodb-java-driver</artifactId>
+            <version>6.9.1</version>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.44.Final</version>

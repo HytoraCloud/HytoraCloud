@@ -38,14 +38,14 @@ public class ReceiverBootingSetupNotDone {
         receiver.getConsole().getLogger().sendMessage("§9-----------------------------------------");
         receiver.getService(CommandService.class).setActive(false);
         new ReceiverSetup().start(receiver.getConsole(), setup -> {
-            spigot.setValue(Spigot.byKey(setup.getSpigotVersion()));
-            bungeeCord.setValue(setup.getBungeeCordType());
-            receiver.getService(CommandService.class).setActive(true);
             if (setup.isCancelled()) {
                 receiver.getConsole().getLogger().sendMessage("ERROR", "§cYou are not allowed to cancel this setup!");
                 System.exit(0);
                 return;
             }
+            spigot.setValue(Spigot.byKey(setup.getSpigotVersion()));
+            bungeeCord.setValue(setup.getBungeeCordType());
+            receiver.getService(CommandService.class).setActive(true);
 
             receiver.getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
             Updater.download(spigot.getValue().getUrl(), new File(receiver.getService(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading Spigot");

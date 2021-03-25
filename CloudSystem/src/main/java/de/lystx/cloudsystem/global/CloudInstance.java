@@ -1,10 +1,12 @@
 package de.lystx.cloudsystem.global;
 
+import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
+import de.lystx.cloudsystem.library.service.setup.impl.InstanceChooser;
 import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketShutdown;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
@@ -30,6 +32,7 @@ import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import de.lystx.cloudsystem.library.service.util.LogService;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;
 import de.lystx.cloudsystem.library.service.webserver.WebServer;
+import de.lystx.cloudsystem.receiver.Receiver;
 import io.vson.elements.object.VsonObject;
 import org.apache.commons.io.FileUtils;
 
@@ -37,18 +40,49 @@ import java.io.IOException;
 
 public class CloudInstance extends CloudLibrary {
 
-
     public CloudInstance(CloudType cloudType) {
         super(cloudType);
 
         this.cloudServices.add(new CommandService(this, "Command", CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new LoggerService(this, "CloudLogger", CloudService.CloudServiceType.UTIL));
+
         this.console = new CloudConsole(this.getService(LoggerService.class), this.getService(CommandService.class), System.getProperty("user.name"));
 
-        this.screenPrinter = new CloudScreenPrinter(this.console, this);
+        if (cloudType == CloudType.NONE) {
+            this.console.getCommandManager().setActive(false);
+            new InstanceChooser().start(this.console, instanceChooser -> {
+                if (instanceChooser.isCancelled()) {
+                    console.getLogger().sendMessage("ERROR", "§cWish you a good day anyways :(");
+                    System.exit(1);
+                    return;
+                }
+                console.getLogger().sendMessage("INFO", "§7Starting §b" + (instanceChooser.getInstance().equalsIgnoreCase("R") ? "Receiver" : "CloudSystem") + " §7version §a" + Updater.getCloudVersion() + " §7by §bLystx§h...");
+                Scheduler.getInstance().scheduleDelayedTask(() -> {
+                    for (int i = 0; i < 100; i++) {
+                        System.out.println();
+                    }
+                }, 10L);
+
+                console.stop();
+                console.interrupt();
+
+                Scheduler.getInstance().scheduleDelayedTask(() -> {
+                    this.console.getCommandManager().setActive(true);
+                    if (instanceChooser.getInstance().equalsIgnoreCase("R")) {
+                        Receiver receiver = new Receiver();
+                    } else {
+                        CloudSystem cloudSystem = new CloudSystem();
+                    }
+                }, 15L);
+            });
+            return;
+        }
 
         this.cloudServices.add(new FileService(this, "File", CloudService.CloudServiceType.CONFIG));
+        this.cloudServices.add(new LogService(this, "Logging", CloudService.CloudServiceType.UTIL));
 
+
+        this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
         if (cloudType.equals(CloudType.CLOUDSYSTEM)) {
             this.webServer = new WebServer(this);
@@ -57,7 +91,6 @@ public class CloudInstance extends CloudLibrary {
         }
 
         this.cloudServices.add(new ConfigService(this, "Config", CloudService.CloudServiceType.CONFIG));
-        this.cloudServices.add(new LogService(this, "Logging", CloudService.CloudServiceType.UTIL));
 
         this.cloudServices.add(new TemplateService(this, "Templates", CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new ScreenService(this, "Screens", CloudService.CloudServiceType.MANAGING));

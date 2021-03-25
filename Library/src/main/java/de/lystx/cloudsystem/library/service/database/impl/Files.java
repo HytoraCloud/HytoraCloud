@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.service.database.impl;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Getter
-public class Files implements CloudDatabase {
+public class Files implements IDatabase {
 
     private final DatabaseService databaseService;
 

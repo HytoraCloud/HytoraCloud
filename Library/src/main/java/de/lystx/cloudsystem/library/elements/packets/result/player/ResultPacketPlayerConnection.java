@@ -9,7 +9,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import io.vson.elements.object.VsonObject;
 
 
-public class ResultPacketPlayerConnection extends ResultPacket {
+public class ResultPacketPlayerConnection extends ResultPacket<CloudConnection> {
 
     private final String name;
 
@@ -18,12 +18,12 @@ public class ResultPacketPlayerConnection extends ResultPacket {
     }
 
     @Override
-    public VsonObject read(CloudLibrary cloudLibrary) {
+    public CloudConnection read(CloudLibrary cloudLibrary) {
         CloudPlayerData data = cloudLibrary.getService(PermissionService.class).getPermissionPool().getPlayerData(this.name);
-        return new VsonObject().putAll(new CloudConnection(
+        return new CloudConnection(
                 data.getUuid(),
                 data.getName(),
                 data.getIpAddress()
-        ));
+        );
     }
 }

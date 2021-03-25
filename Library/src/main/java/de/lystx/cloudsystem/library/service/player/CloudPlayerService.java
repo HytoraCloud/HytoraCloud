@@ -1,11 +1,13 @@
 package de.lystx.cloudsystem.library.service.player;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
-import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -16,7 +18,7 @@ import java.util.*;
 public class CloudPlayerService extends CloudService {
 
     private final List<CloudPlayer> onlinePlayers;
-    private final CloudDatabase database;
+    private final IDatabase database;
 
     public CloudPlayerService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
@@ -41,6 +43,7 @@ public class CloudPlayerService extends CloudService {
         if (this.getCloudLibrary().getWebServer() != null) {
             this.getCloudLibrary().getWebServer().update("players", this.toDocument());
         }
+        Constants.CLOUDPLAYERS = new Filter<>(this.onlinePlayers);
         return registered;
     }
 
@@ -89,6 +92,7 @@ public class CloudPlayerService extends CloudService {
             //Ignoring because it doesn't break the cloud
         }
         this.onlinePlayers.remove(this.getOnlinePlayer(cloudPlayer.getName()));
+        Constants.CLOUDPLAYERS = new Filter<>(this.onlinePlayers);
     }
 
     /**
@@ -100,6 +104,7 @@ public class CloudPlayerService extends CloudService {
     public void update(String name, CloudPlayer newPlayer) {
         CloudPlayer cloudPlayer = this.getOnlinePlayer(name);
         this.onlinePlayers.set(this.onlinePlayers.indexOf(cloudPlayer), newPlayer);
+        Constants.CLOUDPLAYERS = new Filter<>(this.onlinePlayers);
     }
 
     /**

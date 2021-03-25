@@ -4,6 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.command.ServiceCommand;
 import de.lystx.cloudapi.bukkit.events.other.CloudServerNPCInteractEvent;
+import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInDeleteNPC;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -68,7 +69,7 @@ public class PacketReader {
                     NPC getSafe = CloudServer.getInstance().getNpcManager().getNPC(npc.getLocation());
                     if (getSafe != null) {
                         String group = CloudServer.getInstance().getNpcManager().getGroupNPCS().get(getSafe);
-                        CloudServer.getInstance().getNpcManager().deleteNPC(getSafe);
+                        new PacketInDeleteNPC(CloudServer.getInstance().getNpcManager().getKey(getSafe)).unsafe().async().send(CloudAPI.getInstance());
                         ServiceCommand.deleters.remove(player.getUniqueId());
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Removed NPC for group §b" + group + "§8!");
                     } else {

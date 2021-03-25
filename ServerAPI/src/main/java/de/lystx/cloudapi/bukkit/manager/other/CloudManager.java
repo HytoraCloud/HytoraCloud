@@ -24,6 +24,14 @@ public class CloudManager {
     private int maxPlayers;
     private String motd;
 
+    /**
+     * Sets the fields to defaults
+     * using {@link Bukkit#getMaxPlayers()} etc
+     * Tries to set {@link ServiceState} for PaperSpigot
+     * and normal Spigot (bit struggling)
+     *
+     * @param cloudAPI
+     */
     public CloudManager(CloudAPI cloudAPI) {
         this.cloudAPI = cloudAPI;
         try {

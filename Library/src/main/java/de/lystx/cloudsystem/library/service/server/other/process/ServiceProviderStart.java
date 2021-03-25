@@ -10,6 +10,8 @@ import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.io.FileService;
+import de.lystx.cloudsystem.library.service.module.Module;
+import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
@@ -24,16 +26,24 @@ import java.util.Objects;
 import java.util.Properties;
 
 
+/**
+ * This class starts your service
+ * and copies all of its files from
+ * the template to the dynamic or
+ * static directory
+ */
 public class ServiceProviderStart {
 
     private final CloudLibrary cloudLibrary;
-    private final File template, dynamic, staticDir, spigotPlugins, bungeePlugins, global, version;
+    private final File template;
+    private final File spigotPlugins;
+    private final File bungeePlugins;
+    private final File global;
+    private final File version;
 
-    public ServiceProviderStart(CloudLibrary cloudLibrary, File template, File dynamic, File staticDir, File spigotPlugins, File bungeePlugins, File global, File version) {
+    public ServiceProviderStart(CloudLibrary cloudLibrary, File template, File spigotPlugins, File bungeePlugins, File global, File version) {
         this.cloudLibrary = cloudLibrary;
         this.template = template;
-        this.dynamic = dynamic;
-        this.staticDir = staticDir;
         this.version = version;
         this.bungeePlugins = bungeePlugins;
         this.spigotPlugins = spigotPlugins;
@@ -83,7 +93,6 @@ public class ServiceProviderStart {
 
             serverLocation.mkdirs();
             plugins.mkdirs();
-
             try {
                 FileUtils.copyDirectory(templateLocation, serverLocation);
                 File folder = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? bungeePlugins : spigotPlugins;
@@ -101,6 +110,11 @@ public class ServiceProviderStart {
                         FileUtils.copyDirectory(file, new File(plugins, file.getName()));
                     } else {
                         FileUtils.copyFile(file, new File(plugins, file.getName()));
+                    }
+                }
+                for (Module module : cloudLibrary.getService(ModuleService.class).getModules()) {
+                    if (module.getInfo().isCopy()) {
+                        FileUtils.copyFile(module.getInfo().getFile(), new File(plugins, module.getInfo().getFile().getName()));
                     }
                 }
 
@@ -197,7 +211,7 @@ public class ServiceProviderStart {
                     Properties properties = new Properties();
                     properties.load(stream);
                     properties.setProperty("server-port", service.getPort() + "");
-                    properties.setProperty("server-ip", "127.0.0.1");
+                    properties.setProperty("server-ip", "0");
                     properties.setProperty("max-players", String.valueOf(service.getServiceGroup().getMaxPlayers()));
                     properties.setProperty("server-name", service.getName());
                     properties.setProperty("online-mode", "false");
@@ -220,19 +234,23 @@ public class ServiceProviderStart {
             document.putAll(service);
             document.save();
 
-            String[] command = new String[]{
-                    "java",
-                    "-Dio.netty.leakDetectionLevel=DISABLED",
-                    "-Djline.terminal=jline.UnsupportedTerminal",
-                    "-Dfile.encoding=UTF-8",
-                    "-Xms" + service.getServiceGroup().getMinRam() + "M",
-                    "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
-                    "-jar",
-                    jarFile,
-                    service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : ""
-            };
-
-            Threader.getInstance().startProcess(command, serverLocation, process -> {
+            Threader.getInstance().startProcess(new String[]
+                    {
+                            "java",
+                            "-XX:+UseG1GC",
+                            "-XX:MaxGCPauseMillis=50",
+                            "-XX:-UseAdaptiveSizePolicy",
+                            "-XX:CompileThreshold=100",
+                            "-Dcom.mojang.eula.agree=true",
+                            "-Dio.netty.recycler.maxCapacity=0",
+                            "-Dio.netty.recycler.maxCapacity.default=0",
+                            "-Djline.terminal=jline.UnsupportedTerminal",
+                            "-Xmx" + service.getServiceGroup().getMaxRam() + "M",
+                            "-jar",
+                            jarFile,
+                            service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : ""
+                    }
+                    , serverLocation, process -> {
                 CloudScreen cloudScreen = new CloudScreen(Thread.currentThread(), process, serverLocation, service.getName());
                 cloudLibrary.getService(ScreenService.class).getMap().put(cloudScreen.getScreenName(), cloudScreen);
                 cloudScreen.start();

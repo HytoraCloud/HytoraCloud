@@ -22,6 +22,16 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+/**
+ * This Updater checks for updates
+ * and if there is an update and you enabled
+ * AutoUpdate it'll download the newest version for
+ * you and give you an overview of
+ *
+ * -> Changelog (What changed)
+ * -> New Version
+ * -> Progressbar (Download of the Cloud)
+ */
 @Getter
 public class Updater {
 
@@ -120,11 +130,11 @@ public class Updater {
      * @return current version of cloud
      */
     public static String getCloudVersion() {
-        return "BETA-1.7.4";
+        return "BETA-1.7.5";
     }
 
     /**
-     *
+     * Gets the Changelog from the current Object
      * @return changelog
      */
     public static List<String> getChangeLog() {

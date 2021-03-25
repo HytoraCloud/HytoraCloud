@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.library.service.database.impl;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
@@ -13,7 +13,7 @@ import lombok.Setter;
 import java.sql.*;
 import java.util.*;
 
-public class MySQL implements CloudDatabase {
+public class MySQL implements IDatabase {
 
     private final DatabaseService databaseService;
 

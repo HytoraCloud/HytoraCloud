@@ -63,7 +63,7 @@ public class ModuleLoader {
                             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
                             return;
                         }
-                        if (document.has("main") && document.has("author") && document.has("version") && document.has("name")) {
+                        if (document.has("main") && document.has("author") && document.has("version") && document.has("name") && document.has("copy")) {
                             Class<?> cl = classLoader.findClass(document.getString("main"));
                             if (cl == null) {
                                 this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §ccouldn't be found!");
@@ -71,7 +71,9 @@ public class ModuleLoader {
                             }
                             if (cl.getSuperclass().getName().equalsIgnoreCase(Module.class.getName())) {
                                 Module mod = (Module) cl.newInstance();
-                                mod.setInfo(new ModuleInfo(document.getString("name"), document.getString("author"), document.getString("version"), document.getList("commands")));
+                                final ModuleInfo moduleInfo = new ModuleInfo(document.getString("name"), document.getString("author"), document.getString("version"), document.getList("commands"), document.getBoolean("copy"));
+                                moduleInfo.setFile(file);
+                                mod.setInfo(moduleInfo);
                                 mod.setEventService(cloudLibrary.getService(EventService.class));
                                 mod.setCommandService(cloudLibrary.getService(CommandService.class));
                                 mod.setCloudLibrary(this.cloudLibrary);

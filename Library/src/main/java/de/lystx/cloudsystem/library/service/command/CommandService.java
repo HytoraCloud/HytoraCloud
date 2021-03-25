@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @Getter @Setter
-public final class CommandService extends CloudService {
+public class CommandService extends CloudService {
 
     private final Map<String, List<Method>> commandClasses;
     private final List<CommandInfo> commandInfos;

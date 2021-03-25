@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.elements.packets.both;
 
-import de.lystx.cloudsystem.library.service.player.featured.CloudInventory;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudInventory;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

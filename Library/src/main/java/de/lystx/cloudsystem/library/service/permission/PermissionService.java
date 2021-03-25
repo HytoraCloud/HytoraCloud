@@ -46,11 +46,14 @@ public class PermissionService extends CloudService {
             return;
         }
         try {
+            if (this.getCloudLibrary().getService(DatabaseService.class) == null) {
+                return;
+            }
             List<CloudPlayerData> list = this.getCloudLibrary().getService(DatabaseService.class).getDatabase().loadEntries();
             this.permissionPool.getPlayerCache().addAll(list);
             this.permissionPool.setEnabled(this.enabled);
         } catch (NullPointerException e) {
-            //Ignoring because it throws null on startUp
+            e.printStackTrace();
         }
     }
 

@@ -4,6 +4,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Class used to run a Task
+ * async or sync and for once
+ * or even multiple times
+ * you can cancel the Task at any time
+ */
 @Getter @RequiredArgsConstructor @Setter
 public class Task implements Runnable {
 

@@ -2,17 +2,20 @@ package de.lystx.cloudsystem.library.elements.packets.result.services;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
-import de.lystx.cloudsystem.library.service.server.other.ServerService;
-import io.vson.elements.object.VsonObject;
+import de.lystx.cloudsystem.library.elements.service.Service;
 
-public class ResultPacketServices extends ResultPacket {
+import java.util.LinkedList;
+import java.util.List;
+
+public class ResultPacketServices extends ResultPacket<List<Service>> {
 
 
     @Override
-    public VsonObject read(CloudLibrary cloudLibrary) {
-        VsonObject doc = new VsonObject();
-        return new VsonObject()
-                .append("services", cloudLibrary.getService(ServerService.class).getServices())
-                .append("proxies", doc);
+    public List<Service> read(CloudLibrary cloudLibrary) {
+        List<Service> services = new LinkedList<>();
+        for (List<Service> value : cloudLibrary.getService().getServices().values()) {
+            services.addAll(value);
+        }
+        return services;
     }
 }

@@ -42,7 +42,7 @@ public class WebServer {
             this.enabled = this.config.getBoolean("enabled", true);
             this.whitelistedIps = this.config.has("whitelistedIps") ?
                     this.config.getList("whitelistedIps", String.class) :
-                    this.config.append("whitelistedIps", Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1S")).getList("whitelistedIps", String.class);
+                    this.config.append("whitelistedIps", Arrays.asList("0", "127.0.0.1", "0:0:0:0:0:0:0:1S")).getList("whitelistedIps", String.class);
             this.config.save();
             try {
                 this.handlers = new HashMap<>();

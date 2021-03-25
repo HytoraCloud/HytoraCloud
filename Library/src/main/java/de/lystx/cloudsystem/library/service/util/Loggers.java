@@ -5,6 +5,13 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import lombok.AllArgsConstructor;
 
+/**
+ * This class disables unused
+ * loggings for like netty or mongodb
+ * or anything you want to disable
+ * just add it to the {@link java.lang.reflect.Constructor} and
+ * use the {@link Loggers#disable()} Method to disable them
+ */
 @AllArgsConstructor
 public class Loggers {
 

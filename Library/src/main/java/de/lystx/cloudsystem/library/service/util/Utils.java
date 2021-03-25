@@ -3,6 +3,11 @@ package de.lystx.cloudsystem.library.service.util;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Class for utiliities
+ * made static because it's
+ * easier to call the methods
+ */
 public class Utils {
 
     /**

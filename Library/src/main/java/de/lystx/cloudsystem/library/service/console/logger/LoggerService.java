@@ -30,7 +30,9 @@ public class LoggerService extends CloudService {
                 this.consoleReader = new ConsoleReader(System.in, System.err);
                 this.consoleReader.setExpandEvents(false);
                 if (!Constants.JLINE_COMPLETER_INSTALLED) {
-                    this.consoleReader.addCompleter(new CloudCompleter(cloudLibrary.getService(CommandService.class)));
+                    if (cloudLibrary != null && cloudLibrary.getService(CommandService.class) != null) {
+                        this.consoleReader.addCompleter(new CloudCompleter(cloudLibrary.getService(CommandService.class)));
+                    }
                 }
             } catch (IOException e) {
                 System.out.println("[Console] Something went wrong while initialising ConsoleReader!");
@@ -63,12 +65,11 @@ public class LoggerService extends CloudService {
             } else {
                 System.out.println(ConsoleColor.stripColor(message));
             }
-
-            LogService logService = this.getCloudLibrary().getService(LogService.class);
-            if (logService != null) {
-                logService.log(ConsoleColor.stripColor(message));
-            } else {
-                System.out.println("[Logger] Couldn't find LoggerService.class (Wasn't added maybe?)");
+            try {
+                LogService logService = this.getCloudLibrary().getService(LogService.class);
+                if (logService != null) logService.log(ConsoleColor.stripColor(message));
+            } catch (NullPointerException e) {
+                //IGNORING
             }
         } catch (Exception e) {
             e.printStackTrace();

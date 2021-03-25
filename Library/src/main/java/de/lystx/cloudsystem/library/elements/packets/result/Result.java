@@ -21,14 +21,31 @@ public class Result<R> implements Serializable {
         this.throwable = null;
     }
 
+    /**
+     * Casts Result to {@link VsonObject}
+     * @return
+     */
     public VsonObject getDocument() {
         return (VsonObject) this.result;
     }
 
+    /**
+     * Uses this as {@link VsonObject} to
+     * untree the object of this class
+     * and get the object as a specified GenericType
+     * @param tClass
+     * @param <T>
+     * @return
+     */
     public <T> T getResultAs(Class<T> tClass) {
         return this.getDocument().getAs(tClass);
     }
 
+    /**
+     * Accepts Consumer if Error was found
+     * @param consumer
+     * @return
+     */
     public Result<R> onError(Consumer<Throwable> consumer) {
         if (this.throwable != null) {
             consumer.accept(this.throwable);
@@ -36,6 +53,11 @@ public class Result<R> implements Serializable {
         return this;
     }
 
+    /**
+     * Accepts Consumer if Document was returned
+     * @param consumer
+     * @return
+     */
     public Result<R> onDocumentSet(Consumer<VsonObject> consumer) {
         if (this.getResult() instanceof VsonObject) {
             consumer.accept(this.getDocument());
@@ -43,11 +65,21 @@ public class Result<R> implements Serializable {
         return this;
     }
 
+    /**
+     * Accepts Consumer if Result was returned
+     * @param consumer
+     * @return
+     */
     public Result<R> onResultSet(Consumer<Result<R>> consumer) {
         consumer.accept(this);
         return this;
     }
 
+    /**
+     * Accepts Consumer if GenericObject was found
+     * @param consumer
+     * @return
+     */
     public Result<R> onReceiveObject(Consumer<R> consumer) {
         consumer.accept(this.getResult());
         return this;

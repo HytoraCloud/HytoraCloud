@@ -9,6 +9,13 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * This class is for getting values
+ * for a specific server.
+ * You can even use it to ping other servers
+ * like "GommeHD.net" or "Hypixel.net" to get information
+ * of them like OnlinePlayers, MaxPlayers and the Motd
+ */
 @Getter
 public class ServerPinger {
 

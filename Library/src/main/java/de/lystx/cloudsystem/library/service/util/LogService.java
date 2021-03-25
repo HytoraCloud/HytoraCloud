@@ -11,6 +11,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * This class logs all contents
+ * of the {@link de.lystx.cloudsystem.library.service.console.CloudConsole} to
+ * the given file for the current log
+ * it will cache the log and writes it on shutdown.
+ */
 @Getter @Setter
 public class LogService extends CloudService {
 

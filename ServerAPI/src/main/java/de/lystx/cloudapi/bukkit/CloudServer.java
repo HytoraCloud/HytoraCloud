@@ -23,6 +23,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -54,32 +55,35 @@ public class CloudServer extends JavaPlugin implements CloudService {
 
     @Override
     public void onEnable() {
-        instance = this;
+        CloudAPI.getInstance().execute(() -> {
+            instance = this;
+            Constants.BUKKIT_VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 
-        //Initializing Objects
-        this.manager = new CloudManager(CloudAPI.getInstance());
-        this.signManager = new SignManager(this);
-        this.nametagManager = new NametagManager();
-        this.skinFetcher = new SkinFetcher();
-        this.npcManager = new NPCManager();
-
-        // Version check to enable an disable LabyMod and NPCs
-        try {
-            Class.forName("net.minecraft.server.v1_8_R3.Packet");
+            //Initializing Objects
+            this.manager = new CloudManager(CloudAPI.getInstance());
+            this.signManager = new SignManager(this);
+            this.nametagManager = new NametagManager();
+            this.skinFetcher = new SkinFetcher();
             this.npcManager = new NPCManager();
-            this.newVersion = false;
             this.labyMod = new LabyMod(CloudAPI.getInstance());
-        } catch (Exception e){
-            this.newVersion = true;
-        }
-        this.taskId = -1;
-        this.bootstrap();
+
+            try {
+                Class.forName("net.minecraft.server.v1_8_R3.Packet");
+                this.npcManager = new NPCManager();
+                this.newVersion = false;
+            } catch (Exception e){
+                this.newVersion = true;
+            }
+            this.taskId = -1;
+            this.bootstrap();
+
+        });
     }
 
     @Override
     public void onDisable() {
         if (CloudAPI.getInstance().getCloudClient().isConnected()) {
-            CloudAPI.getInstance().disconnect();
+            CloudAPI.getInstance().getCloudClient().disconnect();
         }
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LABYMOD");
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");

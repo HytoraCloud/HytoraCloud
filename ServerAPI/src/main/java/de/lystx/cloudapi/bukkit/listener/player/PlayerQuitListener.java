@@ -20,7 +20,7 @@ public class PlayerQuitListener implements Listener {
         packetReader.uninject();
         CloudServer.PACKET_READERS.remove(player.getUniqueId());
         CloudServer.getInstance().startStopTimer();
-        new PacketInServiceUpdate(CloudAPI.getInstance().getService()).unsafe().async().send();
+        CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
     }
 
 }

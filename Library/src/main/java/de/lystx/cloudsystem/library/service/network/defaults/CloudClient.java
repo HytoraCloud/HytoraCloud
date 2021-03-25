@@ -65,6 +65,16 @@ public class CloudClient extends NettyClient implements CloudExecutor {
     }
 
     /**
+     * Registers multiple PacketHandlers
+     * @param packetHandlerAdapter
+     */
+    public void registerPacketHandlers(Object... packetHandlerAdapter) {
+        for (Object o : packetHandlerAdapter) {
+            this.registerPacketHandler(o);
+        }
+    }
+
+    /**
      * registers networkHandler
      * @param networkHandler
      */

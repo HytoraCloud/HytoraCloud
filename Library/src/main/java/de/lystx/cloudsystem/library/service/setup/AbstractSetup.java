@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.setup;
 
+import de.lystx.cloudsystem.library.elements.list.CloudList;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import lombok.Getter;
@@ -11,6 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * This class is used for
+ * Setup purposes.
+ * To create a Setup just make the class extend
+ * {@link AbstractSetup}
+ *
+ * @param <T>
+ */
 @Getter
 public abstract class AbstractSetup<T> {
 
@@ -21,6 +30,9 @@ public abstract class AbstractSetup<T> {
     private boolean skipped;
     private Map.Entry<Field, Setup> currentPart;
     private Consumer<T> consumer;
+
+
+    protected boolean cancellable = true;
 
     /**
      * Starts the setup and loops through the given questions
@@ -33,7 +45,9 @@ public abstract class AbstractSetup<T> {
 
         scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("§9");
-        scanner.getLogger().sendMessage("SETUP", "§aIf you want to setup just type §2'cancel'§a!");
+        if (this.isCancellable()) {
+            scanner.getLogger().sendMessage("SETUP", "§aIf you want to setup just type §2'cancel'§a!");
+        }
 
         for (Field field : getClass().getDeclaredFields()) {
             if (field.getAnnotation(Setup.class) != null) {
@@ -47,8 +61,9 @@ public abstract class AbstractSetup<T> {
         this.cloudConsole.getLogger().sendMessage("SETUP", this.currentPart.getValue().question() + " §7(§a" + this.currentPart.getKey().getType().getSimpleName() + "§7)");
         this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
 
+
+        this.cloudConsole.setCurrentSetup(this);
         while (this.current < this.setupParts.size() + 1) {
-            this.cloudConsole.setCurrentSetup(this);
             try {
                 String line = this.cloudConsole.getLogger().getConsoleReader().readLine(ConsoleColor.formatColorString(this.cloudConsole.getPrefix()));
                 if (line != null) {

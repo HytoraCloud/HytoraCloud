@@ -1,7 +1,6 @@
 package de.lystx.cloudsystem.library.service.network;
 
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
-import io.netty.channel.ChannelFutureListener;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

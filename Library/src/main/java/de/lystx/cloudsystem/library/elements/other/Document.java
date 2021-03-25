@@ -274,7 +274,17 @@ public class Document {
         return result;
     }
 
-    public <T> List<T> getList(String key, Class<?> getAs) {
+    public <T> List<T> getList(Class<T> tClass) {
+        List<T> result = new LinkedList<>();
+        for (JsonElement element : this.getAs(JsonArray.class)) {
+            if (element instanceof JsonObject) {
+                result.add((T)new Document().getObject(element.getAsJsonObject(), tClass));
+            }
+        }
+        return result;
+    }
+
+    public <T> List<T> getList(String key, Class<T> getAs) {
         List<T> result = new LinkedList<>();
         for (JsonElement element : this.getJsonArray(key)) {
             if (element instanceof JsonObject) {

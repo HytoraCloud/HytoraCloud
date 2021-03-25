@@ -8,6 +8,7 @@ import de.lystx.cloudapi.standalone.manager.CloudPlayers;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
+import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
@@ -34,21 +35,26 @@ import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModAddon;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.server.other.process.Threader;
-import de.lystx.cloudsystem.library.service.util.Acceptable;
+import de.lystx.cloudsystem.library.elements.interfaces.Acceptable;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
+import io.vson.VsonValue;
+import io.vson.annotation.other.Vson;
+import io.vson.annotation.other.VsonAdapter;
+import io.vson.elements.VsonString;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
+import io.vson.manage.vson.VsonWriter;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -77,6 +83,7 @@ public class CloudAPI implements CloudService {
 
     public CloudAPI() {
         instance = this;
+
         this.cloudLibrary = new CloudLibrary(CloudType.CLOUDAPI);
         this.cloudClient =  this.cloudLibrary.getCloudClient();
         this.executorService = Executors.newCachedThreadPool();
@@ -89,30 +96,51 @@ public class CloudAPI implements CloudService {
 
         Constants.EXECUTOR = this.cloudClient;
         Constants.PERMISSION_POOL = this.permissionPool;
+        Constants.CLOUD_TYPE = CloudType.CLOUDAPI;
+        LabyModAddon.load();
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
         this.useChat = false;
         this.nametags = false;
         this.joinable = false;
 
-        this.cloudClient.registerPacketHandler(new PacketHandlerConfig(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerCommand(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerNetwork(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerSubChannel(this));
-        this.cloudClient.registerPacketHandler(new PacketHandlerCommunication(this));
-
-        this.bootstrap();
+        this.registerPacketHandler(
+                new PacketHandlerConfig(this),
+                new PacketHandlerCommand(this),
+                new PacketHandlerNetwork(this),
+                new PacketHandlerSubChannel(this),
+                new PacketHandlerCommunication(this)
+        ).bootstrap();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
     }
 
+    /**
+     * Registers a PacketHandler
+     * @param handler
+     */
+    public CloudAPI registerPacketHandler(Object... handler) {
+        this.cloudClient.registerPacketHandlers(handler);
+        return this;
+    }
 
+    /**
+     * Registers {@link NetworkHandler}s
+     * @param networkHandlers
+     */
+    public CloudAPI registerNetworkHandler(NetworkHandler... networkHandlers) {
+        for (NetworkHandler networkHandler : networkHandlers) {
+            this.cloudClient.registerHandler(networkHandler);
+        }
+        return this;
+    }
     /**
      * Registers a Command
      * @param commandObject
      */
-    public void registerCommand(Object commandObject) {
+    public CloudAPI registerCommand(Object commandObject) {
         this.commandService.registerCommand(commandObject);
+        return this;
     }
 
     /**
@@ -133,13 +161,6 @@ public class CloudAPI implements CloudService {
      */
     public void installMaven(String groupId, String artifactId, String version, Repository repo) {
         this.cloudLibrary.getLibraryService().install(groupId, artifactId, version, repo);
-    }
-
-    /**
-     * This will stop the connection between client and Server
-     */
-    public void disconnect() {
-        this.cloudClient.disconnect();
     }
 
     /**
@@ -224,16 +245,14 @@ public class CloudAPI implements CloudService {
      * the serviec will stop
      */
     public void bootstrap() {
-        Threader.getInstance().execute(() -> {
-            try {
-                this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketInRegister(this.getService())));
-                this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
-            } catch (Exception e) {
-                System.out.println("[CLOUDAPI] Couldn't connect to CloudSystem! Stopping...");
-                e.printStackTrace();
-                System.exit(0);
-            }
-        });
+        try {
+            this.cloudClient.onConnectionEstablish(nettyClient -> nettyClient.sendPacket(new PacketInRegister(this.getService())));
+            this.cloudClient.connect(this.getService().getHost(), this.getService().getCloudPort());
+        } catch (Exception e) {
+            System.out.println("[CloudAPI] Couldn't connect to CloudSystem! Stopping...");
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
 
     @Override
@@ -242,8 +261,10 @@ public class CloudAPI implements CloudService {
     }
 
     public void shutdown(Consumer<PacketState> consumer) {
-        this.sendPacket(new PacketInStopServer(this.getService()), consumer);
-        this.disconnect();
+        new PacketInStopServer(this.getService()).unsafe().send(this, packetState -> {
+            this.cloudClient.disconnect();
+            consumer.accept(packetState);
+        });
     }
 
     /**
@@ -251,7 +272,7 @@ public class CloudAPI implements CloudService {
      * @param command
      */
     public void sendCommand(String command) {
-        new PacketCommand("null", command).unsafe().async().send(this);
+        this.sendPacket(new PacketCommand("null", command));
     }
 
     /**
@@ -270,7 +291,7 @@ public class CloudAPI implements CloudService {
      */
     public void sendPacket(Packet packet, Consumer<PacketState> consumer) {
         if (packet.unsafe() != null && packet.unsafe().isAsync()) {
-            this.executorService.execute(() -> this.sendPacket(packet));
+            this.execute(() -> this.sendPacket(packet));
             return;
         }
         if (packet.getClass().getName().toLowerCase().contains("de.lystx.cloudsystem.library.elements.packets")) {
@@ -299,16 +320,6 @@ public class CloudAPI implements CloudService {
             });
         }
         this.sendPacket(packet);
-    }
-
-    @Override
-    public CloudExecutor getCurrentExecutor() {
-        return this.cloudClient;
-    }
-
-    @Override
-    public CloudType getType() {
-        return CloudType.CLOUDAPI;
     }
 
     /**
@@ -507,4 +518,15 @@ public class CloudAPI implements CloudService {
         CloudServer.getInstance().getManager().setMotd(motd);
         return this;
     }
+
+    @Override
+    public CloudExecutor getCurrentExecutor() {
+        return this.cloudClient;
+    }
+
+    @Override
+    public CloudType getType() {
+        return CloudType.CLOUDAPI;
+    }
+
 }

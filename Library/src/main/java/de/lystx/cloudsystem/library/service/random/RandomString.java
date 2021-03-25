@@ -25,10 +25,12 @@ public class RandomString {
         this(length, new SecureRandom());
     }
 
-    public RandomString() {
-        this(21);
-    }
-
+    /**
+     * Returns a new Random String
+     * with the length of the provided length
+     * in the constructor
+     * @return String
+     */
     public String next() {
         for (int idx = 0; idx < buf.length; ++idx) {
             buf[idx] = symbols[random.nextInt(symbols.length)];
@@ -36,6 +38,12 @@ public class RandomString {
         return new String(buf);
     }
 
+    /**
+     * Returns a new Random String
+     * with the length of the provided length
+     * as parameter
+     * @return String
+     */
     public String next(int newLength) {
         this.buf = new char[newLength];
         for (int idx = 0; idx < buf.length; ++idx) {

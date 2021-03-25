@@ -37,26 +37,25 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
                 CloudProxy.getInstance().getNetworkManager().switchMaintenance(info.getNetworkConfig().getNetworkConfig().isMaintenance());
             }
 
-            if (info.getNetworkConfig().getNetworkConfig().isHubCommand()) {
+            if (info.getNetworkConfig().getNetworkConfig().isHubCommand())
                 CloudAPI.getInstance().registerCommand(new HubCommand());
-            } else {
-                CloudAPI.getInstance().unregisterCommand(new HubCommand());
-            }
+            else CloudAPI.getInstance().unregisterCommand(new HubCommand());
 
-            info.getServices().values().forEach(value -> value.forEach(service -> {
-                if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
-                    ServerInfo serverInfo = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()), "CloudService", false);
-                    ProxyServer.getInstance().getServers().put(service.getName(), serverInfo);
+
+            for (List<Service> value : info.getServices().values()) {
+                for (Service service : value) {
+                    if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
+                        ServerInfo serverInfo = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()), "CloudService", false);
+                        ProxyServer.getInstance().getServers().put(service.getName(), serverInfo);
+                    }
                 }
-            }));
-
-            ProxyServer.getInstance().getServers().values().forEach(serverInfo -> {
+            }
+            for (ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
                 Service service = CloudAPI.getInstance().getNetwork().getService(serverInfo.getName());
                 if (service == null) {
                     ProxyServer.getInstance().getServers().remove(serverInfo.getName());
                 }
-            });
-
+            }
         }
     }
 }

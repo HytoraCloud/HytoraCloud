@@ -60,11 +60,13 @@ public class CloudBootingSetupNotDone {
             if (setup.isCancelled()) {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cYou are §enot §callowed to §4cancel §ccloudSystem setup! Restart the cloud!");
                 System.exit(0);
+                return;
             }
 
             if (!setup.getDatabase().equalsIgnoreCase("FILES") && !setup.getDatabase().equalsIgnoreCase("MONGODB") && !setup.getDatabase().equalsIgnoreCase("MYSQL")) {
                 cloudSystem.getConsole().getLogger().sendMessage("ERROR", "§cPlease provide a §evalid database§c!");
                 System.exit(0);
+                return;
             }
             VsonObject document = cloudSystem.getService(ConfigService.class).getVsonObject();
             document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
@@ -145,9 +147,8 @@ public class CloudBootingSetupNotDone {
             cloudSystem.getService(Scheduler.class).scheduleDelayedTask(() -> {
                 Action action = new Action();
 
-                cloudSystem.getService(FileService.class).download(spigot.getValue().getUrl(), new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"));
-
-                cloudSystem.getService(FileService.class).download(bungeeCord.getValue().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
+                Updater.download(spigot.getValue().getUrl(), new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading " + spigot.getValue().getJarName());
+                Updater.download(bungeeCord.getValue().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getService(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.getValue().toUpperCase());
 
                 cloudSystem.getService(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getService(FileService.class).getGlobalDirectory(), "server-icon.png"));
 

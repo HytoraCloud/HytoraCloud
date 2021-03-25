@@ -3,6 +3,14 @@ package de.lystx.cloudsystem.library.service.util;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 
+/**
+ * This class gives you information
+ * (TPS) Ticks per second about the cloud
+ * It's like in Bukkit where 20* is the best
+ * and the lower it gets the worse the performance is
+ * It's not as precise as Bukkit so there might be like a small
+ * difference between the real TPS and the displayed TPS
+ */
 public class TicksPerSecond {
 
     public int tickCount;

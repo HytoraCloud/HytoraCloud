@@ -41,6 +41,8 @@ import java.util.*;
 public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.elements.interfaces.CloudService {
 
 
+    //TODO: CHECK FOR EMPTY PERMS.JSON
+
     public List<CloudService> cloudServices;
     protected ReverseMap<String, Object> customs;
 
@@ -64,7 +66,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
     public CloudLibrary(CloudType cloudType) {
         //TODO: Remove manual directorys for LibraryService
-        if (cloudType.equals(CloudType.RECEIVER) || cloudType.equals(CloudType.CLOUDSYSTEM)) {
+        if (cloudType.equals(CloudType.RECEIVER) || cloudType.equals(CloudType.CLOUDSYSTEM) || cloudType.equals(CloudType.NONE)) {
             this.libraryService = new LibraryService("./local/libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.installDefaultLibraries();
             AnsiConsole.systemInstall();
@@ -133,6 +135,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
         this.libraryService.install("org.mongodb", "mongodb-driver", "3.12.7", Repository.CENTRAL);
         this.libraryService.install("org.mongodb", "mongodb-driver-core", "3.12.7", Repository.CENTRAL);
         this.libraryService.install("org.mongodb", "mongo-java-driver", "3.12.7", Repository.CENTRAL);
+        //this.libraryService.install("com.arangodb", "arangodb-java-driver", "6.9.1", Repository.CENTRAL);
 
         //OTHER
         this.libraryService.install("org.openjfx", "javafx-base", "11", Repository.CENTRAL);

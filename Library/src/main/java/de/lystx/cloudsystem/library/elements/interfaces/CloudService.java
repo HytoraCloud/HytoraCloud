@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 
+
 public interface CloudService {
 
 

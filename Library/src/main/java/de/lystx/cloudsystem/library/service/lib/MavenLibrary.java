@@ -3,10 +3,13 @@ package de.lystx.cloudsystem.library.service.lib;
 import lombok.Getter;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.*;
 
 @Getter
@@ -29,7 +32,7 @@ public class MavenLibrary {
      */
     public void install(String url) {
         if (!new File(this.libraryService.getDirectory(), path()).exists()) {
-            System.out.println("[Libraries] Downloading " + groupId + ":" + artifactId + " Library (Version: " + this.version + ")");
+            System.out.println("[Libraries] Downloading " + groupId + ":" + artifactId + " Library (Version: " + this.version + ") from " + url);
             try {
                 if (!Files.exists(this.getPath())) {
                     Path parent = this.getPath().getParent();
@@ -50,7 +53,8 @@ public class MavenLibrary {
                     Files.copy(inputStream, this.getPath());
                 }
 
-                System.out.println("[Libraries] Succesfully downloaded " + artifactId + ":" + groupId);
+                this.fileDownload(this.repo + rawPath() + ".pom.asc", new File(this.libraryService.getDirectory(), this.groupId + ".pom.asc"));
+                this.fileDownload(this.repo + rawPath() + ".pom", new File(this.libraryService.getDirectory(), this.groupId + ".pom.xml"));
             } catch (IOException e) {
                 System.out.println("[Libraries] Couldn't download " + artifactId + ":" + groupId);
             }
@@ -58,6 +62,24 @@ public class MavenLibrary {
         this.libraryService.addURL(this.getPath());
     }
 
+    /**
+     * Downloads a file from website
+     * @param url
+     * @param location
+     */
+    private void fileDownload(String url, File location) {
+        try {
+            if (location.exists()) {
+                location.createNewFile();
+            }
+            URL website = new URL(url);
+            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+            FileOutputStream fos = new FileOutputStream(location);
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        } catch (Exception e) {
+            //Ignoring
+        }
+    }
 
     /**
      * Installs this library
@@ -79,7 +101,15 @@ public class MavenLibrary {
      * @return
      */
     private String path() {
-        return this.getGroupId().replace('.', '/') + "/" + this.getArtifactId() + "/" + this.getVersion() + "/" + this.getArtifactId() + "-" + this.getVersion() + ".jar";
+        return this.rawPath() + ".jar";
+    }
+
+    /**
+     * Returns raw path
+     * @return
+     */
+    private String rawPath() {
+        return this.getGroupId().replace('.', '/') + "/" + this.getArtifactId() + "/" + this.getVersion() + "/" + this.getArtifactId() + "-" + this.getVersion();
     }
 
 }

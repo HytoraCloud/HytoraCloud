@@ -50,7 +50,7 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
                 .append("labyModConfig",
                     new LabyModConfig(
                             false,
-                            "§8» §7HytoraCloud §8× §b%service% §8[§b%online_players%§8/§b%max_player%§8]",
+                            "§8» §7HytoraCloud §8× §b%service% §8[§b%online_players%§8/§b%max_players%§8]",
                             true
                     ))
                 .append("messageConfig",

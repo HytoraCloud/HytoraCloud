@@ -10,6 +10,7 @@ import de.lystx.cloudsystem.library.service.setup.AbstractSetup;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,8 +18,8 @@ import java.util.*;
 @Getter @Setter
 public class CloudConsole extends Thread implements CloudCommandSender {
 
-    private final LoggerService logger;
-    private final CommandService commandManager;
+    private LoggerService logger;
+    private CommandService commandManager;
     private final String buffer;
     private AbstractSetup<?> currentSetup;
     private boolean active;
@@ -36,8 +37,9 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     /**
      * Starts Thread
      */
+    @SneakyThrows
     public void run() {
-        while (!this.isInterrupted()) {
+        while (!this.isInterrupted() && this.isAlive()) {
             try {
                 String s = ConsoleColor.formatColorString(this.getPrefix());
                 String line;

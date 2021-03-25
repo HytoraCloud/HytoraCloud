@@ -1,24 +1,26 @@
 package de.lystx.cloudsystem.library.service.permission.impl;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Getter
+@Getter @Setter
 public class PermissionGroup implements Serializable {
 
-    private final String name;
-    private final Integer id;
-    private final String prefix;
-    private final String suffix;
-    private final String display;
-    private final String chatFormat;
-    private final List<String> permissions;
-    private final List<String> inheritances;
-    private final SerializableDocument entries;
+    private String name;
+    private Integer id;
+    private String prefix;
+    private String suffix;
+    private String display;
+    private String chatFormat;
+    private List<String> permissions;
+    private List<String> inheritances;
+    private SerializableDocument entries;
 
     public PermissionGroup(String name, Integer id, String prefix, String suffix, String display, String chatFormat, List<String> permissions, List<String> inheritances) {
         this(name, id, prefix, suffix, display, chatFormat, permissions, inheritances, new SerializableDocument());
@@ -34,5 +36,19 @@ public class PermissionGroup implements Serializable {
         this.permissions = permissions;
         this.inheritances = inheritances;
         this.entries = entries;
+    }
+
+    /**
+     * Updates the current group
+     * Not safe because {@link Constants#PERMISSION_POOL} might
+     * or could be null at any time when it's not set
+     *
+     * Therefore it's deprecated!
+     */
+    @Deprecated
+    public void update() {
+        PermissionGroup group = Constants.PERMISSION_POOL.getPermissionGroupFromName(this.name);
+        Constants.PERMISSION_POOL.getPermissionGroups().set(Constants.PERMISSION_POOL.getPermissionGroups().indexOf(group), this);
+        Constants.PERMISSION_POOL.update();
     }
 }

@@ -50,11 +50,8 @@ public class CloudNetworkService extends CloudService {
      * Starts server in thread
      */
     public void start() {
-        Thread server = new Thread(() -> {
-            this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
-        }, "hytoraCloud_cloudNetwork");
+        this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
         Constants.EXECUTOR = this.cloudServer;
-        server.start();
     }
 
     /**

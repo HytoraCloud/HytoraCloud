@@ -16,7 +16,7 @@ import java.io.IOException;
 @Getter
 public class DatabaseService extends CloudService {
 
-    private CloudDatabase database;
+    private IDatabase database;
     private VsonObject document;
     private String databaseType;
     private String host;

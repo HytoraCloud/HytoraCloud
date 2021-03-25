@@ -24,8 +24,6 @@ public class PacketHandlerPermissionPool extends PacketHandlerAdapter {
             PermissionPool permissionPool = packetInPermissionPool.getPermissionPool();
             this.cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
             this.cloudSystem.getService(PermissionService.class).save();
-            this.cloudSystem.getService(PermissionService.class).load();
-            this.cloudSystem.getService(PermissionService.class).loadEntries();
             this.cloudSystem.reload();
         }
     }

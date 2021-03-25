@@ -14,6 +14,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+/**
+ * This class is used to
+ * stop the Services and it's own Thread
+ * and also it's {@link CloudScreen}
+ */
 public class ServiceProviderStop {
 
     private final CloudLibrary cloudLibrary;

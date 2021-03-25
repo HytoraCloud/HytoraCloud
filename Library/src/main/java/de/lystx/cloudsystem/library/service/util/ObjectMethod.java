@@ -1,11 +1,18 @@
 
 package de.lystx.cloudsystem.library.service.util;
 
+import de.lystx.cloudsystem.library.service.event.SubscribeEvent;
+import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.lang.reflect.Method;
 
+/**
+ * Used to store Annotations for
+ * {@link PacketHandler} and {@link SubscribeEvent}
+ * @param <T>
+ */
 @Getter @AllArgsConstructor
 public class ObjectMethod<T> {
 

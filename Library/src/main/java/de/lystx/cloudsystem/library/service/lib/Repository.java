@@ -1,10 +1,9 @@
 package de.lystx.cloudsystem.library.service.lib;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter @AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Getter @AllArgsConstructor
 public enum Repository {
 
     CENTRAL("https://repo.maven.apache.org/maven2/"),

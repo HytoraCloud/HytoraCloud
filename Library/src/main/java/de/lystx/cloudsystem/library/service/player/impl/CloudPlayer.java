@@ -4,16 +4,19 @@ import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.packets.both.*;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
-import de.lystx.cloudsystem.library.service.player.featured.CloudInventory;
-import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudInventory;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlayer;
 import de.lystx.cloudsystem.library.service.util.Constants;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import de.lystx.cloudsystem.library.service.util.Reflections;
+import lombok.*;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 @Getter @Setter @ToString(of = "name")
@@ -25,6 +28,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
     private String server;
     private String proxy;
     private CloudPlayerData cloudPlayerData;
+    private LabyModPlayer labyModPlayer;
 
     public CloudPlayer(String name, UUID uniqueId, String ipAddress, String server, String proxy) {
         this.name = name;
@@ -32,6 +36,10 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
         this.ipAddress = ipAddress;
         this.server = server;
         this.proxy = proxy;
+    }
+
+    public Service getConnectedService() {
+        return Constants.SERVICE_FILTER.find(service -> service.getName().equalsIgnoreCase(this.server)).findFirst().orElse(null).get();
     }
 
     /**
@@ -78,8 +86,21 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param message
      */
     public void sendMessage(Object message) {
-        PacketSendMessage sendMessage = new PacketSendMessage(this.uniqueId, message.toString());
-        Constants.EXECUTOR.sendPacket(sendMessage);
+        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+            Object player;
+            if (Constants.SERVICE_TYPE == ServiceType.SPIGOT) {
+                player = Reflections.getBukkitPlayer(this.name);
+            } else {
+                player = Reflections.getBungeePlayer(this.name);
+            }
+            Reflections.callMethod(player, "sendMessage", message);
+            return;
+        }
+        Constants.EXECUTOR.sendPacket(new PacketSendMessage(this.uniqueId, message.toString()));
+    }
+
+    public void sendActionbar(Object message) {
+        Constants.EXECUTOR.sendPacket(new PacketSendActionbar(this.uniqueId, message.toString()));
     }
 
     /**
@@ -87,8 +108,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param cloudComponent
      */
     public void sendComponent(CloudComponent cloudComponent) {
-        PacketSendComponent sendMessage = new PacketSendComponent(this.uniqueId, cloudComponent);
-        Constants.EXECUTOR.sendPacket(sendMessage);
+        Constants.EXECUTOR.sendPacket(new PacketSendComponent(this.uniqueId, cloudComponent));
     }
 
     /**
@@ -96,8 +116,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param cloudInventory
      */
     public void openInventory(CloudInventory cloudInventory) {
-        PacketOpenInventory packetOpenInventory = new PacketOpenInventory(this, cloudInventory);
-        Constants.EXECUTOR.sendPacket(packetOpenInventory);
+        Constants.EXECUTOR.sendPacket(new PacketOpenInventory(this, cloudInventory));
     }
 
     /**
@@ -106,9 +125,14 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param v1
      * @param v2
      */
-    public void playSound(Enum<?> sound, float v1, float v2) {
-        PacketPlaySound playSound = new PacketPlaySound(this.name, sound.name(), v1, v2);
-        Constants.EXECUTOR.sendPacket(playSound);
+    @SneakyThrows
+    public void playSound(Enum<?> sound, Float v1, Float v2) {
+        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI) && Constants.SERVICE_TYPE == ServiceType.SPIGOT) {
+            Object player = Reflections.getBukkitPlayer(this.name);
+            Reflections.callMethod(player, "playSound", sound, v1, v2);
+            return;
+        }
+        Constants.EXECUTOR.sendPacket(new PacketPlaySound(this.name, sound.name(), v1, v2));
     }
 
     /**
@@ -117,16 +141,15 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param subtitle
      */
     public void sendTitle(String title, String subtitle) {
-        PacketSendTitle sendTitle = new PacketSendTitle(this.name, title, subtitle);
-        Constants.EXECUTOR.sendPacket(sendTitle);
+        Constants.EXECUTOR.sendPacket(new PacketSendTitle(this.name, title, subtitle));
     }
+
 
     /**
      * Sends to fallback
      */
     public void fallback() {
-        PacketFallback fallback = new PacketFallback(this.name);
-        Constants.EXECUTOR.sendPacket(fallback);
+        Constants.EXECUTOR.sendPacket(new PacketFallback(this.name));
     }
 
     /**
@@ -134,8 +157,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param server
      */
     public void connect(String server) {
-        PacketConnectServer sendToServer = new PacketConnectServer(this.name, server);
-        Constants.EXECUTOR.sendPacket(sendToServer);
+        Constants.EXECUTOR.sendPacket(new PacketConnectServer(this.name, server));
     }
 
     /**
@@ -159,8 +181,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param serviceGroup
      */
     public void connectRandom(String serviceGroup) {
-        PacketConnectGroup sendToGroup = new PacketConnectGroup(this.name, serviceGroup);
-        Constants.EXECUTOR.sendPacket(sendToGroup);
+        Constants.EXECUTOR.sendPacket(new PacketConnectGroup(this.name, serviceGroup));
     }
 
     /**
@@ -192,6 +213,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param prefix
      * @param message
      */
+    @Deprecated
     public void sendMessage(String prefix, String message) {
         this.sendMessage("§8[§b" + prefix + "§8] §7" + message);
     }

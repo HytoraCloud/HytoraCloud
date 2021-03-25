@@ -1,6 +1,5 @@
 package de.lystx.cloudapi.proxy.handler;
 
-import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutRegisterServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutStartedServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -14,12 +13,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.net.InetSocketAddress;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 
-@AllArgsConstructor
 public class PacketHandlerProxyStartServer extends PacketHandlerAdapter {
-
-
-    private final CloudAPI cloudAPI;
-
 
     public void handle(Packet packet) {
         if (packet instanceof PacketOutRegisterServer) {

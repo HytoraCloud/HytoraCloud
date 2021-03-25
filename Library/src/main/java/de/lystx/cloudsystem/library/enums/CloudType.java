@@ -5,5 +5,6 @@ public enum CloudType {
     RECEIVER, // "Wrapper"
     CLOUDSYSTEM, // "Master"
     LIBRARY, // Internal managing
-    CLOUDAPI // Spigot or Proxy
+    CLOUDAPI, // Spigot or Proxy
+    NONE
 }

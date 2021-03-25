@@ -4,7 +4,11 @@ import io.vson.elements.VsonArray;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 
-
+/**
+ * This is the {@link DefaultSignLayout}
+ * if no LayOut was defined or found in the config
+ * this LayOut will be saved and used afterwards
+ */
 public class DefaultSignLayout extends VsonObject {
 
     /**

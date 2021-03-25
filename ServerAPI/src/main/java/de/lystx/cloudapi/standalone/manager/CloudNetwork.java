@@ -97,7 +97,7 @@ public class CloudNetwork {
      * @param properties
      */
     public void startService(String serviceGroup, SerializableDocument properties) {
-        this.cloudAPI.getCloudClient().sendPacket(new PacketInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties));
+        new PacketInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties).unsafe().async().send(this.cloudAPI);
 
     }
 
@@ -207,7 +207,7 @@ public class CloudNetwork {
      */
     public void getServiceAsync(String name, Consumer<Service> consumer) {
         this.cloudAPI.getExecutorService().submit(() -> {
-            Service service = cloudAPI.sendQuery(new ResultPacketService(name)).getResult().getAs(Service.class);
+            Service service = cloudAPI.sendQuery(new ResultPacketService(name)).getResult();
             consumer.accept(service);
             return service;
         });
@@ -224,29 +224,12 @@ public class CloudNetwork {
 
     public void getServiceGroupAsync(String name, Consumer<ServiceGroup> consumer) {
         this.cloudAPI.getExecutorService().submit(() -> {
-            ServiceGroup service = cloudAPI.sendQuery(new ResultPacketServiceGroup(name)).getResultAs(ServiceGroup.class);
+            ServiceGroup service = cloudAPI.sendQuery(new ResultPacketServiceGroup(name)).getResult();
             consumer.accept(service);
             return service;
         });
     }
 
-    /**
-     * Returns a {@link ServiceInfo}
-     * @param name
-     * @return
-     */
-    public ServiceInfo getServiceInfo(String name) {
-        return ServiceInfo.fromService(this.getService(name), this.cloudAPI.getCloudPlayers().getAll());
-    }
-
-    /**
-     * Returns a {@link GroupInfo}
-     * @param name
-     * @return
-     */
-    public GroupInfo getGroupInfo(String name) {
-        return GroupInfo.fromGroup(this.getServiceGroup(name), this.cloudAPI.getCloudPlayers().getAll(), this.getServices());
-    }
 
     /**
      * Updates the {@link NetworkConfig}

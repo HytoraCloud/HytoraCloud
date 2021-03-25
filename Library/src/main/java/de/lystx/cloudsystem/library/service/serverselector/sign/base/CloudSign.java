@@ -6,6 +6,10 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Serializable Class for the
+ * CloudSign to work with it later
+ */
 @Getter
 public class CloudSign implements Serializable {
 

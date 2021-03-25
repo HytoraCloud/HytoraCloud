@@ -3,21 +3,27 @@ package de.lystx.cloudapi.proxy;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
+import de.lystx.cloudapi.proxy.listener.network.CloudListener;
+import de.lystx.cloudapi.proxy.listener.network.NetworkManager;
+import de.lystx.cloudapi.proxy.listener.other.ProxyPingListener;
+import de.lystx.cloudapi.proxy.listener.other.TablistListener;
+import de.lystx.cloudapi.proxy.listener.player.CommandListener;
+import de.lystx.cloudapi.proxy.listener.player.PlayerListener;
+import de.lystx.cloudapi.proxy.listener.server.ServerConnectListener;
+import de.lystx.cloudapi.proxy.listener.server.ServerKickListener;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.CloudType;
-import de.lystx.cloudsystem.library.elements.service.Service;
-import de.lystx.cloudapi.proxy.listener.*;
 import de.lystx.cloudapi.proxy.manager.HubManager;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
+import de.lystx.cloudsystem.library.service.util.Action;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
-
-import java.util.LinkedList;
-import java.util.List;
 
 @Getter
 public class CloudProxy extends Plugin implements CloudService {
@@ -27,15 +33,20 @@ public class CloudProxy extends Plugin implements CloudService {
 
     private HubManager hubManager;
     private NetworkManager networkManager;
+    private Action action;
 
     @Override
     public void onEnable() {
-        instance = this;
+        CloudAPI.getInstance().execute(() -> {
+            instance = this;
 
-        this.hubManager = new HubManager();
-        this.networkManager = new NetworkManager();
+            this.action = new Action();
+            this.hubManager = new HubManager();
+            this.networkManager = new NetworkManager();
 
-        this.bootstrap();
+            Constants.SERVICE_TYPE = ServiceType.PROXY;
+            this.bootstrap();
+        });
     }
 
     @Override
@@ -75,15 +86,28 @@ public class CloudProxy extends Plugin implements CloudService {
     @Override
     public void bootstrap() {
 
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyStartServer(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyStopServer(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyConfig(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyCloudPlayerHandler(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyStop(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyChatEvent(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerProxyEvent(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerHandler(new CloudListener());
+        CloudAPI.getInstance()
+                //Registers all the PacketHandlers
+                .registerPacketHandler(
+                    new PacketHandlerProxyStartServer(),
+                    new PacketHandlerProxyStopServer(CloudAPI.getInstance()),
+                    new PacketHandlerProxyConfig(CloudAPI.getInstance()),
+                    new PacketHandlerProxyCloudPlayerHandler(CloudAPI.getInstance()),
+                    new PacketHandlerProxyStop(CloudAPI.getInstance()),
+                    new PacketHandlerProxyChatEvent(CloudAPI.getInstance()),
+                    new PacketHandlerProxyEvent(CloudAPI.getInstance()))
 
+                .registerNetworkHandler(new CloudListener()) //Registers the NetworkHandler
+
+                //Registers all Commands
+                .registerCommand(new CloudCommand())
+                .registerCommand(new HubCommand())
+                .registerCommand(new ListCommand())
+                .registerCommand(new WhereCommands())
+                .registerCommand(new PermsCommand())
+                .registerCommand(new NetworkCommand());
+
+        //Registers all Listeners
         this.getProxy().getPluginManager().registerListener(this, new ProxyPingListener());
         this.getProxy().getPluginManager().registerListener(this, new TablistListener());
         this.getProxy().getPluginManager().registerListener(this, new CommandListener());
@@ -91,24 +115,19 @@ public class CloudProxy extends Plugin implements CloudService {
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerConnectListener());
 
-        CloudAPI.getInstance().registerCommand(new CloudCommand());
-        CloudAPI.getInstance().registerCommand(new HubCommand());
-        CloudAPI.getInstance().registerCommand(new ListCommand());
-        CloudAPI.getInstance().registerCommand(new WhereCommands());
-        CloudAPI.getInstance().registerCommand(new PermsCommand());
-        CloudAPI.getInstance().registerCommand(new NetworkCommand());
 
         if (this.getProxyConfig() == null) {
             CloudAPI.getInstance().messageCloud(CloudAPI.getInstance().getService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
             System.out.println("[CloudAPI] Couldn't find ProxyConfig!");
         }
+        System.out.println("[CloudProxy] Booted up in " + this.action.time() + "ms");
 
     }
 
     @Override
     public void shutdown() {
         if (CloudAPI.getInstance().getCloudClient().isConnected()) {
-            CloudAPI.getInstance().disconnect();
+            CloudAPI.getInstance().getCloudClient().disconnect();
         }
     }
 

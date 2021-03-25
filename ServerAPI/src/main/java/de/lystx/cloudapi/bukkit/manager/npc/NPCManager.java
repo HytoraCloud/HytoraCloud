@@ -17,6 +17,13 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * This class is used to manage
+ * all the NPC's and its {@link NPCConfig}
+ *
+ * it updates NPCs for all or just a single {@link Player}
+ * on the current Service
+ */
 @Getter @Setter
 public class NPCManager {
 
@@ -31,6 +38,13 @@ public class NPCManager {
         this.document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
     }
 
+    /**
+     * Creates an NPC
+     * @param location > Location to spawn
+     * @param name > Name of the NPC
+     * @param group > Group of the NPC
+     * @param skin > Skin of the NPC
+     */
     public void createNPC(Location location, String name, String group, String skin) {
         VsonObject document = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST)
                 .append("location", new VsonObject()
@@ -47,14 +61,20 @@ public class NPCManager {
         this.updateNPCS();
     }
 
-    public void deleteNPC(NPC npcV18R3V18R3) {
-        CloudAPI.getInstance().sendPacket(new PacketInDeleteNPC(this.getKey(npcV18R3V18R3)));
-    }
-
+    /**
+     * Returns Key of NPC
+     * @param npcV18R3V18R3
+     * @return
+     */
     public String getKey(NPC npcV18R3V18R3) {
         return this.npcs.get(npcV18R3V18R3);
     }
 
+    /**
+     * Returns NPC by Bukkit Location
+     * @param location
+     * @return
+     */
     public NPC getNPC(Location location) {
         return this.npcs.keySet().stream().filter(npc -> {
             Location loc = npc.getLocation();
@@ -62,11 +82,21 @@ public class NPCManager {
         }).findFirst().orElse(null);
     }
 
-
+    /**
+     * Updates NPCS for all Players
+     */
     public void updateNPCS() {
         Bukkit.getOnlinePlayers().forEach(player -> this.updateNPCS(document, player, false));
     }
 
+    /**
+     * Updates all NPCs for a specific Player
+     * with a custom {@link NPCConfig}
+     *
+     * @param document > NPCConfig parsed as {@link VsonObject}
+     * @param player > Player to update NPCs for
+     * @param join > If update is on join
+     */
     public void updateNPCS(VsonObject document, Player player, boolean join) {
         this.document = document;
         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {

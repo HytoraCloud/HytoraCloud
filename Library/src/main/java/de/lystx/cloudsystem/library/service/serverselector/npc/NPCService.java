@@ -14,6 +14,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The {@link NPCService} manages the NPCs itsself
+ * and the Config.
+ *
+ * It will check for new NPCs or NPCs to delete
+ * It will manage the LayOut of your NPC-Inventory
+ */
 @Getter
 public class NPCService extends CloudService {
 

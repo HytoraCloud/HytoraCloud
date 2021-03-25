@@ -39,7 +39,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-
+/**
+ * The {@link ServerService} manages the whole network.
+ * It starts and stops services and checks for services that
+ * should be online as you defined it in your specific group.
+ * It will register the Services and look how long it took to boot
+ * the service and much more
+ */
 @Getter @Setter
 public class ServerService extends CloudService {
 
@@ -81,7 +87,7 @@ public class ServerService extends CloudService {
             this.portService = new PortService(Integer.parseInt((receiverInfo.getValues().get("proxyStartPort") + "").split("\\.")[0]), Integer.parseInt((receiverInfo.getValues().get("serverStartPort") + "").split("\\.")[0]));
         }
         FileService fs = cloudLibrary.getService(FileService.class);
-        this.providerStart = new ServiceProviderStart(cloudLibrary, fs.getTemplatesDirectory(), fs.getDynamicServerDirectory(), fs.getStaticServerDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory());
+        this.providerStart = new ServiceProviderStart(cloudLibrary, fs.getTemplatesDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory());
         this.providerStop = new ServiceProviderStop(cloudLibrary, this);
 
         this.startServices();
@@ -461,7 +467,7 @@ public class ServerService extends CloudService {
     public void stopServices() {
 
         List<String> already = new LinkedList<>();
-        for (ServiceGroup serviceGroup : this.services.keySet()) {
+        for (ServiceGroup serviceGroup : new LinkedList<>(this.services.keySet())) {
             if (this.getCloudLibrary().getService(GroupService.class) != null && this.getCloudLibrary().getService(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
                 continue;
             }
@@ -501,13 +507,17 @@ public class ServerService extends CloudService {
             return;
         }
         Value<Integer> count = new Value<>(this.getServices(serviceGroup).size());
-        for (Service service : this.getServices(serviceGroup)) {
-            this.stopService(service, false);
-            count.setValue(count.getValue() - 1);
+        try {
+            for (Service service : new LinkedList<>(this.getServices(serviceGroup))) {
+                this.stopService(service, false);
+                count.setValue(count.getValue() - 1);
 
-            if (count.getValue() == 0 && newOnes) {
-                this.needServices(serviceGroup);
+                if (count.getValue() == 0 && newOnes) {
+                    this.needServices(serviceGroup);
+                }
             }
+        } catch (ConcurrentModificationException e) {
+            //Ignoring just continueing
         }
     }
 
@@ -530,7 +540,7 @@ public class ServerService extends CloudService {
      */
     public Service getService(String name) {
         try {
-            for (List<Service> value : this.services.values()) {
+            for (List<Service> value : new LinkedList<>(this.services.values())) {
                 for (Service service : value) {
                     if (service.getName().equalsIgnoreCase(name)) {
                         return service;
@@ -541,6 +551,14 @@ public class ServerService extends CloudService {
             return null;
         }
         return null;
+    }
+
+    public List<Service> allServices() {
+        List<Service> list = new LinkedList<>();
+        for (List<Service> value : new LinkedList<>(this.services.values())) {
+            list.addAll(value);
+        }
+        return list;
     }
 
     /**

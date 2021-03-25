@@ -75,7 +75,6 @@ public class Zip {
                 outZipStream.finish();
             }
         } catch (IOException ignored) {
-
         }
     }
 }

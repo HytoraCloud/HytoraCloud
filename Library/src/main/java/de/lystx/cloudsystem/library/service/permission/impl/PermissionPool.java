@@ -4,7 +4,7 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupAddEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInPermissionPool;
-import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.Constants;
@@ -424,7 +424,7 @@ public class PermissionPool implements Serializable {
      * @param database
      * @return object of file
      */
-    public VsonObject save(File file, File directory, CloudDatabase database) {
+    public VsonObject save(File file, File directory, IDatabase database) {
         try {
             VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             document.clear();

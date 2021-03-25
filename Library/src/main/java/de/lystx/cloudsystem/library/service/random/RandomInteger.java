@@ -1,7 +1,6 @@
 package de.lystx.cloudsystem.library.service.random;
 
 import java.security.SecureRandom;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
@@ -21,6 +20,11 @@ public class RandomInteger {
         this(length, new SecureRandom());
     }
 
+    /**
+     * Returns a random Integer
+     * with the length of the provided length in constructor
+     * @return Integer
+     */
     public int next() {
         for (int idx = 0; idx < buf.length; ++idx) {
             buf[idx] = symbols[random.nextInt(symbols.length)];
@@ -28,6 +32,11 @@ public class RandomInteger {
         return Integer.parseInt(new String(buf));
     }
 
+    /**
+     * Returns a random Integer
+     * with the length of the provided @param newLength
+     * @return Integer
+     */
     public int next(int newLength) {
         this.buf = new char[newLength];
         for (int idx = 0; idx < buf.length; ++idx) {

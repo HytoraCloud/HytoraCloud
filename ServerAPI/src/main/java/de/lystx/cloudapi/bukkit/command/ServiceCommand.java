@@ -5,18 +5,24 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
+import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
+import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInCreateSign;
 import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInDeleteSign;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
-import de.lystx.cloudsystem.library.elements.packets.result.Result;
-import de.lystx.cloudsystem.library.elements.packets.result.ResultPacketDebug;
-import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketCloudPlayer;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudInventory;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudItem;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModAddon;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
+import net.md_5.bungee.api.ProxyServer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -35,6 +41,7 @@ public class ServiceCommand {
     public void execute(CloudCommandSender sender, String[] args) {
         if (sender instanceof CloudPlayer) {
             CloudPlayer player = (CloudPlayer) sender;
+
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("info")) {
@@ -53,6 +60,7 @@ public class ServiceCommand {
                         player.sendMessage("  §8» §bID §8┃ §7" + CloudAPI.getInstance().getService().getServiceID());
                         player.sendMessage("  §8» §bUUID §8┃ §7" + CloudAPI.getInstance().getService().getUniqueId());
                         player.sendMessage("  §8» §bPort §8┃ §7" + CloudAPI.getInstance().getService().getPort());
+                        player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudAPI.getInstance().getService().getServiceGroup().getReceiver());
                         player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudAPI.getInstance().getService().getHost());
                         player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudAPI.getInstance().getService().getServiceGroup().getTemplate());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
@@ -75,7 +83,7 @@ public class ServiceCommand {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis §eCloudSign §cseems not to be registered!");
                                 return;
                             }
-                            new PacketInServiceUpdate(CloudAPI.getInstance().getService()).unsafe().async().send(CloudAPI.getInstance());
+                            CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
                             Block block = Bukkit.getWorld(cloudSign.getWorld()).getBlockAt(cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
                             Sign signBlock = (Sign) block.getState();
                             signBlock.setLine(0, "§8§m------");
@@ -136,7 +144,7 @@ public class ServiceCommand {
                                 signBlock.update(true);
                                 CloudServer.getInstance().getSignManager().getCloudSigns().add(sign);
                                 new PacketInCreateSign(sign).unsafe().send(CloudAPI.getInstance());
-                                new PacketInServiceUpdate(CloudAPI.getInstance().getService()).unsafe().async().send(CloudAPI.getInstance());
+                                CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
                             } else {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
@@ -210,6 +218,7 @@ public class ServiceCommand {
         cloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
         cloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
         cloudPlayer.sendMessage("§8§m--------------------------------------");
+
 
     }
 }

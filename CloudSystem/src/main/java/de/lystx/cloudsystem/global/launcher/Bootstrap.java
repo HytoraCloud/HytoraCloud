@@ -1,13 +1,9 @@
 package de.lystx.cloudsystem.global.launcher;
 
-import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.receiver.Receiver;
-
-import java.util.Arrays;
+import de.lystx.cloudsystem.global.CloudInstance;
+import de.lystx.cloudsystem.library.enums.CloudType;
 
 public class Bootstrap {
-
-    //TODO: forEach zu for Schleifen
 
     public static void main(String[] args)  {
         String javaVersion = System.getProperty("java.version");
@@ -28,12 +24,6 @@ public class Bootstrap {
             System.exit(1);
             return;
         }
-
-
-        if (Arrays.toString(args).toLowerCase().contains("--receiver")) {
-            Receiver receiver = new Receiver();
-        } else {
-            CloudSystem cloudSystem = new CloudSystem();
-        }
+        CloudInstance cloudInstance = new CloudInstance(CloudType.NONE);
     }
 }

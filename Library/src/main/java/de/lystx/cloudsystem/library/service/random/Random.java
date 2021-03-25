@@ -10,12 +10,18 @@ public class Random {
     private final RandomString string;
     private final RandomInteger integer;
 
-
+    /**
+     * Creates the Attributes
+     */
     public Random() {
         this.string = new RandomString(10);
         this.integer = new RandomInteger(1);
     }
 
+    /**
+     * Returns the instance
+     * @return
+     */
     public static Random current() {
         if (instance == null) {
             instance = new Random();

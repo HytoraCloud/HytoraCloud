@@ -14,13 +14,12 @@ import lombok.Getter;
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class ResultPacketLoginRequest extends ResultPacket implements Serializable {
+public class ResultPacketLoginRequest extends ResultPacket<VsonObject> implements Serializable {
 
     private final CloudConnection connection;
 
     @Override
     public VsonObject read(CloudLibrary cloudLibrary) {
-
         VsonObject vsonObject = new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
         return vsonObject;
     }

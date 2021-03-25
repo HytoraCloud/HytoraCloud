@@ -2,7 +2,18 @@ package de.lystx.cloudsystem.library.service.util;
 
 import java.io.*;
 
-public class Serializer<T> implements Serializable{
+/**
+ * This Class is used to
+ * serialize and deserialize Objects
+ *
+ * You enter a value and you will get back
+ * a byte array of it
+ * You can easiliy send this byte array between sockets (Netty)
+ * and recreate the object with the {@link Serializer#deserialize(byte[])} Method
+ *
+ * @param <T> the GenericType you want to serialize
+ */
+public class Serializer<T> implements Serializable {
 
     private final T t;
 

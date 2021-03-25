@@ -14,13 +14,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+/**
+ * This class is used
+ * to get the UUID or the name of a Player
+ * correctly (sync and async)
+ * it caches the UUID and Name in an {@link ReverseMap}
+ * to make it as performant as possible
+ */
 public class UUIDService {
 
     private final ExecutorService executor;
     private final ReverseMap<String, UUID> cache;
     private static UUIDService instance;
 
-
+    /**
+     * Tries to return instance of this class.
+     * If it's null it will set the instance to
+     * a new {@link UUIDService} with 1 Thread
+     *
+     * @return UUIDService
+     */
     public static UUIDService getInstance() {
         if (instance == null) {
             instance = new UUIDService(1);

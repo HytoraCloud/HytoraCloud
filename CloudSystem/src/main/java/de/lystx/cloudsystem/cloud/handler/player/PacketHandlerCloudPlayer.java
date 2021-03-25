@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
+import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.*;
@@ -33,6 +34,8 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
+        Constants.SERVICE_FILTER = new Filter<>(this.cloudSystem.getService().allServices());
+
         if (packet instanceof PacketInRegisterPlayer) {
             PacketInRegisterPlayer packetInRegisterPlayer = (PacketInRegisterPlayer) packet;
             CloudPlayer cloudPlayer = packetInRegisterPlayer.getCloudPlayer();

@@ -107,7 +107,7 @@ public class SignUpdater {
             this.cloudAPI.messageCloud(CloudAPI.getInstance().getService().getName(), "SignSystem didnt find any signs!", false);
             return;
         }
-        HashMap<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
+        Map<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
 
         CloudSign cloudSign = signs.get(current.getServiceID());
         cloudSigns.put(cloudSign, current);

@@ -15,12 +15,6 @@ import java.util.*;
 @Getter
 public class HubManager {
 
-    private final CloudAPI cloudAPI;
-
-    public HubManager() {
-        this.cloudAPI = CloudAPI.getInstance();
-    }
-
     /**
      * Sends player to LobbyServer
      * with hubMessage if
@@ -30,7 +24,7 @@ public class HubManager {
      */
     public boolean send(ProxiedPlayer player) {
         if (isFallback(player)) {
-            String message = this.cloudAPI.getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix());
+            String message = CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix());
             if (!message.trim().isEmpty()) {
                 player.sendMessage(message);
             }
@@ -52,9 +46,9 @@ public class HubManager {
             Fallback fallback = this.getHighestFallback(player);
             Service service;
             try {
-                service = cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(cloudAPI.getNetwork().getServices(cloudAPI.getNetwork().getServiceGroup(fallback.getGroupName())).size()));
+                service = CloudAPI.getInstance().getNetwork().getServices(CloudAPI.getInstance().getNetwork().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudAPI.getInstance().getNetwork().getServices(CloudAPI.getInstance().getNetwork().getServiceGroup(fallback.getGroupName())).size()));
             } catch (Exception e){
-                service = cloudAPI.getNetwork().getService(fallback.getGroupName() + "-1");
+                service = CloudAPI.getInstance().getNetwork().getService(fallback.getGroupName() + "-1");
             }
             return ProxyServer.getInstance().getServerInfo(service.getName());
         } catch (NullPointerException e) {
@@ -85,7 +79,7 @@ public class HubManager {
     public Fallback getHighestFallback(ProxiedPlayer player) {
         List<Fallback> list = this.getFallbacks(player);
         list.sort(Comparator.comparingInt(Fallback::getPriority));
-        return list.get(list.size() - 1) == null ? cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback() : list.get(list.size() - 1);
+        return list.get(list.size() - 1) == null ? CloudAPI.getInstance().getNetworkConfig().getFallbackConfig().getDefaultFallback() : list.get(list.size() - 1);
     }
 
     /**
@@ -113,9 +107,9 @@ public class HubManager {
      */
     public List<Fallback> getFallbacks(ProxiedPlayer player) {
         List<Fallback> list = new LinkedList<>();
-        list.add(cloudAPI.getNetworkConfig().getFallbackConfig().getDefaultFallback());
-        cloudAPI.getNetworkConfig().getFallbackConfig().getFallbacks().forEach(fallback -> {
-            if (cloudAPI.getPermissionPool().hasPermission(player.getName(), fallback.getPermission()) || fallback.getPermission().trim().isEmpty() || fallback.getPermission() == null) {
+        list.add(CloudAPI.getInstance().getNetworkConfig().getFallbackConfig().getDefaultFallback());
+        CloudAPI.getInstance().getNetworkConfig().getFallbackConfig().getFallbacks().forEach(fallback -> {
+            if (CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), fallback.getPermission()) || fallback.getPermission().trim().isEmpty() || fallback.getPermission() == null) {
                 list.add(fallback);
             }
         });

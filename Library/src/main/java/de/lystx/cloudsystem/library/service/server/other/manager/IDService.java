@@ -4,6 +4,14 @@ import lombok.Getter;
 
 import java.util.*;
 
+/**
+ * This Service searches for a free ID
+ * for a certain group
+ * Example :
+ *    Group: Lobby
+ *    ID : 1
+ *    ----> Lobby-1
+ */
 @Getter
 public class IDService {
 

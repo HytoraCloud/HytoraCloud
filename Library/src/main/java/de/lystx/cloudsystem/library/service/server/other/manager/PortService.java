@@ -1,10 +1,18 @@
 package de.lystx.cloudsystem.library.service.server.other.manager;
 
+import de.lystx.cloudsystem.library.service.config.impl.proxy.GlobalProxyConfig;
 import lombok.Getter;
 
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This Service searches for a free Port
+ * for a certain group
+ * It will look for ports within a specific range
+ * you can define in your {@link GlobalProxyConfig} under
+ * proxyStartPort or serverStartPort
+ */
 @Getter
 public class PortService {
 

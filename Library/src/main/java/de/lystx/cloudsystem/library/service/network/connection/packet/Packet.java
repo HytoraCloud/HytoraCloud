@@ -125,7 +125,6 @@ public class Packet implements Serializable {
         @Deprecated
         public void send() {
             Threader.getInstance().execute(() -> Constants.EXECUTOR.sendPacket(Packet.this));
-            ;
         }
 
         @Deprecated

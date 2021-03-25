@@ -15,8 +15,10 @@ public class PacketHandlerCommunication extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketCommunication) {
             PacketCommunication packetCommunication = (PacketCommunication)packet;
-            packetCommunication.setSendBack(false);
-            this.cloudAPI.sendPacket(packetCommunication);
+            if (packetCommunication.isSendBack()) {
+                packetCommunication.setSendBack(false);
+                this.cloudAPI.sendPacket(packetCommunication);
+            }
         }
     }
 

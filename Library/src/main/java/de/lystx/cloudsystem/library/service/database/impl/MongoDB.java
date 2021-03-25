@@ -4,7 +4,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import de.lystx.cloudsystem.library.service.database.CloudDatabase;
+import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -16,7 +16,7 @@ import org.bson.Document;
 import java.util.*;
 
 @Getter
-public class MongoDB implements CloudDatabase {
+public class MongoDB implements IDatabase {
 
     private final DatabaseService databaseService;
 

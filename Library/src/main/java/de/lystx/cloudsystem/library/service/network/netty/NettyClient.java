@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.elements.packets.out.PacketOutVerifyConnecti
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
+import de.lystx.cloudsystem.library.service.server.other.process.Threader;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
@@ -53,61 +54,63 @@ public class NettyClient {
      * @throws Exception
      */
     public void start() throws Exception {
-        EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        Threader.getInstance().execute(() -> {
+            EventLoopGroup workerGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
-        Bootstrap bootstrap;
-        try {
+            Bootstrap bootstrap;
+            try {
 
-            bootstrap = new Bootstrap()
-                    .channel(Epoll.isAvailable() ? EpollSocketChannel.class : NioSocketChannel.class)
-                    .group(workerGroup)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .option(ChannelOption.IP_TOS, 24)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel socketChannel) throws Exception {
-                            ChannelPipeline channelPipeline = socketChannel.pipeline();
-                            channelPipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2));
-                            channelPipeline.addLast(new LengthFieldPrepender(2));
-                            channelPipeline.addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(NettyClient.class.getClassLoader())));
-                            channelPipeline.addLast(new ObjectEncoder());
+                bootstrap = new Bootstrap()
+                        .channel(Epoll.isAvailable() ? EpollSocketChannel.class : NioSocketChannel.class)
+                        .group(workerGroup)
+                        .option(ChannelOption.TCP_NODELAY, true)
+                        .option(ChannelOption.IP_TOS, 24)
+                        .option(ChannelOption.SO_KEEPALIVE, true)
+                        .handler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            public void initChannel(SocketChannel socketChannel) throws Exception {
+                                ChannelPipeline channelPipeline = socketChannel.pipeline();
+                                channelPipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2));
+                                channelPipeline.addLast(new LengthFieldPrepender(2));
+                                channelPipeline.addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(NettyClient.class.getClassLoader())));
+                                channelPipeline.addLast(new ObjectEncoder());
 
-                            channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
-                                @Override
-                                public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
-                                    if (packet instanceof PacketOutVerifyConnection && !established && consumerConnection != null) {
-                                        established = true;
-                                        consumerConnection.accept(NettyClient.this);
+                                channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
+                                    @Override
+                                    public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
+                                        if (packet instanceof PacketOutVerifyConnection && !established && consumerConnection != null) {
+                                            established = true;
+                                            consumerConnection.accept(NettyClient.this);
+                                        }
+                                        packetAdapter.handelAdapterHandler(packet);
                                     }
-                                    packetAdapter.handelAdapterHandler(packet);
-                                }
-                            });
-                            channel = socketChannel;
-                        }
-                    });
+                                });
+                                channel = socketChannel;
+                            }
+                        });
 
-        } catch (IllegalAccessError e) {
-            bootstrap = null;
-        }
-        if (bootstrap == null) {
-            System.out.println("[NettyClient] Couldn't build up Bootstrap for Client!");
-            return;
-        }
-        try {
-            ChannelFuture channelFuture = bootstrap.connect(this.host, port).sync();
-            this.channel = channelFuture.channel();
-            this.running = true;
-            channelFuture.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            this.running = false;
-            this.established = false;
-        } finally {
-            this.running = false;
-            this.established = false;
-            workerGroup.shutdownGracefully();
-        }
+            } catch (IllegalAccessError e) {
+                bootstrap = null;
+            }
+            if (bootstrap == null) {
+                System.out.println("[NettyClient] Couldn't build up Bootstrap for Client!");
+                return;
+            }
+            try {
+                ChannelFuture channelFuture = bootstrap.connect(this.host, port).sync();
+                this.channel = channelFuture.channel();
+                this.running = true;
+                channelFuture.channel().closeFuture().sync();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                this.running = false;
+                this.established = false;
+            } finally {
+                this.running = false;
+                this.established = false;
+                workerGroup.shutdownGracefully();
+            }
+        });
 
     }
 

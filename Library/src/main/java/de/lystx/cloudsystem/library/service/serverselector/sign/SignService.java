@@ -15,6 +15,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The {@link SignService} manages all CloudSigns
+ * it manages your signLayout and your existing signs
+ * and deletes or saves {@link CloudSign}s whenever
+ * you want it
+ */
 @Getter
 public class SignService extends CloudService {
 

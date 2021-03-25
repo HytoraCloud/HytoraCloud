@@ -1,10 +1,15 @@
 package de.lystx.cloudsystem.library.service.util;
 
+import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.elements.service.ServiceType;
+import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
-import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -16,7 +21,12 @@ import java.util.concurrent.Executors;
 public class Constants {
 
     public static CloudExecutor EXECUTOR = null;
+    public static CloudType CLOUD_TYPE = CloudType.LIBRARY;
+    public static ServiceType SERVICE_TYPE = ServiceType.SPIGOT;
+    public static String BUKKIT_VERSION;
     public static final Executor THREAD_POOL = Executors.newFixedThreadPool(1);
+    public static Filter<Service> SERVICE_FILTER = null;
+    public static Filter<CloudPlayer> CLOUDPLAYERS = null;
     public static final String INTERNAL_RECEIVER = "InternalReceiver";
 
     public static PermissionPool PERMISSION_POOL = null;

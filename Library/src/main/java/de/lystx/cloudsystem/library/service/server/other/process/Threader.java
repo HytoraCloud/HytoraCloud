@@ -13,7 +13,6 @@ import java.util.function.Consumer;
  * Coded by CryCodes on 15.03.2021
  * Discord: CryCodes#7342
  */
-
 public class Threader {
 
     private static Threader instance;

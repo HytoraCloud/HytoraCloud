@@ -25,6 +25,10 @@ public class Value<T> {
         this.value = value;
     }
 
+    /**
+     * If the value is a {@link Integer}
+     * it will increase by 1
+     */
     public void increase() {
         if (value instanceof Integer) {
             Integer integer = (Integer) this.value;
@@ -35,6 +39,14 @@ public class Value<T> {
         }
     }
 
+    /**
+     * If the value is a {@link Boolean}
+     * you can change the boolean
+     *
+     * for example if it's currently false it will
+     * will be changed to true but if its true
+     * it will be changed to false
+     */
     public void change() {
         if (value instanceof Boolean) {
             Boolean aBoolean = (Boolean) this.value;
@@ -45,6 +57,10 @@ public class Value<T> {
         }
     }
 
+    /**
+     * If the value is a {@link Integer}
+     * it will decrease by 1
+     */
     public void decrease() {
         if (value instanceof Integer) {
             Integer integer = (Integer) this.value;

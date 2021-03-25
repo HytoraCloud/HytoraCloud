@@ -10,6 +10,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * This class gives you all the information
+ * on your current System like ....
+ * -> CPU
+ * -> Max Memory Usage
+ * -> Internal CPU Usage
+ * -> Free CPU
+ * -> etc
+ */
 public class NetworkInfo {
 
     private long total;

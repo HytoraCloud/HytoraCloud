@@ -3,13 +3,14 @@ package de.lystx.cloudsystem.library.service;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import lombok.Getter;
+import lombok.Setter;
 
-@Getter
+@Getter @Setter
 public abstract class CloudService  {
 
-    private final CloudLibrary cloudLibrary;
-    private final String name;
-    private final CloudServiceType type;
+    private CloudLibrary cloudLibrary;
+    private String name;
+    private CloudServiceType type;
 
     /**
      * Initialsing the CloudService
@@ -23,6 +24,11 @@ public abstract class CloudService  {
         this.type = type;
     }
 
+    /**
+     * Enum to declare which area of utilitty
+     * this CloudService belongs to
+     * Names are self-explaining
+     */
     public enum CloudServiceType {
         UTIL,
         MANAGING,

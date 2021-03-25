@@ -3,15 +3,28 @@ package de.lystx.cloudapi.bukkit.manager.labymod;
 import com.google.gson.*;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
+import de.lystx.cloudapi.bukkit.events.other.MessageReceiveEvent;
 import de.lystx.cloudapi.bukkit.events.player.CloudPlayerLabyModJoinEvent;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModAddon;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlayer;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.VoiceChatSettings;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.PacketUtils;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.vson.VsonValue;
+import io.vson.elements.object.VsonObject;
+import io.vson.manage.vson.VsonParser;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 
+import java.io.IOException;
 import java.util.*;
 
 @Getter
@@ -28,119 +41,94 @@ public class LabyMod implements Listener {
 
         CloudServer.getInstance().getServer().getPluginManager().registerEvents(this, CloudServer.getInstance());
 
-        CloudServer.getInstance().getServer().getMessenger().registerIncomingPluginChannel(CloudServer.getInstance(), "LABYMOD", (channel, player, bytes) -> {
+        CloudServer.getInstance().getServer().getMessenger().registerIncomingPluginChannel( CloudServer.getInstance(), "LMC", (PluginMessageListener) (channel, player, bytes) -> {
+            ByteBuf buf = Unpooled.wrappedBuffer( bytes );
+
             try {
-                if (this.labyModUsers.contains(player.getUniqueId())) {
-                    return;
-                }
-                this.labyModUsers.add(player.getUniqueId());
-                Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> Bukkit.getPluginManager().callEvent(new CloudPlayerLabyModJoinEvent(player, packetUtils.readString(Unpooled.wrappedBuffer(bytes), 32767))));
-            } catch (RuntimeException e) {
-                e.printStackTrace();
+                final String messageKey = getPacketUtils().readString( buf, Short.MAX_VALUE );
+                final String messageContents = getPacketUtils().readString( buf, Short.MAX_VALUE );
+                final JsonElement jsonMessage = new JsonParser().parse( messageContents );
+
+                Bukkit.getScheduler().runTask( CloudServer.getInstance(), new Runnable() {
+                    @Override
+                    public void run() {
+                        if ( !player.isOnline() )
+                            return;
+
+                        try {
+                            Bukkit.getPluginManager().callEvent( new MessageReceiveEvent( player, messageKey, jsonMessage ) );
+                        } catch (Exception e) {
+                            //IGNORING IT
+                        }
+                    }
+                });
+            } catch ( RuntimeException ignored ) {
             }
         });
-
-        CloudServer.getInstance().getServer().getMessenger().registerIncomingPluginChannel(CloudServer.getInstance(), "LMC", (channel, player, bytes) -> {
-            if (this.labyModUsers.contains(player.getUniqueId())) {
-                return;
-            }
-            this.labyModUsers.add(player.getUniqueId());
-            try {
-                Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> Bukkit.getPluginManager().callEvent(new CloudPlayerLabyModJoinEvent(player, "3.7.7")));
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-
-    public void sendServerMessage(Player player, String messageKey, JsonElement messageContents) {
-        messageContents = this.packetUtils.cloneJson(messageContents);
-        this.packetUtils.sendPacket(player, this.packetUtils.getPluginMessagePacket("LMC", this.packetUtils.getBytesToSend(messageKey, messageContents.toString())));
-    }
-
-
-    public void sendClientToServer( Player player, String title, String address) {
-
-        JsonObject object = new JsonObject();
-        object.addProperty( "title", title ); // Title of the warning
-        object.addProperty( "address", address ); // Destination server address
-        object.addProperty( "preview", true ); // Display the server icon, motd and user count
-
-
-        this.sendServerMessage( player, "server_switch", object );
-    }
-    private void updateGameInfo( Player player, boolean hasGame, String gamemode, long startTime, long endTime ) {
-
-        JsonObject obj = new JsonObject();
-        obj.addProperty( "hasGame", hasGame );
-
-        if ( hasGame ) {
-            obj.addProperty( "game_mode", gamemode );
-            obj.addProperty( "game_startTime", startTime );
-            obj.addProperty( "game_endTime", endTime );
-        }
-
-        this.sendServerMessage( player, "discord_rpc", obj );
-    }
-
-    public void setSubtitle( Player receiver, UUID subtitlePlayer, String value ) {
-        JsonArray array = new JsonArray();
-        JsonObject subtitle = new JsonObject();
-        subtitle.addProperty( "uuid", subtitlePlayer.toString() );
-        subtitle.addProperty( "size", 0.8d ); // Range is 0.8 - 1.6 (1.6 is Minecraft default)
-        if(value != null)
-            subtitle.addProperty( "value", value );
-        array.add(subtitle);
-
-        this.sendServerMessage( receiver, "account_subtitle", array );
-    }
-
-    public void sendCurrentPlayingGamemode( Player player, boolean visible, String gamemodeName ) {
-        JsonObject object = new JsonObject();
-        object.addProperty( "show_gamemode", visible ); // Gamemode visible for everyone
-        object.addProperty( "gamemode_name", gamemodeName ); // Name of the current playing gamemode
-
-        this.sendServerMessage( player, "server_gamemode", object );
-    }
-
-    public void sendCineScope( Player player, int coveragePercent, long duration ) {
-        JsonObject object = new JsonObject();
-        object.addProperty( "coverage", coveragePercent );
-        object.addProperty( "duration", duration );
-        this.sendServerMessage( player, "cinescopes", object );
-    }
-
-    public void sendMutedPlayerTo( Player player, UUID mutedPlayer, boolean muted ) {
-        JsonObject voicechatObject = new JsonObject();
-        JsonObject mutePlayerObject = new JsonObject();
-
-        mutePlayerObject.addProperty("mute", muted );
-        mutePlayerObject.addProperty("target", String.valueOf(mutedPlayer));
-
-        voicechatObject.add("mute_player", mutePlayerObject);
-
-        this.sendServerMessage( player, "voicechat", voicechatObject );
-    }
-
-    public void disableVoiceChat( Player player ) {
-        JsonObject object = new JsonObject();
-        object.addProperty( "allowed", false );
-        this.sendServerMessage( player, "voicechat", object );
-    }
-
-    public boolean isLabyMod(UUID uuid) {
-        return this.labyModUsers.contains(uuid);
-    }
-
-    @EventHandler
-    public void onLabyModJoin(CloudPlayerLabyModJoinEvent event) {
-
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         this.labyModUsers.remove(player.getUniqueId());
+    }
+
+    @EventHandler @SneakyThrows
+    public void handleMessage(MessageReceiveEvent event) {
+
+        final String messageKey = event.getMessageKey();
+        final Player player = event.getPlayer();
+
+        if ( messageKey.equals( "INFO" ) ) {
+
+
+
+            final VsonParser vsonParser = new VsonParser();
+            final VsonValue vsonValue = vsonParser.parse(event.getJsonMessage().toString());
+
+            VsonObject vsonObject = (VsonObject) vsonValue;
+            CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
+            LabyModPlayer labyModPlayer = new LabyModPlayer(player.getName(), vsonObject.getString("version"));
+
+            for (VsonValue value : vsonObject.getArray("addons")) {
+                LabyModAddon labyModAddon =  ((VsonObject)value).getAs(LabyModAddon.class);
+                labyModPlayer.getAddons().add(labyModAddon);
+            }
+
+            cloudPlayer.setLabyModPlayer(labyModPlayer);
+            cloudPlayer.update();
+
+            String version = vsonObject.has( "version" ) && vsonObject.get( "version" ).isString() ? vsonObject.get( "version" ).asString() : "Unknown";
+
+            if (labyModUsers.contains(player.getUniqueId())) {
+                return;
+            }
+            labyModUsers.add(player.getUniqueId());
+            Bukkit.getPluginManager().callEvent(new CloudPlayerLabyModJoinEvent(cloudPlayer, version));
+
+        } else if (messageKey.equals("voicechat")) {
+            CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
+                try {
+                    VsonObject vc = new VsonObject(event.getJsonMessage().toString());
+                    CloudAPI.getInstance().getCloudPlayers().getAsync(player.getName(), cp -> {
+                        LabyModPlayer labyModPlayer = cp.getLabyModPlayer();
+
+                        labyModPlayer.setVoiceChatSettings(new VoiceChatSettings(
+                                vc.getBoolean("enabled"),
+                                vc.getInteger("surround_range"),
+                                vc.getInteger("surround_volume"),
+                                vc.getBoolean("screamer_protection"),
+                                vc.getInteger("screamer_protection_level"),
+                                vc.getInteger("screamer_max_volume"),
+                                vc.getInteger("microphone_volume")
+                        ));
+                        cp.setLabyModPlayer(labyModPlayer);
+                        cp.update();
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }, 20L);
+        }
     }
 }

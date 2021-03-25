@@ -5,9 +5,9 @@ import de.lystx.cloudsystem.global.CloudInstance;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
-import de.lystx.cloudsystem.library.service.player.featured.CloudInventory;
-import de.lystx.cloudsystem.library.service.player.featured.CloudItem;
-import de.lystx.cloudsystem.library.service.player.featured.CloudPlayerInventory;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudInventory;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudItem;
+import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudPlayerInventory;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.AllArgsConstructor;
 

@@ -5,10 +5,8 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.events.other.CloudServerNPCInteractEvent;
 import de.lystx.cloudapi.bukkit.utils.Item;
 import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
-import de.lystx.cloudsystem.library.elements.service.GroupInfo;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
-import de.lystx.cloudsystem.library.elements.service.ServiceInfo;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.npc.NPCConfig;
 import io.vson.elements.object.VsonObject;
@@ -174,25 +172,24 @@ public class NPCListener implements Listener {
     public String replace(String input, Service service, ServiceGroup serviceGroup) {
         try {
             if (service != null) {
-                ServiceInfo serviceInfo = CloudAPI.getInstance().getNetwork().getServiceInfo(service.getName());
                 input = input.replace("%service%", service.getName());
                 input = input.replace("%uuid%", service.getUniqueId().toString());
                 input = input.replace("%port%", "" + service.getPort());
                 input = input.replace("%id%", "" + service.getServiceID());
                 input = input.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
-                input = input.replace("%motd%", serviceInfo.getMotd());
-                input = input.replace("%max%", serviceInfo.getMaxPlayers() + "");
-                input = input.replace("%online%", serviceInfo.getOnlinePlayers().size() + "");
+                input = input.replace("%motd%", service.getInfo().getMotd());
+                input = input.replace("%max%", service.getInfo().getMaxPlayers() + "");
+                input = input.replace("%online%", service.getInfo().getOnlinePlayers().size() + "");
 
             }
             if (serviceGroup != null) {
-                GroupInfo groupInfo = CloudAPI.getInstance().getNetwork().getGroupInfo(serviceGroup.getName());
-                input = input.replace("%group%", groupInfo.getName());
+                ServiceGroup group = CloudAPI.getInstance().getNetwork().getServiceGroup(serviceGroup.getName());
+                input = input.replace("%group%", group.getName());
                 input = input.replace("%template%", serviceGroup.getTemplate());
                 input = input.replace("%type%", serviceGroup.getServiceType().name());
                 input = input.replace("%newServer%", "" + serviceGroup.getNewServerPercent());
-                input = input.replace("%online_services%", groupInfo.getOnlineServices().size() + "");
-                input = input.replace("%online_players%", groupInfo.getOnlinePlayers().size() + "");
+                input = input.replace("%online_services%", group.getInfo().getOnlineServices().size() + "");
+                input = input.replace("%online_players%", group.getInfo().getOnlinePlayers().size() + "");
             }
             input = input.replace("%prefix%", CloudAPI.getInstance().getPrefix());
 

@@ -3,14 +3,16 @@ package de.lystx.cloudsystem.library.elements.service;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class ServiceInfo extends Service{
+public class ServiceInfo extends Service {
 
     private final ServerPinger serverPinger;
 
@@ -44,6 +46,22 @@ public class ServiceInfo extends Service{
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * Returns the {@link CloudPlayer}s on this
+     * Service (for example "Lobby-1")
+     *
+     * @return List<CloudPlayer>
+     */
+    public List<CloudPlayer> getOnlinePlayers() {
+        List<CloudPlayer> list = new LinkedList<>();
+        for (CloudPlayer cloudPlayer : Constants.CLOUDPLAYERS.find(cloudPlayer -> cloudPlayer.getConnectedService().getName().equalsIgnoreCase(this.getName())).findAll()) {
+            list.add(cloudPlayer);
+        }
+        return list;
+    }
+
 
     /**
      * Constructs ServiceInfo
