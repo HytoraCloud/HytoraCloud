@@ -1,0 +1,7 @@
+{
+  "name": "commands-module",
+  "author": "Lystx",
+  "version": "1.0",
+  "main": "de.lystx.module.commands.CommandModule",
+  "copyType": "COPY_BUNGEE"
+}

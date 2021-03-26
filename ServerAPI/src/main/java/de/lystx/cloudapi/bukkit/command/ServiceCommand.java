@@ -73,6 +73,10 @@ public class ServiceCommand {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
+                        if (CloudAPI.getInstance().getModule("module-serverSelector") == null) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
+                            return;
+                        }
                         Set<Material> materials = new HashSet<>();
                         materials.add(Material.AIR);
                         Location loc = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
@@ -101,6 +105,10 @@ public class ServiceCommand {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
+                        if (CloudAPI.getInstance().getModule("module-serverSelector") == null) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
+                            return;
+                        }
                         if (CloudServer.getInstance().isNewVersion()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
                             return;
@@ -120,6 +128,10 @@ public class ServiceCommand {
                     if (args[0].equalsIgnoreCase("createSign")) {
                         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis is not a Lobby server!");
+                            return;
+                        }
+                        if (CloudAPI.getInstance().getModule("module-serverSelector") == null) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
                             return;
                         }
                         String serverGroup = args[1];
@@ -181,6 +193,10 @@ public class ServiceCommand {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
                             return;
                         }
+                        if (CloudAPI.getInstance().getModule("module-serverSelector") == null) {
+                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
+                            return;
+                        }
                         String groupName = args[1];
                         NPC npcV18R3V18R3 = CloudServer.getInstance().getNpcManager().getNPC(Bukkit.getPlayer(player.getName()).getLocation());
                         if (npcV18R3V18R3 != null) {
@@ -211,10 +227,12 @@ public class ServiceCommand {
         cloudPlayer.sendMessage("§bCloudService §7Help§8:");
         cloudPlayer.sendMessage("§8§m--------------------------------------");
         cloudPlayer.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
-        cloudPlayer.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
-        cloudPlayer.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
-        cloudPlayer.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
-        cloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
+        if (CloudAPI.getInstance().getModule("module-serverSelector") != null) {
+            cloudPlayer.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
+            cloudPlayer.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
+            cloudPlayer.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
+            cloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
+        }
         cloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
         cloudPlayer.sendMessage("§8§m--------------------------------------");
 

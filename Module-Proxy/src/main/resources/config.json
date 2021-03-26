@@ -1,0 +1,7 @@
+{
+  "name": "proxy-module",
+  "author": "Lystx",
+  "version": "1.0",
+  "main": "de.lystx.module.proxy.ProxyModule",
+  "copyType": "COPY_BUNGEE"
+}

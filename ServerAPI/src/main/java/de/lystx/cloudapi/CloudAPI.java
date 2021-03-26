@@ -5,10 +5,12 @@ import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.standalone.handler.*;
 import de.lystx.cloudapi.standalone.manager.CloudNetwork;
 import de.lystx.cloudapi.standalone.manager.CloudPlayers;
+import de.lystx.cloudapi.standalone.manager.Fallbacks;
 import de.lystx.cloudapi.standalone.manager.Templates;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.packets.result.other.ResultPacketModules;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.CustomPacket;
@@ -24,9 +26,12 @@ import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
+import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.event.Event;
 import de.lystx.cloudsystem.library.service.lib.Repository;
+import de.lystx.cloudsystem.library.service.module.Module;
+import de.lystx.cloudsystem.library.service.module.ModuleInfo;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
@@ -71,6 +76,7 @@ public class CloudAPI implements CloudService {
     private final CloudLibrary cloudLibrary;
     private final CloudClient cloudClient;
     private final CloudNetwork network;
+    private final Fallbacks fallbacks;
     private final Templates templates;
     private final CloudPlayers cloudPlayers;
     private final ExecutorService executorService;
@@ -89,6 +95,7 @@ public class CloudAPI implements CloudService {
         this.executorService = Executors.newCachedThreadPool();
 
         this.network = new CloudNetwork(this);
+        this.fallbacks = new Fallbacks(this);
         this.cloudPlayers = new CloudPlayers(this);
         this.permissionPool = new PermissionPool(cloudLibrary);
         this.templates = new Templates(this);
@@ -171,6 +178,23 @@ public class CloudAPI implements CloudService {
      */
     public <T> void sendQuery(ResultPacket<T> packet, Consumer<Result<T>> consumer) {
         this.executorService.execute(() -> this.sendQuery(packet).onResultSet(consumer));
+    }
+
+    /**
+     * Returns all the Modules
+     * @return
+     */
+    public List<ModuleInfo> getModules() {
+        return this.sendQuery(new ResultPacketModules()).getResult();
+    }
+
+    /**
+     * Returnms a module by name
+     * @param name of the Module
+     * @return
+     */
+    public ModuleInfo getModule(String name) {
+        return this.getModules().stream().filter(moduleInfo -> moduleInfo.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     /**
@@ -356,6 +380,14 @@ public class CloudAPI implements CloudService {
      */
     public Service getService() {
        return this.getDocument().getAs(Service.class);
+    }
+
+    /**
+     * Returns the {@link ProxyConfig}
+     * @return
+     */
+    public ProxyConfig getProxyConfig() {
+        return CloudAPI.getInstance().getService().getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class);
     }
 
     /**

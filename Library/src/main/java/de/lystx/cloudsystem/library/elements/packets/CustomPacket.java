@@ -32,16 +32,11 @@ import java.io.Serializable;
 @Getter
 public class CustomPacket extends PacketCommunication implements Serializable {
 
-     public CustomPacket(Packet packet) {
-        this.append("packet", packet);
-        this.setSendBack(true);
-     }
+    private final String packetClass;
 
-    /**
-     * Returns customPacket
-     * @return
-     */
-     public Packet getPacket() {
-         return (Packet) this.document().get("packet");
+     public CustomPacket(Packet packet) {
+         this.packetClass = packet.getClass().getName();
+         this.append("packet", packet);
+         this.setSendBack(true);
      }
 }

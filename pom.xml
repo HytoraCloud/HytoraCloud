@@ -12,6 +12,11 @@
         <module>Library</module>
         <module>CloudSystem</module>
         <module>ServerAPI</module>
+        <module>Module-Notify</module>
+        <module>Module-Proxy</module>
+        <module>Module-Commands</module>
+        <module>Module-HubCommand</module>
+        <module>Module-ServerSelector</module>
     </modules>
 
     <properties>

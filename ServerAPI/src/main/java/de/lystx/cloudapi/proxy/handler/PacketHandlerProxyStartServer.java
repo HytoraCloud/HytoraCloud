@@ -21,9 +21,6 @@ public class PacketHandlerProxyStartServer extends PacketHandlerAdapter {
         } else if (packet instanceof PacketOutStartedServer) {
             PacketOutStartedServer startServerPacketProxy = (PacketOutStartedServer)packet;
             this.register(startServerPacketProxy.getService());
-            for (ProxiedPlayer current : ProxyServer.getInstance().getPlayers()) {
-                CloudProxy.getInstance().getNetworkManager().sendStartServerMessage(current, startServerPacketProxy.getService().getName());
-            }
         }
     }
 

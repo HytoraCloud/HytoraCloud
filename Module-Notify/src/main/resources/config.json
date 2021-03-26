@@ -1,0 +1,7 @@
+{
+  "name": "notify-module",
+  "author": "Lystx",
+  "version": "1.0",
+  "main": "de.lystx.module.notify.NotifyModule",
+  "copyType": "COPY_BUNGEE"
+}

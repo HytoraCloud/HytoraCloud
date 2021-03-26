@@ -160,7 +160,9 @@ public class NettyClient {
                 this.tries.remove(packet.getClass());
                 return;
             }
-            consumer.accept(PacketState.RETRY);
+            if (consumer != null) {
+                consumer.accept(PacketState.RETRY);
+            }
             this.tries.put(packet.getClass(), tries);
             new Timer().schedule(new TimerTask() {
                 @Override

@@ -116,7 +116,9 @@ public class FileService extends CloudService {
         this.backupDirectory = new File(this.globalDirectory, "backup/");
         this.backupFile = new File(this.backupDirectory, "backup.json");
 
-        this.check();
+        if (!cloudLibrary.getType().equals(CloudType.CLOUDAPI)) {
+            this.check();
+        }
     }
 
     /**

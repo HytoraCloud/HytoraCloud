@@ -313,12 +313,16 @@ public class PermissionPool implements Serializable {
      * @return (group sorted by IDS)
      */
     public PermissionGroup getHighestPermissionGroup(String player) {
-        List<PermissionGroup> list = this.getPermissionGroups(player);
-        list.sort(Comparator.comparingInt(PermissionGroup::getId));
-        if (list.isEmpty()) {
-            return this.getDefaultPermissionGroup();
-        } else {
-            return list.get(0);
+        try {
+            List<PermissionGroup> list = this.getPermissionGroups(player);
+            list.sort(Comparator.comparingInt(PermissionGroup::getId));
+            if (list.isEmpty()) {
+                return this.getDefaultPermissionGroup();
+            } else {
+                return list.get(0);
+            }
+        } catch (NullPointerException e) {
+            return null;
         }
     }
 

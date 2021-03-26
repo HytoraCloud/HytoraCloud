@@ -13,7 +13,6 @@ public class PacketOutRegisterServer extends Packet implements Serializable {
     private final Service service;
     private String action;
 
-
     public PacketOutRegisterServer(Service service) {
         this.service = service;
     }

@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.module.Module;
+import de.lystx.cloudsystem.library.service.module.ModuleCopyType;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -113,9 +114,23 @@ public class ServiceProviderStart {
                     }
                 }
                 for (Module module : cloudLibrary.getService(ModuleService.class).getModules()) {
-                    if (module.getInfo().isCopy()) {
-                        FileUtils.copyFile(module.getInfo().getFile(), new File(plugins, module.getInfo().getFile().getName()));
+                    switch (module.getInfo().getCopyType()) {
+                        case COPY_ALL:
+                            FileUtils.copyFile(module.getInfo().getFile(), new File(plugins, module.getInfo().getFile().getName()));
+                            break;
+                        case COPY_BUNGEE:
+                            if (service.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+                                FileUtils.copyFile(module.getInfo().getFile(), new File(plugins, module.getInfo().getFile().getName()));
+                            }
+                            break;
+                        case COPY_SPIGOT:
+                            if (service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
+                                FileUtils.copyFile(module.getInfo().getFile(), new File(plugins, module.getInfo().getFile().getName()));
+                            }
+                        case COPY_NOT:
+                            break;
                     }
+
                 }
 
             } catch (IOException e) {

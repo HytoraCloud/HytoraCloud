@@ -1,12 +1,8 @@
 package de.lystx.cloudapi.proxy;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudapi.proxy.command.*;
 import de.lystx.cloudapi.proxy.handler.*;
 import de.lystx.cloudapi.proxy.listener.network.CloudListener;
-import de.lystx.cloudapi.proxy.listener.network.NetworkManager;
-import de.lystx.cloudapi.proxy.listener.other.ProxyPingListener;
-import de.lystx.cloudapi.proxy.listener.other.TablistListener;
 import de.lystx.cloudapi.proxy.listener.player.CommandListener;
 import de.lystx.cloudapi.proxy.listener.player.PlayerListener;
 import de.lystx.cloudapi.proxy.listener.server.ServerConnectListener;
@@ -32,7 +28,6 @@ public class CloudProxy extends Plugin implements CloudService {
     private static CloudProxy instance;
 
     private HubManager hubManager;
-    private NetworkManager networkManager;
     private Action action;
 
     @Override
@@ -42,7 +37,6 @@ public class CloudProxy extends Plugin implements CloudService {
 
             this.action = new Action();
             this.hubManager = new HubManager();
-            this.networkManager = new NetworkManager();
 
             Constants.SERVICE_TYPE = ServiceType.PROXY;
             this.bootstrap();
@@ -68,7 +62,7 @@ public class CloudProxy extends Plugin implements CloudService {
      * @return
      */
     public ProxyConfig getProxyConfig() {
-        return CloudAPI.getInstance().getService().getServiceGroup().getValues().get("proxyConfig", ProxyConfig.class);
+        return CloudAPI.getInstance().getProxyConfig();
     }
 
     /**
@@ -97,19 +91,10 @@ public class CloudProxy extends Plugin implements CloudService {
                     new PacketHandlerProxyChatEvent(CloudAPI.getInstance()),
                     new PacketHandlerProxyEvent(CloudAPI.getInstance()))
 
-                .registerNetworkHandler(new CloudListener()) //Registers the NetworkHandler
+                .registerNetworkHandler(new CloudListener()); //Registers the NetworkHandler
 
-                //Registers all Commands
-                .registerCommand(new CloudCommand())
-                .registerCommand(new HubCommand())
-                .registerCommand(new ListCommand())
-                .registerCommand(new WhereCommands())
-                .registerCommand(new PermsCommand())
-                .registerCommand(new NetworkCommand());
 
         //Registers all Listeners
-        this.getProxy().getPluginManager().registerListener(this, new ProxyPingListener());
-        this.getProxy().getPluginManager().registerListener(this, new TablistListener());
         this.getProxy().getPluginManager().registerListener(this, new CommandListener());
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());

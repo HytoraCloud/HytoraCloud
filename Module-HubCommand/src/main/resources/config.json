@@ -1,0 +1,7 @@
+{
+  "name": "hub-command-module",
+  "author": "Lystx",
+  "version": "1.0",
+  "main": "de.lystx.module.hub.HubModule",
+  "copyType": "COPY_BUNGEE"
+}

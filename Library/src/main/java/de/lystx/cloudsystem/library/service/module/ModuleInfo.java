@@ -5,17 +5,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 @Getter @Setter
 @RequiredArgsConstructor
-public class ModuleInfo {
+public class ModuleInfo implements Serializable {
 
     private final String name;
     private final String author;
     private final String version;
     private final List<String> commands;
-    private final boolean copy;
+    private final ModuleCopyType copyType;
 
 
     private File file;

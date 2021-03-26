@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.module.Module;
+import de.lystx.cloudsystem.library.service.module.ModuleCopyType;
 import de.lystx.cloudsystem.library.service.module.ModuleInfo;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.util.HytoraClassLoader;
@@ -13,6 +14,7 @@ import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Objects;
 
 @Getter
@@ -63,7 +65,7 @@ public class ModuleLoader {
                             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
                             return;
                         }
-                        if (document.has("main") && document.has("author") && document.has("version") && document.has("name") && document.has("copy")) {
+                        if (document.has("main") && document.has("author") && document.has("version") && document.has("name") && document.has("copyType")) {
                             Class<?> cl = classLoader.findClass(document.getString("main"));
                             if (cl == null) {
                                 this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §ccouldn't be found!");
@@ -71,7 +73,7 @@ public class ModuleLoader {
                             }
                             if (cl.getSuperclass().getName().equalsIgnoreCase(Module.class.getName())) {
                                 Module mod = (Module) cl.newInstance();
-                                final ModuleInfo moduleInfo = new ModuleInfo(document.getString("name"), document.getString("author"), document.getString("version"), document.getList("commands"), document.getBoolean("copy"));
+                                final ModuleInfo moduleInfo = new ModuleInfo(document.getString("name"), document.getString("author"), document.getString("version"), new LinkedList<>(), ModuleCopyType.valueOf(document.getString("copyType").toUpperCase()));
                                 moduleInfo.setFile(file);
                                 mod.setInfo(moduleInfo);
                                 mod.setEventService(cloudLibrary.getService(EventService.class));

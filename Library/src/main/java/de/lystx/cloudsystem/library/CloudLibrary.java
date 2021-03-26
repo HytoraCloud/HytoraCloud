@@ -187,7 +187,9 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
      * Raw method to send packet
      * @param packet
      */
-    public void sendPacket(Packet packet) {}
+    public void sendPacket(Packet packet) {
+        this.getCurrentExecutor().sendPacket(packet);
+    }
 
     @Override
     public CloudExecutor getCurrentExecutor() {

@@ -18,6 +18,7 @@ import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.io.FileService;
+import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -38,6 +39,7 @@ import lombok.Setter;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * The {@link ServerService} manages the whole network.
@@ -264,7 +266,6 @@ public class ServerService extends CloudService {
             this.services.put(service.getServiceGroup(), list);
         }
         Action action = this.actions.getOrDefault(service.getName(), new Action());
-
         this.getCloudLibrary().sendPacket(new PacketOutRegisterServer(service).setAction(action.getMS()));
         this.actions.remove(service.getName());
         if (this.getCloudLibrary().getScreenPrinter().getScreen() != null && this.getCloudLibrary().getScreenPrinter().isInScreen()) {
@@ -334,7 +335,6 @@ public class ServerService extends CloudService {
             this.getCloudLibrary().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
             return new VsonObject().append("message", "§cCouldn't start any services of §e" + serviceGroup.getName() + " §cbecause the maximum of services of this group is §e" + serviceGroup.getMaxServer() + "§c!").append("sucess", false);
         }
-        this.getCloudLibrary().sendPacket(new PacketOutRegisterServer(service));
         if (service.getPort() <= 0) {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
             int id = this.idService.getFreeID(serviceGroup.getName());
@@ -354,9 +354,9 @@ public class ServerService extends CloudService {
 
         this.actions.put(service.getName(), new Action());
         if (this.providerStart.autoStartService(this, service, properties)) {
+            getCloudLibrary().sendPacket(new PacketOutStartedServer(service));
             this.notifyStart(service);
             this.getCloudLibrary().getService(EventService.class).callEvent(new ServiceStartEvent(service));
-            new PacketOutStartedServer(service).unsafe().async().send(this.getCloudLibrary());
             return new VsonObject().append("sucess", true);
         }
         return new VsonObject();

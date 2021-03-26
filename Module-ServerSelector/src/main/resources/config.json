@@ -1,0 +1,7 @@
+{
+  "name": "module-serverSelector",
+  "author": "Lystx",
+  "version": "1.0",
+  "main": "de.lystx.serverselector.ModuleSelector",
+  "copyType": "COPY_SPIGOT"
+}

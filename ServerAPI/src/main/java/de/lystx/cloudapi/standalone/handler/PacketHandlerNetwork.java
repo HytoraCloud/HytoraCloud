@@ -33,10 +33,10 @@ public class PacketHandlerNetwork extends PacketHandlerAdapter {
             }
         } else if (packet instanceof PacketOutRegisterServer) {
             Service service = ((PacketOutRegisterServer) packet).getService();
-            this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> {
+            for (NetworkHandler networkHandler : this.cloudAPI.getCloudClient().getNetworkHandlers()) {
                 networkHandler.onServerStart(service);
                 networkHandler.onServerUpdate(service);
-            });
+            }
         } else if (packet instanceof PacketOutStopServer) {
             Service service = ((PacketOutStopServer) packet).getService();
             this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onServerStop(service));
@@ -58,9 +58,7 @@ public class PacketHandlerNetwork extends PacketHandlerAdapter {
             CloudPlayerChangeServerEvent serverEvent = (CloudPlayerChangeServerEvent)packet.getEvent();
             CloudPlayer cloudPlayer = serverEvent.getCloudPlayer();
             cloudPlayer.setServer(serverEvent.getNewServer());
-
             this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onServerChange(cloudPlayer, serverEvent.getNewServer()));
-
             CloudAPI.getInstance().getCloudPlayers().update(cloudPlayer);
         } else if (packet.getEvent() instanceof CloudPlayerQuitEvent) {
             CloudPlayerQuitEvent quitEvent = (CloudPlayerQuitEvent) packet.getEvent();

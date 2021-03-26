@@ -42,18 +42,9 @@ public class HubManager {
      * @return
      */
     public ServerInfo getInfo(ProxiedPlayer player) {
-        try {
-            Fallback fallback = this.getHighestFallback(player);
-            Service service;
-            try {
-                service = CloudAPI.getInstance().getNetwork().getServices(CloudAPI.getInstance().getNetwork().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudAPI.getInstance().getNetwork().getServices(CloudAPI.getInstance().getNetwork().getServiceGroup(fallback.getGroupName())).size()));
-            } catch (Exception e){
-                service = CloudAPI.getInstance().getNetwork().getService(fallback.getGroupName() + "-1");
-            }
-            return ProxyServer.getInstance().getServerInfo(service.getName());
-        } catch (NullPointerException e) {
-            return null;
-        }
+        return ProxyServer.getInstance().getServerInfo(CloudAPI.getInstance().getFallbacks().getFallback(
+                CloudAPI.getInstance().getCloudPlayers().get(player.getName())
+        ).getName());
     }
 
 
@@ -88,13 +79,8 @@ public class HubManager {
      * @return
      */
     public boolean isFallback(ProxiedPlayer player) {
-        Value<Boolean> booleanValue = new Value<>(false);
-        this.getFallbacks(player).forEach(fallback -> {
-            if (player.getServer().getInfo().getName().split("-")[0].equalsIgnoreCase(fallback.getGroupName())) {
-                booleanValue.setValue(true);
-            }
-        });
-        return booleanValue.getValue();
+        final CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
+        return CloudAPI.getInstance().getFallbacks().isFallback(cloudPlayer);
     }
 
     /**
@@ -106,14 +92,8 @@ public class HubManager {
      * @return
      */
     public List<Fallback> getFallbacks(ProxiedPlayer player) {
-        List<Fallback> list = new LinkedList<>();
-        list.add(CloudAPI.getInstance().getNetworkConfig().getFallbackConfig().getDefaultFallback());
-        CloudAPI.getInstance().getNetworkConfig().getFallbackConfig().getFallbacks().forEach(fallback -> {
-            if (CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), fallback.getPermission()) || fallback.getPermission().trim().isEmpty() || fallback.getPermission() == null) {
-                list.add(fallback);
-            }
-        });
-        return list;
+        final CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
+        return CloudAPI.getInstance().getFallbacks().getFallbacks(cloudPlayer);
     }
 
 }
