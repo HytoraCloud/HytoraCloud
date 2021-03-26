@@ -47,21 +47,24 @@ public class LabyMod implements Listener {
             try {
                 final String messageKey = getPacketUtils().readString( buf, Short.MAX_VALUE );
                 final String messageContents = getPacketUtils().readString( buf, Short.MAX_VALUE );
-                final JsonElement jsonMessage = new JsonParser().parse( messageContents );
 
-                Bukkit.getScheduler().runTask( CloudServer.getInstance(), new Runnable() {
-                    @Override
-                    public void run() {
-                        if ( !player.isOnline() )
-                            return;
+                try {
+                    JsonElement jsonMessage = new JsonParser().parse( messageContents );
+                    Bukkit.getScheduler().runTask( CloudServer.getInstance(), new Runnable() {
+                        @Override
+                        public void run() {
+                            if ( !player.isOnline() )
+                                return;
 
-                        try {
-                            Bukkit.getPluginManager().callEvent( new MessageReceiveEvent( player, messageKey, jsonMessage ) );
-                        } catch (Exception e) {
-                            //IGNORING IT
+                            try {
+                                Bukkit.getPluginManager().callEvent( new MessageReceiveEvent( player, messageKey, jsonMessage ) );
+                            } catch (Exception e) {
+                                //IGNORING IT
+                            }
                         }
-                    }
-                });
+                    });
+                } catch (Exception e) { }
+
             } catch ( RuntimeException ignored ) {
             }
         });

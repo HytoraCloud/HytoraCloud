@@ -47,15 +47,6 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
                 } else {
                     return;
                 }
-                if (!cloudSystem.isRunning() || (this.cloudSystem.getScreenPrinter().getScreen() != null && this.cloudSystem.getScreenPrinter().isInScreen())) {
-                    return;
-                }
-                if (cloudPlayer.getServer().equalsIgnoreCase("no_server_found")) {
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is logging on on §a" + cloudPlayer.getProxy());
-                } else {
-                    this.cloudSystem.getConsole().getLogger().sendMessage("NETWORK", "§7Player §b" + cloudPlayer.getName() + " §7is connected on §a" + cloudPlayer.getServer() + " §7| §bProxy " + cloudPlayer.getProxy());
-                }
-                return;
             }
             if (this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(cloudPlayer.getName()) != null) {
                 return;

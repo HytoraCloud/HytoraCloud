@@ -47,7 +47,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     public List<CloudPlayer> getPlayersOnGroup(String group) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
-            if (cloudPlayer.getServerGroup().equalsIgnoreCase(group)) {
+            if (cloudPlayer.getConnectedService().getServiceGroup().getName().equalsIgnoreCase(group)) {
                 list.add(cloudPlayer);
             }
         }
@@ -62,7 +62,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     public List<CloudPlayer> getPlayersOnServer(String server) {
        List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
-            if (cloudPlayer.getServer().equalsIgnoreCase(server)) {
+            if (cloudPlayer.getConnectedService().getName().equalsIgnoreCase(server)) {
                 list.add(cloudPlayer);
             }
         }

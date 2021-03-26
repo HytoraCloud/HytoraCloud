@@ -36,7 +36,7 @@ public class ServiceInfo extends Service {
         super(name, uniqueId, serviceGroup, serviceID, port, cloudPort, serviceState);
         this.serverPinger = new ServerPinger();
         this.onlinePlayers = onlinePlayers;
-        this.onlinePlayers.removeIf(cloudPlayer -> !cloudPlayer.getServer().equalsIgnoreCase(name));
+        this.onlinePlayers.removeIf(cloudPlayer -> !cloudPlayer.getConnectedService().getName().equalsIgnoreCase(name));
         try {
             this.serverPinger.pingServer(this.getHost(), port, 20);
             this.motd = this.serverPinger.getMotd();

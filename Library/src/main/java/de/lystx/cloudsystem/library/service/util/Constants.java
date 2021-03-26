@@ -9,7 +9,9 @@ import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 
 import java.util.HashMap;
 import java.util.LinkedList;

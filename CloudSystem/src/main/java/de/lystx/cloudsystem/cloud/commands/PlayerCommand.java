@@ -30,7 +30,7 @@ public class PlayerCommand {
 
                 sender.sendMessage("INFO", "§bPlayers§7:");
                 for (CloudPlayer onlinePlayer : ps.getOnlinePlayers()) {
-                    sender.sendMessage("INFO", "§9" + onlinePlayer.getName() + " §7| §bServer " + onlinePlayer.getServer() + " §7| §aProxy " + onlinePlayer.getProxy());
+                    sender.sendMessage("INFO", "§9" + onlinePlayer.getName() + " §7| §bServer " + onlinePlayer.getConnectedService().getName() + " §7| §aProxy " + onlinePlayer.getProxy());
                 }
             }
         } else if (args.length == 2) {
@@ -60,7 +60,7 @@ public class PlayerCommand {
                 sender.sendMessage("INFO", "§7First login | §b" + pool.getFormat().format(new Date(playerData.getFirstLogin())));
                 sender.sendMessage("INFO", "§7Last login | §b" + pool.getFormat().format(new Date(playerData.getLastLogin())));
                 if (cloudPlayer != null) {
-                    sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getServer());
+                    sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getConnectedService().getName());
                     sender.sendMessage("INFO", "§7Proxy | §b" + cloudPlayer.getProxy());
                 }
             } else {

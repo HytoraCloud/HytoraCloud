@@ -23,7 +23,6 @@ public class ResultPacketLoginSuccess extends ResultPacket<VsonObject> implement
         CloudPlayer cloudPlayer = cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName());
         cloudPlayer.setCloudPlayerData(cloudLibrary.getService(PermissionService.class).getPermissionPool().getPlayerData(cloudPlayer.getName()));
         cloudPlayer.setServer(this.service);
-
         cloudLibrary.getService(CloudPlayerService.class).update(this.connection.getName(), cloudPlayer);
         cloudLibrary.reload();
         return new VsonObject()

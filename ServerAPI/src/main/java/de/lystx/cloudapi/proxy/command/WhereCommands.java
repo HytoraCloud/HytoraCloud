@@ -15,7 +15,7 @@ public class WhereCommands {
     public void execute(CloudCommandSender commandSender, String[] args) {
         if (commandSender instanceof CloudPlayer) {
             CloudPlayer player = (CloudPlayer)commandSender;
-            Service s = CloudAPI.getInstance().getNetwork().getService(player.getServer());
+            Service s = CloudAPI.getInstance().getNetwork().getService(player.getConnectedService().getName());
             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§6" + s.getName() + "#" + s.getUniqueId() + " §8«» §a" + CloudAPI.getInstance().getService().getName());
 
         }
@@ -31,7 +31,7 @@ public class WhereCommands {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + args[0] + " §cseems not to be online!");
                         return;
                     }
-                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Server of §b" + cloudPlayer.getName() + " §8: §a" + cloudPlayer.getServer());
+                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Server of §b" + cloudPlayer.getName() + " §8: §a" + cloudPlayer.getConnectedService().getName());
                 } else {
                     player.sendMessage(CloudAPI.getInstance().getPrefix() + "§c/whereis <player>");
                 }

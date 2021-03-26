@@ -75,13 +75,6 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
     }
 
     /**
-     * @return serverGroup
-     */
-    public String getServerGroup() {
-        return this.server.split("-")[0];
-    }
-
-    /**
      * Sends a message
      * @param message
      */
