@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.console.CloudConsole;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.event.Event;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.lib.LibraryService;
 import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
@@ -65,23 +66,25 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
     protected CloudType cloudType;
 
     public CloudLibrary(CloudType cloudType) {
-        //TODO: Remove manual directorys for LibraryService
-        if (cloudType.equals(CloudType.RECEIVER) || cloudType.equals(CloudType.CLOUDSYSTEM) || cloudType.equals(CloudType.NONE)) {
-            this.libraryService = new LibraryService("./local/libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
-            this.installDefaultLibraries();
-            AnsiConsole.systemInstall();
-            Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
-            loggers.disable();
-        } else {
-            this.libraryService = new LibraryService("../../../../../libs/", ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
-            this.installDefaultLibraries();
-        }
         this.cloudType = cloudType;
         this.customs = new ReverseMap<>();
         this.cloudServices = new LinkedList<>();
         this.host = "127.0.0.1";
         this.port = 2131;
         this.running = true;
+
+        this.cloudServices.add(new FileService(this, "Files", CloudService.CloudServiceType.MANAGING));
+
+        if (cloudType.equals(CloudType.RECEIVER) || cloudType.equals(CloudType.CLOUDSYSTEM) || cloudType.equals(CloudType.NONE)) {
+            this.libraryService = new LibraryService(this.getService(FileService.class).getLibraryDirectory(), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.installDefaultLibraries();
+            AnsiConsole.systemInstall();
+            Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
+            loggers.disable();
+        } else {
+            this.libraryService = new LibraryService(new File("../../../../../libs/"), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.installDefaultLibraries();
+        }
 
         this.cloudServer = new CloudServer(this.host, this.port);
         this.cloudClient = new CloudClient(this.host, this.port);

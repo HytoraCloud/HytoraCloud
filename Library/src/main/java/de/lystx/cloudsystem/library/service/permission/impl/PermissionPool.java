@@ -302,7 +302,7 @@ public class PermissionPool implements Serializable {
                 }
             }
         } catch (NullPointerException e) {
-            //Ignoring
+            e.printStackTrace();
         }
         return permissionGroups;
     }
@@ -427,7 +427,6 @@ public class PermissionPool implements Serializable {
     public VsonObject save(File file, File directory, IDatabase database) {
         try {
             VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
-            document.clear();
             document.append("enabled", this.enabled);
             for (PermissionGroup permissionGroup : this.permissionGroups) {
                 document.append(permissionGroup.getName(), permissionGroup);

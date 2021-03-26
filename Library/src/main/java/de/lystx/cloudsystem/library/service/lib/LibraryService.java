@@ -1,6 +1,5 @@
 package de.lystx.cloudsystem.library.service.lib;
 
-import de.lystx.cloudsystem.library.service.scheduler.Schedule;
 import lombok.Getter;
 
 import java.io.File;
@@ -20,8 +19,8 @@ public class LibraryService {
     private final ClassLoader classLoader;
     private final List<MavenLibrary> libraries;
 
-    public LibraryService(String direrctory, ClassLoader classLoader) {
-        this.directory = new File(direrctory);
+    public LibraryService(File direrctory, ClassLoader classLoader) {
+        this.directory = direrctory;
         this.directory.mkdirs();
         this.classLoader = classLoader;
         this.libraries = new LinkedList<>();

@@ -1,5 +1,8 @@
 package de.lystx.cloudsystem.library.service.util;
 
+import lombok.SneakyThrows;
+
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,5 +26,19 @@ public class Utils {
         }
 
         return list;
+    }
+
+    public static boolean existsClass(String name) {
+        try {
+            Class.forName(name);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    @SneakyThrows
+    public static void createFile(File file) {
+        file.createNewFile();
     }
 }

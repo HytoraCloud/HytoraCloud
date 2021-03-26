@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.io;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
@@ -123,12 +124,9 @@ public class FileService extends CloudService {
      */
     public void check() {
         this.cloudDirectory.mkdirs();
-
-        if (!this.startSh.exists() || !this.startBat.exists()) {
+        if (!this.startSh.exists() && !this.startBat.exists()) {
             this.copyFileWithURL("/implements/start/start.bat", this.startBat);
             this.copyFileWithURL("/implements/start/start.sh", this.startSh);
-            System.exit(0);
-            return;
         }
 
         this.serverDirectory.mkdirs();
@@ -165,17 +163,12 @@ public class FileService extends CloudService {
             this.backupDirectory.mkdirs();
         }
 
-        try {
-            for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {
-                if (file.isDirectory()) {
-                    FileUtils.deleteDirectory(file);
-                } else {
-                    FileUtils.forceDelete(file);
+        if (Utils.existsClass("org.apache.commons.io.FileUtils")) {
+            try {
+                for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {
+                    if (file.isDirectory()) FileUtils.deleteDirectory(file); else FileUtils.forceDelete(file);
                 }
-            }
-
-        } catch (IOException e) {
-
+            } catch (IOException ignored) {}
         }
     }
 
@@ -185,6 +178,9 @@ public class FileService extends CloudService {
      * @param location
      */
     public void copyFileWithURL(String filename, File location) {
+        if (!Utils.existsClass("org.apache.commons.io.FileUtils")) {
+            return;
+        }
         try {
             URL inputUrl = getClass().getResource(filename);
             if (location.exists()) {
@@ -222,14 +218,10 @@ public class FileService extends CloudService {
      * @param message
      */
     public void write(File file, String message) {
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) { }
-        }
         try {
-            FileWriter filewriter=new FileWriter(file, true);
-            BufferedWriter bufferedwriter= new BufferedWriter(filewriter);
+            Utils.createFile(file);
+            FileWriter filewriter = new FileWriter(file, true);
+            BufferedWriter bufferedwriter = new BufferedWriter(filewriter);
             bufferedwriter.write(message);
             bufferedwriter.newLine();
             bufferedwriter.close();

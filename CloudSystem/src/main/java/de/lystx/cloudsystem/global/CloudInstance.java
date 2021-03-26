@@ -78,9 +78,7 @@ public class CloudInstance extends CloudLibrary {
             return;
         }
 
-        this.cloudServices.add(new FileService(this, "File", CloudService.CloudServiceType.CONFIG));
         this.cloudServices.add(new LogService(this, "Logging", CloudService.CloudServiceType.UTIL));
-
 
         this.screenPrinter = new CloudScreenPrinter(this.console, this);
 
@@ -116,6 +114,13 @@ public class CloudInstance extends CloudLibrary {
 
     }
 
+    /**
+     * Checks if the Cloud is setup
+     * if the AutoUpdater is enabled
+     * and if it needs an AutoUpdater
+     *
+     * @return Boolean
+     */
     public boolean autoUpdater() {
         if (this.getService(ConfigService.class).getNetworkConfig().isSetupDone()) {
             if (this.getService(ConfigService.class).getNetworkConfig().isAutoUpdater()) {
@@ -132,11 +137,16 @@ public class CloudInstance extends CloudLibrary {
         return false;
     }
 
-
+    /**
+     * Reloads all NPCS
+     */
     public void reloadNPCS() {
         this.getService(CloudNetworkService.class).sendPacket(new PacketOutNPC(this.getService(NPCService.class).getNPCConfig(), this.getService(NPCService.class).getDocument()));
     }
 
+    /**
+     * Reloads all
+     */
     public void reload() {
         try {
             this.getService(ServerService.class).setServiceGroups(this.getService(GroupService.class).getGroups());
@@ -154,6 +164,10 @@ public class CloudInstance extends CloudLibrary {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Shuts down the Cloud
+     */
     public void shutdown() {
         this.sendPacket(new PacketShutdown());
         this.setRunning(false);

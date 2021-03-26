@@ -110,21 +110,21 @@ public class LabyMod implements Listener {
             CloudAPI.getInstance().getScheduler().scheduleDelayedTask(() -> {
                 try {
                     VsonObject vc = new VsonObject(event.getJsonMessage().toString());
-                    CloudAPI.getInstance().getCloudPlayers().getAsync(player.getName(), cp -> {
-                        LabyModPlayer labyModPlayer = cp.getLabyModPlayer();
+                    CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
 
-                        labyModPlayer.setVoiceChatSettings(new VoiceChatSettings(
-                                vc.getBoolean("enabled"),
-                                vc.getInteger("surround_range"),
-                                vc.getInteger("surround_volume"),
-                                vc.getBoolean("screamer_protection"),
-                                vc.getInteger("screamer_protection_level"),
-                                vc.getInteger("screamer_max_volume"),
-                                vc.getInteger("microphone_volume")
-                        ));
-                        cp.setLabyModPlayer(labyModPlayer);
-                        cp.update();
-                    });
+                    LabyModPlayer labyModPlayer = cloudPlayer.getLabyModPlayer();
+
+                    labyModPlayer.setVoiceChatSettings(new VoiceChatSettings(
+                            vc.getBoolean("enabled"),
+                            vc.getInteger("surround_range"),
+                            vc.getInteger("surround_volume"),
+                            vc.getBoolean("screamer_protection"),
+                            vc.getInteger("screamer_protection_level"),
+                            vc.getInteger("screamer_max_volume"),
+                            vc.getInteger("microphone_volume")
+                    ));
+                    cloudPlayer.setLabyModPlayer(labyModPlayer);
+                    cloudPlayer.update();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

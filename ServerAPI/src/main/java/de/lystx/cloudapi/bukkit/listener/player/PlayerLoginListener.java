@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 public class PlayerLoginListener implements Listener {
 
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleLogin(PlayerLoginEvent event) {
         if (CloudAPI.getInstance().getNetwork().getServices().isEmpty()) {

@@ -41,7 +41,6 @@ public class ServiceCommand {
     public void execute(CloudCommandSender sender, String[] args) {
         if (sender instanceof CloudPlayer) {
             CloudPlayer player = (CloudPlayer) sender;
-
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("info")) {
