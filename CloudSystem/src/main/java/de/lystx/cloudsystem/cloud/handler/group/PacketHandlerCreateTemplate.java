@@ -24,7 +24,7 @@ public class PacketHandlerCreateTemplate extends PacketHandlerAdapter {
             if (get == null) {
                 return;
             }
-            this.cloudSystem.getService(TemplateService.class).copy(get, packetInCopyTemplate.getTemplate());
+            this.cloudSystem.getService(TemplateService.class).copy(get, packetInCopyTemplate.getTemplate(), packetInCopyTemplate.getSpecificDirectory());
         }
     }
 }

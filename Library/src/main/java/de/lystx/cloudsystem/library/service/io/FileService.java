@@ -4,8 +4,11 @@ import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.util.Utils;
+import io.vson.elements.object.VsonObject;
+import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -20,6 +23,7 @@ public class FileService extends CloudService {
 
     private File cloudDirectory;
     private File libraryDirectory;
+    private File tempDirectory;
     private File configFile;
     private File permissionsFile;
 
@@ -61,12 +65,16 @@ public class FileService extends CloudService {
     private File spigotVersionsDirectory;
     private File oldSpigotVersionsDirectory;
 
+
+    private VsonObject tempData;
+
     /**
      * Initialising all files and folders
      * @param cloudLibrary
      * @param name
      * @param cloudType
      */
+    @SneakyThrows
     public FileService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
         super(cloudLibrary, name, cloudType);
         this.startBat = new File("start.bat");
@@ -103,6 +111,7 @@ public class FileService extends CloudService {
 
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");
+        this.tempDirectory = new File(this.globalDirectory, "temp/");
         this.bungeeCordPluginsDirectory = new File(this.pluginsDirectory, "bungee/");
         this.globalPluginsDirectory = new File(this.pluginsDirectory, "global/");
         this.spigotPluginsDirectory = new File(this.pluginsDirectory, "spigot/");
@@ -112,6 +121,7 @@ public class FileService extends CloudService {
         this.logsDirectory = new File(this.globalDirectory, "logs/");
         this.modulesDirectory = new File(this.globalDirectory, "modules/");
 
+        this.tempData = new VsonObject(new File(this.tempDirectory, "temp.vson"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
 
         this.backupDirectory = new File(this.globalDirectory, "backup/");
         this.backupFile = new File(this.backupDirectory, "backup.json");
@@ -126,10 +136,11 @@ public class FileService extends CloudService {
      */
     public void check() {
         this.cloudDirectory.mkdirs();
-        if (!this.startSh.exists() && !this.startBat.exists()) {
+        if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && !this.startSh.exists() && !this.startBat.exists()) {
             this.copyFileWithURL("/implements/start/start.bat", this.startBat);
             this.copyFileWithURL("/implements/start/start.sh", this.startSh);
         }
+
 
         this.serverDirectory.mkdirs();
         this.staticServerDirectory.mkdirs();
@@ -152,6 +163,7 @@ public class FileService extends CloudService {
         this.templatesDirectory.mkdirs();
 
         this.globalDirectory.mkdirs();
+        this.tempDirectory.mkdirs();
         this.pluginsDirectory.mkdirs();
         this.bungeeCordPluginsDirectory.mkdirs();
         this.spigotPluginsDirectory.mkdirs();
@@ -163,6 +175,14 @@ public class FileService extends CloudService {
         if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             this.modulesDirectory.mkdirs();
             this.backupDirectory.mkdirs();
+        }
+        if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && !this.tempData.getBoolean("hadOptionToUseModules", false)) {
+            this.copyFileWithURL("/implements/modules/module-notify.jar", new File(this.modulesDirectory, "module-notify.jar"));
+            this.copyFileWithURL("/implements/modules/module-commands.jar", new File(this.modulesDirectory, "module-commands.jar"));
+            this.copyFileWithURL("/implements/modules/module-proxy.jar", new File(this.modulesDirectory, "module-proxy.jar"));
+            this.copyFileWithURL("/implements/modules/module-hubcommand.jar", new File(this.modulesDirectory, "module-hubcommand.jar"));
+            this.tempData.append("hadOptionToUseModules", true);
+            this.tempData.save();
         }
 
         if (Utils.existsClass("org.apache.commons.io.FileUtils")) {
@@ -193,9 +213,10 @@ public class FileService extends CloudService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } catch (NullPointerException e) { }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
-
     /**
      * Downloads file from website
      * @param url

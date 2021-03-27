@@ -54,7 +54,7 @@ public class ReceiverPacketHandlerServer {
 
     @PacketHandler
     public void handleTemplate(PacketInCopyTemplate packet) {
-        this.receiver.getService(TemplateService.class).copy(packet.getService(), packet.getTemplate());
+        this.receiver.getService(TemplateService.class).copy(packet.getService(), packet.getTemplate(), packet.getSpecificDirectory());
     }
 
     @PacketHandler

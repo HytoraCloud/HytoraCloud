@@ -19,6 +19,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
+
 public class PlayerListener implements Listener {
 
     private final CloudAPI cloudAPI;
@@ -28,7 +29,7 @@ public class PlayerListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void handlePreLogin(LoginEvent event) {
 
         CloudConnection connection = new CloudConnection(event.getConnection().getUniqueId(), event.getConnection().getName(), event.getConnection().getAddress().getAddress().getHostAddress());
@@ -103,9 +104,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void handlePermissionCheck(PermissionCheckEvent e) {
-        if (!cloudAPI.getPermissionPool().isEnabled()) {
-            return;
-        }
+
         if (cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), "*")) {
             e.setHasPermission(true);
         } else {

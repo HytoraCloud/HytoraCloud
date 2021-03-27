@@ -73,10 +73,9 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
         this.port = 2131;
         this.running = true;
 
-        this.cloudServices.add(new FileService(this, "Files", CloudService.CloudServiceType.MANAGING));
 
         if (cloudType.equals(CloudType.RECEIVER) || cloudType.equals(CloudType.CLOUDSYSTEM) || cloudType.equals(CloudType.NONE)) {
-            this.libraryService = new LibraryService(this.getService(FileService.class).getLibraryDirectory(), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.libraryService = new LibraryService(new File("./local/libs/"), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.installDefaultLibraries();
             AnsiConsole.systemInstall();
             Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
@@ -85,6 +84,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
             this.libraryService = new LibraryService(new File("../../../../../libs/"), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.installDefaultLibraries();
         }
+        this.cloudServices.add(new FileService(this, "Files", CloudService.CloudServiceType.MANAGING));
 
         this.cloudServer = new CloudServer(this.host, this.port);
         this.cloudClient = new CloudClient(this.host, this.port);

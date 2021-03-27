@@ -14,6 +14,7 @@ import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.event.Event;
+import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
@@ -28,6 +29,8 @@ import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,12 +115,18 @@ public class CloudSystem extends CloudInstance implements CloudService {
         }
     }
 
-    @Override
+    @Override @SneakyThrows
     public void shutdown() {
         super.shutdown();
         this.getService(StatisticsService.class).save();
         this.getService(SignService.class).save();
         this.getService(NPCService.class).save();
+
+        for (File file : this.getService(FileService.class).getTempDirectory().listFiles()) {
+            if (file.getName().startsWith("[!]")) {
+                FileUtils.forceDelete(file);
+            }
+        }
     }
 
     @Override

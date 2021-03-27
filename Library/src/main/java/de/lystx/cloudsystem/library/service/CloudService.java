@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter @Setter
 public abstract class CloudService  {
 
-    private CloudLibrary cloudLibrary;
+    protected CloudLibrary cloudLibrary;
     private String name;
     private CloudServiceType type;
 

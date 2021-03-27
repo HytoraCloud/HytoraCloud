@@ -14,6 +14,7 @@ import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -91,12 +92,14 @@ public class ModuleLoader {
                                 mod.onLoadConfig(cloudLibrary);
                                 moduleService.getModules().add(mod);
                                 ModuleInfo info = mod.getInfo();
-                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§7The Module §b" + info.getName() + " §7by §b" + info.getAuthor() + " §7Version§8: §b" + info.getVersion() + " §7was loaded§8!");
+                                this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§7The Module §b" + info.getName() + " §7by §b" + info.getAuthor() + " §7Version §b" + info.getVersion() + " §7was loaded§8!");
                             } else {
                                 this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §cdoesn't extends the Module.class!");
                             }
                         } else {
                             this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cA Module doesn't have all needed attributes in the §econfig.json§c!");
+                            String needed = Arrays.toString(ModuleInfo.class.getDeclaredFields()).replace("[", "").replace("]", "");
+                            this.cloudLibrary.getConsole().getLogger().sendMessage("MODULES", "§cNeeded§h: §e" + needed);
                         }
                     }
                 }

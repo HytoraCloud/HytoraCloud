@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Class for utiliities
@@ -28,6 +29,22 @@ public class Utils {
         return list;
     }
 
+    public static <T> void doUntilEmpty(List<T> list, Consumer<T> listConsumer, Consumer<List<T>> emptyConsumer) {
+        int i = list.size();
+        for (T t : list) {
+            listConsumer.accept(t);
+            i--;
+            if (i <= 0) {
+                emptyConsumer.accept(list);
+            }
+        }
+    }
+
+    /**
+     * Checks if a class exists
+     * @param name
+     * @return
+     */
     public static boolean existsClass(String name) {
         try {
             Class.forName(name);

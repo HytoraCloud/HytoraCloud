@@ -41,14 +41,6 @@ public class CloudNetwork {
     }
 
     /**
-     * Updates a {@link ServiceGroup}
-     * @param serviceGroup
-     */
-    public void updateServiceGroup(ServiceGroup serviceGroup) {
-        this.cloudAPI.sendPacket(new PacketInUpdateServiceGroup(serviceGroup));
-    }
-
-    /**
      * Returns Proxy ({@link Service}) by port
      * @param port
      * @return

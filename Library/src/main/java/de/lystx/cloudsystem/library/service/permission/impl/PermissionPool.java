@@ -369,7 +369,7 @@ public class PermissionPool implements Serializable {
      */
     public boolean hasPermission(String playerName, String permission) {
         if (!this.enabled) {
-            return true;
+            return false;
         }
         boolean is = false;
         CloudPlayerData data = this.getPlayerData(playerName);

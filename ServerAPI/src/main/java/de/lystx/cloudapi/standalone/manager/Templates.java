@@ -20,7 +20,17 @@ public class Templates {
      * @param template
      */
     public void copy(String server, String template) {
-        PacketInCopyTemplate packetInCopyTemplate = new PacketInCopyTemplate(this.cloudAPI.getNetwork().getService(server), template);
+        this.copy(server, template, null);
+    }
+    /**
+     * Copies a server into a specific Template
+     * but it only copies a specific folder like "world"
+     * or the "plugins" folder or "plugins/YourFolder"
+     * @param server
+     * @param template
+     */
+    public void copy(String server, String template, String specificDirectory) {
+        PacketInCopyTemplate packetInCopyTemplate = new PacketInCopyTemplate(this.cloudAPI.getNetwork().getService(server), template, specificDirectory);
         CloudAPI.getInstance().getCloudClient().sendPacket(packetInCopyTemplate);
     }
 

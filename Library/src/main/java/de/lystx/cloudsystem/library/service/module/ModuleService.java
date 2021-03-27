@@ -42,6 +42,7 @@ public class ModuleService extends CloudService {
     public void load() {
         this.moduleLoader.loadModules();
         this.modules.forEach((module -> module.onEnable(this.getCloudLibrary())));
+        this.cloudLibrary.getConsole().getLogger().sendMessage("§8");
     }
 
     /**

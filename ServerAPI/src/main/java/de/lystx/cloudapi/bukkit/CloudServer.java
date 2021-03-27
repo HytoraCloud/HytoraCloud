@@ -24,6 +24,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.PacketStat
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -209,23 +210,25 @@ public class CloudServer extends JavaPlugin implements CloudService {
             return;
         }
 
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            CloudPlayer player = CloudAPI.getInstance().getCloudPlayers().get(onlinePlayer.getName());
-            if (player != null) {
-                onlinePlayer.sendMessage(msg);
-                if (CloudAPI.getInstance().getNetwork().getLobbies().size() == 1) {
-                    onlinePlayer.kickPlayer(msg);
+        Utils.doUntilEmpty(new LinkedList<>(Bukkit.getOnlinePlayers()),
+            player -> {
+                CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(player.getName());
+                if (cloudPlayer != null) {
+                    player.sendMessage(msg);
+                    if (CloudAPI.getInstance().getNetwork().getLobbies().size() == 1) {
+                        Bukkit.getScheduler().runTask(CloudServer.getInstance(), () -> player.kickPlayer(msg));
+                    } else {
+                        cloudPlayer.fallback();
+                    }
                 } else {
-                    player.fallback();
+                    player.kickPlayer(msg);
                 }
-            } else {
-                onlinePlayer.kickPlayer(msg);
-            }
-            size--;
-            if (size <= 0) {
+            },
+            players -> {
                 this.shutdown0();
             }
-        }
+        );
+
     }
 
     /**

@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-@Getter @Setter @ToString
+@Getter @Setter
 public class Service implements Serializable, Objectable<Service> {
 
     private final String name;
@@ -72,6 +72,14 @@ public class Service implements Serializable, Objectable<Service> {
      * @return
      */
     public ServiceInfo getInfo() {
+        if (this.serviceGroup.getServiceType().equals(ServiceType.PROXY)) {
+            throw new UnsupportedOperationException("Can't get ServiceInfo for a ProxyService!");
+        }
         return ServiceInfo.fromService(this, Arrays.asList(Constants.CLOUDPLAYERS.toArray()));
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -11,6 +11,7 @@ import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -67,20 +68,27 @@ public class TemplateService extends CloudService {
      * @param service
      * @param template
      */
-    public void copy(Service service, String template) {
+    @SneakyThrows
+    public void copy(Service service, String template, String dir) {
         CloudScreen screen = this.getCloudLibrary().getService(ScreenService.class).getMap().get(service.getName());
         if (screen == null) {
             return;
         }
+        if (dir != null) {
+            File file = new File(screen.getServerDir(), dir);
+            if (file.isDirectory()) {
+                FileUtils.copyDirectoryToDirectory(file, new File(getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + template + "/"));
+            } else {
+                FileUtils.copyFileToDirectory(file, new File(getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + template + "/"));
+            }
+            this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§2Copied folder §e" + dir + " §7from Service §a" + service.getName() + " §2into template §a" + template + "§8!");
+            return;
+        }
         for (File file : Objects.requireNonNull(screen.getServerDir().listFiles())) {
-            try {
-                if (file.isDirectory()) {
-                    FileUtils.copyDirectoryToDirectory(file, new File(getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + template + "/"));
-                } else {
-                    FileUtils.copyFileToDirectory(file, new File(getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + template + "/"));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (file.isDirectory()) {
+                FileUtils.copyDirectoryToDirectory(file, new File(getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + template + "/"));
+            } else {
+                FileUtils.copyFileToDirectory(file, new File(getCloudLibrary().getService(FileService.class).getTemplatesDirectory(), service.getServiceGroup().getName() + "/" + template + "/"));
             }
         }
         this.getCloudLibrary().getConsole().getLogger().sendMessage("NETWORK", "§2Copied Service §a" + service.getName() + " §2into template §a" + template + "§8!");

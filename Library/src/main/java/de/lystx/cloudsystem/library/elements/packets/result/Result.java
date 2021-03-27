@@ -22,14 +22,6 @@ public class Result<R> implements Serializable {
     }
 
     /**
-     * Casts Result to {@link VsonObject}
-     * @return
-     */
-    public VsonObject getDocument() {
-        return (VsonObject) this.result;
-    }
-
-    /**
      * Uses this as {@link VsonObject} to
      * untree the object of this class
      * and get the object as a specified GenericType
@@ -38,7 +30,7 @@ public class Result<R> implements Serializable {
      * @return
      */
     public <T> T getResultAs(Class<T> tClass) {
-        return this.getDocument().getAs(tClass);
+        return ((VsonObject) this.getResult()).getAs(tClass);
     }
 
     /**
@@ -60,7 +52,7 @@ public class Result<R> implements Serializable {
      */
     public Result<R> onDocumentSet(Consumer<VsonObject> consumer) {
         if (this.getResult() instanceof VsonObject) {
-            consumer.accept(this.getDocument());
+            consumer.accept(((VsonObject) this.getResult()));
         }
         return this;
     }

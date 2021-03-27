@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.io.FileService;
+import de.lystx.cloudsystem.library.service.io.Zip;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import io.vson.elements.VsonArray;
@@ -80,6 +81,11 @@ public class GroupService extends CloudService {
                     }
                 }
             }
+        }
+        for (ServiceGroup group : this.groups) {
+            Zip zip = new Zip();
+            FileService fs = this.getCloudLibrary().getService(FileService.class);
+            zip.zip(new File(fs.getTemplatesDirectory(), group.getName()), new File(fs.getTempDirectory(), "[!] group_template_" + group.getName() + ".zip"));
         }
     }
 

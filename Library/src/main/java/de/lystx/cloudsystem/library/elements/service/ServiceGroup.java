@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInUpdateServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import io.vson.elements.object.Objectable;
@@ -38,12 +39,25 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
     }
 
     /**
+     * Updates the {@link ServiceGroup} on all
+     * CloudInstances and syncs it's values all
+     * over the CloudNetwork
+     */
+    public void update() {
+        Constants.EXECUTOR.sendPacket(new PacketInUpdateServiceGroup(this));
+    }
+
+    /**
      * Returns a ServiceInfo by this Service
      * Used to return Motd, players etc
      * @return
      */
     public GroupInfo getInfo() {
         return GroupInfo.fromGroup(this, Arrays.asList(Constants.CLOUDPLAYERS.toArray()), Arrays.asList(Constants.SERVICE_FILTER.toArray()));
+    }
+
+    public String toString() {
+        return this.name;
     }
 
 }
