@@ -6,6 +6,7 @@ import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
 import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.*;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
@@ -21,7 +22,7 @@ import java.util.List;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.util.Constants;
 
-public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
+public class PacketHandlerCloudPlayer {
 
     private final CloudSystem cloudSystem;
     private int tries;
@@ -32,61 +33,65 @@ public class PacketHandlerCloudPlayer extends PacketHandlerAdapter {
         this.list = new LinkedList<>();
     }
 
-    @Override
-    public void handle(Packet packet) {
+
+    @PacketHandler
+    public void handle(PacketInPlayerExecuteCommand packet) {
+        this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
+    }
+
+    @PacketHandler
+    public void handle(PacketInNetworkPing packet) {
+        this.cloudSystem.getService(StatisticsService.class).getStatistics().add("pings");
+    }
+
+    @PacketHandler
+    public void handle(PacketUpdatePlayer packet) {
+        PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
+        permissionPool.updatePlayerData(((PacketUpdatePlayer)packet).getName(), ((PacketUpdatePlayer)packet).getNewCloudPlayer().getCloudPlayerData());
+        cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
+        cloudSystem.getService(PermissionService.class).save();
+        this.cloudSystem.getService(CloudPlayerService.class).update(((PacketUpdatePlayer)packet).getName(), ((PacketUpdatePlayer)packet).getNewCloudPlayer());
+        this.cloudSystem.reload();
+    }
+
+    @PacketHandler
+    public void handle(PacketInUnregisterPlayer packet) {
+        CloudPlayer cloudPlayer = this
+                .cloudSystem
+                .getService(CloudPlayerService.class)
+                .getOnlinePlayer(((PacketInUnregisterPlayer)packet).getName());
+        if (cloudPlayer != null) {
+            Constants.EXECUTOR.callEvent(new CloudPlayerQuitEvent(cloudPlayer));
+            this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
+            //this.cloudSystem.reload();
+        }
+    }
+
+    @PacketHandler
+    public void handle(PacketInRegisterPlayer packet) {
         Constants.SERVICE_FILTER = new Filter<>(this.cloudSystem.getService().allServices());
 
-        if (packet instanceof PacketInRegisterPlayer) {
-            PacketInRegisterPlayer packetInRegisterPlayer = (PacketInRegisterPlayer) packet;
-            CloudPlayer cloudPlayer = packetInRegisterPlayer.getCloudPlayer();
-            Constants.EXECUTOR.callEvent(new CloudPlayerJoinEvent(cloudPlayer));
-            cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerDataOrDefault(cloudPlayer.getName()));
-            if (packetInRegisterPlayer.isSendMessage()) {
-                if (!list.contains(cloudPlayer.getName())) {
-                    list.add(cloudPlayer.getName());
-                } else {
-                    return;
-                }
-            }
-            if (this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(cloudPlayer.getName()) != null) {
+        CloudPlayer cloudPlayer = ((PacketInRegisterPlayer) packet).getCloudPlayer();
+        Constants.EXECUTOR.callEvent(new CloudPlayerJoinEvent(cloudPlayer));
+        cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerDataOrDefault(cloudPlayer.getName()));
+        if (((PacketInRegisterPlayer) packet).isSendMessage()) {
+            if (!list.contains(cloudPlayer.getName())) {
+                list.add(cloudPlayer.getName());
+            } else {
                 return;
             }
-            if (!this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(cloudPlayer)) {
-                this.cloudSystem.getService(StatisticsService.class).getStatistics().add("registeredPlayers");
-            }
-
-            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
-           // this.cloudSystem.reload();
-
-        } else if (packet instanceof PacketInPlayerExecuteCommand) {
-
-            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
-
-        } else if (packet instanceof PacketInNetworkPing) {
-
-            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("pings");
-
-        } else if (packet instanceof PacketUpdatePlayer) {
-            PacketUpdatePlayer player = (PacketUpdatePlayer)packet;
-            PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
-            permissionPool.updatePlayerData(player.getName(), player.getNewCloudPlayer().getCloudPlayerData());
-            cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
-            cloudSystem.getService(PermissionService.class).save();
-            this.cloudSystem.getService(CloudPlayerService.class).update(player.getName(), player.getNewCloudPlayer());
-            this.cloudSystem.reload();
-
-       } else if (packet instanceof PacketInUnregisterPlayer) {
-            PacketInUnregisterPlayer packetInUnregisterPlayer = (PacketInUnregisterPlayer)packet;
-            CloudPlayer cloudPlayer = this
-                    .cloudSystem
-                    .getService(CloudPlayerService.class)
-                    .getOnlinePlayer(packetInUnregisterPlayer.getName());
-            if (cloudPlayer != null) {
-                Constants.EXECUTOR.callEvent(new CloudPlayerQuitEvent(cloudPlayer));
-                this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
-                //this.cloudSystem.reload();
-            }
         }
+        if (this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(cloudPlayer.getName()) != null) {
+            return;
+        }
+        if (!this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(cloudPlayer)) {
+            this.cloudSystem.getService(StatisticsService.class).getStatistics().add("registeredPlayers");
+            this.cloudSystem.sendPacket(new PacketUpdatePermissionPool(this.cloudSystem.getService(PermissionService.class).getPermissionPool()).setSendBack(false));
+        }
+
+        this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
+       // this.cloudSystem.reload();
+
     }
 
 

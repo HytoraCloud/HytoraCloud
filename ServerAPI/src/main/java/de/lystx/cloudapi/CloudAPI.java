@@ -41,6 +41,7 @@ import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModAddon;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.server.other.process.Threader;
 import de.lystx.cloudsystem.library.elements.interfaces.Acceptable;
@@ -85,6 +86,7 @@ public class CloudAPI implements CloudService {
     private boolean nametags;
     private boolean useChat;
     private boolean joinable;
+    private boolean newVersion;
     private String chatFormat;
 
     public CloudAPI() {
@@ -116,7 +118,8 @@ public class CloudAPI implements CloudService {
                 new PacketHandlerCommand(this),
                 new PacketHandlerNetwork(this),
                 new PacketHandlerSubChannel(this),
-                new PacketHandlerCommunication(this)
+                new PacketHandlerCommunication(this),
+                new PacketHandlerPermissionPool(this)
         ).bootstrap();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
@@ -549,6 +552,18 @@ public class CloudAPI implements CloudService {
         }
         CloudServer.getInstance().getManager().setMotd(motd);
         return this;
+    }
+
+    /**
+     * Updates the Nametag for a player
+     *
+     * @param player
+     * @param prefix
+     * @param suffix
+     * @param priority
+     */
+    public void updateNametag(CloudPlayer player, String prefix, String suffix, Integer priority) {
+        CloudServer.getInstance().getNametagManager().setNametag(prefix, suffix, priority, player.getName());
     }
 
     @Override

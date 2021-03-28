@@ -20,7 +20,6 @@ import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.service.backup.BackupService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
-import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.util.Constants;
@@ -72,9 +71,7 @@ public class CloudBootingSetupDone {
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerPermissionPool(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerMessage(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerServiceUpdate(cloudSystem));
-        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudSign(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCloudPlayerCommunication(cloudSystem));
-        cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerNPC(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerSubChannel(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCommand(cloudSystem));
         cloudSystem.getService(CloudNetworkService.class).registerHandler(new PacketHandlerCreateTemplate(cloudSystem));

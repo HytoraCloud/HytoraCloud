@@ -1,14 +1,15 @@
 package de.lystx.module.commands;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.packets.result.Result;
-import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
 import de.lystx.cloudsystem.library.service.module.Module;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
-import de.lystx.module.commands.packets.CommandModulePacket;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommandModule extends Module {
 
@@ -34,9 +35,13 @@ public class CommandModule extends Module {
         cloudLibrary.getService(CloudNetworkService.class).registerHandler(this);
     }
 
-    @PacketHandler(transformTo = CommandModulePacket.class)
-    public void a(CommandModulePacket packet) {
-        this.cloudLibrary.sendPacket(new CommandModulePacket(this.getConfig()));
+    @PacketHandler
+    public void handle(PacketInformation packet) {
+        if (packet.getKey().equalsIgnoreCase("modulePacket")) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("config", this.getConfig());
+            this.cloudLibrary.sendPacket(new PacketInformation("modulePacket_back", map));
+        }
     }
 
 

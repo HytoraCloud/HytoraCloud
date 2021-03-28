@@ -42,7 +42,7 @@ public interface CloudExecutor extends Serializable {
      */
     default void callEvent(Event event) {
         if (event instanceof Serializable) {
-            this.sendPacket(new PacketCallEvent(event).setSendBack(true));
+            this.sendPacket(new PacketCallEvent(event));
         } else {
             System.out.println("[CloudLibrary] Couldn't call Event " + event.getClass().getSimpleName() + " because the class doesn't implement Serializable or one of the objects doesn't implement Serializable!");
         }

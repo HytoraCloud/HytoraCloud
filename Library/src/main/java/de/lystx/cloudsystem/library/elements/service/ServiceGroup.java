@@ -53,7 +53,7 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
      * @return
      */
     public GroupInfo getInfo() {
-        return GroupInfo.fromGroup(this, Arrays.asList(Constants.CLOUDPLAYERS.toArray()), Arrays.asList(Constants.SERVICE_FILTER.toArray()));
+        return GroupInfo.fromGroup(this, new LinkedList<>(Arrays.asList(Constants.CLOUDPLAYERS.toArray())), new LinkedList<>(Arrays.asList(Constants.SERVICE_FILTER.toArray())));
     }
 
     public String toString() {

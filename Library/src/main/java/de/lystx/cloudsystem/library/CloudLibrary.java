@@ -42,8 +42,6 @@ import java.util.*;
 public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.elements.interfaces.CloudService {
 
 
-    //TODO: CHECK FOR EMPTY PERMS.JSON
-
     public List<CloudService> cloudServices;
     protected ReverseMap<String, Object> customs;
 
@@ -217,10 +215,5 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
      * Raw method to shutdown
      */
     public void shutdown() {}
-
-    /**
-     * Raw method to reload NPCS
-     */
-    public void reloadNPCS() { }
 
 }

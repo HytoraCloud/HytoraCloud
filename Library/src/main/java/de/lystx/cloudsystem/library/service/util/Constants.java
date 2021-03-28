@@ -13,10 +13,7 @@ import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlaye
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -29,6 +26,7 @@ public class Constants {
     public static final Executor THREAD_POOL = Executors.newFixedThreadPool(1);
     public static Filter<Service> SERVICE_FILTER = null;
     public static Filter<CloudPlayer> CLOUDPLAYERS = null;
+    public static final List<UUID> DELETERS = new LinkedList<>();
     public static final String INTERNAL_RECEIVER = "InternalReceiver";
 
     public static PermissionPool PERMISSION_POOL = null;

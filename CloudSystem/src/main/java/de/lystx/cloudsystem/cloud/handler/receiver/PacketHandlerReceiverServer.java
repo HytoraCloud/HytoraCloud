@@ -1,6 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.receiver;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCommunication;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutRegisterServer;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutStartedServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -17,7 +18,7 @@ public class PacketHandlerReceiverServer extends PacketHandlerAdapter {
 
     @Override
     public void handle(Packet packet) {
-        if (packet.getClass().getSimpleName().startsWith("PacketIn")) {
+        if (packet.getClass().getSimpleName().startsWith("PacketIn") && (packet.getClass().getSuperclass() != null && !packet.getClass().getSuperclass().equals(PacketCommunication.class))) {
             this.cloudSystem.sendPacket(packet);
         }
     }

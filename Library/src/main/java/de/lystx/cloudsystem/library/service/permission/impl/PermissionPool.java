@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.library.service.permission.impl;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupAddEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInPermissionPool;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
@@ -51,7 +51,7 @@ public class PermissionPool implements Serializable {
      * Updates the permissionPool
      */
     public void update() {
-        Constants.EXECUTOR.sendPacket(new PacketInPermissionPool(this));
+        Constants.EXECUTOR.sendPacket(new PacketUpdatePermissionPool(this));
     }
 
     /**

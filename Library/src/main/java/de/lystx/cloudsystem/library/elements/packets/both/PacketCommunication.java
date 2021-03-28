@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * //TODO: DOCUMENTATION
+ */
 @Getter @Setter
 public class PacketCommunication extends Packet implements Serializable {
 

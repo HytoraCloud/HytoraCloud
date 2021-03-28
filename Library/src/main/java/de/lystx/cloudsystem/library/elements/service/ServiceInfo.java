@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.serverselector.sign.manager.ServerPinger;
+import de.lystx.cloudsystem.library.service.util.ServerPinger;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 
@@ -36,14 +36,18 @@ public class ServiceInfo extends Service {
         super(name, uniqueId, serviceGroup, serviceID, port, cloudPort, serviceState);
         this.serverPinger = new ServerPinger();
         this.onlinePlayers = onlinePlayers;
-        this.onlinePlayers.removeIf(cloudPlayer -> !cloudPlayer.getConnectedService().getName().equalsIgnoreCase(name));
         try {
-            this.serverPinger.pingServer(this.getHost(), port, 20);
-            this.motd = this.serverPinger.getMotd();
-            this.maxPlayers = this.serverPinger.getMaxplayers();
-            this.online = this.serverPinger.isOnline();
-        } catch (IOException e) {
-            e.printStackTrace();
+            this.onlinePlayers.removeIf(cloudPlayer -> !cloudPlayer.getConnectedService().getName().equalsIgnoreCase(name));
+            try {
+                this.serverPinger.pingServer(this.getHost(), port, 20);
+                this.motd = this.serverPinger.getMotd();
+                this.maxPlayers = this.serverPinger.getMaxplayers();
+                this.online = this.serverPinger.isOnline();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (NullPointerException e) {
+            //THROWN ON BOOTUP IF Constants#CLOUDPLAYERS is null
         }
     }
 

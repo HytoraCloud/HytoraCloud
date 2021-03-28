@@ -27,13 +27,6 @@ public class FileService extends CloudService {
     private File configFile;
     private File permissionsFile;
 
-    private File npcDirectory;
-    private File npcFile;
-    private File npcLayout;
-
-    private File signDirectory;
-    private File signLayoutFile;
-    private File signsFile;
 
     private File serverDirectory;
     private File staticServerDirectory;
@@ -97,13 +90,6 @@ public class FileService extends CloudService {
         this.databaseDirectory = new File(this.cloudDirectory, "database/");
         this.cloudPlayerDirectory = new File(this.databaseDirectory, "players/");
 
-        this.npcDirectory = new File(this.databaseDirectory, "npcSelector/");
-        this.npcFile = new File(this.npcDirectory, "npcs.json");
-        this.npcLayout = new File(this.npcDirectory, "config.json");
-
-        this.signDirectory = new File(this.databaseDirectory, "signSelector/");
-        this.signsFile = new File(this.signDirectory, "signs.json");
-        this.signLayoutFile = new File(this.signDirectory, "signLayouts.json");
         this.statsFile = new File(this.databaseDirectory, "stats.json");
 
         this.groupsDirectory = new File(this.cloudDirectory, "groups/");
@@ -154,8 +140,6 @@ public class FileService extends CloudService {
 
         if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM)) {
             this.databaseDirectory.mkdirs();
-            this.signDirectory.mkdirs();
-            this.npcDirectory.mkdirs();
             this.cloudPlayerDirectory.mkdirs();
             this.groupsDirectory.mkdirs();
         }
@@ -178,6 +162,7 @@ public class FileService extends CloudService {
         }
         if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && !this.tempData.getBoolean("hadOptionToUseModules", false)) {
             this.copyFileWithURL("/implements/modules/module-notify.jar", new File(this.modulesDirectory, "module-notify.jar"));
+            this.copyFileWithURL("/implements/modules/module-serverSelector.jar", new File(this.modulesDirectory, "module-serverSelector.jar"));
             this.copyFileWithURL("/implements/modules/module-commands.jar", new File(this.modulesDirectory, "module-commands.jar"));
             this.copyFileWithURL("/implements/modules/module-proxy.jar", new File(this.modulesDirectory, "module-proxy.jar"));
             this.copyFileWithURL("/implements/modules/module-hubcommand.jar", new File(this.modulesDirectory, "module-hubcommand.jar"));

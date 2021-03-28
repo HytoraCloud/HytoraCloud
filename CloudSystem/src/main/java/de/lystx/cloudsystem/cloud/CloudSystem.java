@@ -23,8 +23,6 @@ import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
-import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
-import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -55,8 +53,6 @@ public class CloudSystem extends CloudInstance implements CloudService {
         this.cloudServices.add(new StatisticsService(this, "Stats", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.UTIL));
         this.cloudServices.add(new GroupService(this, "Groups", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new PermissionService(this, "Permissions", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
-        this.cloudServices.add(new SignService(this, "Signs", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
-        this.cloudServices.add(new NPCService(this, "NPCs", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new DatabaseService(this, "Database", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
         this.cloudServices.add(new CloudPlayerService(this, "CloudPlayerService", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING));
 
@@ -79,9 +75,6 @@ public class CloudSystem extends CloudInstance implements CloudService {
         super.reload();
         this.getService(PermissionService.class).load();
         this.getService(PermissionService.class).loadEntries();
-        this.getService(NPCService.class).load();
-        this.getService(SignService.class).load();
-        this.getService(SignService.class).loadSigns();
         this.getService(StatisticsService.class).getStatistics().add("reloadedCloud");
     }
 
@@ -119,8 +112,6 @@ public class CloudSystem extends CloudInstance implements CloudService {
     public void shutdown() {
         super.shutdown();
         this.getService(StatisticsService.class).save();
-        this.getService(SignService.class).save();
-        this.getService(NPCService.class).save();
 
         for (File file : this.getService(FileService.class).getTempDirectory().listFiles()) {
             if (file.getName().startsWith("[!]")) {
@@ -141,6 +132,6 @@ public class CloudSystem extends CloudInstance implements CloudService {
 
     @Override
     public void callEvent(Event event) {
-        this.sendPacket(new PacketCallEvent(event).setSendBack(true));
+        this.sendPacket(new PacketCallEvent(event));
     }
 }

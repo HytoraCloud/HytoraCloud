@@ -7,7 +7,8 @@ import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class PacketHandlerEvent {
+public class
+PacketHandlerEvent {
 
     private final CloudSystem cloudSystem;
 

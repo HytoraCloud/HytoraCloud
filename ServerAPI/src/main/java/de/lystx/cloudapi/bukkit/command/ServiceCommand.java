@@ -4,37 +4,22 @@ import com.sun.management.OperatingSystemMXBean;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
-import de.lystx.cloudapi.bukkit.manager.npc.impl.NPC;
-import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
-import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
-import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInCreateSign;
-import de.lystx.cloudsystem.library.elements.packets.in.serverselector.PacketInDeleteSign;
-import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
-import de.lystx.cloudsystem.library.elements.service.Service;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
-import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
-import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudInventory;
-import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudItem;
-import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModAddon;
-import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlayer;
+import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.serverselector.sign.base.CloudSign;
-import net.md_5.bungee.api.ProxyServer;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.function.Consumer;
 
 public class ServiceCommand {
 
-    public static final List<UUID> deleters = new LinkedList<>();
     private boolean executed = false;
 
     @Command(name = "service", description = "Bukkit server command", aliases = {"hs", "cloudserver"})
@@ -81,22 +66,13 @@ public class ServiceCommand {
                         materials.add(Material.AIR);
                         Location loc = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
                         if (loc.getBlock().getType().equals(Material.WALL_SIGN)) {
-                            CloudSign cloudSign = CloudServer.getInstance().getSignManager().getSignUpdater().getCloudSign(loc);
-                            if (cloudSign == null) {
-                                player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThis §eCloudSign §cseems not to be registered!");
-                                return;
-                            }
-                            CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
-                            Block block = Bukkit.getWorld(cloudSign.getWorld()).getBlockAt(cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
-                            Sign signBlock = (Sign) block.getState();
-                            signBlock.setLine(0, "§8§m------");
-                            signBlock.setLine(1, "§4⚠⚠⚠⚠⚠");
-                            signBlock.setLine(2, "§8» §cRemoved");
-                            signBlock.setLine(3, "§8§m------");
-                            signBlock.update(true);
-                            CloudServer.getInstance().getSignManager().getCloudSigns().remove(cloudSign);
-                            CloudAPI.getInstance().sendPacket(new PacketInDeleteSign(cloudSign));
-                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You removed a CloudSign for the group §b" + cloudSign.getGroup().toUpperCase());
+
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("player", player.getName());
+                            map.put("location", loc.serialize());
+                            PacketInformation packetInformation = new PacketInformation("deleteSign", map);
+
+                            CloudAPI.getInstance().sendPacket(packetInformation);
                         } else {
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
                         }
@@ -114,11 +90,11 @@ public class ServiceCommand {
                             return;
                         }
 
-                        if (!deleters.contains(player.getUniqueId())) {
-                            deleters.add(player.getUniqueId());
+                        if (!Constants.DELETERS.contains(player.getUniqueId())) {
+                            Constants.DELETERS.add(player.getUniqueId());
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Leftclick the §bNPC §7you want to remove§8! §cTo cancel type this command §eagain§c!");
                         } else {
-                            deleters.remove(player.getUniqueId());
+                            Constants.DELETERS.remove(player.getUniqueId());
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cDeletion was §ecancelled§c!");
                         }
                     } else {
@@ -141,22 +117,15 @@ public class ServiceCommand {
                             materials.add(Material.AIR);
                             Location loc = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
                             if (loc.getBlock().getType().equals(Material.WALL_SIGN)) {
-                                CloudSign sign = new CloudSign((int) loc.getX(), (int) loc.getY(), (int) loc.getZ(), group.getName(), loc.getWorld().getName());
-                                if (CloudServer.getInstance().getSignManager().getSignUpdater().getCloudSign(loc) != null) {
-                                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe §eCloudSign §calready exists!");
-                                    return;
-                                }
-                                Block block = Bukkit.getWorld(sign.getWorld()).getBlockAt(sign.getX(), sign.getY(), sign.getZ());
-                                Sign signBlock = (Sign) block.getState();
-                                signBlock.setLine(0, "§8§m------");
-                                signBlock.setLine(1, "§b" + serverGroup.toUpperCase());
-                                signBlock.setLine(2, "RELOADING...");
-                                signBlock.setLine(3, "§8§m------");
-                                signBlock.update(true);
-                                CloudServer.getInstance().getSignManager().getCloudSigns().add(sign);
-                                new PacketInCreateSign(sign).unsafe().send(CloudAPI.getInstance());
-                                CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
-                                player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
+
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("player", player.getName());
+                                map.put("location", loc.serialize());
+                                map.put("group", group.getName());
+                                PacketInformation packetInformation = new PacketInformation("createSign", map);
+
+                                CloudAPI.getInstance().sendPacket(packetInformation);
+
                             } else {
                                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
                             }
@@ -198,19 +167,18 @@ public class ServiceCommand {
                             return;
                         }
                         String groupName = args[1];
-                        NPC npcV18R3V18R3 = CloudServer.getInstance().getNpcManager().getNPC(Bukkit.getPlayer(player.getName()).getLocation());
-                        if (npcV18R3V18R3 != null) {
-                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThere is already an §eNPC §cfor this location!");
-                            return;
-                        }
-                        ServiceGroup group = CloudAPI.getInstance().getNetwork().getServiceGroup(groupName);
-                        if (group != null) {
-                            CloudServer.getInstance().getNpcManager().createNPC(Bukkit.getPlayer(player.getName()).getLocation(), ChatColor.translateAlternateColorCodes('&',
-                                    args[2].replace("_", " ")), group.getName(), args[3]);
-                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You created an NPC for the group §b" + group.getName() + " §7with skin §b" + args[3] + "§8!");
-                        } else {
-                            player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe group §e" + groupName + " §cdoesn't exist!");
-                        }
+
+                        Map<String, Object> map = new HashMap<>();
+
+                        map.put("key", "createNPC");
+                        map.put("player", player.getName());
+                        map.put("skin", args[3]);
+                        map.put("name", args[2].replace("_", " "));
+                        map.put("loc", Bukkit.getPlayer(player.getName()).getLocation().serialize());
+                        map.put("group", groupName);
+                        PacketInformation packetInformation = new PacketInformation("createNPC", map);
+
+                        CloudAPI.getInstance().sendPacket(packetInformation);
                     } else {
                         this.help(player);
                     }

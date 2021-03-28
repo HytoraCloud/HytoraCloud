@@ -93,7 +93,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
             } else {
                 player = Reflections.getBungeePlayer(this.name);
             }
-            Reflections.callMethod(player, "sendMessage", message);
+            Reflections.callMethod(player, "sendMessage", message.toString());
             return;
         }
         Constants.EXECUTOR.sendPacket(new PacketSendMessage(this.uniqueId, message.toString()));

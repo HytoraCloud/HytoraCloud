@@ -48,6 +48,13 @@ public abstract class Module {
     }
 
     /**
+     * Called when Module is reloaded
+     * @param cloudLibrary
+     */
+    public void onReload(CloudLibrary cloudLibrary) {}
+
+
+    /**
      * Registers an event
      * @param eventClass
      */

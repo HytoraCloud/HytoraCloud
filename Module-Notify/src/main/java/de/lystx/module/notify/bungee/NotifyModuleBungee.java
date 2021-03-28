@@ -63,8 +63,8 @@ public class NotifyModuleBungee extends Plugin {
                             replace("%prefix%", CloudAPI.getInstance().getPrefix());
                     break;
                 case 3:
-                    message = CloudAPI.getInstance().getPrefix() + "§7The Service §e" + servername + " §7has booted up§8!";
-                    break;
+                    return;
+
             }
             player.sendMessage(new TextComponent(message));
         }

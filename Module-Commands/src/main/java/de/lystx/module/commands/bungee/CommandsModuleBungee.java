@@ -1,24 +1,28 @@
 package de.lystx.module.commands.bungee;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.module.commands.bungee.commands.*;
-import de.lystx.module.commands.packets.CommandModulePacket;
 import io.vson.elements.object.VsonObject;
 import net.md_5.bungee.api.plugin.Plugin;
+
+import java.util.HashMap;
 
 
 public class CommandsModuleBungee extends Plugin {
 
     @Override
     public void onEnable() {
-        CloudAPI.getInstance().sendPacket(new CommandModulePacket(null));
+        CloudAPI.getInstance().sendPacket(new PacketInformation("modulePacket", new HashMap<>()));
         CloudAPI.getInstance().registerPacketHandler(this);
     }
-    @PacketHandler(transformTo = CommandModulePacket.class)
-    public void handle(CommandModulePacket packet) {
-
-        final VsonObject result = packet.getVsonObject();
+    @PacketHandler()
+    public void handle(PacketInformation packet) {
+        if (!packet.getKey().equalsIgnoreCase("modulePacket_back")) {
+            return;
+        }
+        final VsonObject result = (VsonObject) packet.getData().get("config");
         if (result == null) {
             return;
         }

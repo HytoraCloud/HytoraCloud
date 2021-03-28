@@ -2,11 +2,13 @@ package de.lystx.cloudsystem.library.service.player.featured.labymod;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.server.other.process.Threader;
+import io.vson.VsonValue;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import jdk.nashorn.api.scripting.URLReader;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
@@ -17,22 +19,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-@Getter @AllArgsConstructor
+@Getter @RequiredArgsConstructor
 public class LabyModAddon implements Serializable {
 
-    private final String name = "No Name found";
+    private final String name;
     private final UUID uuid;
-    private final String version = "No Version Found";
-    private final String hash = "No Hash Found";
+    private final String version;
+    private final String hash;
     private final int mcVersion;
     private final boolean installer;
     private final boolean restart;
     private final boolean includeInJar;
-    private final String description = "No Description";
+    private final String description;
     private final int filesize;
     private final int category;
     private final boolean verified;
-    private final String author = "No Author found";
+    private final String author;
     private final List<Integer> sorting;
 
 
@@ -42,29 +44,26 @@ public class LabyModAddon implements Serializable {
      *
      * URL : https://dl.labymod.net/addons.json
      */
+    @SneakyThrows
     public static void load() {
-        Threader.getInstance().execute(() -> {
-            try {
-                StringBuilder stringBuilder = new StringBuilder();
-                BufferedReader bufferedReader = new BufferedReader(new URLReader(new URL("https://dl.labymod.net/addons.json")));
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line);
-                }
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader bufferedReader = new BufferedReader(new URLReader(new URL("https://dl.labymod.net/addons.json")));
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line);
+        }
 
-                bufferedReader.close();
+        bufferedReader.close();
 
-                Document document = new Document(stringBuilder.toString());
+        VsonObject document = new VsonObject(stringBuilder.toString());
 
-                LABY_MOD_ADDONS.addAll(document.getDocument("addons").getList("18", LabyModAddon.class));
-                LABY_MOD_ADDONS.addAll(document.getDocument("addons").getList("112", LabyModAddon.class));
-                LABY_MOD_ADDONS.addAll(document.getDocument("addons").getList("116", LabyModAddon.class));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        final VsonObject addons = document.getVson("addons");
+
+        LABY_MOD_ADDONS.addAll(addons.getList("18", LabyModAddon.class));
+        LABY_MOD_ADDONS.addAll(addons.getList("112", LabyModAddon.class));
+        LABY_MOD_ADDONS.addAll(addons.getList("116", LabyModAddon.class));
+
     }
-
 
     public static final List<LabyModAddon> LABY_MOD_ADDONS = new LinkedList<>();
 
@@ -96,14 +95,4 @@ public class LabyModAddon implements Serializable {
         return addons;
     }
 
-    @SneakyThrows
-    public VsonObject toVson() {
-        VsonObject vsonObject = new VsonObject(VsonSettings.SAFE_TREE_OBJECTS);
-        for (Field declaredField : this.getClass().getDeclaredFields()) {
-            declaredField.setAccessible(true);
-            vsonObject.append(declaredField.getName(), declaredField.get(this));
-        }
-
-        return vsonObject;
-    }
 }

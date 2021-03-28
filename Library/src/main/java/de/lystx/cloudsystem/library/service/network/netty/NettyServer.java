@@ -70,7 +70,13 @@ public class NettyServer {
                     channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
                         @Override
                         public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
-                            packetAdapter.handelAdapterHandler(packet);
+                            packetAdapter.handelAdapterHandler((Packet) packet);
+                        }
+
+                        @Override
+                        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                            socketChannel.writeAndFlush(new PacketOutVerifyConnection(socketChannel.localAddress().getAddress().getHostAddress(), socketChannel.localAddress().getPort()));
+                            registeredChannels.add(socketChannel);
                         }
 
                         @Override
@@ -81,9 +87,6 @@ public class NettyServer {
                             cause.printStackTrace();
                         }
                     });
-                    registeredChannels.add(socketChannel);
-                    socketChannel.writeAndFlush(new PacketOutVerifyConnection(socketChannel.localAddress().getAddress().getHostAddress(), socketChannel.localAddress().getPort()));
-                    //System.out.println("[NettyServer] Initialized NettyClient > " + socketChannel);
                 }
             });
 

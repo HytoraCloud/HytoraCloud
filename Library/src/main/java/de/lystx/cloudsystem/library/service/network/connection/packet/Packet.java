@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.function.Consumer;
 
 public class Packet implements Serializable {

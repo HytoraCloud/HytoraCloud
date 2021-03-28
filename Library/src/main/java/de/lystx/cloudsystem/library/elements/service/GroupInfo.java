@@ -15,7 +15,7 @@ public class GroupInfo extends ServiceGroup {
 
     private GroupInfo(UUID uniqueId, String name, String receiver, String template, ServiceType serviceType, int maxServer, int minServer, int maxRam, int minRam, int maxPlayers, int newServerPercent, boolean maintenance, boolean lobby, boolean dynamic, List<CloudPlayer> onlinePlayers, List<Service> onlineServices) {
         super(uniqueId, name, template, serviceType, receiver, maxServer, minServer, maxRam, minRam, maxPlayers, newServerPercent, maintenance, lobby, dynamic);
-        this.onlineServices = onlineServices;
+        this.onlineServices = new LinkedList<>(onlineServices);
 
         this.onlineServices.removeIf(onlineService -> !onlineService.getServiceGroup().getName().equalsIgnoreCase(name));
     }
@@ -24,7 +24,7 @@ public class GroupInfo extends ServiceGroup {
      * Returns the {@link CloudPlayer}s on this
      * ServiceGroup (for example "Lobby")
      *
-     * @return List<CloudPlayer>
+     * @return List with CloudPlayers on this Group
      */
     public List<CloudPlayer> getOnlinePlayers() {
         List<CloudPlayer> list = new LinkedList<>();
@@ -43,6 +43,6 @@ public class GroupInfo extends ServiceGroup {
      * @return
      */
     public static GroupInfo fromGroup(ServiceGroup serviceGroup, List<CloudPlayer> cloudPlayers, List<Service> services) {
-        return new GroupInfo(serviceGroup.getUniqueId(), serviceGroup.getName(), serviceGroup.getReceiver(),  serviceGroup.getTemplate(), serviceGroup.getServiceType(), serviceGroup.getMaxServer(), serviceGroup.getMinServer(), serviceGroup.getMaxRam(), serviceGroup.getMinRam(), serviceGroup.getMaxPlayers(), serviceGroup.getNewServerPercent(), serviceGroup.isMaintenance(), serviceGroup.isLobby(), serviceGroup.isDynamic(), cloudPlayers, services);
+        return new GroupInfo(serviceGroup.getUniqueId(), serviceGroup.getName(), serviceGroup.getReceiver(),  serviceGroup.getTemplate(), serviceGroup.getServiceType(), serviceGroup.getMaxServer(), serviceGroup.getMinServer(), serviceGroup.getMaxRam(), serviceGroup.getMinRam(), serviceGroup.getMaxPlayers(), serviceGroup.getNewServerPercent(), serviceGroup.isMaintenance(), serviceGroup.isLobby(), serviceGroup.isDynamic(), new LinkedList<>(cloudPlayers), services);
     }
 }

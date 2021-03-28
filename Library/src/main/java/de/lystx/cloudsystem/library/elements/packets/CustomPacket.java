@@ -37,6 +37,5 @@ public class CustomPacket extends PacketCommunication implements Serializable {
      public CustomPacket(Packet packet) {
          this.packetClass = packet.getClass().getName();
          this.append("packet", packet);
-         this.setSendBack(true);
      }
 }

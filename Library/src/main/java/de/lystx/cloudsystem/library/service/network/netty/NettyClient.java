@@ -76,6 +76,7 @@ public class NettyClient {
                                 channelPipeline.addLast(new ObjectEncoder());
 
                                 channelPipeline.addLast(new SimpleChannelInboundHandler<Packet>() {
+
                                     @Override
                                     public void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
                                         if (packet instanceof PacketOutVerifyConnection && !established && consumerConnection != null) {
@@ -83,6 +84,15 @@ public class NettyClient {
                                             consumerConnection.accept(NettyClient.this);
                                         }
                                         packetAdapter.handelAdapterHandler(packet);
+                                    }
+
+
+                                    @Override
+                                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                                        /*if (cause instanceof ClassNotFoundException) {
+                                            return;
+                                        }
+                                        super.exceptionCaught(ctx, cause);*/
                                     }
                                 });
                                 channel = socketChannel;
@@ -150,26 +160,10 @@ public class NettyClient {
                     consumer.accept(PacketState.FAILED);
                 }
             }
-
         } else {
-            int tries = this.tries.getOrDefault(packet.getClass(), 0);
-            tries += 1;
-            if (tries >= 5) {
-                consumer.accept(PacketState.FAILED);
-                System.out.println("[NettyClient] Tried 5 times to send packet " + packet.getClass().getSimpleName() + " but connection refused!");
-                this.tries.remove(packet.getClass());
-                return;
-            }
             if (consumer != null) {
-                consumer.accept(PacketState.RETRY);
+                consumer.accept(PacketState.NULL);
             }
-            this.tries.put(packet.getClass(), tries);
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    sendPacket(packet, consumer);
-                }
-            }, 1000L);
         }
     }
 

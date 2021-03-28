@@ -107,7 +107,11 @@ public class CloudPlayerService extends CloudService {
      */
     public void update(String name, CloudPlayer newPlayer) {
         CloudPlayer cloudPlayer = this.getOnlinePlayer(name);
-        this.onlinePlayers.set(this.onlinePlayers.indexOf(cloudPlayer), newPlayer);
+        try {
+            this.onlinePlayers.set(this.onlinePlayers.indexOf(cloudPlayer), newPlayer);
+        } catch (IndexOutOfBoundsException e) {
+            this.onlinePlayers.add(newPlayer);
+        }
         Constants.CLOUDPLAYERS = new Filter<>(this.onlinePlayers);
     }
 

@@ -6,14 +6,9 @@ import de.lystx.cloudapi.bukkit.command.StopCommand;
 import de.lystx.cloudapi.bukkit.events.other.BukkitEventEvent;
 import de.lystx.cloudapi.bukkit.handler.*;
 import de.lystx.cloudapi.bukkit.listener.cloud.CloudListener;
-import de.lystx.cloudapi.bukkit.listener.other.NPCListener;
 import de.lystx.cloudapi.bukkit.listener.player.*;
 import de.lystx.cloudapi.bukkit.manager.labymod.LabyMod;
 import de.lystx.cloudapi.bukkit.manager.nametag.NametagManager;
-import de.lystx.cloudapi.bukkit.manager.npc.NPCManager;
-import de.lystx.cloudapi.bukkit.manager.npc.impl.PacketReader;
-import de.lystx.cloudapi.bukkit.manager.npc.impl.SkinFetcher;
-import de.lystx.cloudapi.bukkit.manager.sign.SignManager;
 import de.lystx.cloudapi.bukkit.manager.other.CloudManager;
 import de.lystx.cloudapi.bukkit.utils.CloudPermissibleBase;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
@@ -43,16 +38,11 @@ public class CloudServer extends JavaPlugin implements CloudService {
     private static CloudServer instance;
 
     private CloudManager manager;
-    private SignManager signManager;
     private NametagManager nametagManager;
-    private NPCManager npcManager;
-    private SkinFetcher skinFetcher;
     private LabyMod labyMod;
     private boolean newVersion;
 
     private int taskId;
-
-    public static final Map<UUID, PacketReader> PACKET_READERS = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -62,19 +52,16 @@ public class CloudServer extends JavaPlugin implements CloudService {
 
             //Initializing Objects
             this.manager = new CloudManager(CloudAPI.getInstance());
-            this.signManager = new SignManager(this);
             this.nametagManager = new NametagManager();
-            this.skinFetcher = new SkinFetcher();
-            this.npcManager = new NPCManager();
             this.labyMod = new LabyMod(CloudAPI.getInstance());
 
             try {
                 Class.forName("net.minecraft.server.v1_8_R3.Packet");
-                this.npcManager = new NPCManager();
                 this.newVersion = false;
             } catch (Exception e){
                 this.newVersion = true;
             }
+            CloudAPI.getInstance().setNewVersion(this.newVersion);
             this.taskId = -1;
             this.bootstrap();
 
@@ -88,12 +75,6 @@ public class CloudServer extends JavaPlugin implements CloudService {
         }
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LABYMOD");
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");
-        try {
-            int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
-            CloudAPI.getInstance().getScheduler().cancelTask(animationScheduler);
-        } catch (NullPointerException e) {
-            System.out.println("[CloudAPI] Couldn't cancel task for SignUpdater!");
-        }
     }
 
     /**
@@ -123,14 +104,11 @@ public class CloudServer extends JavaPlugin implements CloudService {
         // Registering PacketHandlers
         CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerInventory(CloudAPI.getInstance()));
         CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitStop(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitSignSystem(CloudAPI.getInstance()));
         CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitServerUpdate(CloudAPI.getInstance()));
         CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitCloudPlayerHandler(CloudAPI.getInstance()));
         CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitSubChannel(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitNPCs(CloudAPI.getInstance()));
         CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerTPS(CloudAPI.getInstance()));
         CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerBukkitEvent(CloudAPI.getInstance()));
-        CloudAPI.getInstance().getCloudClient().registerPacketHandler(new PacketHandlerUpdate(CloudAPI.getInstance()));
 
         // Connecting to cloud and managing cloud stuff
         CloudAPI.getInstance().getCloudClient().registerHandler(new CloudListener());
@@ -143,8 +121,6 @@ public class CloudServer extends JavaPlugin implements CloudService {
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerChatListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
-        this.getServer().getPluginManager().registerEvents(new PlayerSignListener(), this);
-        this.getServer().getPluginManager().registerEvents(new NPCListener(), this);
 
         // Registering commands
         CloudAPI.getInstance().registerCommand(new ServiceCommand());

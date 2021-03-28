@@ -117,7 +117,7 @@ public class PlayerListener implements Listener {
         String message = event.getMessage();
         String player = ((ProxiedPlayer)event.getSender()).getName();
         PacketPlayerChat packet = new PacketPlayerChat(player, message);
-        CloudAPI.getInstance().sendPacket(packet.setSendBack(true));
+        CloudAPI.getInstance().sendPacket(packet);
     }
 
     @EventHandler

@@ -2,6 +2,7 @@ package de.lystx.cloudsystem.library.service.server.other;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
@@ -19,6 +20,7 @@ import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
+import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
@@ -259,6 +261,7 @@ public class ServerService extends CloudService {
      * @param service
      */
     public void registerService(Service service) {
+        cloudLibrary.sendPacket(new PacketUpdatePermissionPool(cloudLibrary.getService(PermissionService.class).getPermissionPool()).setSendBack(false));
         List<Service> list = this.getServices(service.getServiceGroup());
         Service s = this.getService(service.getName());
         if (s == null) {

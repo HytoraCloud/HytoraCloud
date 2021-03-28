@@ -146,7 +146,15 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      * @param name
      */
     public void getAsync(String name, Consumer<CloudPlayer> consumer) {
-        this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name), vsonObjectResult -> consumer.accept(vsonObjectResult.getResult().getObject("cloudPlayer", CloudPlayer.class)));
+        this.cloudAPI.sendQuery(
+                new ResultPacketCloudPlayer(name),
+                vsonObjectResult ->
+                        consumer.accept(
+                                vsonObjectResult
+                                        .getResult()
+                                        .getObject("cloudPlayer", CloudPlayer.class)
+                        )
+        );
     }
 
     /**

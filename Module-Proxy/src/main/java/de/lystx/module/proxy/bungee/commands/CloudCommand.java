@@ -74,17 +74,17 @@ public class CloudCommand implements TabCompletable {
                         }
 
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Trying to start a new service of group §a" + group.getName() + "§8...");
-                        try {
-                            CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname), vsonObjectResult -> {
+
+                        CloudAPI.getInstance().sendQuery(new ResultPacketStartService(groupname), vsonObjectResult -> {
+                            try {
                                 VsonObject document = vsonObjectResult.getResult();
                                 String message = document.getString("message");
                                 if (!document.getBoolean("sucess", false)) {
                                     player.sendMessage(CloudAPI.getInstance().getPrefix() + message);
                                 }
-                            });
-                        } catch (NullPointerException e) {
-                            //Ignoring everything went well
-                        }
+                            } catch (NullPointerException e) {}
+                        });
+
                     } else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
                         boolean add = args[0].equalsIgnoreCase("add");
                         String playername = args[1];

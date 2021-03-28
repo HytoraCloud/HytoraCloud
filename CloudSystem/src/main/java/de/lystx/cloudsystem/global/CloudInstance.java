@@ -5,12 +5,12 @@ import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.module.Module;
 import de.lystx.cloudsystem.library.service.server.impl.TemplateService;
 import de.lystx.cloudsystem.library.service.setup.impl.InstanceChooser;
 import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketShutdown;
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
-import de.lystx.cloudsystem.library.elements.packets.out.other.PacketOutNPC;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
@@ -27,8 +27,6 @@ import de.lystx.cloudsystem.library.service.screen.CloudScreenPrinter;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
-import de.lystx.cloudsystem.library.service.serverselector.npc.NPCService;
-import de.lystx.cloudsystem.library.service.serverselector.sign.SignService;
 import de.lystx.cloudsystem.library.service.util.LogService;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;
 import de.lystx.cloudsystem.library.service.webserver.WebServer;
@@ -138,16 +136,14 @@ public class CloudInstance extends CloudLibrary {
     }
 
     /**
-     * Reloads all NPCS
-     */
-    public void reloadNPCS() {
-        this.getService(CloudNetworkService.class).sendPacket(new PacketOutNPC(this.getService(NPCService.class).getNPCConfig(), this.getService(NPCService.class).getDocument()));
-    }
-
-    /**
      * Reloads all
      */
     public void reload() {
+
+        for (Module module : this.getService(ModuleService.class).getModules()) {
+            module.onReload(this);
+        }
+
         try {
             this.getService(ServerService.class).setServiceGroups(this.getService(GroupService.class).getGroups());
             this.getService(ConfigService.class).reload();
@@ -155,10 +151,7 @@ public class CloudInstance extends CloudLibrary {
             this.getService(CloudNetworkService.class).sendPacket(new PacketOutGlobalInfo(
                     this.getService(ConfigService.class).getNetworkConfig(),
                     this.getService(ServerService.class).getServices(),
-                    this.getService(PermissionService.class).getPermissionPool(),
-                    this.getService(CloudPlayerService.class).getOnlinePlayers(),
-                    this.getService(SignService.class).getCloudSigns(),
-                    this.getService(SignService.class).getSignLayOut().getDocument()
+                    this.getService(CloudPlayerService.class).getOnlinePlayers()
             ));
         } catch (NullPointerException e) {
             e.printStackTrace();

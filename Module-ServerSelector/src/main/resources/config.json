@@ -2,6 +2,6 @@
   "name": "module-serverSelector",
   "author": "Lystx",
   "version": "1.0",
-  "main": "de.lystx.serverselector.ModuleSelector",
+  "main": "de.lystx.serverselector.cloud.ModuleSelector",
   "copyType": "COPY_SPIGOT"
 }
