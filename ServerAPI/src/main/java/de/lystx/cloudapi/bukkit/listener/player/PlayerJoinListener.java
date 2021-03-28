@@ -29,7 +29,6 @@ public class PlayerJoinListener implements Listener {
         }
 
         final Player player = event.getPlayer();
-
         final CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
 
         CloudAPI.getInstance().sendPacket(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName()));
@@ -56,7 +55,7 @@ public class PlayerJoinListener implements Listener {
             labyModPlayer.updateGamemode(CloudAPI.getInstance().getNetworkConfig().getLabyModConfig()
                     .getServerSwitchMessage().replace("&", "§").replace("%service%", CloudAPI.getInstance().getService().getName())
                     .replace("%group%", CloudAPI.getInstance().getService().getServiceGroup().getName())
-                    .replace("%online_players%", Bukkit.getOnlinePlayers().size() + " ")
+                    .replace("%online_players%", Bukkit.getOnlinePlayers().size() + "")
                     .replace("%max_player%", Bukkit.getMaxPlayers() + " ")
                     .replace("%id%", CloudAPI.getInstance().getService().getServiceID() + "")
                     .replace("%receiver%", CloudAPI.getInstance().getService().getServiceGroup().getReceiver() + "")

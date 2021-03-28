@@ -44,7 +44,9 @@ public class LabyMod implements Listener {
 
         CloudServer.getInstance().getServer().getMessenger().registerIncomingPluginChannel( CloudServer.getInstance(), "LMC", (channel, player, bytes) -> {
             ByteBuf buf = Unpooled.wrappedBuffer( bytes );
-
+            if (bytes.length > 32767) {
+                return;
+            }
             try {
                 final String messageKey = getPacketUtils().readString( buf, Short.MAX_VALUE );
                 final String messageContents = getPacketUtils().readString( buf, Short.MAX_VALUE );
@@ -53,15 +55,13 @@ public class LabyMod implements Listener {
                     if (messageContents.equalsIgnoreCase("{}")) {
                         return;
                     }
-                    JsonElement jsonMessage = new JsonParser().parse( messageContents );
 
                     Bukkit.getScheduler().runTask( CloudServer.getInstance(), () -> {
                         if (player.isOnline()) {
                             try {
-                                Bukkit.getPluginManager().callEvent( new MessageReceiveEvent( player, messageKey, jsonMessage ) );
+                                Bukkit.getPluginManager().callEvent( new MessageReceiveEvent( player, messageKey, JsonParser.parseString( messageContents ) ) );
                             } catch (Exception ignored) {}
                         }
-
                     });
                 } catch (Exception ignored) {}
 

@@ -130,7 +130,7 @@ public class Updater {
      * @return current version of cloud
      */
     public static String getCloudVersion() {
-        return "BETA-1.7.6";
+        return "BETA-1.7.7";
     }
 
     /**

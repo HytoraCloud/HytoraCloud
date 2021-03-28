@@ -332,7 +332,23 @@ public class PermissionPool implements Serializable {
      * @return Players data
      */
     public CloudPlayerData getPlayerData(String playerName) {
-        return this.playerCache.stream().filter(cloudPlayerData -> cloudPlayerData.getName().equalsIgnoreCase(playerName)).findFirst().orElse(null);
+
+        if (this.playerCache == null) {
+            this.playerCache = new LinkedList<>();
+        }
+
+        return this
+                .playerCache
+                .stream()
+                .filter(
+                        cloudPlayerData ->
+                                cloudPlayerData
+                                        .getName()
+                                        .equalsIgnoreCase(
+                                                playerName
+                                        ))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

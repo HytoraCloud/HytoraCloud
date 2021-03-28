@@ -13,6 +13,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 @AllArgsConstructor
 public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
@@ -25,12 +26,11 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
         ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerPacketReceiveEvent(packet));
         if (packet instanceof PacketOutGlobalInfo) {
 
-            boolean mc = this.cloudAPI.getNetworkConfig().getNetworkConfig().isMaintenance();
             PacketOutGlobalInfo info = (PacketOutGlobalInfo)packet;
 
             cloudAPI.setNetworkConfig(info.getNetworkConfig());
 
-            if (mc != info.getNetworkConfig().getNetworkConfig().isMaintenance()) {
+            if (info.getNetworkConfig().getNetworkConfig().isMaintenance()) {
                 this.switchMaintenance(info.getNetworkConfig().getNetworkConfig().isMaintenance());
             }
 
@@ -51,16 +51,30 @@ public class PacketHandlerProxyConfig extends PacketHandlerAdapter {
         }
     }
 
-
+    /**
+     * Changes Network Maintenance
+     * @param to
+     */
     public void switchMaintenance(Boolean to) {
         if (!to) {
             return;
         }
-        CloudAPI.getInstance().getCloudPlayers().forEach(cloudPlayer -> {
-            if (!CloudAPI.getInstance().getNetworkConfig().getNetworkConfig().getWhitelistedPlayers().contains(cloudPlayer.getName()) && !cloudPlayer.hasPermission("cloudsystem.network.maintenance")) {
-                cloudPlayer.createConnection().disconnect(
-                        CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("%prefix%", CloudAPI.getInstance().getPrefix()));
+        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            if (!CloudAPI
+                    .getInstance()
+                    .getNetworkConfig()
+                    .getNetworkConfig()
+                    .getWhitelistedPlayers()
+                    .contains(player.getName())
+                    && !player.hasPermission("cloudsystem.network.maintenance")) {
+                player.disconnect(
+                        CloudAPI.getInstance()
+                                .getNetworkConfig()
+                                .getMessageConfig()
+                                .getMaintenanceKickMessage()
+                                .replace("%prefix%",
+                                        CloudAPI.getInstance().getPrefix()));
             }
-        });
+        }
     }
 }

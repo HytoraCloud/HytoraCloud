@@ -56,7 +56,11 @@ public class SignUpdater {
      */
     public void run() {
         long repeat = plugin.getSignLayOut().getRepeatTick();
-        this.animationScheduler = this.cloudAPI.getScheduler().scheduleRepeatingTask(this::update, 0, repeat).getId();
+        if (animationScheduler != 0) {
+            Bukkit.getScheduler().cancelTask(this.animationScheduler);
+        }
+        this.animationScheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(SpigotSelector.getInstance(), this::update, 0L, repeat);
+
     }
 
     /**

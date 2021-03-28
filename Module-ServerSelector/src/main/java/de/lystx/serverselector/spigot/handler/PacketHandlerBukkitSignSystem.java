@@ -17,10 +17,17 @@ public class PacketHandlerBukkitSignSystem extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketOutServerSelector) {
             PacketOutServerSelector info = (PacketOutServerSelector) packet;
+
+            boolean b = false;
+            int repeatTick = SpigotSelector.getInstance().getSignManager().getSignLayOut().getRepeatTick();
+            if (repeatTick != info.getSignLayOut().getInteger("repeatTick")) {
+                b = true;
+            }
+
             SpigotSelector.getInstance().getSignManager().setSignLayOut(new SignLayOut(new VsonObject(info.getSignLayOut(), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES)));
             SpigotSelector.getInstance().getSignManager().setCloudSigns(info.getCloudSigns());
-            SpigotSelector.getInstance().getSignManager().run();
 
+            if (!b) SpigotSelector.getInstance().getSignManager().run();
             if (CloudAPI.getInstance().isNewVersion()) {
                 return;
             }

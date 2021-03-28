@@ -45,7 +45,7 @@ public class ServiceCommand {
                         player.sendMessage("  §8» §bUUID §8┃ §7" + CloudAPI.getInstance().getService().getUniqueId());
                         player.sendMessage("  §8» §bPort §8┃ §7" + CloudAPI.getInstance().getService().getPort());
                         player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudAPI.getInstance().getService().getServiceGroup().getReceiver());
-                        player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudAPI.getInstance().getService().getHost());
+                        player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudAPI.getInstance().getService().getHost() + "§8:§7" + CloudAPI.getInstance().getService().getCloudPort());
                         player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudAPI.getInstance().getService().getServiceGroup().getTemplate());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
                         player.sendMessage("  §8» §bInternal CPU Usage §8┃ §7" + format);

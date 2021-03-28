@@ -28,12 +28,13 @@ public class SignManager {
         this.run();
     }
 
-
+    /**
+     * Starts the Sign Scheduler
+     */
     public void run() {
         if (!CloudAPI.getInstance().getService().getServiceGroup().isLobby()) {
             return;
         }
-        //CloudAPI.getInstance().getScheduler().cancelTask(this.signUpdater.getAnimationScheduler());
-        //CloudAPI.getInstance().getExecutorService().execute(() -> this.signUpdater.run());
+        CloudAPI.getInstance().getExecutorService().execute(() -> this.signUpdater.run());
     }
 }

@@ -197,7 +197,16 @@ public class CloudAPI implements CloudService {
      * @return
      */
     public ModuleInfo getModule(String name) {
-        return this.getModules().stream().filter(moduleInfo -> moduleInfo.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        List<ModuleInfo> moduleInfos = this.getModules();
+
+        return moduleInfos
+                .stream()
+                .filter(
+                        moduleInfo ->
+                                moduleInfo.getName().equalsIgnoreCase(name)
+                )
+                .findFirst()
+                .orElse(null);
     }
 
     /**

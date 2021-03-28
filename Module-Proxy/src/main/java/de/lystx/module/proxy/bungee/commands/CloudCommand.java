@@ -108,6 +108,26 @@ public class CloudCommand implements TabCompletable {
                         globalProxyConfig.setWhitelistedPlayers(whitelist);
                         networkConfig.setNetworkConfig(globalProxyConfig);
                         CloudAPI.getInstance().getNetwork().updateNetworkConfig(networkConfig);
+
+                        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(playername);
+
+                        if (!add) {
+                            if (!CloudAPI
+                                    .getInstance()
+                                    .getNetworkConfig()
+                                    .getNetworkConfig()
+                                    .getWhitelistedPlayers()
+                                    .contains(player.getName())
+                                    && !player.hasPermission("cloudsystem.network.maintenance")) {
+                                cloudPlayer.kick(
+                                        CloudAPI.getInstance()
+                                                .getNetworkConfig()
+                                                .getMessageConfig()
+                                                .getMaintenanceKickMessage()
+                                                .replace("%prefix%",
+                                                        CloudAPI.getInstance().getPrefix()));
+                            }
+                        }
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7The player §b" + playername + " §7was " + (add ? "§aadded to §7" : "§cremoved from §7") + "maintenance§8!");
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         if (args[1].equalsIgnoreCase("maintenance")) {

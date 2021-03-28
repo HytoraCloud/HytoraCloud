@@ -59,7 +59,7 @@ public class SpigotSelector extends JavaPlugin {
     public void onDisable() {
         try {
             int animationScheduler = this.signManager.getSignUpdater().getAnimationScheduler();
-            CloudAPI.getInstance().getScheduler().cancelTask(animationScheduler);
+            Bukkit.getScheduler().cancelTask(animationScheduler);
         } catch (NullPointerException e) {
             System.out.println("[ServerSelector] Couldn't cancel task for SignUpdater!");
         }
