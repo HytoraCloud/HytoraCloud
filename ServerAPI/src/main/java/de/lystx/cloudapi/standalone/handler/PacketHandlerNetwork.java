@@ -5,7 +5,11 @@ import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServ
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketCommunication;
+import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePlayer;
+import de.lystx.cloudsystem.library.elements.packets.in.player.PacketInUnregisterPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceStateChange;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutRegisterServer;
@@ -16,6 +20,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -49,21 +54,41 @@ public class PacketHandlerNetwork extends PacketHandlerAdapter {
     }
 
     @PacketHandler
+    public void handle(PacketUpdatePlayer packet) {
+        final CloudPlayer cloudPlayer = packet.getNewCloudPlayer();
+        CloudAPI.getInstance().getCloudPlayers().update(cloudPlayer);
+        Constants.CLOUDPLAYERS = new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll());
+    }
+
+    @PacketHandler
+    public void handle(PacketInUnregisterPlayer packet) {
+        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(packet.getName());
+        if (cloudPlayer == null) {
+            return;
+        }
+        CloudAPI.getInstance().getCloudPlayers().remove(cloudPlayer);
+        Constants.CLOUDPLAYERS = new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll());
+    }
+
+    @PacketHandler
     public void handleEvent(PacketCallEvent packet) {
         if (packet.getEvent() instanceof CloudPlayerJoinEvent) {
             CloudPlayerJoinEvent joinEvent = (CloudPlayerJoinEvent) packet.getEvent();
             this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onPlayerJoin(joinEvent.getCloudPlayer()));
             CloudAPI.getInstance().getCloudPlayers().getAll().add(joinEvent.getCloudPlayer());
+            Constants.CLOUDPLAYERS = new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll());
         } else if (packet.getEvent() instanceof CloudPlayerChangeServerEvent) {
             CloudPlayerChangeServerEvent serverEvent = (CloudPlayerChangeServerEvent)packet.getEvent();
             CloudPlayer cloudPlayer = serverEvent.getCloudPlayer();
             cloudPlayer.setServer(serverEvent.getNewServer());
+            cloudPlayer.update();
             this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onServerChange(cloudPlayer, serverEvent.getNewServer()));
-            CloudAPI.getInstance().getCloudPlayers().update(cloudPlayer);
+
         } else if (packet.getEvent() instanceof CloudPlayerQuitEvent) {
             CloudPlayerQuitEvent quitEvent = (CloudPlayerQuitEvent) packet.getEvent();
             this.cloudAPI.getCloudClient().getNetworkHandlers().forEach(networkHandler -> networkHandler.onPlayerQuit(quitEvent.getCloudPlayer()));
-            CloudAPI.getInstance().getCloudPlayers().getAll().remove(CloudAPI.getInstance().getCloudPlayers().get(quitEvent.getCloudPlayer().getName()));
+            CloudAPI.getInstance().getCloudPlayers().remove(CloudAPI.getInstance().getCloudPlayers().get(quitEvent.getCloudPlayer().getName()));
+            Constants.CLOUDPLAYERS = new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll());
         }
     }
 }

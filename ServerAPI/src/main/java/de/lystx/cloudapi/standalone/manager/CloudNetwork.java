@@ -166,8 +166,11 @@ public class CloudNetwork {
      * @return
      */
     public List<Service> getServices(ServiceGroup serviceGroup) {
+
         try {
-            return this.services.get(this.getServiceGroup(serviceGroup.getName()));
+            List<Service> services = new LinkedList<>(this.services.get(this.getServiceGroup(serviceGroup.getName())));
+            services.sort(Comparator.comparingInt(Service::getServiceID));
+            return services;
         } catch (NullPointerException e) {
             return new LinkedList<>();
         }

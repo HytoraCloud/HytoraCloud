@@ -82,11 +82,6 @@ public class GroupService extends CloudService {
                 }
             }
         }
-        for (ServiceGroup group : this.groups) {
-            Zip zip = new Zip();
-            FileService fs = this.getCloudLibrary().getService(FileService.class);
-            zip.zip(new File(fs.getTemplatesDirectory(), group.getName()), new File(fs.getTempDirectory(), "[!] group_template_" + group.getName() + ".zip"));
-        }
     }
 
     /**

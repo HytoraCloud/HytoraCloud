@@ -42,10 +42,7 @@ public class PermissionGroup implements Serializable {
      * Updates the current group
      * Not safe because {@link Constants#PERMISSION_POOL} might
      * or could be null at any time when it's not set
-     *
-     * Therefore it's deprecated!
      */
-    @Deprecated
     public void update() {
         PermissionGroup group = Constants.PERMISSION_POOL.getPermissionGroupFromName(this.name);
         Constants.PERMISSION_POOL.getPermissionGroups().set(Constants.PERMISSION_POOL.getPermissionGroups().indexOf(group), this);

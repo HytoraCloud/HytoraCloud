@@ -115,7 +115,6 @@ public class NPCListener implements Listener {
                 inventory.setItem(lr, glass);
             }
         }
-        List<Service> list = CloudAPI.getInstance().getNetwork().getServices(serviceGroup);
 
         for (VsonObject document : config.getItems()) {
             if (document.isEmpty()) {
@@ -125,6 +124,7 @@ public class NPCListener implements Listener {
             for (String s : lore) {
                 lore.set(lore.indexOf(s), this.replace(s, null, serviceGroup));
             }
+
             int slot = document.getInteger("slot", 0);
             inventory.setItem(slot, new Item(Material.valueOf(document.getString("type")))
                     .setDisplayName(this.replace(document.getString("name"), null, serviceGroup))
@@ -132,15 +132,24 @@ public class NPCListener implements Listener {
                     .build());
         }
 
-        for (Service service : list) {
-            List<String> lore = config.getLore();
-            for (String s : lore) {
-                lore.set(lore.indexOf(s), this.replace(s, service, serviceGroup));
+        for (Service service : CloudAPI.getInstance().getNetwork().getServices(serviceGroup)) {
+            try {
+                List<String> strings = new LinkedList<>();
+
+                for (String s : config.getLore()) {
+                    strings.add(this.replace(s, service, serviceGroup));
+                }
+
+                ItemStack itemStack = new Item(Material.valueOf(config.getItemType().toUpperCase()))
+                        .setDisplayName(this.replace(config.getItemName(), service, serviceGroup))
+                        .addLoreArray(strings)
+                        .build();
+                inventory.addItem(itemStack);
+
+                serviceMap.put(this.getSlot(itemStack, inventory), service);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            ItemStack itemStack = new Item(Material.valueOf(config.getItemType().toUpperCase()))
-                    .setDisplayName(this.replace(config.getItemName(), service, serviceGroup)).addLoreArray(lore).build();
-            inventory.addItem(itemStack);
-            serviceMap.put(this.getSlot(itemStack, inventory), service);
         }
         this.services.put(player.getUniqueId(), serviceMap);
         return inventory;
@@ -177,9 +186,14 @@ public class NPCListener implements Listener {
                 input = input.replace("%port%", "" + service.getPort());
                 input = input.replace("%id%", "" + service.getServiceID());
                 input = input.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
-                input = input.replace("%motd%", service.getInfo().getMotd());
-                input = input.replace("%max%", service.getInfo().getMaxPlayers() + "");
-                input = input.replace("%online%", service.getInfo().getOnlinePlayers().size() + "");
+                if (service.getInfo() != null) {
+                    String motd = service.getInfo().getMotd() == null ? "no_motd" : service.getInfo().getMotd();
+                    String maxPlayers = String.valueOf(service.getInfo().getMaxPlayers());
+                    String online = String.valueOf(service.getInfo().getOnlinePlayers().size());
+                    input = input.replace("%motd%", motd);
+                    input = input.replace("%max%", maxPlayers);
+                    input = input.replace("%online%", online);
+                }
 
             }
             if (serviceGroup != null) {
@@ -193,7 +207,9 @@ public class NPCListener implements Listener {
             }
             input = input.replace("%prefix%", CloudAPI.getInstance().getPrefix());
 
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
         return input;
     }
 }

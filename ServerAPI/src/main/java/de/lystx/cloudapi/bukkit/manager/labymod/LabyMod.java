@@ -59,7 +59,7 @@ public class LabyMod implements Listener {
                     Bukkit.getScheduler().runTask( CloudServer.getInstance(), () -> {
                         if (player.isOnline()) {
                             try {
-                                Bukkit.getPluginManager().callEvent( new MessageReceiveEvent( player, messageKey, JsonParser.parseString( messageContents ) ) );
+                                Bukkit.getPluginManager().callEvent( new MessageReceiveEvent( player, messageKey, new JsonParser().parse( messageContents ) ) );
                             } catch (Exception ignored) {}
                         }
                     });

@@ -92,8 +92,8 @@ public class Document {
                 return this;
             }
             this.jsonObject.add(key, gson.toJsonTree(value));
-        } catch (NullPointerException e){}
-
+        } catch (Exception ignored){
+        }
         return this;
     }
 

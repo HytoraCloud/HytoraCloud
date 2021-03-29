@@ -493,6 +493,7 @@ public class CloudAPI implements CloudService {
             data.setUuid(uuid);
             data.setIpAddress(ipAddress);
         }
+
         if (booleanValue.getValue()) {
             data.setPermissionEntries(entries);
             permissionPool.updatePlayerData(player, data);

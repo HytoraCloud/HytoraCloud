@@ -47,10 +47,10 @@ public class PacketHandlerCloudPlayer {
     @PacketHandler
     public void handle(PacketUpdatePlayer packet) {
         PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
-        permissionPool.updatePlayerData(((PacketUpdatePlayer)packet).getName(), ((PacketUpdatePlayer)packet).getNewCloudPlayer().getCloudPlayerData());
+        permissionPool.updatePlayerData(packet.getName(), packet.getNewCloudPlayer().getCloudPlayerData());
         cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
         cloudSystem.getService(PermissionService.class).save();
-        this.cloudSystem.getService(CloudPlayerService.class).update(((PacketUpdatePlayer)packet).getName(), ((PacketUpdatePlayer)packet).getNewCloudPlayer());
+        this.cloudSystem.getService(CloudPlayerService.class).update(packet.getName(), packet.getNewCloudPlayer());
         this.cloudSystem.reload();
     }
 
@@ -59,11 +59,11 @@ public class PacketHandlerCloudPlayer {
         CloudPlayer cloudPlayer = this
                 .cloudSystem
                 .getService(CloudPlayerService.class)
-                .getOnlinePlayer(((PacketInUnregisterPlayer)packet).getName());
+                .getOnlinePlayer(packet.getName());
         if (cloudPlayer != null) {
             Constants.EXECUTOR.callEvent(new CloudPlayerQuitEvent(cloudPlayer));
             this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
-            //this.cloudSystem.reload();
+            this.cloudSystem.reload();
         }
     }
 
@@ -71,10 +71,10 @@ public class PacketHandlerCloudPlayer {
     public void handle(PacketInRegisterPlayer packet) {
         Constants.SERVICE_FILTER = new Filter<>(this.cloudSystem.getService().allServices());
 
-        CloudPlayer cloudPlayer = ((PacketInRegisterPlayer) packet).getCloudPlayer();
+        CloudPlayer cloudPlayer = packet.getCloudPlayer();
         Constants.EXECUTOR.callEvent(new CloudPlayerJoinEvent(cloudPlayer));
         cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerDataOrDefault(cloudPlayer.getName()));
-        if (((PacketInRegisterPlayer) packet).isSendMessage()) {
+        if (packet.isSendMessage()) {
             if (!list.contains(cloudPlayer.getName())) {
                 list.add(cloudPlayer.getName());
             } else {
@@ -99,10 +99,14 @@ public class PacketHandlerCloudPlayer {
     public void handleEvent(PacketCallEvent event) {
         if (event.getEvent() instanceof CloudPlayerChangeServerEvent) {
             CloudPlayerChangeServerEvent serverEvent = (CloudPlayerChangeServerEvent)event.getEvent();
-            CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(serverEvent.getCloudPlayer().getName());
-            if (cloudPlayer != null) {
-                cloudPlayer.setServer(serverEvent.getNewServer());
-                this.cloudSystem.getService(CloudPlayerService.class).update(cloudPlayer.getName(), cloudPlayer);
+            try {
+                CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(serverEvent.getCloudPlayer().getName());
+                if (cloudPlayer != null) {
+                    cloudPlayer.setServer(serverEvent.getNewServer());
+                    cloudPlayer.update();
+                }
+            } catch (NullPointerException e) {
+                //IGNORING
             }
         }
     }

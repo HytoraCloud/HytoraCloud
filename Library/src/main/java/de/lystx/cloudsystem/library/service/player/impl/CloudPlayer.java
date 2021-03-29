@@ -39,7 +39,18 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
     }
 
     public Service getConnectedService() {
-        return Constants.SERVICE_FILTER.find(service -> service.getName().equalsIgnoreCase(this.server)).findFirst().orElse(null).get();
+        return Constants
+                .SERVICE_FILTER
+                .find(
+                        service ->
+                                service
+                                        .getName()
+                                        .equalsIgnoreCase(
+                                                this.server
+                                        )
+                ).findFirst()
+                .orElse(null)
+                .get();
     }
 
     /**

@@ -9,9 +9,7 @@ import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudPlayerInventory;
-import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -24,8 +22,8 @@ public class Constants {
     public static ServiceType SERVICE_TYPE = ServiceType.SPIGOT;
     public static String BUKKIT_VERSION;
     public static final Executor THREAD_POOL = Executors.newFixedThreadPool(1);
-    public static Filter<Service> SERVICE_FILTER = null;
-    public static Filter<CloudPlayer> CLOUDPLAYERS = null;
+    public static Filter<Service> SERVICE_FILTER = new Filter<>(new LinkedList<>());
+    public static Filter<CloudPlayer> CLOUDPLAYERS = new Filter<>(new LinkedList<>());
     public static final List<UUID> DELETERS = new LinkedList<>();
     public static final String INTERNAL_RECEIVER = "InternalReceiver";
 

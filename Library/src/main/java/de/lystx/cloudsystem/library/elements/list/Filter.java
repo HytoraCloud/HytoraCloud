@@ -4,10 +4,7 @@ import com.google.common.collect.Iterators;
 import de.lystx.cloudsystem.library.elements.interfaces.Acceptable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Filter<T> implements Iterable<T> {
@@ -19,11 +16,17 @@ public class Filter<T> implements Iterable<T> {
     }
 
     public Filter(List<T> tList) {
-        CloudList<T> cloudList = new CloudList<>();
-        for (T t : tList) {
-            cloudList.add(t).queue();
+        CloudList<T> ts;
+        if (tList == null) {
+            ts = new CloudList<>();
+        } else {
+            CloudList<T> cloudList = new CloudList<>();
+            for (T t : tList) {
+                cloudList.add(t).queue();
+            }
+            ts = cloudList;
         }
-        this.list = cloudList;
+        this.list = ts;
     }
 
     /**

@@ -14,6 +14,8 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 @Getter @AllArgsConstructor
 public class PacketHandlerConfig extends PacketHandlerAdapter {
@@ -25,12 +27,11 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
         if (packet instanceof PacketOutGlobalInfo) {
             this.cloudAPI.setJoinable(true);
             PacketOutGlobalInfo info = (PacketOutGlobalInfo)packet;
-            this.cloudAPI.getCloudPlayers().getAll().clear();
             this.cloudAPI.setNetworkConfig(info.getNetworkConfig());
             this.cloudAPI.getNetwork().setServices(info.getServices());
             this.cloudAPI.getCloudPlayers().setCloudPlayers(info.getCloudPlayers());
 
-            Constants.CLOUDPLAYERS = new Filter<>(this.cloudAPI.getCloudPlayers().getAll());
+            Constants.CLOUDPLAYERS = new Filter<>(info.getCloudPlayers());
             Constants.PERMISSION_POOL = this.cloudAPI.getPermissionPool();
             Constants.SERVICE_FILTER = new Filter<>(this.cloudAPI.getNetwork().getServices());
 

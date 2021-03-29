@@ -67,7 +67,8 @@ public class PermsCommand implements TabCompletable {
                     return;
                 }
                 pool.removePermissionGroup(player, permissionGroup);
-                pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
+                pool.update();
+               // pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                 CloudSystem.getInstance().getService(PermissionService.class).load();
                 CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                 CloudSystem.getInstance().reload();
@@ -119,7 +120,8 @@ public class PermsCommand implements TabCompletable {
                     try {
                         Integer i = Integer.parseInt(args[3].split(format)[0]);
                         pool.updatePermissionGroup(player, group, i, validality);
-                        pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
+                        pool.update();
+                        //pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                         CloudSystem.getInstance().getService(PermissionService.class).load();
                         CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                         CloudSystem.getInstance().reload();
@@ -129,7 +131,8 @@ public class PermsCommand implements TabCompletable {
                     }
                 } else {
                     pool.updatePermissionGroup(player, group, -1, PermissionValidality.DAY);
-                    pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
+                    pool.update();
+                    //pool.save(CloudSystem.getInstance().getService(FileService.class).getPermissionsFile(), CloudSystem.getInstance().getService(FileService.class).getCloudPlayerDirectory(), CloudSystem.getInstance().getService(DatabaseService.class).getDatabase());
                     CloudSystem.getInstance().getService(PermissionService.class).load();
                     CloudSystem.getInstance().getService(PermissionService.class).loadEntries();
                     CloudSystem.getInstance().reload();

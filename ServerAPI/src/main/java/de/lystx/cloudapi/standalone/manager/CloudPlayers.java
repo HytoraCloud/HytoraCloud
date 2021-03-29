@@ -110,6 +110,14 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
         return this.cloudPlayers.stream().filter(cloudPlayer -> cloudPlayer.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
+    public CloudPlayer getQuery(String name) {
+        return this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(name)).getResult().getObject("cloudPlayer", CloudPlayer.class);
+    }
+
+    public CloudPlayer getQuery(UUID uniqueId) {
+        return this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uniqueId)).getResult().getObject("cloudPlayer", CloudPlayer.class);
+    }
+
     /**
      * Returns a Stream {@link CloudPlayer}
      * @param name
@@ -146,15 +154,24 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      * @param name
      */
     public void getAsync(String name, Consumer<CloudPlayer> consumer) {
-        this.cloudAPI.sendQuery(
-                new ResultPacketCloudPlayer(name),
-                vsonObjectResult ->
-                        consumer.accept(
-                                vsonObjectResult
-                                        .getResult()
-                                        .getObject("cloudPlayer", CloudPlayer.class)
-                        )
-        );
+        try {
+            this.cloudAPI.sendQuery(
+                    new ResultPacketCloudPlayer(name),
+                    vsonObjectResult -> {
+                        try {
+                            consumer.accept(
+                                    vsonObjectResult
+                                            .getResult()
+                                            .getObject("cloudPlayer", CloudPlayer.class)
+                            );
+                        } catch (NullPointerException e) {
+                            consumer.accept(null);
+                        }
+                    }
+            );
+        } catch (NullPointerException e) {
+            consumer.accept(null);
+        }
     }
 
     /**
@@ -165,7 +182,24 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      * @param uuid
      */
     public void getAsync(UUID uuid, Consumer<CloudPlayer> consumer) {
-        this.cloudAPI.sendQuery(new ResultPacketCloudPlayer(uuid), vsonObjectResult -> consumer.accept(vsonObjectResult.getResult().getObject("cloudPlayer", CloudPlayer.class)));
+        try {
+            this.cloudAPI.sendQuery(
+                    new ResultPacketCloudPlayer(uuid),
+                    vsonObjectResult -> {
+                        try {
+                            consumer.accept(
+                                    vsonObjectResult
+                                            .getResult()
+                                            .getObject("cloudPlayer", CloudPlayer.class)
+                            );
+                        } catch (NullPointerException e) {
+                            consumer.accept(null);
+                        }
+                    }
+            );
+        } catch (NullPointerException e) {
+            consumer.accept(null);
+        }
     }
 
     /**
@@ -190,5 +224,13 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     @Override
     public Spliterator<CloudPlayer> spliterator() {
         return this.getAll().spliterator();
+    }
+
+    /**
+     * Removes a player from the Cache
+     * @param cloudPlayer
+     */
+    public void remove(CloudPlayer cloudPlayer) {
+        this.cloudPlayers.remove(cloudPlayer);
     }
 }

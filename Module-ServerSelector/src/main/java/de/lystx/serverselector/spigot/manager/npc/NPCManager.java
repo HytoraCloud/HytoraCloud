@@ -109,7 +109,7 @@ public class NPCManager {
         if (CloudAPI.getInstance().isNewVersion()) {
             return;
         }
-        if (!join) {
+        if (join) {
             this.npcs.keySet().forEach(npc -> npc.destroy(player));
         }
         document.keys().forEach(key -> {
@@ -123,14 +123,17 @@ public class NPCManager {
             }
             Location location = new Location(Bukkit.getWorld(loc.getString("world")), loc.getDouble("x"), loc.getDouble("y"), loc.getDouble("z"),
                     loc.getFloat("yaw"), loc.getFloat("pitch"));
-            String name = doc.getString("name");
-            String skin = doc.getString("skin");
-            String group = doc.getString("group");
-            NPC npc = new NPC(name, location);
-            this.npcs.put(npc, key);
-            this.groupNPCS.put(npc, group);
-            npc.setSkin(skin);
-            npc.spawn(player);
+
+            if (this.getNPC(location) == null || join) {
+                String name = doc.getString("name");
+                String skin = doc.getString("skin");
+                String group = doc.getString("group");
+                NPC npc = new NPC(name, location);
+                this.npcs.put(npc, key);
+                this.groupNPCS.put(npc, group);
+                npc.setSkin(skin);
+                npc.spawn(player);
+            }
         });
     }
 }

@@ -27,19 +27,19 @@ public class PlayerJoinListener implements Listener {
                 SpigotSelector.PACKET_READERS.put(player.getUniqueId(), packetReader);
                 SpigotSelector.getInstance().getNpcManager().updateNPCS(SpigotSelector.getInstance().getNpcManager().getDocument(), player, true);
 
-                if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
-
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                        PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
-                        if (group == null) {
-                            System.out.println("[CloudAPI] Couldn't update Nametag for " + player.getName() + "! His PermissionGroup couldn't be found!");
-                            return;
-                        }
-                        CloudAPI.getInstance().updateNametag(CloudAPI.getInstance().getCloudPlayers().get(player.getName()), group.getPrefix(), group.getSuffix(), group.getId());
-                    }
-                }
             } catch (NoSuchElementException e){
                 e.printStackTrace();
+            }
+        }
+        if (CloudAPI.getInstance().isNametags() && CloudAPI.getInstance().getPermissionPool().isAvailable()) {
+
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                PermissionGroup group = CloudAPI.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getName());
+                if (group == null) {
+                    System.out.println("[CloudAPI] Couldn't update Nametag for " + player.getName() + "! His PermissionGroup couldn't be found!");
+                    return;
+                }
+                CloudAPI.getInstance().updateNametag(CloudAPI.getInstance().getCloudPlayers().get(player.getName()), group.getPrefix(), group.getSuffix(), group.getId());
             }
         }
     }

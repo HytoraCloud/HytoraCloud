@@ -5,8 +5,6 @@ import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.database.IDatabase;
-import de.lystx.cloudsystem.library.service.io.FileService;
-import de.lystx.cloudsystem.library.service.io.Zip;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.Constants;
@@ -14,8 +12,6 @@ import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Getter
@@ -95,7 +91,7 @@ public class CloudPlayerService extends CloudService {
         } catch (NullPointerException e) {
             //Ignoring because it doesn't break the cloud
         }
-        this.onlinePlayers.remove(this.getOnlinePlayer(cloudPlayer.getName()));
+        this.onlinePlayers.remove(cloudPlayer);
         Constants.CLOUDPLAYERS = new Filter<>(this.onlinePlayers);
     }
 
@@ -107,11 +103,11 @@ public class CloudPlayerService extends CloudService {
      */
     public void update(String name, CloudPlayer newPlayer) {
         CloudPlayer cloudPlayer = this.getOnlinePlayer(name);
-        try {
-            this.onlinePlayers.set(this.onlinePlayers.indexOf(cloudPlayer), newPlayer);
-        } catch (IndexOutOfBoundsException e) {
+        if (cloudPlayer != null) {
+            this.onlinePlayers.removeIf(onlinePlayer -> onlinePlayer.getName().equalsIgnoreCase(cloudPlayer.getName()));
             this.onlinePlayers.add(newPlayer);
         }
+
         Constants.CLOUDPLAYERS = new Filter<>(this.onlinePlayers);
     }
 

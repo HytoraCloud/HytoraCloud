@@ -86,7 +86,11 @@ public class PermissionPool implements Serializable {
         if (oldData == null) {
             return;
         }
-        this.playerCache.set(this.playerCache.indexOf(oldData), newData);
+        try {
+            this.playerCache.set(this.playerCache.indexOf(oldData), newData);
+        } catch (IndexOutOfBoundsException e) {
+            //IGNORING
+        }
     }
 
     /**
@@ -94,13 +98,15 @@ public class PermissionPool implements Serializable {
      * @return default permissionGroup
      */
     public PermissionGroup getDefaultPermissionGroup() {
-        this.permissionGroups.sort(Comparator.comparingInt(PermissionGroup::getId));
-        try {
-            if (!this.permissionGroups.isEmpty()) {
-                return this.permissionGroups.get(this.permissionGroups.size() - 1);
+        if (this.permissionGroups != null) {
+            this.permissionGroups.sort(Comparator.comparingInt(PermissionGroup::getId));
+            try {
+                if (!this.permissionGroups.isEmpty()) {
+                    return this.permissionGroups.get(this.permissionGroups.size() - 1);
+                }
+            } catch (Exception e) {
+                //Ignoring
             }
-        } catch (Exception e) {
-            //Ignoring
         }
         return Constants.DEFAULT_PERMISSION_GROUP;
     }
@@ -173,16 +179,7 @@ public class PermissionPool implements Serializable {
             group.getPermissions().remove(permission);
         }
         this.permissionGroups.set(this.permissionGroups.indexOf(group), group);
-    }
-
-    /**
-     * Updates a permissionGroup
-     * @param permissionGroup
-     */
-    public void updatePermissionGroup(PermissionGroup permissionGroup) {
-        PermissionGroup group = this.getPermissionGroupFromName(permissionGroup.getName());
-        this.permissionGroups.set(this.permissionGroups.indexOf(group), permissionGroup);
-        this.update();
+        permissionGroup.update();
     }
 
 
@@ -337,18 +334,15 @@ public class PermissionPool implements Serializable {
             this.playerCache = new LinkedList<>();
         }
 
-        return this
-                .playerCache
-                .stream()
-                .filter(
-                        cloudPlayerData ->
-                                cloudPlayerData
-                                        .getName()
-                                        .equalsIgnoreCase(
-                                                playerName
-                                        ))
-                .findFirst()
-                .orElse(null);
+        for (CloudPlayerData cloudPlayerData : this.playerCache) {
+            try {
+                if (cloudPlayerData.getName().equalsIgnoreCase(playerName)) {
+                    return cloudPlayerData;
+                }
+            } catch (NullPointerException ignored) {}
+        }
+        return new DefaultCloudPlayerData(tryUUID(playerName), playerName, "-1");
+
     }
 
     /**
@@ -445,18 +439,21 @@ public class PermissionPool implements Serializable {
      * @return object of file
      */
     public VsonObject save(File file, File directory, IDatabase database) {
+
         try {
             VsonObject document = new VsonObject(file, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             document.append("enabled", this.enabled);
-            for (PermissionGroup permissionGroup : this.permissionGroups) {
+            for (PermissionGroup permissionGroup : new LinkedList<>(this.permissionGroups)) {
                 document.append(permissionGroup.getName(), permissionGroup);
             }
             document.save();
-            this.playerCache.forEach(cloudPlayerData -> database.setPlayerData(cloudPlayerData.getUuid(), cloudPlayerData));
+            for (CloudPlayerData cloudPlayerData : new LinkedList<>(this.playerCache)) {
+                database.setPlayerData(cloudPlayerData.getUuid(), cloudPlayerData);
+            }
             this.clearInvalidUUIDs(directory);
             return document;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+
         }
         return null;
     }

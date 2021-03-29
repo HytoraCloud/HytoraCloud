@@ -1,6 +1,8 @@
 package de.lystx.cloudsystem.library.service.server.other;
 
+import com.sun.org.apache.bcel.internal.Const;
 import de.lystx.cloudsystem.library.CloudLibrary;
+import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
 import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.enums.CloudType;
@@ -37,6 +39,7 @@ import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.http.Consts;
 
 import java.io.File;
 import java.io.IOException;
@@ -261,6 +264,7 @@ public class ServerService extends CloudService {
      * @param service
      */
     public void registerService(Service service) {
+        Constants.SERVICE_FILTER = new Filter<>(this.allServices());
         cloudLibrary.sendPacket(new PacketUpdatePermissionPool(cloudLibrary.getService(PermissionService.class).getPermissionPool()).setSendBack(false));
         List<Service> list = this.getServices(service.getServiceGroup());
         Service s = this.getService(service.getName());

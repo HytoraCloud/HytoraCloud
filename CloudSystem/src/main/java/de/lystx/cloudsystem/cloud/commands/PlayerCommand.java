@@ -30,7 +30,7 @@ public class PlayerCommand {
 
                 sender.sendMessage("INFO", "§bPlayers§7:");
                 for (CloudPlayer onlinePlayer : ps.getOnlinePlayers()) {
-                    sender.sendMessage("INFO", "§9" + onlinePlayer.getName() + " §7| §bServer " + onlinePlayer.getConnectedService().getName() + " §7| §aProxy " + onlinePlayer.getProxy());
+                    sender.sendMessage("INFO", "§9" + onlinePlayer.getName() + " §7| §bServer " + (onlinePlayer.getConnectedService() == null ? "Logging in..." : onlinePlayer.getConnectedService().getName()) + " §7| §aProxy " + onlinePlayer.getProxy());
                 }
             }
         } else if (args.length == 2) {
@@ -49,19 +49,23 @@ public class PlayerCommand {
                     playerData = pool.getPlayerData(player);
                     sender.sendMessage("ERROR", "§aOnline §bInformation §7on " + cloudPlayer.getName() + "§7:");
                 }
-                PermissionGroup permissionGroup = pool.getHighestPermissionGroup(player);
-                PermissionEntry permissionEntry = playerData.getForGroup(permissionGroup.getName());
-                String v = permissionEntry.getValidTime();
-                sender.sendMessage("INFO", "§7Name | §b" + playerData.getName());
-                sender.sendMessage("INFO", "§7UUID | §b" + playerData.getUuid());
-                sender.sendMessage("INFO", "§7PermissionGroup | §b" + permissionGroup.getName());
-                sender.sendMessage("INFO", "   §7> §7Validality | §b" + (v.trim().isEmpty() ? "Lifetime" : v));
-                sender.sendMessage("INFO", "§7Ip Address | §b" + playerData.getIpAddress());
-                sender.sendMessage("INFO", "§7First login | §b" + pool.getFormat().format(new Date(playerData.getFirstLogin())));
-                sender.sendMessage("INFO", "§7Last login | §b" + pool.getFormat().format(new Date(playerData.getLastLogin())));
-                if (cloudPlayer != null) {
-                    sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getConnectedService().getName());
-                    sender.sendMessage("INFO", "§7Proxy | §b" + cloudPlayer.getProxy());
+                try {
+                    PermissionGroup permissionGroup = pool.getHighestPermissionGroup(player);
+                    PermissionEntry permissionEntry = playerData.getForGroup(permissionGroup.getName());
+                    String v = permissionEntry.getValidTime();
+                    sender.sendMessage("INFO", "§7Name | §b" + playerData.getName());
+                    sender.sendMessage("INFO", "§7UUID | §b" + playerData.getUuid());
+                    sender.sendMessage("INFO", "§7PermissionGroup | §b" + permissionGroup.getName());
+                    sender.sendMessage("INFO", "   §7> §7Validality | §b" + (v.trim().isEmpty() ? "Lifetime" : v));
+                    sender.sendMessage("INFO", "§7Ip Address | §b" + playerData.getIpAddress());
+                    sender.sendMessage("INFO", "§7First login | §b" + pool.getFormat().format(new Date(playerData.getFirstLogin())));
+                    sender.sendMessage("INFO", "§7Last login | §b" + pool.getFormat().format(new Date(playerData.getLastLogin())));
+                    if (cloudPlayer != null) {
+                        sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getConnectedService().getName());
+                        sender.sendMessage("INFO", "§7Proxy | §b" + cloudPlayer.getProxy());
+                    }
+                } catch (NullPointerException e) {
+                    sender.sendMessage("ERROR", "§cAn error has occured while attempting to perform this command!");
                 }
             } else {
                 this.correctSyntax(sender);

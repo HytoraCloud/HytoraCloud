@@ -1,12 +1,12 @@
 package de.lystx.cloudsystem.library.elements.service;
 
+import de.lystx.cloudsystem.library.elements.list.CloudList;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.ServerPinger;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +19,7 @@ public class ServiceInfo extends Service {
     private String motd;
     private int maxPlayers;
     private boolean online;
-    private final List<CloudPlayer> onlinePlayers;
+    private int onlinePlayers;
 
     /**
      * Creates the ServiceInfo
@@ -30,24 +30,18 @@ public class ServiceInfo extends Service {
      * @param port
      * @param cloudPort
      * @param serviceState
-     * @param onlinePlayers
      */
-    private ServiceInfo(String name, UUID uniqueId, ServiceGroup serviceGroup, int serviceID, int port, int cloudPort, ServiceState serviceState, List<CloudPlayer> onlinePlayers) {
+    private ServiceInfo(String name, UUID uniqueId, ServiceGroup serviceGroup, int serviceID, int port, int cloudPort, ServiceState serviceState) {
         super(name, uniqueId, serviceGroup, serviceID, port, cloudPort, serviceState);
         this.serverPinger = new ServerPinger();
-        this.onlinePlayers = onlinePlayers;
         try {
-            this.onlinePlayers.removeIf(cloudPlayer -> !cloudPlayer.getConnectedService().getName().equalsIgnoreCase(name));
-            try {
-                this.serverPinger.pingServer(this.getHost(), port, 20);
-                this.motd = this.serverPinger.getMotd();
-                this.maxPlayers = this.serverPinger.getMaxplayers();
-                this.online = this.serverPinger.isOnline();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (NullPointerException e) {
-            //THROWN ON BOOTUP IF Constants#CLOUDPLAYERS is null
+            this.serverPinger.pingServer(this.getHost(), port, 20);
+            this.motd = this.serverPinger.getMotd();
+            this.onlinePlayers = this.serverPinger.getPlayers();
+            this.maxPlayers = this.serverPinger.getMaxplayers();
+            this.online = this.serverPinger.isOnline();
+        } catch (Exception e) {
+            //SERVICEINFO BROKEN /COULD NOT GET MOTD OR MAXPLAYERS OR ONLINEPLAYERS
         }
     }
 
@@ -60,8 +54,11 @@ public class ServiceInfo extends Service {
      */
     public List<CloudPlayer> getOnlinePlayers() {
         List<CloudPlayer> list = new LinkedList<>();
-        for (CloudPlayer cloudPlayer : Constants.CLOUDPLAYERS.find(cloudPlayer -> cloudPlayer.getConnectedService().getName().equalsIgnoreCase(this.getName())).findAll()) {
-            list.add(cloudPlayer);
+        for (CloudPlayer globalOnlinePlayer : Constants.CLOUDPLAYERS) {
+            if (!globalOnlinePlayer.getServer().equalsIgnoreCase(this.getName())) {
+                continue;
+            }
+            list.add(globalOnlinePlayer);
         }
         return list;
     }
@@ -70,10 +67,9 @@ public class ServiceInfo extends Service {
     /**
      * Constructs ServiceInfo
      * @param service
-     * @param cloudPlayers
      * @return
      */
-    public static ServiceInfo fromService(Service service, List<CloudPlayer> cloudPlayers) {
-        return new ServiceInfo(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), service.getCloudPort(), service.getServiceState(), cloudPlayers);
+    public static ServiceInfo fromService(Service service) {
+        return new ServiceInfo(service.getName(), service.getUniqueId(), service.getServiceGroup(), service.getServiceID(), service.getPort(), service.getCloudPort(), service.getServiceState());
     }
 }

@@ -75,7 +75,7 @@ public class Service implements Serializable, Objectable<Service> {
         if (this.serviceGroup.getServiceType().equals(ServiceType.PROXY)) {
             throw new UnsupportedOperationException("Can't get ServiceInfo for a ProxyService!");
         }
-        return ServiceInfo.fromService(this, Arrays.asList(Constants.CLOUDPLAYERS.toArray()));
+        return ServiceInfo.fromService(this);
     }
 
     @Override
