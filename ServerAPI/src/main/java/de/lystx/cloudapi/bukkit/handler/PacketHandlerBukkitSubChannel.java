@@ -3,7 +3,7 @@ package de.lystx.cloudapi.bukkit.handler;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.events.network.CloudServerPacketReceiveEvent;
 import de.lystx.cloudapi.bukkit.events.network.CloudServerSubChannelMessageEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;

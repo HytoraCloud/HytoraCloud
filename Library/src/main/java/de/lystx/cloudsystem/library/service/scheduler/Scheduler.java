@@ -286,25 +286,4 @@ public class Scheduler extends CloudService {
 		return instance;
 	}
 
-	/**
-	 * Schedules something by Annotation
-	 * @param object
-	 * @param runnable
-	 */
-	public static void schedule(Object object, Runnable runnable) {
-		StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-		String method = ste[ste.length - 1 - 1].getMethodName();
-		try {
-			Method declaredMethod = object.getClass().getDeclaredMethod(method);
-			Schedule schedule = declaredMethod.getAnnotation(Schedule.class);
-			if (schedule.period() != -1L) {
-				getInstance().scheduleRepeatingTask(runnable, schedule.delay(), schedule.period(), !schedule.sync());
-			} else {
-				getInstance().delayTask(runnable, schedule.delay(), !schedule.sync());
-			}
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-	}
-
 }

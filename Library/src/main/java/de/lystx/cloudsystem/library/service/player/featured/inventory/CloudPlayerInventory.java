@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.service.player.featured.inventory;
 
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInventoryUpdate;
+import de.lystx.cloudsystem.library.elements.packets.both.inventory.PacketInventoryUpdate;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter() @Setter
+@Getter @Setter
 public class CloudPlayerInventory implements Serializable {
 
     private CloudItem helmet, chestplate, leggings, boots;
@@ -23,14 +23,30 @@ public class CloudPlayerInventory implements Serializable {
         this.slots = new HashMap<>();
     }
 
+    /**
+     * Sets a {@link CloudItem} to a
+     * slot in the {@link CloudPlayerInventory}
+     * @param i
+     * @param item
+     */
     public void setItem(int i, CloudItem item) {
         this.slots.put(i, item);
     }
 
+    /**
+     * Updates the inventory
+     * without clearing
+     */
     public void update() {
         this.update(false);
     }
 
+    /**
+     * Updates the {@link CloudPlayerInventory} of
+     * the given CloudPlayer
+     * @param clearAfter > If true it will set all
+     *               values to null and clear the items
+     */
     public void update(boolean clearAfter) {
         Constants.INVENTORIES.put(this.cloudPlayer.getUniqueId(), this);
         Constants.EXECUTOR.sendPacket(new PacketInventoryUpdate(this.cloudPlayer, this));

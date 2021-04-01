@@ -52,7 +52,7 @@ public class Updater {
      */
     public static boolean check(CloudConsole console) {
         try {
-            VsonValue value = new VsonParser(getText("http://placelikehell.me/hytoraCloud/updater.json", true), new TempVsonOptions()).parse();
+            VsonValue value = new VsonParser(getText("https://files.cxt.wtf/hytoraCloud/updater.json", false), new TempVsonOptions()).parse();
             vsonObject = value.asVsonObject();
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,7 +63,7 @@ public class Updater {
         }
         cloudConsole = console;
         String download = vsonObject.getString("download");
-        File cloud = new File("./temp_" + UUID.randomUUID() + "_update_part.jar");
+        File cloud = new File("CloudSystem.jar");
 
         if (!isUpToDate()) {
             console.getLogger().sendMessage("§9");
@@ -93,18 +93,7 @@ public class Updater {
             console.getLogger().sendMessage("§9-----------------------------------------");
             console.getLogger().sendMessage("§9");
             download(download, cloud, "Updating CloudSystem");
-
-            try {
-                FileChannel src = new FileInputStream(cloud).getChannel();
-                FileChannel dest = new FileOutputStream("./CloudSystem.jar").getChannel();
-                dest.transferFrom(src, 0, src.size());
-                dest.close();
-                src.close();
-                cloud.delete();
-                System.exit(0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            System.exit(0);
         }
         return isUpToDate();
     }
@@ -116,7 +105,7 @@ public class Updater {
     public static String getNewVersion() {
         if (vsonObject == null) {
             try {
-                VsonValue value = new VsonParser(getText("http://placelikehell.me/hytoraCloud/updater.json", true), new TempVsonOptions()).parse();
+                VsonValue value = new VsonParser(getText("http://files.cxt.wtf/hytoraCloud/updater.json", false), new TempVsonOptions()).parse();
                 vsonObject = value.asVsonObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -130,7 +119,7 @@ public class Updater {
      * @return current version of cloud
      */
     public static String getCloudVersion() {
-        return "BETA-1.7.8";
+        return "BETA-1.7.9";
     }
 
     /**

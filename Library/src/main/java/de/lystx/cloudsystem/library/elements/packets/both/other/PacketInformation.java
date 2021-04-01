@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.elements.packets.both;
+package de.lystx.cloudsystem.library.elements.packets.both.other;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

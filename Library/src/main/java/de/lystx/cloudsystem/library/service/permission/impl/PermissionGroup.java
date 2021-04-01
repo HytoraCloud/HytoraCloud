@@ -44,6 +44,7 @@ public class PermissionGroup implements Serializable {
      * or could be null at any time when it's not set
      */
     public void update() {
+        //TODO: SAFELY UPDATE AND SEND TO CLOUD
         PermissionGroup group = Constants.PERMISSION_POOL.getPermissionGroupFromName(this.name);
         Constants.PERMISSION_POOL.getPermissionGroups().set(Constants.PERMISSION_POOL.getPermissionGroups().indexOf(group), this);
         Constants.PERMISSION_POOL.update();

@@ -1,12 +1,14 @@
 package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInGetLog;
 import de.lystx.cloudsystem.library.elements.packets.result.Result;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketCloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.Constants;
 import io.vson.elements.object.VsonObject;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +37,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      * @param service
      */
     public void sendLog(CloudPlayer cloudPlayer, Service service) {
-        new PacketInGetLog(service, cloudPlayer.getName()).unsafe().async().send(this.cloudAPI);
+        cloudAPI.sendPacket(new PacketInGetLog(service, cloudPlayer.getName()));
     }
 
     /**
@@ -47,7 +49,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     public List<CloudPlayer> getPlayersOnGroup(String group) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
-            if (cloudPlayer.getConnectedService().getServiceGroup().getName().equalsIgnoreCase(group)) {
+            if (cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(group)) {
                 list.add(cloudPlayer);
             }
         }
@@ -62,7 +64,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
     public List<CloudPlayer> getPlayersOnServer(String server) {
        List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.cloudPlayers) {
-            if (cloudPlayer.getConnectedService().getName().equalsIgnoreCase(server)) {
+            if (cloudPlayer.getService().getName().equalsIgnoreCase(server)) {
                 list.add(cloudPlayer);
             }
         }
@@ -93,11 +95,16 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public void update(CloudPlayer newPlayer) {
         CloudPlayer cloudPlayer = this.get(newPlayer.getName());
+        if (cloudPlayer == null) {
+            cloudPlayers.add(newPlayer);
+            return;
+        }
         try {
             this.cloudPlayers.set(this.cloudPlayers.indexOf(cloudPlayer), newPlayer);
         } catch (IndexOutOfBoundsException ignored) {
             //Ignoring on Server change
         }
+        Constants.CLOUDPLAYERS = new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll());
     }
 
     /**
@@ -232,5 +239,11 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public void remove(CloudPlayer cloudPlayer) {
         this.cloudPlayers.remove(cloudPlayer);
+        Constants.CLOUDPLAYERS = new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll());
+    }
+
+    public void add(CloudPlayer cloudPlayer) {
+        this.cloudPlayers.add(cloudPlayer);
+        Constants.CLOUDPLAYERS = new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll());
     }
 }

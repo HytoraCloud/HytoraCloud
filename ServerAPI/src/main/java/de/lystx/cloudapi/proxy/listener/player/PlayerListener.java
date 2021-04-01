@@ -3,9 +3,9 @@ package de.lystx.cloudapi.proxy.listener.player;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.other.ProxyServerLoginFailEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketPlayerChat;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketInRegisterPlayer;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketInUnregisterPlayer;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketPlayerChat;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketRegisterPlayer;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
@@ -28,7 +28,6 @@ public class PlayerListener implements Listener {
         this.cloudAPI = CloudAPI.getInstance();
     }
 
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handlePreLogin(LoginEvent event) {
 
@@ -36,9 +35,8 @@ public class PlayerListener implements Listener {
         CloudPlayer cloudPlayer = this.cloudAPI.getCloudPlayers().get(connection.getName());
 
         if (cloudPlayer == null) {
-            CloudPlayer cp = new CloudPlayer(connection.getName(), connection.getUniqueId(), connection.getAddress(), "no_server_found", cloudAPI.getNetwork().getProxy(event.getConnection().getVirtualHost().getPort()).getName());
-            PacketInRegisterPlayer packet = new PacketInRegisterPlayer(cp);
-            CloudAPI.getInstance().sendPacket(packet);
+            CloudPlayer cp = new CloudPlayer(connection);
+            cp.setProxy(cloudAPI.getService()); //Sets proxy of the player
 
             if (!CloudProxy.getInstance().getProxyConfig().isEnabled()) {
                 return;
@@ -62,6 +60,7 @@ public class PlayerListener implements Listener {
                     event.setCancelled(true);
                     event.setCancelReason(new TextComponent(cloudAPI.getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
                 }
+                return;
             }
             if ((cloudAPI.getCloudPlayers().getAll().size() + 1) >= CloudProxy.getInstance().getProxyConfig().getMaxPlayers()) {
                 ProxyServerLoginFailEvent failEvent = new ProxyServerLoginFailEvent(event.getConnection(), ProxyServerLoginFailEvent.Reason.NETWORK_FULL);
@@ -72,7 +71,9 @@ public class PlayerListener implements Listener {
                 } else {
                     event.setCancelReason(new TextComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", cloudAPI.getPrefix())));
                 }
+                return;
             }
+            CloudAPI.getInstance().sendPacket(new PacketRegisterPlayer(cp));
         } else {
             event.setCancelled(true);
             ProxyServerLoginFailEvent proxyServerLoginFailEvent = new ProxyServerLoginFailEvent(event.getConnection(), ProxyServerLoginFailEvent.Reason.ALREADY_ON_NETWORK);
@@ -88,23 +89,7 @@ public class PlayerListener implements Listener {
 
 
     @EventHandler
-    public void handleFail(ProxyServerLoginFailEvent event) {
-        PacketInUnregisterPlayer packet = new PacketInUnregisterPlayer(event.getConnection().getName());
-        CloudAPI.getInstance().sendPacket(packet);
-    }
-
-    @EventHandler
-    public void handlePluginMessage(PluginMessageEvent event) {
-        /*if (event.getTag().equals("MC|BSign") || event.getTag().equals("MC|BEdit")) {
-            if (customPayloadFixer) {
-                event.setCancelled(true);
-            }
-        }*/
-    }
-
-    @EventHandler
     public void handlePermissionCheck(PermissionCheckEvent e) {
-
         if (cloudAPI.getPermissionPool().hasPermission(e.getSender().getName(), "*")) {
             e.setHasPermission(true);
         } else {
@@ -116,8 +101,7 @@ public class PlayerListener implements Listener {
     public void onCommand(ChatEvent event) {
         String message = event.getMessage();
         String player = ((ProxiedPlayer)event.getSender()).getName();
-        PacketPlayerChat packet = new PacketPlayerChat(player, message);
-        CloudAPI.getInstance().sendPacket(packet);
+        CloudAPI.getInstance().sendPacket(new PacketPlayerChat(player, message));
     }
 
     @EventHandler
@@ -155,8 +139,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        PacketInUnregisterPlayer packet = new PacketInUnregisterPlayer(player.getName());
-        CloudAPI.getInstance().sendPacket(packet);
+        CloudAPI.getInstance().sendPacket(new PacketUnregisterPlayer(player.getName()));
 
     }
 }

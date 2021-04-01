@@ -6,10 +6,12 @@ import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
+import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.featured.inventory.CloudPlayerInventory;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -39,6 +41,13 @@ public class Constants {
     public static boolean JLINE_COMPLETER_INSTALLED;
 
     public static final Map<UUID, CloudPlayerInventory> INVENTORIES = new HashMap<>();
+
+
+    public static CloudPlayerData getDefaultData(UUID uuid, String name, String ip) {
+        final CloudPlayerData cloudPlayerData = new CloudPlayerData(uuid, name, Collections.singletonList(new PermissionEntry(uuid, PERMISSION_POOL.getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), ip, true, new Date().getTime(), 0L);
+        cloudPlayerData.setDefault(true);
+        return cloudPlayerData;
+    }
 
     /**
      * Checks if dependencies are already loaded

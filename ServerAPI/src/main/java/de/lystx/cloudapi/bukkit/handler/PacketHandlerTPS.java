@@ -2,7 +2,7 @@ package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketTPS;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketTPS;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;

@@ -4,12 +4,11 @@ import com.sun.management.OperatingSystemMXBean;
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.CloudServer;
 import de.lystx.cloudapi.bukkit.utils.Reflections;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketInformation;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import org.bukkit.*;
@@ -26,6 +25,7 @@ public class ServiceCommand {
     public void execute(CloudCommandSender sender, String[] args) {
         if (sender instanceof CloudPlayer) {
             CloudPlayer player = (CloudPlayer) sender;
+
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("info")) {

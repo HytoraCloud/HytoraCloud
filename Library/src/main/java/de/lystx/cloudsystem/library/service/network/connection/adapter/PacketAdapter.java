@@ -67,7 +67,7 @@ public class PacketAdapter {
                 for (ObjectMethod<PacketHandler> em : methodList) {
                     PacketHandler packetHandler = em.getAnnotation();
                     if (packet instanceof CustomPacket && !packetHandler.transformTo().equals(Packet.class)) {
-                        Packet examplePacket = packet.document().getObject("packet", packetHandler.transformTo());
+                        Packet examplePacket = packet.getObject("packet", packetHandler.transformTo());
                         this.handelAdapterHandler(examplePacket);
                         continue;
                     }

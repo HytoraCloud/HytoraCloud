@@ -1,13 +1,12 @@
 package de.lystx.cloudsystem.library.service.network.defaults;
 
-import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCallEvent;
 import de.lystx.cloudsystem.library.service.event.Event;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 
 import java.io.Serializable;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public interface CloudExecutor extends Serializable {
@@ -16,12 +15,7 @@ public interface CloudExecutor extends Serializable {
      * Interface method for sending packet
      * @param packet
      */
-    default void sendPacket(Packet packet) {
-        if (packet.unsafe().isAsync()) {
-            packet.unsafe().sync();
-            Executors.newCachedThreadPool().execute(() -> this.sendPacket(packet));
-        }
-    }
+    void sendPacket(Packet packet);
 
     /**
      * Sends packet with interface
@@ -37,7 +31,7 @@ public interface CloudExecutor extends Serializable {
     PacketAdapter getPacketAdapter();
 
     /**
-     * Calls an Event with the {{@link de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent}}
+     * Calls an Event with the {{@link PacketCallEvent}}
      * @param event
      */
     default void callEvent(Event event) {

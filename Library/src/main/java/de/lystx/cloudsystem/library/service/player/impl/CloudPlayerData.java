@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-@Getter @Setter
+@Getter @Setter @AllArgsConstructor
 public class CloudPlayerData implements Serializable {
 
     private UUID uuid;
@@ -23,15 +23,8 @@ public class CloudPlayerData implements Serializable {
     private long firstLogin;
     private long lastLogin;
 
-    public CloudPlayerData(
-            UUID uuid,
-            String name,
-            List<PermissionEntry> permissionEntries,
-            List<String> permissions,
-            String ipAddress,
-            boolean notifyServerStart,
-            long firstLogin,
-            long lastLogin) {
+
+    public CloudPlayerData(UUID uuid, String name, List<PermissionEntry> permissionEntries, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
         this.uuid = uuid;
         this.name = name;
         this.firstLogin = firstLogin;

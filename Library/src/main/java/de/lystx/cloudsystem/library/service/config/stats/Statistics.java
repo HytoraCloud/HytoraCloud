@@ -50,7 +50,6 @@ public class Statistics implements Serializable {
         if (document.isEmpty()) {
             document.append("connections", 0D);
             document.append("startedServices", 0D);
-            document.append("pings", 0D);
             document.append("registeredPlayers", 0D);
             document.append("bootedUp", 0D);
             document.append("executedCommands", 0D);

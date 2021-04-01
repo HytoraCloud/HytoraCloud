@@ -15,7 +15,7 @@ public class WhereAmICommand {
     public void execute(CloudCommandSender commandSender, String[] args) {
         if (commandSender instanceof CloudPlayer) {
             CloudPlayer player = (CloudPlayer)commandSender;
-            Service s = CloudAPI.getInstance().getNetwork().getService(player.getConnectedService().getName());
+            Service s = CloudAPI.getInstance().getNetwork().getService(player.getService().getName());
             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§6" + s.getName() + "#" + s.getUniqueId() + " §8«» §a" + CloudAPI.getInstance().getService().getName());
 
         }

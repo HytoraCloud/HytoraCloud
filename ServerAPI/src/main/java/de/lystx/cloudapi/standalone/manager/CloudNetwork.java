@@ -2,9 +2,9 @@ package de.lystx.cloudapi.standalone.manager;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketTPS;
-import de.lystx.cloudsystem.library.elements.packets.in.other.PacketInNetworkConfig;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketTPS;
+import de.lystx.cloudsystem.library.elements.packets.in.other.PacketUpdateNetworkConfig;
 import de.lystx.cloudsystem.library.elements.packets.in.service.*;
 import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacketService;
 import de.lystx.cloudsystem.library.elements.packets.result.services.ResultPacketServiceGroup;
@@ -13,7 +13,6 @@ import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.elements.other.Document;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -89,7 +88,7 @@ public class CloudNetwork {
      * @param properties
      */
     public void startService(String serviceGroup, SerializableDocument properties) {
-        new PacketInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties).unsafe().async().send(this.cloudAPI);
+        cloudAPI.sendPacket(new PacketInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties));
 
     }
 
@@ -231,7 +230,7 @@ public class CloudNetwork {
      * @param networkConfig
      */
     public void updateNetworkConfig(NetworkConfig networkConfig) {
-        this.cloudAPI.sendPacket(new PacketInNetworkConfig(networkConfig));
+        this.cloudAPI.sendPacket(new PacketUpdateNetworkConfig(networkConfig));
     }
 
     /**

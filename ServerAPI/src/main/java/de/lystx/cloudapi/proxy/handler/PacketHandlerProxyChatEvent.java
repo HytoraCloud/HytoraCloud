@@ -2,7 +2,7 @@ package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.player.ProxyServerChatEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketPlayerChat;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketPlayerChat;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import lombok.AllArgsConstructor;

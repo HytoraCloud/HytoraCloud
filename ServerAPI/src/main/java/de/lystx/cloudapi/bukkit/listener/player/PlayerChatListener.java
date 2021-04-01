@@ -28,7 +28,7 @@ public class PlayerChatListener implements Listener {
             }
             CloudAPI.getInstance().execute(() -> CloudAPI.getInstance().getCommandService().execute(cloudPlayer, true, event.getMessage()));
         }
-        new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()).unsafe().async().send(CloudAPI.getInstance());
+        CloudAPI.getInstance().sendPacket(new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 
 

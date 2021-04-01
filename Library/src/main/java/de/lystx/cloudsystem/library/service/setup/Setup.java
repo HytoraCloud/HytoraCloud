@@ -14,6 +14,8 @@ public @interface Setup {
     String[] onlyAnswers() default {}; //Anwsers that are only allowe
     String[] changeAnswers() default {}; //Answers that change
 
+    String[] message() default {}; //Extra message that will be printed
+
     String[] exitAfterAnswer() default {}; //Exit after a given answer
 
     GoTo goTo() default @GoTo(id = -1, value = "", elseID = -1); //Goto after a value

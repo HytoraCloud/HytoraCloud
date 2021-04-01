@@ -55,7 +55,7 @@ public class ServiceInfo extends Service {
     public List<CloudPlayer> getOnlinePlayers() {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer globalOnlinePlayer : Constants.CLOUDPLAYERS) {
-            if (!globalOnlinePlayer.getServer().equalsIgnoreCase(this.getName())) {
+            if (!globalOnlinePlayer.getService().getName().equalsIgnoreCase(this.getName())) {
                 continue;
             }
             list.add(globalOnlinePlayer);

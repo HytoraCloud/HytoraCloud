@@ -21,7 +21,7 @@ public class WhereIsCommand {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe player §e" + args[0] + " §cseems not to be online!");
                         return;
                     }
-                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Server of §b" + cloudPlayer.getName() + " §8: §a" + cloudPlayer.getConnectedService().getName());
+                    player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Server of §b" + cloudPlayer.getName() + " §8: §a" + cloudPlayer.getService().getName());
                 } else {
                     player.sendMessage(CloudAPI.getInstance().getPrefix() + "§c/whereis <player>");
                 }

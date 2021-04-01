@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.handler.managing;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;

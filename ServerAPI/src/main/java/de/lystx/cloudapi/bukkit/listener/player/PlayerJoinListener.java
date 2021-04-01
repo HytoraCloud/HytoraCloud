@@ -31,7 +31,7 @@ public class PlayerJoinListener implements Listener {
         final Player player = event.getPlayer();
         final CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
 
-        CloudAPI.getInstance().sendPacket(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService().getName()));
+        CloudAPI.getInstance().sendPacket(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService()));
 
         CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
         int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
@@ -39,7 +39,6 @@ public class PlayerJoinListener implements Listener {
         if (percent <= 100 && (((double) Bukkit.getOnlinePlayers().size()) / (double) Bukkit.getMaxPlayers()) * 100 >= percent) {
             CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new SerializableDocument().append("waitingForPlayers", true));
         }
-
     }
 
     @EventHandler

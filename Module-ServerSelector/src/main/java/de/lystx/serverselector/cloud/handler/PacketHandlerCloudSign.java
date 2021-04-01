@@ -1,7 +1,7 @@
 package de.lystx.serverselector.cloud.handler;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketInformation;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.serverselector.cloud.manager.sign.SignService;

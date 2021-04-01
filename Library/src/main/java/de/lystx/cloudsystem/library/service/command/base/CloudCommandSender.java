@@ -32,12 +32,6 @@ public interface CloudCommandSender {
     void kick(String reason);
 
     /**
-     * Sends to server
-     * @param server
-     */
-    void connect(String server);
-
-    /**
      * Fallbacks
      */
     void fallback();

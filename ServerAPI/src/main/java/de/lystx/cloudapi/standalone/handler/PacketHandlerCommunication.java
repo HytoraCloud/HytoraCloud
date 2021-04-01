@@ -1,7 +1,7 @@
 package de.lystx.cloudapi.standalone.handler;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketCommunication;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCommunication;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;

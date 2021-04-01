@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import de.lystx.cloudsystem.library.service.util.ReverseMap;
+import de.lystx.cloudsystem.library.service.util.CloudMap;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -18,13 +18,13 @@ import java.util.function.Consumer;
  * This class is used
  * to get the UUID or the name of a Player
  * correctly (sync and async)
- * it caches the UUID and Name in an {@link ReverseMap}
+ * it caches the UUID and Name in an {@link CloudMap}
  * to make it as performant as possible
  */
 public class UUIDService {
 
     private final ExecutorService executor;
-    private final ReverseMap<String, UUID> cache;
+    private final CloudMap<String, UUID> cache;
     private static UUIDService instance;
 
     /**
@@ -55,7 +55,7 @@ public class UUIDService {
      */
     public UUIDService(ExecutorService executor) {
         this.executor = executor;
-        this.cache = new ReverseMap<>();
+        this.cache = new CloudMap<>();
     }
 
     /**

@@ -4,13 +4,12 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
-import de.lystx.cloudsystem.library.elements.list.Filter;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePlayer;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketUpdatePlayer;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketRegisterPlayer;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.cloudsystem.library.elements.packets.in.player.*;
 import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
-import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
@@ -19,7 +18,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 
 import java.util.LinkedList;
 import java.util.List;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
+
 import de.lystx.cloudsystem.library.service.util.Constants;
 
 public class PacketHandlerCloudPlayer {
@@ -39,15 +38,11 @@ public class PacketHandlerCloudPlayer {
         this.cloudSystem.getService(StatisticsService.class).getStatistics().add("executedCommands");
     }
 
-    @PacketHandler
-    public void handle(PacketInNetworkPing packet) {
-        this.cloudSystem.getService(StatisticsService.class).getStatistics().add("pings");
-    }
 
     @PacketHandler
     public void handle(PacketUpdatePlayer packet) {
         PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
-        permissionPool.updatePlayerData(packet.getName(), packet.getNewCloudPlayer().getCloudPlayerData());
+        permissionPool.updatePlayerData(packet.getName(), packet.getNewCloudPlayer().getData());
         cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
         cloudSystem.getService(PermissionService.class).save();
         this.cloudSystem.getService(CloudPlayerService.class).update(packet.getName(), packet.getNewCloudPlayer());
@@ -55,7 +50,7 @@ public class PacketHandlerCloudPlayer {
     }
 
     @PacketHandler
-    public void handle(PacketInUnregisterPlayer packet) {
+    public void handle(PacketUnregisterPlayer packet) {
         CloudPlayer cloudPlayer = this
                 .cloudSystem
                 .getService(CloudPlayerService.class)
@@ -68,12 +63,14 @@ public class PacketHandlerCloudPlayer {
     }
 
     @PacketHandler
-    public void handle(PacketInRegisterPlayer packet) {
-        Constants.SERVICE_FILTER = new Filter<>(this.cloudSystem.getService().allServices());
+    public void handle(PacketRegisterPlayer packet) {
+        //Constants.SERVICE_FILTER = new Filter<>(this.cloudSystem.getService().allServices());
 
         CloudPlayer cloudPlayer = packet.getCloudPlayer();
-        Constants.EXECUTOR.callEvent(new CloudPlayerJoinEvent(cloudPlayer));
+        cloudSystem.callEvent(new CloudPlayerJoinEvent(cloudPlayer));
         cloudPlayer.setCloudPlayerData(this.cloudSystem.getService(PermissionService.class).getPermissionPool().getPlayerDataOrDefault(cloudPlayer.getName()));
+
+
         if (packet.isSendMessage()) {
             if (!list.contains(cloudPlayer.getName())) {
                 list.add(cloudPlayer.getName());
@@ -86,12 +83,10 @@ public class PacketHandlerCloudPlayer {
         }
         if (!this.cloudSystem.getService(CloudPlayerService.class).registerPlayer(cloudPlayer)) {
             this.cloudSystem.getService(StatisticsService.class).getStatistics().add("registeredPlayers");
-            this.cloudSystem.sendPacket(new PacketUpdatePermissionPool(this.cloudSystem.getService(PermissionService.class).getPermissionPool()).setSendBack(false));
+            this.cloudSystem.getService(PermissionService.class).getPermissionPool().update();
         }
 
         this.cloudSystem.getService(StatisticsService.class).getStatistics().add("connections");
-       // this.cloudSystem.reload();
-
     }
 
 
@@ -102,7 +97,7 @@ public class PacketHandlerCloudPlayer {
             try {
                 CloudPlayer cloudPlayer = this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayer(serverEvent.getCloudPlayer().getName());
                 if (cloudPlayer != null) {
-                    cloudPlayer.setServer(serverEvent.getNewServer());
+                    cloudPlayer.setService(cloudSystem.getService().getService(serverEvent.getNewServer()));
                     cloudPlayer.update();
                 }
             } catch (NullPointerException e) {

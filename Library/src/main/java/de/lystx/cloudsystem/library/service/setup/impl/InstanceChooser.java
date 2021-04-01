@@ -12,6 +12,9 @@ public class InstanceChooser extends AbstractSetup<InstanceChooser> {
         this.cancellable = false;
     }
 
-    @Setup(id = 1, question = "Do you want to start the Cloud or the Receiver? (\"C\" = CloudSystem, \"R\" = Receiver)", onlyAnswers = {"C", "R"})
+    @Setup(
+            id = 1,
+            question = "Do you want to start the Cloud or the Receiver?",
+            message = {"§f[§9SETUP§f] §f[§b1§f] §eCloudSystem", "§f[§9SETUP§f] §f[§b2§f] §6Receiver"}, onlyAnswers = {"1", "2"})
     private String instance;
 }

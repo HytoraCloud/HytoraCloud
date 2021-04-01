@@ -1,8 +1,7 @@
 package de.lystx.cloudsystem.cloud.handler.receiver;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketCommunication;
-import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutRegisterServer;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCommunication;
 import de.lystx.cloudsystem.library.elements.packets.out.service.PacketOutStartedServer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;

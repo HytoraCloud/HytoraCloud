@@ -1,12 +1,12 @@
 package de.lystx.serverselector.spigot.handler;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
-import de.lystx.cloudsystem.library.service.util.AppendMap;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketInformation;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
+import de.lystx.cloudsystem.library.service.util.CloudMap;
 import de.lystx.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.serverselector.spigot.SpigotSelector;
 import org.bukkit.Bukkit;
@@ -37,7 +37,7 @@ public class PacketHandlerManageSigns {
                 SpigotSelector.getInstance().getSignManager().getCloudSigns().add(sign);
 
 
-                PacketInformation packetInformation = new PacketInformation("PacketInCreateSign", new AppendMap<String, Object>().append("sign", sign.serialize()));
+                PacketInformation packetInformation = new PacketInformation("PacketInCreateSign", new CloudMap<String, Object>().append("sign", sign.serialize()));
                 CloudAPI.getInstance().sendPacket(packetInformation);
                 CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
                 player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
@@ -61,7 +61,7 @@ public class PacketHandlerManageSigns {
             signBlock.setLine(3, "§8§m------");
             signBlock.update(true);
             SpigotSelector.getInstance().getSignManager().getCloudSigns().remove(cloudSign);
-            PacketInformation packetInformation = new PacketInformation("PacketInDeleteSign", new AppendMap<String, Object>().append("sign", cloudSign.serialize()));
+            PacketInformation packetInformation = new PacketInformation("PacketInDeleteSign", new CloudMap<String, Object>().append("sign", cloudSign.serialize()));
             CloudAPI.getInstance().sendPacket(packetInformation);
             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7You removed a CloudSign for the group §b" + cloudSign.getGroup().toUpperCase());
 

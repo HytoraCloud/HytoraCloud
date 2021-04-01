@@ -72,7 +72,7 @@ public class NPCListener implements Listener {
                 if (!SpigotSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage().trim().isEmpty()) {
                     player.sendMessage(this.replace(SpigotSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage(), service, service.getServiceGroup()));
                 }
-                cloudPlayer.connect(service.getName());
+                cloudPlayer.connect(service);
             }
         }
     }
@@ -202,8 +202,8 @@ public class NPCListener implements Listener {
                 input = input.replace("%template%", serviceGroup.getTemplate());
                 input = input.replace("%type%", serviceGroup.getServiceType().name());
                 input = input.replace("%newServer%", "" + serviceGroup.getNewServerPercent());
-                input = input.replace("%online_services%", group.getInfo().getOnlineServices().size() + "");
-                input = input.replace("%online_players%", group.getInfo().getOnlinePlayers().size() + "");
+                input = input.replace("%online_services%", group.getServices().size() + "");
+                input = input.replace("%online_players%", group.getOnlinePlayers().size() + "");
             }
             input = input.replace("%prefix%", CloudAPI.getInstance().getPrefix());
 

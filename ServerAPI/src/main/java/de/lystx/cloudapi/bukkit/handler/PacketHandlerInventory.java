@@ -2,8 +2,8 @@ package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.bukkit.utils.Item;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketOpenInventory;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInventoryUpdate;
+import de.lystx.cloudsystem.library.elements.packets.both.inventory.PacketOpenInventory;
+import de.lystx.cloudsystem.library.elements.packets.both.inventory.PacketInventoryUpdate;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;

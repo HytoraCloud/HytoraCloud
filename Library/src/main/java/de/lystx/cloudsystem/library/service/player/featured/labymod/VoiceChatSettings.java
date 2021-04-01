@@ -5,6 +5,13 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
+/**
+ * Class is used to get
+ * Information from a {@link LabyModPlayer}
+ * {@link VoiceChatSettings}.
+ * This contains if its enabled, the volume
+ * and many more values
+ */
 @Getter @AllArgsConstructor
 public class VoiceChatSettings implements Serializable {
 

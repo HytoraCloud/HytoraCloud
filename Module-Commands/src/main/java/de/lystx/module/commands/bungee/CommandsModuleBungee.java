@@ -1,7 +1,7 @@
 package de.lystx.module.commands.bungee;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketInformation;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import de.lystx.module.commands.bungee.commands.*;
 import io.vson.elements.object.VsonObject;

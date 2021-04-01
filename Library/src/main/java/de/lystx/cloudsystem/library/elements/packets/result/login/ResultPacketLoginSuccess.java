@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.elements.packets.result.login;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
@@ -18,17 +19,14 @@ import java.io.Serializable;
 public class ResultPacketLoginSuccess extends ResultPacket<VsonObject> implements Serializable {
 
     private final CloudConnection connection;
-    private final String service;
+    private final Service service;
 
     @Override
     public VsonObject read(CloudLibrary cloudLibrary) {
         CloudPlayer cloudPlayer = cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayer(this.connection.getName());
-        cloudPlayer.setCloudPlayerData(cloudLibrary.getService(PermissionService.class).getPermissionPool().getPlayerData(cloudPlayer.getName()));
-        cloudPlayer.setServer(this.service);
+        cloudPlayer.setService(this.service);
         cloudPlayer.update();
-        cloudLibrary.reload();
         Constants.CLOUDPLAYERS = new Filter<>(cloudLibrary.getService(CloudPlayerService.class).getOnlinePlayers());
-        return new VsonObject()
-                .append("cloudPlayer", cloudPlayer);
+        return new VsonObject().append("cloudPlayer", cloudPlayer);
     }
 }

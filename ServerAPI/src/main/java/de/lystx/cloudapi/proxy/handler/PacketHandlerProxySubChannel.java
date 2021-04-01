@@ -2,7 +2,7 @@ package de.lystx.cloudapi.proxy.handler;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.network.ProxyServerSubChannelMessageEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;

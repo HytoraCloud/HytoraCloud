@@ -92,11 +92,6 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     }
 
     @Override
-    public void connect(String server) {
-        throw new UnsupportedOperationException("Console doesn't support : connect" );
-    }
-
-    @Override
     public void fallback() {
         throw new UnsupportedOperationException("Console doesn't support : fallback" );
     }

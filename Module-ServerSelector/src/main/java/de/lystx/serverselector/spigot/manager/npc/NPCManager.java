@@ -1,8 +1,8 @@
 package de.lystx.serverselector.spigot.manager.npc;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
-import de.lystx.cloudsystem.library.service.util.AppendMap;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketInformation;
+import de.lystx.cloudsystem.library.service.util.CloudMap;
 import de.lystx.serverselector.cloud.manager.npc.NPCConfig;
 import de.lystx.serverselector.spigot.manager.npc.impl.NPC;
 import io.vson.elements.object.VsonObject;
@@ -58,7 +58,7 @@ public class NPCManager {
                 .append("skin", skin)
                 .append("group", group);
 
-        PacketInformation packetInformation = new PacketInformation("PacketInCreateNPC", new AppendMap<String, Object>()
+        PacketInformation packetInformation = new PacketInformation("PacketInCreateNPC", new CloudMap<String, Object>()
                 .append("key", name + "_" + group + UUID.randomUUID())
                 .append("vsonObject", VsonObject.encode(document)));
         CloudAPI.getInstance().sendPacket(packetInformation);

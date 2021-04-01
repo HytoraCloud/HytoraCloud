@@ -54,7 +54,7 @@ public class CloudInstance extends CloudLibrary {
                     System.exit(1);
                     return;
                 }
-                console.getLogger().sendMessage("INFO", "§7Starting §b" + (instanceChooser.getInstance().equalsIgnoreCase("R") ? "Receiver" : "CloudSystem") + " §7version §a" + Updater.getCloudVersion() + " §7by §bLystx§h...");
+                console.getLogger().sendMessage("INFO", "§7Starting §b" + (instanceChooser.getInstance().equalsIgnoreCase("2") ? "Receiver" : "CloudSystem") + " §7version §a" + Updater.getCloudVersion() + " §7by §bLystx§h...");
                 Scheduler.getInstance().scheduleDelayedTask(() -> {
                     for (int i = 0; i < 100; i++) {
                         System.out.println();
@@ -66,7 +66,7 @@ public class CloudInstance extends CloudLibrary {
 
                 Scheduler.getInstance().scheduleDelayedTask(() -> {
                     this.console.getCommandManager().setActive(true);
-                    if (instanceChooser.getInstance().equalsIgnoreCase("R")) {
+                    if (instanceChooser.getInstance().equalsIgnoreCase("2")) {
                         Receiver receiver = new Receiver();
                     } else {
                         CloudSystem cloudSystem = new CloudSystem();

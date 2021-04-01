@@ -58,7 +58,10 @@ public abstract class AbstractSetup<T> {
         this.currentPart = this.getEntry(1);
 
         this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
-        this.cloudConsole.getLogger().sendMessage("SETUP", this.currentPart.getValue().question() + " §7(§a" + this.currentPart.getKey().getType().getSimpleName() + "§7)");
+        this.cloudConsole.getLogger().sendMessage("SETUP", this.currentPart.getValue().question());
+        for (String s : this.currentPart.getValue().message()) {
+            this.cloudConsole.getLogger().sendMessage(s);
+        }
         this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
 
 
@@ -162,7 +165,10 @@ public abstract class AbstractSetup<T> {
         this.currentPart = this.getEntry(this.current);
         if (this.currentPart != null) {
             this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
-            this.cloudConsole.getLogger().sendMessage("SETUP", "§b" + this.currentPart.getValue().question() + " §7(§a" + this.currentPart.getKey().getType().getSimpleName() + "§7)");
+            this.cloudConsole.getLogger().sendMessage("SETUP", "§b" + this.currentPart.getValue().question());
+            for (String s : this.currentPart.getValue().message()) {
+                this.cloudConsole.getLogger().sendMessage(s);
+            }
             this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
         }
     }

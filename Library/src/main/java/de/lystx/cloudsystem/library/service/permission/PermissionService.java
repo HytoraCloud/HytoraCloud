@@ -123,7 +123,7 @@ public class PermissionService extends CloudService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Constants.PERMISSION_POOL = this.permissionPool;
+        permissionPool.update();
     }
 
     /**

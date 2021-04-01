@@ -19,8 +19,8 @@ public class PacketHandlerCommand extends PacketHandlerAdapter {
     public void handle(Packet packet) {
         if (packet instanceof PacketCommand) {
             PacketCommand packetPlayInCommand = (PacketCommand)packet;
-            if (packetPlayInCommand.document().getString("service").equalsIgnoreCase("null")) {
-                cloudSystem.getService(CommandService.class).execute(packetPlayInCommand.document().getString("command"), cloudSystem.getConsole());
+            if (((String)packetPlayInCommand.get("service")).equalsIgnoreCase("null")) {
+                cloudSystem.getService(CommandService.class).execute((String) packetPlayInCommand.get("command"), cloudSystem.getConsole());
             }
         }
     }

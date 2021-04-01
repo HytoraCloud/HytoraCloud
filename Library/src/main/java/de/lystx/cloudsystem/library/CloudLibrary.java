@@ -2,9 +2,8 @@ package de.lystx.cloudsystem.library;
 
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
-import de.lystx.cloudsystem.library.elements.packets.result.Result;
-import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
@@ -15,9 +14,7 @@ import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.lib.LibraryService;
 import de.lystx.cloudsystem.library.service.lib.Repository;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudClient;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
@@ -27,7 +24,6 @@ import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.io.AuthManager;
 import de.lystx.cloudsystem.library.service.util.*;
 import de.lystx.cloudsystem.library.service.webserver.WebServer;
-import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.fusesource.jansi.AnsiConsole;
@@ -43,7 +39,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
 
     public List<CloudService> cloudServices;
-    protected ReverseMap<String, Object> customs;
+    protected CloudMap<String, Object> customs;
 
     protected String host;
     protected Integer port;
@@ -65,7 +61,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
     public CloudLibrary(CloudType cloudType) {
         this.cloudType = cloudType;
-        this.customs = new ReverseMap<>();
+        this.customs = new CloudMap<>();
         this.cloudServices = new LinkedList<>();
         this.host = "127.0.0.1";
         this.port = 2131;
@@ -156,7 +152,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
 
     /**
      * Calls an Event with the
-     * {@link de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent}
+     * {@link PacketCallEvent}
      * @param event
      */
     public void callEvent(Event event) {

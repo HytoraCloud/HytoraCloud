@@ -1,5 +1,6 @@
-package de.lystx.cloudsystem.library.elements.packets.both;
+package de.lystx.cloudsystem.library.elements.packets.both.player;
 
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCommunication;
 import lombok.Getter;
 
 @Getter

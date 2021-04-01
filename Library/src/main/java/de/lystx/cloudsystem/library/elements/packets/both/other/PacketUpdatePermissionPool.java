@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.elements.packets.both;
+package de.lystx.cloudsystem.library.elements.packets.both.other;
 
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
@@ -19,9 +19,9 @@ public class PacketUpdatePermissionPool extends PacketCommunication implements S
 
     public PermissionPool getPermissionPool(CloudLibrary cloudLibrary) {
         PermissionPool permissionPool = new PermissionPool(cloudLibrary);
-        permissionPool.setEnabled(this.document().getBoolean("enabled"));
-        permissionPool.setPermissionGroups(this.document().getList("groups", PermissionGroup.class));
-        permissionPool.setPlayerCache(this.document().getList("cache", CloudPlayerData.class));
+        permissionPool.setEnabled(this.getBoolean("enabled"));
+        permissionPool.setPermissionGroups(this.getList("groups", PermissionGroup.class));
+        permissionPool.setPlayerCache(this.getList("cache", CloudPlayerData.class));
         return permissionPool;
     }
 }

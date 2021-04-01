@@ -20,7 +20,7 @@ public class PacketHandlerResult extends PacketHandlerAdapter {
             Result<Object> result = new Result<>(resultPacket.getUniqueId(), resultPacket.read(cloudSystem));
 
             resultPacket.setResult(result);
-            resultPacket.unsafe().async().send(cloudSystem);
+            cloudSystem.sendPacket(resultPacket);
 
         }
     }

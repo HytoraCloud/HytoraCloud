@@ -1,7 +1,8 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
-import de.lystx.cloudsystem.library.elements.packets.both.*;
+import de.lystx.cloudsystem.library.elements.packets.both.inventory.PacketOpenInventory;
+import de.lystx.cloudsystem.library.elements.packets.both.player.*;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
@@ -16,41 +17,34 @@ import de.lystx.cloudsystem.library.service.util.Reflections;
 import lombok.*;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.UUID;
 
-@Getter @Setter @ToString(of = "name")
+@Getter @Setter
 public class CloudPlayer implements Serializable, CloudCommandSender {
 
-    private final String name;
-    private final UUID uniqueId;
-    private final String ipAddress;
-    private String server;
-    private String proxy;
+    private Service service;
+    private Service proxy;
+    
+    private final CloudConnection connection;
+
     private CloudPlayerData cloudPlayerData;
     private LabyModPlayer labyModPlayer;
 
-    public CloudPlayer(String name, UUID uniqueId, String ipAddress, String server, String proxy) {
-        this.name = name;
-        this.uniqueId = uniqueId;
-        this.ipAddress = ipAddress;
-        this.server = server;
-        this.proxy = proxy;
+    public CloudPlayer(CloudConnection connection) {
+        this.connection = connection;
+        
     }
 
-    public Service getConnectedService() {
-        return Constants
-                .SERVICE_FILTER
-                .find(
-                        service ->
-                                service
-                                        .getName()
-                                        .equalsIgnoreCase(
-                                                this.server
-                                        )
-                ).findFirst()
-                .orElse(null)
-                .get();
+    public String getName() {
+        return this.connection.getName();
+    }
+
+    public UUID getUniqueId() {
+        return this.connection.getUniqueId();
+    }
+
+    public String getIpAddress() {
+        return this.connection.getAddress();
     }
 
     /**
@@ -58,8 +52,8 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * > If null returns defaultData
      * @return CloudPlayerData
      */
-    public CloudPlayerData getCloudPlayerData() {
-        return this.cloudPlayerData == null ? new DefaultCloudPlayerData(this.uniqueId, this.name, this.ipAddress) : this.cloudPlayerData;
+    public CloudPlayerData getData() {
+        return this.cloudPlayerData == null ? Constants.getDefaultData(this.getUniqueId(), this.getName(), this.getIpAddress()) : this.cloudPlayerData;
     }
 
     /**
@@ -67,14 +61,14 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @return
      */
     public CloudPlayerInventory getInventory() {
-        return Constants.INVENTORIES.getOrDefault(this.uniqueId, new CloudPlayerInventory(this));
+        return Constants.INVENTORIES.getOrDefault(this.getUniqueId(), new CloudPlayerInventory(this));
     }
 
     /**
      * Updates a player and all his data
      */
     public void update() {
-        Constants.EXECUTOR.sendPacket(new PacketUpdatePlayer(this.name, this));
+        Constants.EXECUTOR.sendPacket(new PacketUpdatePlayer(this.getName(), this));
     }
 
     /**
@@ -82,14 +76,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @return Highest permissionGroup of player
      */
     public PermissionGroup getPermissionGroup() {
-        return Constants.PERMISSION_POOL.getHighestPermissionGroup(this.name);
-    }
-
-    /**
-     * @return serverGroup
-     */
-    public String getServerGroup() {
-        return this.server.split("-")[0];
+        return Constants.PERMISSION_POOL.getHighestPermissionGroup(this.getName());
     }
 
     /**
@@ -100,18 +87,25 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
         if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
             Object player;
             if (Constants.SERVICE_TYPE == ServiceType.SPIGOT) {
-                player = Reflections.getBukkitPlayer(this.name);
+                player = Reflections.getBukkitPlayer(this.getName());
             } else {
-                player = Reflections.getBungeePlayer(this.name);
+                player = Reflections.getBungeePlayer(this.getName());
+            }
+            if (message == null) {
+                message = "null";
             }
             Reflections.callMethod(player, "sendMessage", message.toString());
             return;
         }
-        Constants.EXECUTOR.sendPacket(new PacketSendMessage(this.uniqueId, message.toString()));
+        Constants.EXECUTOR.sendPacket(new PacketSendMessage(this.getUniqueId(), message.toString()));
     }
 
+    /**
+     * Sends an actionbar message
+     * @param message
+     */
     public void sendActionbar(Object message) {
-        Constants.EXECUTOR.sendPacket(new PacketSendActionbar(this.uniqueId, message.toString()));
+        Constants.EXECUTOR.sendPacket(new PacketSendActionbar(this.getUniqueId(), message.toString()));
     }
 
     /**
@@ -119,7 +113,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param cloudComponent
      */
     public void sendComponent(CloudComponent cloudComponent) {
-        Constants.EXECUTOR.sendPacket(new PacketSendComponent(this.uniqueId, cloudComponent));
+        Constants.EXECUTOR.sendPacket(new PacketSendComponent(this.getUniqueId(), cloudComponent));
     }
 
     /**
@@ -139,11 +133,11 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
     @SneakyThrows
     public void playSound(Enum<?> sound, Float v1, Float v2) {
         if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI) && Constants.SERVICE_TYPE == ServiceType.SPIGOT) {
-            Object player = Reflections.getBukkitPlayer(this.name);
+            Object player = Reflections.getBukkitPlayer(this.getName());
             Reflections.callMethod(player, "playSound", sound, v1, v2);
             return;
         }
-        Constants.EXECUTOR.sendPacket(new PacketPlaySound(this.name, sound.name(), v1, v2));
+        Constants.EXECUTOR.sendPacket(new PacketPlaySound(this.getName(), sound.name(), v1, v2));
     }
 
     /**
@@ -152,7 +146,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param subtitle
      */
     public void sendTitle(String title, String subtitle) {
-        Constants.EXECUTOR.sendPacket(new PacketSendTitle(this.name, title, subtitle));
+        Constants.EXECUTOR.sendPacket(new PacketSendTitle(this.getName(), title, subtitle));
     }
 
 
@@ -160,15 +154,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * Sends to fallback
      */
     public void fallback() {
-        Constants.EXECUTOR.sendPacket(new PacketFallback(this.name));
-    }
-
-    /**
-     * Connects to server
-     * @param server
-     */
-    public void connect(String server) {
-        Constants.EXECUTOR.sendPacket(new PacketConnectServer(this.name, server));
+        Constants.EXECUTOR.sendPacket(new PacketFallback(this.getName()));
     }
 
     /**
@@ -176,7 +162,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param service
      */
     public void connect(Service service) {
-        this.connect(service.getName());
+        Constants.EXECUTOR.sendPacket(new PacketConnectServer(this.getName(), service.getName()));
     }
 
     /**
@@ -184,15 +170,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param serviceGroup
      */
     public void connectRandom(ServiceGroup serviceGroup) {
-        this.connectRandom(serviceGroup.getName());
-    }
-
-    /**
-     * Sends player to a random service
-     * @param serviceGroup
-     */
-    public void connectRandom(String serviceGroup) {
-        Constants.EXECUTOR.sendPacket(new PacketConnectGroup(this.name, serviceGroup));
+        Constants.EXECUTOR.sendPacket(new PacketConnectGroup(this.getName(), serviceGroup.getName()));
     }
 
     /**
@@ -200,7 +178,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @param reason
      */
     public void kick(String reason) {
-        this.createConnection().disconnect(reason);
+        this.getConnection().disconnect(reason);
     }
 
     /**
@@ -208,24 +186,11 @@ public class CloudPlayer implements Serializable, CloudCommandSender {
      * @return if has permission
      */
     public boolean hasPermission(String permission) {
-        return Constants.PERMISSION_POOL.hasPermission(this.name, permission);
+        return Constants.PERMISSION_POOL.hasPermission(this.getName(), permission);
     }
 
-    /**
-     * Creates connection
-     * @return CloudConnection
-     */
-    public CloudConnection createConnection() {
-        return new CloudConnection(this.uniqueId, this.name, this.ipAddress);
-    }
-
-    /**
-     * Sends message with prefix (unused)
-     * @param prefix
-     * @param message
-     */
     @Deprecated
     public void sendMessage(String prefix, String message) {
-        this.sendMessage("§8[§b" + prefix + "§8] §7" + message);
+        throw new UnsupportedOperationException("Only works on CloudConsole!");
     }
 }

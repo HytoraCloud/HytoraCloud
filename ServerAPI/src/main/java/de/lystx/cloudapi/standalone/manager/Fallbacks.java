@@ -26,7 +26,7 @@ public class Fallbacks {
     public boolean isFallback(CloudPlayer player) {
         Value<Boolean> booleanValue = new Value<>(false);
         this.getFallbacks(player).forEach(fallback -> {
-            if (player.getServer().split("-")[0].equalsIgnoreCase(fallback.getGroupName())) {
+            if (player.getService().getServiceGroup().getName().equalsIgnoreCase(fallback.getGroupName())) {
                 booleanValue.setValue(true);
             }
         });

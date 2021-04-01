@@ -1,10 +1,8 @@
 package de.lystx.cloudsystem.library.service.server.other;
 
-import com.sun.org.apache.bcel.internal.Const;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStartEvent;
 import de.lystx.cloudsystem.library.elements.events.other.ServiceStopEvent;
@@ -21,7 +19,6 @@ import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.io.FileService;
-import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.permission.PermissionService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
@@ -39,12 +36,10 @@ import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.http.Consts;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * The {@link ServerService} manages the whole network.
@@ -265,7 +260,7 @@ public class ServerService extends CloudService {
      */
     public void registerService(Service service) {
         Constants.SERVICE_FILTER = new Filter<>(this.allServices());
-        cloudLibrary.sendPacket(new PacketUpdatePermissionPool(cloudLibrary.getService(PermissionService.class).getPermissionPool()).setSendBack(false));
+        this.cloudLibrary.getService(PermissionService.class).getPermissionPool().update();
         List<Service> list = this.getServices(service.getServiceGroup());
         Service s = this.getService(service.getName());
         if (s == null) {

@@ -1,24 +1,24 @@
 package de.lystx.cloudsystem.library.service.player.featured.labymod;
 
-import de.lystx.cloudsystem.library.elements.other.Document;
-import de.lystx.cloudsystem.library.service.server.other.process.Threader;
-import io.vson.VsonValue;
 import io.vson.elements.object.VsonObject;
-import io.vson.enums.VsonSettings;
 import jdk.nashorn.api.scripting.URLReader;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class is used to
+ * listen to Information from {@link LabyModPlayer}s
+ * and check Information of their Addons like
+ * Name, author, version and stuff like that
+ */
 @Getter @RequiredArgsConstructor
 public class LabyModAddon implements Serializable {
 
@@ -65,6 +65,7 @@ public class LabyModAddon implements Serializable {
 
     }
 
+    //List to save all cached LabyModAddons to work with them later
     public static final List<LabyModAddon> LABY_MOD_ADDONS = new LinkedList<>();
 
     /**

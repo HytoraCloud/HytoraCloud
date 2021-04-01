@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.cloud.handler.other;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.events.SubChannelMessageEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketSubMessage;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketSubMessage;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;

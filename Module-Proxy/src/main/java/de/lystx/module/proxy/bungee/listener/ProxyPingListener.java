@@ -7,7 +7,6 @@ import java.util.stream.IntStream;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.events.other.ProxyServerMotdRequestEvent;
-import de.lystx.cloudsystem.library.elements.packets.in.player.PacketInNetworkPing;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.Motd;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
@@ -35,7 +34,6 @@ public class ProxyPingListener implements Listener {
     @EventHandler
     public void onProxyPing(ProxyPingEvent event) {
         try {
-            new PacketInNetworkPing().unsafe().async().send(CloudAPI.getInstance());
             int port = event.getConnection().getVirtualHost().getPort();
             ServerPing ping = event.getResponse();
 

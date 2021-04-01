@@ -4,7 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponent;
 import de.lystx.cloudsystem.library.elements.chat.CloudComponentAction;
-import de.lystx.cloudsystem.library.elements.packets.both.*;
+import de.lystx.cloudsystem.library.elements.packets.both.player.*;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;

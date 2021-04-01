@@ -19,11 +19,11 @@ public class PacketHandlerCommand  {
     public void handlePacket(PacketCommand packet) {
 
         if (cloudAPI.getService().getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
-            CloudProxy.getInstance().executeCommand(packet.document().getString("command"));
+            CloudProxy.getInstance().executeCommand(packet.getString("command"));
             return;
         }
-        if (packet.document().getString("service").equalsIgnoreCase(cloudAPI.getService().getName())) {
-            CloudServer.getInstance().executeCommand(packet.document().getString("command"));
+        if (packet.getString("service").equalsIgnoreCase(cloudAPI.getService().getName())) {
+            CloudServer.getInstance().executeCommand(packet.getString("command"));
         }
     }
 }

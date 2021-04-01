@@ -1,6 +1,6 @@
 package de.lystx.cloudsystem.library.elements.packets;
 
-import de.lystx.cloudsystem.library.elements.packets.both.PacketCommunication;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCommunication;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.netty.NettyClient;
 import de.lystx.cloudsystem.library.service.network.netty.NettyServer;

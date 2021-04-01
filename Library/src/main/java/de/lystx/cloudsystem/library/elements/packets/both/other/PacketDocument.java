@@ -1,4 +1,4 @@
-package de.lystx.cloudsystem.library.elements.packets.both;
+package de.lystx.cloudsystem.library.elements.packets.both.other;
 
 import de.lystx.cloudsystem.library.elements.other.Document;
 import lombok.Getter;
@@ -10,6 +10,5 @@ public class PacketDocument extends PacketCommunication {
 
     public PacketDocument(String key, Document document) {
         this.key = key;
-        this.document = document.toString();
     }
 }

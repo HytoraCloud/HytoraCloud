@@ -24,6 +24,6 @@ public class PacketOutGlobalInfo extends Packet implements Serializable {
     }
 
     public List<CloudPlayer> getCloudPlayers() {
-        return this.document().getList("cloudPlayers", CloudPlayer.class);
+        return this.getList("cloudPlayers", CloudPlayer.class);
     }
 }

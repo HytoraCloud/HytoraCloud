@@ -5,7 +5,7 @@ import de.lystx.cloudapi.proxy.CloudProxy;
 import de.lystx.cloudapi.proxy.events.player.ProxyServerPlayerRankUpdateEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupAddEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketCallEvent;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCallEvent;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

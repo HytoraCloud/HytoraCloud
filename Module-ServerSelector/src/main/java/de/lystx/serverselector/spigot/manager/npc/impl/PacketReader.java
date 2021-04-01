@@ -1,8 +1,8 @@
 package de.lystx.serverselector.spigot.manager.npc.impl;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketInformation;
-import de.lystx.cloudsystem.library.service.util.AppendMap;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketInformation;
+import de.lystx.cloudsystem.library.service.util.CloudMap;
 import de.lystx.serverselector.spigot.event.CloudServerNPCInteractEvent;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.serverselector.spigot.SpigotSelector;
@@ -17,7 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 public class PacketReader {
 
@@ -81,7 +80,7 @@ public class PacketReader {
 
 
 
-                        PacketInformation packetInformation = new PacketInformation("PacketInDeleteNPC", new AppendMap<String, Object>()
+                        PacketInformation packetInformation = new PacketInformation("PacketInDeleteNPC", new CloudMap<String, Object>()
                                 .append("key", SpigotSelector.getInstance().getNpcManager().getKey(getSafe)));
 
                         CloudAPI.getInstance().sendPacket(packetInformation);

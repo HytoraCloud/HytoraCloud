@@ -48,12 +48,22 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
     }
 
     /**
-     * Returns a ServiceInfo by this Service
-     * Used to return Motd, players etc
+     * Returns the {@link CloudPlayer}s on this
+     * ServiceGroup (for example "Lobby")
+     *
+     * @return List with CloudPlayers on this Group
+     */
+    public List<CloudPlayer> getOnlinePlayers() {
+        return new LinkedList<>(Constants.CLOUDPLAYERS.find(cloudPlayer -> cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(this.getName())).findAll());
+    }
+
+    /**
+     * Returns a List with all the
+     * Services online on this group
      * @return
      */
-    public GroupInfo getInfo() {
-        return GroupInfo.fromGroup(this, new LinkedList<>(Arrays.asList(Constants.CLOUDPLAYERS.toArray())), new LinkedList<>(Arrays.asList(Constants.SERVICE_FILTER.toArray())));
+    public List<Service> getServices() {
+        return new LinkedList<>(Constants.SERVICE_FILTER.find(service -> service.getServiceGroup().getName().equalsIgnoreCase(this.name)).findAll());
     }
 
     public String toString() {

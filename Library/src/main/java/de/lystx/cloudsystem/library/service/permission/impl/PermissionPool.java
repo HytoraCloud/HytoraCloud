@@ -3,10 +3,9 @@ package de.lystx.cloudsystem.library.service.permission.impl;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupAddEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketUpdatePermissionPool;
+import de.lystx.cloudsystem.library.elements.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.player.impl.DefaultCloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.Constants;
 import de.lystx.cloudsystem.library.service.uuid.UUIDService;
 import io.vson.elements.object.VsonObject;
@@ -15,7 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,6 +49,10 @@ public class PermissionPool implements Serializable {
      * Updates the permissionPool
      */
     public void update() {
+        Constants.PERMISSION_POOL = this;
+        if (Constants.EXECUTOR == null) {
+            return;
+        }
         Constants.EXECUTOR.sendPacket(new PacketUpdatePermissionPool(this));
     }
 
@@ -279,7 +281,7 @@ public class PermissionPool implements Serializable {
                 this.update();
             }
         } else {
-            this.playerCache.add(new DefaultCloudPlayerData(uuid, player, "-1"));
+            this.playerCache.add(Constants.getDefaultData(uuid, player, "-1"));
         }
     }
 
@@ -341,7 +343,7 @@ public class PermissionPool implements Serializable {
                 }
             } catch (NullPointerException ignored) {}
         }
-        return new DefaultCloudPlayerData(tryUUID(playerName), playerName, "-1");
+        return Constants.getDefaultData(tryUUID(playerName), playerName, "-1");
 
     }
 
@@ -363,7 +365,7 @@ public class PermissionPool implements Serializable {
         CloudPlayerData pre = this.getPlayerData(playerName);
         if (pre == null) {
             UUID uuid = this.tryUUID(playerName);
-            CloudPlayerData data = new DefaultCloudPlayerData(uuid, playerName, "-1");
+            CloudPlayerData data = Constants.getDefaultData(uuid, playerName, "-1");
             data.setDefault(true);
             return data;
         } else {

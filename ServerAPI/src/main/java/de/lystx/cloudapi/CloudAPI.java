@@ -106,7 +106,7 @@ public class CloudAPI implements CloudService {
         Constants.EXECUTOR = this.cloudClient;
         Constants.PERMISSION_POOL = this.permissionPool;
         Constants.CLOUD_TYPE = CloudType.CLOUDAPI;
-        LabyModAddon.load();
+        this.execute(LabyModAddon::load);
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
         this.useChat = false;
@@ -119,6 +119,7 @@ public class CloudAPI implements CloudService {
                 new PacketHandlerNetwork(this),
                 new PacketHandlerSubChannel(this),
                 new PacketHandlerCommunication(this),
+                new PacketHandlerPlayer(this),
                 new PacketHandlerPermissionPool(this)
         ).bootstrap();
 
@@ -297,7 +298,7 @@ public class CloudAPI implements CloudService {
     }
 
     public void shutdown(Consumer<PacketState> consumer) {
-        new PacketInStopServer(this.getService()).unsafe().send(this, packetState -> {
+        this.sendPacket(new PacketInStopServer(this.getService()), packetState -> {
             this.cloudClient.disconnect();
             consumer.accept(packetState);
         });
@@ -326,10 +327,6 @@ public class CloudAPI implements CloudService {
      * @param consumer
      */
     public void sendPacket(Packet packet, Consumer<PacketState> consumer) {
-        if (packet.unsafe() != null && packet.unsafe().isAsync()) {
-            this.execute(() -> this.sendPacket(packet));
-            return;
-        }
         if (packet.getClass().getName().toLowerCase().contains("de.lystx.cloudsystem.library.elements.packets")) {
             this.cloudClient.sendPacket(packet, consumer);
         } else {
@@ -373,7 +370,7 @@ public class CloudAPI implements CloudService {
      * @param showUpInConsole > If false it will only be logged
      */
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
-        new PacketInLogMessage(prefix, message, showUpInConsole).unsafe().async().send(this.cloudClient);
+        this.sendPacket(new PacketInLogMessage(prefix, message, showUpInConsole));
     }
 
     /**

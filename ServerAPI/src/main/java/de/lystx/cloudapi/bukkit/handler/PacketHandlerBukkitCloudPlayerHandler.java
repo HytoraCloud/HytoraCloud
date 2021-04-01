@@ -1,9 +1,9 @@
 package de.lystx.cloudapi.bukkit.handler;
 
 import de.lystx.cloudapi.CloudAPI;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketPlaySound;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketSendActionbar;
-import de.lystx.cloudsystem.library.elements.packets.both.PacketSendTitle;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketPlaySound;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketSendActionbar;
+import de.lystx.cloudsystem.library.elements.packets.both.player.PacketSendTitle;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -47,7 +47,7 @@ public class PlayerSignListener implements Listener {
                 player.sendMessage(CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("&", "§").replace("%prefix%", CloudAPI.getInstance().getPrefix()));
                 return;
             }
-            cloudPlayer.connect(meta.getName());
+            cloudPlayer.connect(meta);
         }
     }
 }
