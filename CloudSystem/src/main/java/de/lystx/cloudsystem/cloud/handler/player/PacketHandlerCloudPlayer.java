@@ -4,6 +4,7 @@ import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerChangeServerEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerJoinEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerQuitEvent;
+import de.lystx.cloudsystem.library.elements.list.Filter;
 import de.lystx.cloudsystem.library.elements.packets.both.other.PacketCallEvent;
 import de.lystx.cloudsystem.library.elements.packets.both.player.PacketUpdatePlayer;
 import de.lystx.cloudsystem.library.elements.packets.both.player.PacketRegisterPlayer;
@@ -19,7 +20,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 
 public class PacketHandlerCloudPlayer {
 
@@ -47,6 +48,7 @@ public class PacketHandlerCloudPlayer {
         cloudSystem.getService(PermissionService.class).save();
         this.cloudSystem.getService(CloudPlayerService.class).update(packet.getName(), packet.getNewCloudPlayer());
         this.cloudSystem.reload();
+        CloudCache.CLOUDPLAYERS = new Filter<CloudPlayer>(this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayers());
     }
 
     @PacketHandler
@@ -56,7 +58,7 @@ public class PacketHandlerCloudPlayer {
                 .getService(CloudPlayerService.class)
                 .getOnlinePlayer(packet.getName());
         if (cloudPlayer != null) {
-            Constants.EXECUTOR.callEvent(new CloudPlayerQuitEvent(cloudPlayer));
+            CloudCache.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerQuitEvent(cloudPlayer));
             this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
             this.cloudSystem.reload();
         }

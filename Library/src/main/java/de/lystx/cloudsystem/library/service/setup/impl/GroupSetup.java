@@ -4,7 +4,7 @@ package de.lystx.cloudsystem.library.service.setup.impl;
 import de.lystx.cloudsystem.library.service.setup.GoTo;
 import de.lystx.cloudsystem.library.service.setup.AbstractSetup;
 import de.lystx.cloudsystem.library.service.setup.Setup;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import lombok.Getter;
 
 @Getter
@@ -43,7 +43,7 @@ public class GroupSetup extends AbstractSetup<GroupSetup> {
     @Setup(id = 11, question = "How many players may be online at maximum ?", forbiddenAnswers = {"0"})
     private int maxPlayers;
 
-    @Setup(id = 12, question = "On which Receiver should this group run ? (Use " + Constants.INTERNAL_RECEIVER + " for this CloudSystem)")
+    @Setup(id = 12, question = "On which Receiver should this group run ? (Use " + CloudCache.INTERNAL_RECEIVER + " for this CloudSystem)")
     private String receiver;
 
 

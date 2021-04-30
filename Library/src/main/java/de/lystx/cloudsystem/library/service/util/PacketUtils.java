@@ -21,7 +21,7 @@ import io.netty.handler.codec.EncoderException;
 
 public class PacketUtils {
 
-    private final String version = Constants.BUKKIT_VERSION;
+    private final String version = CloudCache.getInstance().getBukkitVersion();
     private Class<?> packetClass;
     private Class<?> packetPlayOutCustomPayloadClass;
     private Constructor<?> customPayloadConstructor;
@@ -105,6 +105,9 @@ public class PacketUtils {
     }
 
     public JsonElement cloneJson(JsonElement cloneElement) {
+        if (cloneElement.toString().equalsIgnoreCase("{}")) {
+            return cloneElement;
+        }
         try {
             return new JsonParser().parse(cloneElement.toString());
         } catch (JsonParseException var3) {

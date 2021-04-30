@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -44,7 +44,7 @@ public class Files implements IDatabase {
     @Override
     public void registerPlayer(CloudPlayer cloudPlayer) {
         if (!this.isRegistered(cloudPlayer.getUniqueId())) {
-            CloudPlayerData data = Constants.getDefaultData(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayer.getIpAddress());
+            CloudPlayerData data = CloudCache.getInstance().getPermissionPool().getDefaultData(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayer.getIpAddress());
             this.setPlayerData(cloudPlayer.getUniqueId(), data);
         } else {
             CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUniqueId());

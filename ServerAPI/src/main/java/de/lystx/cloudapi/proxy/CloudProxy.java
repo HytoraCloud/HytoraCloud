@@ -2,23 +2,29 @@ package de.lystx.cloudapi.proxy;
 
 import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudapi.proxy.handler.*;
+import de.lystx.cloudapi.proxy.listener.other.TablistListener;
 import de.lystx.cloudapi.proxy.listener.network.CloudListener;
 import de.lystx.cloudapi.proxy.listener.player.CommandListener;
 import de.lystx.cloudapi.proxy.listener.player.PlayerListener;
 import de.lystx.cloudapi.proxy.listener.server.ServerConnectListener;
 import de.lystx.cloudapi.proxy.listener.server.ServerKickListener;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
+import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.service.ServiceType;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudapi.proxy.manager.HubManager;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
+import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.Action;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 @Getter
@@ -38,9 +44,79 @@ public class CloudProxy extends Plugin implements CloudService {
             this.action = new Action();
             this.hubManager = new HubManager();
 
-            Constants.SERVICE_TYPE = ServiceType.PROXY;
+
+            ProxyServer.getInstance().getPluginManager().registerListener(this, new ProxyPingListener());
+            ProxyServer.getInstance().getPluginManager().registerListener(this, new TablistListener());
+
+            CloudAPI.getInstance().registerCommand(new PermsCommand());
+            CloudAPI.getInstance().registerCommand(new CloudCommand());
+            CloudAPI.getInstance().registerCommand(new HubCommand());
+            CloudAPI.getInstance().registerCommand(new WhereAmICommand());
+            CloudAPI.getInstance().registerCommand(new WhereIsCommand());
+            CloudAPI.getInstance().registerCommand(new ListCommand());
+            CloudAPI.getInstance().registerCommand(new NetworkCommand());
+
+            CloudCache.getInstance().setCurrentServiceType(ServiceType.PROXY);
             this.bootstrap();
+
+            CloudAPI.getInstance().registerNetworkHandler(new NetworkHandler() {
+                @Override
+                public void onServerStart(Service service) {
+                    CloudProxy.this.notify(3, service.getName());
+                }
+
+                @Override
+                public void onServerQueue(Service service) {
+                    CloudProxy.this.notify(1, service.getName());
+                }
+
+                @Override
+                public void onServerStop(Service service) {
+                    CloudProxy.this.notify(2, service.getName());
+                }
+            });
         });
+    }
+
+
+
+    /**
+     * Notifies all {@link ProxiedPlayer}s
+     * on the Network if they have the permission to
+     * get notified and if they have enabled it
+     *
+     * @param state
+     * @param servername
+     */
+    public void notify(int state, String servername) {
+        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            if (!CloudAPI.getInstance().getPermissionPool().hasPermission(player.getName(), "cloudsystem.notify")) {
+                return;
+            }
+            CloudPlayerData playerData = CloudAPI.getInstance().getPermissionPool().getPlayerData(player.getName());
+            if (playerData != null && !playerData.isNotifyServerStart()) {
+                return;
+            }
+            String message = null;
+            switch (state){
+                case 1:
+                    message = CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getServerStartMessage().
+                            replace("&", "§").
+                            replace("%server%", servername).
+                            replace("%prefix%", CloudAPI.getInstance().getPrefix());
+                    break;
+                case 2:
+                    message = CloudAPI.getInstance().getNetworkConfig().getMessageConfig().getServerStopMessage().
+                            replace("&", "§").
+                            replace("%server%", servername).
+                            replace("%prefix%", CloudAPI.getInstance().getPrefix());
+                    break;
+                case 3:
+                    return;
+
+            }
+            player.sendMessage(new TextComponent(message));
+        }
     }
 
     @Override

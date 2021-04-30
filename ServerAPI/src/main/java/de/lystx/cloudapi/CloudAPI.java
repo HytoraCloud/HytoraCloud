@@ -29,8 +29,8 @@ import de.lystx.cloudsystem.library.service.config.impl.NetworkConfig;
 import de.lystx.cloudsystem.library.service.config.impl.proxy.ProxyConfig;
 import de.lystx.cloudsystem.library.service.config.stats.Statistics;
 import de.lystx.cloudsystem.library.service.event.Event;
+import de.lystx.cloudsystem.library.service.event.EventService;
 import de.lystx.cloudsystem.library.service.lib.Repository;
-import de.lystx.cloudsystem.library.service.module.Module;
 import de.lystx.cloudsystem.library.service.module.ModuleInfo;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
@@ -45,16 +45,11 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.server.other.process.Threader;
 import de.lystx.cloudsystem.library.elements.interfaces.Acceptable;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
-import io.vson.VsonValue;
-import io.vson.annotation.other.Vson;
-import io.vson.annotation.other.VsonAdapter;
-import io.vson.elements.VsonString;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
-import io.vson.manage.vson.VsonWriter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -82,6 +77,7 @@ public class CloudAPI implements CloudService {
     private final CloudPlayers cloudPlayers;
     private final ExecutorService executorService;
     private final CommandService commandService;
+    private final EventService eventService;
 
     private boolean nametags;
     private boolean useChat;
@@ -102,10 +98,11 @@ public class CloudAPI implements CloudService {
         this.permissionPool = new PermissionPool(cloudLibrary);
         this.templates = new Templates(this);
         this.commandService = new CommandService(this.cloudLibrary, "Command", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING);
+        this.eventService = this.cloudLibrary.getService(EventService.class);
 
-        Constants.EXECUTOR = this.cloudClient;
-        Constants.PERMISSION_POOL = this.permissionPool;
-        Constants.CLOUD_TYPE = CloudType.CLOUDAPI;
+        CloudCache.getInstance().setCurrentCloudExecutor(this.cloudClient);
+        CloudCache.getInstance().setPermissionPool(this.permissionPool);
+        CloudCache.getInstance().setCurrentCloudType(CloudType.CLOUDAPI);
         this.execute(LabyModAddon::load);
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";
@@ -120,7 +117,8 @@ public class CloudAPI implements CloudService {
                 new PacketHandlerSubChannel(this),
                 new PacketHandlerCommunication(this),
                 new PacketHandlerPlayer(this),
-                new PacketHandlerPermissionPool(this)
+                new PacketHandlerPermissionPool(this),
+                new PacketHandlerCallEvent(this)
         ).bootstrap();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_hook"));
@@ -210,6 +208,10 @@ public class CloudAPI implements CloudService {
                 .orElse(null);
     }
 
+    public <T> Result<T> sendQuery(ResultPacket<T> packet) {
+        return this.sendQuery(packet, 3000);
+    }
+
     /**
      * Sends a Query to the Cloud
      * This will send a {@link ResultPacket} to the Cloud
@@ -222,7 +224,7 @@ public class CloudAPI implements CloudService {
      * @param packet > The ResultPacket to send
      * @return Result from CloudLibrary
      */
-    public <T> Result<T> sendQuery(ResultPacket<T> packet) {
+    public <T> Result<T> sendQuery(ResultPacket<T> packet, int timeout) {
         Value<Result<T>> value = new Value<>();
         UUID uuid = UUID.randomUUID();
 
@@ -248,7 +250,7 @@ public class CloudAPI implements CloudService {
         });
         int count = 0;
 
-        while (value.getValue() == null && count++ < 3000) {
+        while (value.getValue() == null && count++ < timeout) {
             try {
                 Thread.sleep(0, 500000);
             } catch (InterruptedException e) {
@@ -256,7 +258,7 @@ public class CloudAPI implements CloudService {
                 e.printStackTrace();
             }
         }
-        if (count >= 2999) {
+        if (count >= timeout) {
             Result<T> r = new Result<>(uuid, null);
             r.setThrowable(new TimeoutException("Request timed out!"));
             value.setValue(r);

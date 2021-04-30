@@ -9,7 +9,7 @@ public class Reflections {
 
     @SneakyThrows
     public static Class<?> getNmsClass(String nmsClassName) {
-        return Class.forName("net.minecraft.server." + Constants.BUKKIT_VERSION + "." + nmsClassName);
+        return Class.forName("net.minecraft.server." + CloudCache.getInstance().getBukkitVersion() + "." + nmsClassName);
     }
 
     /**

@@ -4,7 +4,7 @@ import de.lystx.cloudapi.CloudAPI;
 import de.lystx.cloudsystem.library.elements.packets.both.other.PacketInformation;
 import de.lystx.cloudsystem.library.service.util.CloudMap;
 import de.lystx.serverselector.spigot.event.CloudServerNPCInteractEvent;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import de.lystx.serverselector.spigot.SpigotSelector;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -73,7 +73,7 @@ public class PacketReader {
                 if (npc == null) {
                     return;
                 }
-                if (Constants.DELETERS.contains(player.getUniqueId())) {
+                if (CloudCache.getInstance().getNpcDeleterList().contains(player.getUniqueId())) {
                     NPC getSafe = SpigotSelector.getInstance().getNpcManager().getNPC(npc.getLocation());
                     if (getSafe != null) {
                         String group = SpigotSelector.getInstance().getNpcManager().getGroupNPCS().get(getSafe);
@@ -85,7 +85,7 @@ public class PacketReader {
 
                         CloudAPI.getInstance().sendPacket(packetInformation);
 
-                        Constants.DELETERS.remove(player.getUniqueId());
+                        CloudCache.getInstance().getNpcDeleterList().remove(player.getUniqueId());
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Removed NPC for group §b" + group + "§8!");
                     } else {
                         player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cThe NPC couldn't be found!");

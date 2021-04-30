@@ -2,7 +2,7 @@ package de.lystx.cloudsystem.library.service.player.featured.inventory;
 
 import de.lystx.cloudsystem.library.elements.packets.both.inventory.PacketInventoryUpdate;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,8 +48,8 @@ public class CloudPlayerInventory implements Serializable {
      *               values to null and clear the items
      */
     public void update(boolean clearAfter) {
-        Constants.INVENTORIES.put(this.cloudPlayer.getUniqueId(), this);
-        Constants.EXECUTOR.sendPacket(new PacketInventoryUpdate(this.cloudPlayer, this));
+        CloudCache.getInstance().getCloudInventories().put(this.cloudPlayer.getUniqueId(), this);
+        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(new PacketInventoryUpdate(this.cloudPlayer, this));
         if (clearAfter) {
             this.slots = new HashMap<>();
             this.helmet = null;

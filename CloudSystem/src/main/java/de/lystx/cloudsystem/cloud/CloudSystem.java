@@ -132,6 +132,6 @@ public class CloudSystem extends CloudInstance implements CloudService {
 
     @Override
     public void callEvent(Event event) {
-        this.sendPacket(new PacketCallEvent(event));
+        super.callEvent(event);
     }
 }

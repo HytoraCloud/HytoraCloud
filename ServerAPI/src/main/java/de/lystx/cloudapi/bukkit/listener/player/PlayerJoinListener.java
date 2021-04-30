@@ -6,6 +6,7 @@ import de.lystx.cloudapi.bukkit.events.player.CloudPlayerLabyModJoinEvent;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
 import de.lystx.cloudsystem.library.elements.packets.result.login.ResultPacketLoginSuccess;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModAddon;
 import de.lystx.cloudsystem.library.service.player.featured.labymod.LabyModPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudConnection;
@@ -23,21 +24,26 @@ public class PlayerJoinListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
 
+        final Player player = event.getPlayer();
+        final Service service = CloudAPI.getInstance().getService();
+        final CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
+        connection.setStart(service);
+
+        CloudAPI.getInstance().execute(() -> {
+            CloudAPI.getInstance().sendQuery(new ResultPacketLoginSuccess(connection));
+            CloudAPI.getInstance().sendQuery(new ResultPacketLoginSuccess(connection));
+        });
+
         //Player has joined; server is not stopping
         if (CloudServer.getInstance().getTaskId() != -1) {
             CloudAPI.getInstance().getScheduler().cancelTask(CloudServer.getInstance().getTaskId()); //Cancelling stop ask
         }
 
-        final Player player = event.getPlayer();
-        final CloudConnection connection = new CloudConnection(player.getUniqueId(), player.getName(), player.getAddress().getAddress().getHostAddress());
-
-        CloudAPI.getInstance().sendPacket(new ResultPacketLoginSuccess(connection, CloudAPI.getInstance().getService()));
-
-        CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(CloudAPI.getInstance().getService()));
+        CloudAPI.getInstance().sendPacket(new PacketInServiceUpdate(service));
         int percent = CloudAPI.getInstance().getService().getServiceGroup().getNewServerPercent();
 
         if (percent <= 100 && (((double) Bukkit.getOnlinePlayers().size()) / (double) Bukkit.getMaxPlayers()) * 100 >= percent) {
-            CloudAPI.getInstance().getNetwork().startService(CloudAPI.getInstance().getService().getServiceGroup().getName(), new SerializableDocument().append("waitingForPlayers", true));
+            CloudAPI.getInstance().getNetwork().startService(service.getServiceGroup().getName(), new SerializableDocument().append("waitingForPlayers", true));
         }
     }
 

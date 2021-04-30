@@ -6,18 +6,11 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketUpdateNetwor
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
-import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.Constants;
-import de.lystx.cloudsystem.library.service.util.Serializer;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 @Getter @AllArgsConstructor
 public class PacketHandlerConfig extends PacketHandlerAdapter {
@@ -33,9 +26,9 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
             this.cloudAPI.getNetwork().setServices(info.getServices());
             this.cloudAPI.getCloudPlayers().setCloudPlayers(info.getCloudPlayers());
 
-            Constants.CLOUDPLAYERS = new Filter<>(info.getCloudPlayers());
-            Constants.PERMISSION_POOL = this.cloudAPI.getPermissionPool();
-            Constants.SERVICE_FILTER = new Filter<>(this.cloudAPI.getNetwork().getServices());
+            CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(info.getCloudPlayers()));
+            CloudCache.getInstance().setPermissionPool(this.cloudAPI.getPermissionPool());
+            CloudCache.getInstance().setServiceFilter(new Filter<>(this.cloudAPI.getNetwork().getServices()));
 
         }
     }

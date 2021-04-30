@@ -20,14 +20,4 @@ public abstract class Packet extends CloudMap<String, Object> implements Seriali
         return this;
     }
 
-    /**
-     * Appeding whole value to packet
-     * @param value
-     * @return current packet
-     */
-    public Packet append(Object value) {
-        this.putAll(VsonObject.encode((VsonObject) new VsonTree(value).tree()));
-        return this;
-    }
-
 }

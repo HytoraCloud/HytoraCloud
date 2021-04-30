@@ -3,6 +3,7 @@ package de.lystx.cloudsystem.library.service.io;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import de.lystx.cloudsystem.library.service.util.Utils;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -112,7 +113,7 @@ public class FileService extends CloudService {
         this.backupDirectory = new File(this.globalDirectory, "backup/");
         this.backupFile = new File(this.backupDirectory, "backup.json");
 
-        if (!cloudLibrary.getType().equals(CloudType.CLOUDAPI)) {
+        if (!CloudCache.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
             this.check();
         }
     }
@@ -161,11 +162,7 @@ public class FileService extends CloudService {
             this.backupDirectory.mkdirs();
         }
         if (getCloudLibrary().getCloudType().equals(CloudType.CLOUDSYSTEM) && !this.tempData.getBoolean("hadOptionToUseModules", false)) {
-            this.copyFileWithURL("/implements/modules/module-notify.jar", new File(this.modulesDirectory, "module-notify.jar"));
             this.copyFileWithURL("/implements/modules/module-serverSelector.jar", new File(this.modulesDirectory, "module-serverSelector.jar"));
-            this.copyFileWithURL("/implements/modules/module-commands.jar", new File(this.modulesDirectory, "module-commands.jar"));
-            this.copyFileWithURL("/implements/modules/module-proxy.jar", new File(this.modulesDirectory, "module-proxy.jar"));
-            this.copyFileWithURL("/implements/modules/module-hubcommand.jar", new File(this.modulesDirectory, "module-hubcommand.jar"));
             this.tempData.append("hadOptionToUseModules", true);
             this.tempData.save();
         }
@@ -191,6 +188,10 @@ public class FileService extends CloudService {
         try {
             URL inputUrl = getClass().getResource(filename);
             if (location.exists()) {
+                return;
+            }
+            if (inputUrl == null) {
+                System.out.println("[FileService] Couldn't copy file " + filename + " to " + location.toString() + "!");
                 return;
             }
             try {

@@ -3,13 +3,11 @@ package de.lystx.cloudsystem.library.service.player.featured.labymod;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import de.lystx.cloudsystem.library.enums.CloudType;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import de.lystx.cloudsystem.library.service.util.PacketUtils;
 import de.lystx.cloudsystem.library.service.util.Reflections;
 import io.vson.elements.object.VsonObject;
-import io.vson.enums.FileFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -39,7 +37,7 @@ public class LabyModPlayer implements Serializable {
      * @param gamemode
      */
     public void updateGamemode(String gamemode) {
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
             this.sendServerMessage( player, "server_gamemode", new VsonObject()
                     .append("show_gamemode", true)
@@ -59,7 +57,7 @@ public class LabyModPlayer implements Serializable {
         for (int i = 0; i < addons.length; i++) {
             uuids[i] = addons[i].getUuid();
         }
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
 
             JsonObject object = new JsonObject();
@@ -85,7 +83,7 @@ public class LabyModPlayer implements Serializable {
      * for this {@link LabyModPlayer}
      */
     public void disableVoicechat() {
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
             this.sendServerMessage(player, "voicechat", new VsonObject().append("allowed", false).toJson());
         } else {
@@ -100,7 +98,7 @@ public class LabyModPlayer implements Serializable {
      * @param uniqueId
      */
     public void mutePlayerForSelf(UUID uniqueId, boolean mute) {
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
 
             VsonObject vsonObject = new VsonObject();
@@ -126,7 +124,7 @@ public class LabyModPlayer implements Serializable {
      * Code: https://docs.labymod.net/pages/server/watermark/
      */
     public void sendWatermark(boolean visible) {
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
             this.sendServerMessage( player, "watermark", new VsonObject().append("visible", visible).toJson());
         } else {
@@ -143,7 +141,7 @@ public class LabyModPlayer implements Serializable {
      */
     @SneakyThrows
     public void setSubtitle(String value) {
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
 
             final Class<?> aClass = Class.forName("org.bukkit.Bukkit");
@@ -212,7 +210,7 @@ public class LabyModPlayer implements Serializable {
      * @param address The Address of the server
      */
     public void sendClientToServer(String title, String address) {
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
 
             this.sendServerMessage( player, "server_switch",
@@ -234,7 +232,7 @@ public class LabyModPlayer implements Serializable {
      * @param duration
      */
     public void sendCineScope(int coveragePercent, long duration ) {
-        if (Constants.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (CloudCache.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             Object player = Reflections.getBukkitPlayer(this.name);
 
             this.sendServerMessage( player, "cinescopes", new VsonObject()

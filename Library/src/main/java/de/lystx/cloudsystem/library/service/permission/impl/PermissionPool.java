@@ -3,10 +3,11 @@ package de.lystx.cloudsystem.library.service.permission.impl;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupAddEvent;
 import de.lystx.cloudsystem.library.elements.events.player.CloudPlayerPermissionGroupRemoveEvent;
+import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import de.lystx.cloudsystem.library.service.uuid.UUIDService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -49,11 +50,17 @@ public class PermissionPool implements Serializable {
      * Updates the permissionPool
      */
     public void update() {
-        Constants.PERMISSION_POOL = this;
-        if (Constants.EXECUTOR == null) {
+        CloudCache.getInstance().setPermissionPool(this);
+        if (CloudCache.getInstance().getCurrentCloudExecutor() == null) {
             return;
         }
-        Constants.EXECUTOR.sendPacket(new PacketUpdatePermissionPool(this));
+        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(new PacketUpdatePermissionPool(this));
+    }
+
+    public CloudPlayerData getDefaultData(UUID uuid, String name, String ip) {
+        final CloudPlayerData cloudPlayerData = new CloudPlayerData(uuid, name, Collections.singletonList(new PermissionEntry(uuid, this.getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), ip, true, new Date().getTime(), 0L);
+        cloudPlayerData.setDefault(true);
+        return cloudPlayerData;
     }
 
     /**
@@ -110,7 +117,7 @@ public class PermissionPool implements Serializable {
                 //Ignoring
             }
         }
-        return Constants.DEFAULT_PERMISSION_GROUP;
+        return new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new SerializableDocument());
     }
 
     /**
@@ -161,7 +168,7 @@ public class PermissionPool implements Serializable {
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
         try {
-            Constants.EXECUTOR.callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
+            CloudCache.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
         } catch (NullPointerException e) {
             //IGnoring in setup
         }
@@ -261,7 +268,7 @@ public class PermissionPool implements Serializable {
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
         try {
-            Constants.EXECUTOR.callEvent(new CloudPlayerPermissionGroupAddEvent(playerName, group, i, validality));
+            CloudCache.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerPermissionGroupAddEvent(playerName, group, i, validality));
         } catch (NullPointerException e) {
             //IGnoring in setup
         }
@@ -281,7 +288,7 @@ public class PermissionPool implements Serializable {
                 this.update();
             }
         } else {
-            this.playerCache.add(Constants.getDefaultData(uuid, player, "-1"));
+            this.playerCache.add(this.getDefaultData(uuid, player, "-1"));
         }
     }
 
@@ -294,11 +301,12 @@ public class PermissionPool implements Serializable {
         List<PermissionGroup> permissionGroups = new LinkedList<>();
         try {
             CloudPlayerData data = this.getPlayerData(player);
-            if (data != null) {
-                for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
-                    PermissionGroup permissionGroup = this.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
-                    permissionGroups.add(permissionGroup);
-                }
+            if (data == null) {
+                data = this.getDefaultData(UUIDService.getInstance().getUUID(player), player, "-1");
+            }
+            for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
+                PermissionGroup permissionGroup = this.getPermissionGroupFromName(permissionEntry.getPermissionGroup());
+                permissionGroups.add(permissionGroup);
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -318,7 +326,7 @@ public class PermissionPool implements Serializable {
             if (list.isEmpty()) {
                 return this.getDefaultPermissionGroup();
             } else {
-                return list.get(0);
+                return list.get(list.size() - 1);
             }
         } catch (NullPointerException e) {
             return null;
@@ -343,7 +351,7 @@ public class PermissionPool implements Serializable {
                 }
             } catch (NullPointerException ignored) {}
         }
-        return Constants.getDefaultData(tryUUID(playerName), playerName, "-1");
+        return this.getDefaultData(tryUUID(playerName), playerName, "-1");
 
     }
 
@@ -365,7 +373,7 @@ public class PermissionPool implements Serializable {
         CloudPlayerData pre = this.getPlayerData(playerName);
         if (pre == null) {
             UUID uuid = this.tryUUID(playerName);
-            CloudPlayerData data = Constants.getDefaultData(uuid, playerName, "-1");
+            CloudPlayerData data = this.getDefaultData(uuid, playerName, "-1");
             data.setDefault(true);
             return data;
         } else {

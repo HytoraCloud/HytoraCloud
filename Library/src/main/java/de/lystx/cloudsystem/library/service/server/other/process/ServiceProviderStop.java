@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -42,7 +42,7 @@ public class ServiceProviderStop {
             screen.getThread().stop();
             screen.getProcess().destroy();
             Scheduler.getInstance().scheduleDelayedTaskAsync(() -> {
-                Constants.THREAD_POOL.execute(() -> {
+                CloudCache.getInstance().getThreadPool().execute(() -> {
                     if (service.getServiceGroup().isDynamic()) {
                         try {
                             FileUtils.deleteDirectory(screen.getServerDir());

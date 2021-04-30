@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
 import de.lystx.cloudsystem.library.service.console.logger.LoggerService;
 import de.lystx.cloudsystem.library.service.setup.AbstractSetup;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -43,7 +43,7 @@ public class CloudConsole extends Thread implements CloudCommandSender {
             try {
                 String s = ConsoleColor.formatColorString(this.getPrefix());
                 String line;
-                if (!Constants.NEEDS_DEPENDENCIES) {
+                if (!CloudCache.getInstance().isNeedsDependencies()) {
                     if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
                         if (!line.trim().isEmpty()) {
                             this.logger.getConsoleReader().setPrompt("");

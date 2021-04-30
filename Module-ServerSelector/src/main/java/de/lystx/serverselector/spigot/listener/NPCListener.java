@@ -186,14 +186,13 @@ public class NPCListener implements Listener {
                 input = input.replace("%port%", "" + service.getPort());
                 input = input.replace("%id%", "" + service.getServiceID());
                 input = input.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
-                if (service.getInfo() != null) {
-                    String motd = service.getInfo().getMotd() == null ? "no_motd" : service.getInfo().getMotd();
-                    String maxPlayers = String.valueOf(service.getInfo().getMaxPlayers());
-                    String online = String.valueOf(service.getInfo().getOnlinePlayers().size());
-                    input = input.replace("%motd%", motd);
-                    input = input.replace("%max%", maxPlayers);
-                    input = input.replace("%online%", online);
-                }
+
+                String motd = service.getMotd() == null ? "no_motd" : service.getMotd();
+                String maxPlayers = String.valueOf(service.getMaxPlayers());
+                String online = String.valueOf(service.getOnlinePlayers().size());
+                input = input.replace("%motd%", motd);
+                input = input.replace("%max%", maxPlayers);
+                input = input.replace("%online%", online);
 
             }
             if (serviceGroup != null) {

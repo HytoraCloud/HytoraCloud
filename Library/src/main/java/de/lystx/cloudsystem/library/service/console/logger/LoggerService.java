@@ -5,7 +5,7 @@ import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.command.CommandService;
 import de.lystx.cloudsystem.library.service.console.CloudCompleter;
 import de.lystx.cloudsystem.library.service.console.color.ConsoleColor;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import de.lystx.cloudsystem.library.service.util.LogService;
 import jline.console.ConsoleReader;
 import lombok.Getter;
@@ -25,11 +25,11 @@ public class LoggerService extends CloudService {
      */
     public LoggerService(CloudLibrary cloudLibrary, String name, CloudServiceType type) {
         super(cloudLibrary, name, type);
-        if (!Constants.NEEDS_DEPENDENCIES) {
+        if (!CloudCache.getInstance().isNeedsDependencies()) {
             try {
                 this.consoleReader = new ConsoleReader(System.in, System.err);
                 this.consoleReader.setExpandEvents(false);
-                if (!Constants.JLINE_COMPLETER_INSTALLED) {
+                if (!CloudCache.getInstance().isJlineCompleterInstalled()) {
                     if (cloudLibrary != null && cloudLibrary.getService(CommandService.class) != null) {
                         this.consoleReader.addCompleter(new CloudCompleter(cloudLibrary.getService(CommandService.class)));
                     }
@@ -58,7 +58,7 @@ public class LoggerService extends CloudService {
     public void sendMessage(String message) {
         try {
             message = ConsoleColor.formatColorString(message);
-            if (!Constants.NEEDS_DEPENDENCIES) {
+            if (!CloudCache.getInstance().isNeedsDependencies()) {
                 this.consoleReader.println('\r' + message);
                 this.consoleReader.drawLine();
                 this.consoleReader.flush();

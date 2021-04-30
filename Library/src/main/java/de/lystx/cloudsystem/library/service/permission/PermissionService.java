@@ -9,7 +9,7 @@ import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionGroup;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionPool;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Getter @Setter
@@ -68,7 +69,7 @@ public class PermissionService extends CloudService {
         this.permissionPool.getPermissionGroups().clear();
         if (!this.file.exists()) {
             VsonObject vsonObject = new VsonObject(VsonSettings.SAFE_TREE_OBJECTS, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
-            PermissionGroup defaultGroup = Constants.DEFAULT_PERMISSION_GROUP;
+            PermissionGroup defaultGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new SerializableDocument());
             PermissionGroup adminGroup = new PermissionGroup(
                     "Admin",
                     0,

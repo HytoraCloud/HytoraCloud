@@ -50,7 +50,7 @@ public class PlayerCommand {
                     sender.sendMessage("ERROR", "§aOnline §bInformation §7on " + cloudPlayer.getName() + "§7:");
                 }
                 try {
-                    PermissionGroup permissionGroup = pool.getHighestPermissionGroup(player);
+                    PermissionGroup permissionGroup = pool.getHighestPermissionGroup(player); //TODO: id SORTING IS WRONG
                     PermissionEntry permissionEntry = playerData.getForGroup(permissionGroup.getName());
                     String v = permissionEntry.getValidTime();
                     sender.sendMessage("INFO", "§7Name | §b" + playerData.getName());
@@ -61,11 +61,14 @@ public class PlayerCommand {
                     sender.sendMessage("INFO", "§7First login | §b" + pool.getFormat().format(new Date(playerData.getFirstLogin())));
                     sender.sendMessage("INFO", "§7Last login | §b" + pool.getFormat().format(new Date(playerData.getLastLogin())));
                     if (cloudPlayer != null) {
-                        sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getService().getName());
                         sender.sendMessage("INFO", "§7Proxy | §b" + cloudPlayer.getProxy());
+                        sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getService().getName());
                     }
                 } catch (NullPointerException e) {
                     sender.sendMessage("ERROR", "§cAn error has occured while attempting to perform this command!");
+                    for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                        sender.sendMessage("ERROR", "§e" + stackTraceElement.toString());
+                    }
                 }
             } else {
                 this.correctSyntax(sender);

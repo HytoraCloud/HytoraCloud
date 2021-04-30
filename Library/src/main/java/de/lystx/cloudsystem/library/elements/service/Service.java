@@ -1,18 +1,19 @@
 package de.lystx.cloudsystem.library.elements.service;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
+import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.service.util.ServerPinger;
 import io.vson.elements.object.Objectable;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.SneakyThrows;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -67,15 +68,67 @@ public class Service implements Serializable, Objectable<Service> {
     }
 
     /**
-     * Returns a ServiceInfo by this Service
-     * Used to return Motd, players etc
-     * @return
+     * Returns the {@link CloudPlayer}s on this
+     * Service (for example "Lobby-1")
+     *
+     * @return List<CloudPlayer>
      */
-    public ServiceInfo getInfo() {
-        if (this.serviceGroup.getServiceType().equals(ServiceType.PROXY)) {
-            throw new UnsupportedOperationException("Can't get ServiceInfo for a ProxyService!");
+    public List<CloudPlayer> getOnlinePlayers() {
+        List<CloudPlayer> list = new LinkedList<>();
+        for (CloudPlayer globalOnlinePlayer : CloudCache.CLOUDPLAYERS) {
+            if (!globalOnlinePlayer.getService().getName().equalsIgnoreCase(this.getName())) {
+                continue;
+            }
+            list.add(globalOnlinePlayer);
         }
-        return ServiceInfo.fromService(this);
+        return list;
+    }
+
+    /**
+     * Returns the Motd of this Service
+     * might lag if the Service has not been
+     * pinged before
+     *
+     * @return Motd of service
+     */
+    public String getMotd() {
+        if (serviceGroup.getServiceType().equals(ServiceType.PROXY)) {
+            throw new UnsupportedOperationException("Not available for Proxy!");
+        }
+        return this.ping().getMotd();
+    }
+
+    /**
+     * Returns the Maximum PLayers of this Service
+     * might lag if the Service has not been
+     * pinged before
+     *
+     * @return Maximum PLayers of service
+     */
+    public int getMaxPlayers() {
+        if (serviceGroup.getServiceType().equals(ServiceType.PROXY)) {
+            throw new UnsupportedOperationException("Not available for Proxy!");
+        }
+        return this.ping().getMaxplayers();
+    }
+
+    /**
+     * Updates this Service
+     * and syncs it all over the cloud
+     */
+    public void update() {
+        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(new PacketInServiceUpdate(this));
+    }
+
+    @SneakyThrows
+    /**
+     * This pings the current Service
+     * to get all Data of it
+     */
+    private ServerPinger ping() {
+        ServerPinger serverPinger = new ServerPinger();
+        serverPinger.pingServer(this.host, this.port, 20);
+        return serverPinger;
     }
 
     @Override

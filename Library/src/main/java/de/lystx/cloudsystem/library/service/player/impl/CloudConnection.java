@@ -1,10 +1,12 @@
 package de.lystx.cloudsystem.library.service.player.impl;
 
 import de.lystx.cloudsystem.library.elements.packets.both.player.PacketKickPlayer;
+import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.util.Constants;
-import lombok.AllArgsConstructor;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -14,12 +16,15 @@ import java.util.UUID;
  * to disconnect the player
  * and send packets
  */
-@Getter @AllArgsConstructor
+@Getter @RequiredArgsConstructor
 public class CloudConnection implements Serializable {
 
     private final UUID uniqueId;
     private final String name;
     private final String address;
+
+    @Setter
+    private Service start;
 
     /**
      * Closes connection
@@ -34,7 +39,7 @@ public class CloudConnection implements Serializable {
      * @param packet
      */
     public void sendPacket(Packet packet) {
-        Constants.EXECUTOR.sendPacket(packet);
+        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(packet);
     }
 
 }

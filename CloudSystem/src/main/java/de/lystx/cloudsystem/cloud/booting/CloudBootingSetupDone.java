@@ -22,7 +22,7 @@ import de.lystx.cloudsystem.library.service.config.stats.StatisticsService;
 import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.module.ModuleService;
 import de.lystx.cloudsystem.library.service.network.CloudNetworkService;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import de.lystx.cloudsystem.library.service.server.impl.GroupService;
 import de.lystx.cloudsystem.library.service.server.other.ServerService;
 import de.lystx.cloudsystem.library.service.util.NetworkInfo;
@@ -55,7 +55,7 @@ public class CloudBootingSetupDone {
         cloudSystem.cloudServices.add(new ModuleService(cloudSystem, "Modules", CloudService.CloudServiceType.MANAGING));
         cloudSystem.cloudServices.add(new BackupService(cloudSystem, "Backups", CloudService.CloudServiceType.MANAGING));
 
-        Constants.EXECUTOR = cloudSystem.getService(CloudNetworkService.class).getCloudServer();
+        CloudCache.getInstance().setCurrentCloudExecutor(cloudSystem.getService(CloudNetworkService.class).getCloudServer());
 
         cloudSystem.cloudServices.add(cloudSystem.service = new ServerService(cloudSystem, "Services", CloudService.CloudServiceType.NETWORK, cloudSystem.getService(GroupService.class).getGroups()));
 

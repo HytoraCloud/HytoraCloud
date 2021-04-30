@@ -52,7 +52,10 @@ public class LabyMod implements Listener {
                 final String messageContents = getPacketUtils().readString( buf, Short.MAX_VALUE );
 
                 try {
-                    if (messageContents.equalsIgnoreCase("{}")) {
+                    if (messageContents.trim().startsWith("{}")) {
+                        return;
+                    }
+                    if (messageContents.trim().equalsIgnoreCase("{}")) {
                         return;
                     }
 

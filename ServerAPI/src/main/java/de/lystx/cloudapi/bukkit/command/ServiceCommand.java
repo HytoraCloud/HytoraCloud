@@ -10,7 +10,7 @@ import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.command.base.CloudCommandSender;
 import de.lystx.cloudsystem.library.service.command.base.Command;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.Constants;
+import de.lystx.cloudsystem.library.service.util.CloudCache;
 import org.bukkit.*;
 
 import java.lang.management.ManagementFactory;
@@ -90,11 +90,11 @@ public class ServiceCommand {
                             return;
                         }
 
-                        if (!Constants.DELETERS.contains(player.getUniqueId())) {
-                            Constants.DELETERS.add(player.getUniqueId());
+                        if (!CloudCache.getInstance().getNpcDeleterList().contains(player.getUniqueId())) {
+                            CloudCache.getInstance().getNpcDeleterList().add(player.getUniqueId());
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§7Leftclick the §bNPC §7you want to remove§8! §cTo cancel type this command §eagain§c!");
                         } else {
-                            Constants.DELETERS.remove(player.getUniqueId());
+                            CloudCache.getInstance().getNpcDeleterList().remove(player.getUniqueId());
                             player.sendMessage(CloudAPI.getInstance().getPrefix() + "§cDeletion was §ecancelled§c!");
                         }
                     } else {
