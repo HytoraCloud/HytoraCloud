@@ -20,7 +20,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 
 public class PacketHandlerCloudPlayer {
 
@@ -43,12 +43,12 @@ public class PacketHandlerCloudPlayer {
     @PacketHandler
     public void handle(PacketUpdatePlayer packet) {
         PermissionPool permissionPool = cloudSystem.getService(PermissionService.class).getPermissionPool();
-        permissionPool.updatePlayerData(packet.getName(), packet.getNewCloudPlayer().getData());
+        permissionPool.updatePlayerData(packet.getClass().getSimpleName(), packet.getNewCloudPlayer().getData());
         cloudSystem.getService(PermissionService.class).setPermissionPool(permissionPool);
         cloudSystem.getService(PermissionService.class).save();
-        this.cloudSystem.getService(CloudPlayerService.class).update(packet.getName(), packet.getNewCloudPlayer());
+        this.cloudSystem.getService(CloudPlayerService.class).update(packet.getClass().getSimpleName(), packet.getNewCloudPlayer());
         this.cloudSystem.reload();
-        CloudCache.CLOUDPLAYERS = new Filter<CloudPlayer>(this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayers());
+        Cloud.getInstance().setCloudPlayerFilter(new Filter<>(this.cloudSystem.getService(CloudPlayerService.class).getOnlinePlayers()));
     }
 
     @PacketHandler
@@ -56,9 +56,9 @@ public class PacketHandlerCloudPlayer {
         CloudPlayer cloudPlayer = this
                 .cloudSystem
                 .getService(CloudPlayerService.class)
-                .getOnlinePlayer(packet.getName());
+                .getOnlinePlayer(packet.getClass().getSimpleName());
         if (cloudPlayer != null) {
-            CloudCache.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerQuitEvent(cloudPlayer));
+            Cloud.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerQuitEvent(cloudPlayer));
             this.cloudSystem.getService(CloudPlayerService.class).removePlayer(cloudPlayer);
             this.cloudSystem.reload();
         }

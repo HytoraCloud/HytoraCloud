@@ -1,13 +1,16 @@
 package de.lystx.cloudapi.proxy;
 
 import de.lystx.cloudapi.CloudAPI;
+import de.lystx.cloudapi.proxy.commands.*;
 import de.lystx.cloudapi.proxy.handler.*;
-import de.lystx.cloudapi.proxy.listener.other.TablistListener;
-import de.lystx.cloudapi.proxy.listener.network.CloudListener;
-import de.lystx.cloudapi.proxy.listener.player.CommandListener;
-import de.lystx.cloudapi.proxy.listener.player.PlayerListener;
-import de.lystx.cloudapi.proxy.listener.server.ServerConnectListener;
-import de.lystx.cloudapi.proxy.listener.server.ServerKickListener;
+import de.lystx.cloudapi.proxy.impl.commands.*;
+import de.lystx.cloudapi.proxy.impl.listener.network.CloudListener;
+import de.lystx.cloudapi.proxy.impl.listener.other.ProxyPingListener;
+import de.lystx.cloudapi.proxy.impl.listener.other.TablistListener;
+import de.lystx.cloudapi.proxy.impl.listener.player.CommandListener;
+import de.lystx.cloudapi.proxy.impl.listener.player.PlayerListener;
+import de.lystx.cloudapi.proxy.impl.listener.server.ServerConnectListener;
+import de.lystx.cloudapi.proxy.impl.listener.server.ServerKickListener;
 import de.lystx.cloudsystem.library.elements.interfaces.CloudService;
 import de.lystx.cloudsystem.library.elements.interfaces.NetworkHandler;
 import de.lystx.cloudsystem.library.elements.service.Service;
@@ -19,7 +22,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.util.Action;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -56,7 +59,7 @@ public class CloudProxy extends Plugin implements CloudService {
             CloudAPI.getInstance().registerCommand(new ListCommand());
             CloudAPI.getInstance().registerCommand(new NetworkCommand());
 
-            CloudCache.getInstance().setCurrentServiceType(ServiceType.PROXY);
+            Cloud.getInstance().setCurrentServiceType(ServiceType.PROXY);
             this.bootstrap();
 
             CloudAPI.getInstance().registerNetworkHandler(new NetworkHandler() {

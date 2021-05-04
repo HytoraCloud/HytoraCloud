@@ -156,7 +156,7 @@ public class CloudLibrary implements Serializable, de.lystx.cloudsystem.library.
      * @param event
      */
     public void callEvent(Event event) {
-        CloudCache.getInstance().getCurrentCloudExecutor().callEvent(event);
+        Cloud.getInstance().getCurrentCloudExecutor().callEvent(event);
         this.getService(EventService.class).callEvent(event);
     }
 

@@ -1,5 +1,6 @@
 package de.lystx.cloudsystem.library.service.util;
 
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Method;
@@ -9,7 +10,7 @@ public class Reflections {
 
     @SneakyThrows
     public static Class<?> getNmsClass(String nmsClassName) {
-        return Class.forName("net.minecraft.server." + CloudCache.getInstance().getBukkitVersion() + "." + nmsClassName);
+        return Class.forName("net.minecraft.server." + Cloud.getInstance().getBukkitVersion() + "." + nmsClassName);
     }
 
     /**

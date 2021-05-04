@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -43,7 +43,7 @@ public class CloudPlayerService extends CloudService {
         if (this.getCloudLibrary().getWebServer() != null) {
             this.getCloudLibrary().getWebServer().update("players", this.toDocument());
         }
-        CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(this.onlinePlayers));
+        Cloud.getInstance().setCloudPlayerFilter(new Filter<>(this.onlinePlayers));
         return registered;
     }
 
@@ -92,7 +92,7 @@ public class CloudPlayerService extends CloudService {
             //Ignoring because it doesn't break the cloud
         }
         this.onlinePlayers.remove(cloudPlayer);
-        CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(this.onlinePlayers));
+        Cloud.getInstance().setCloudPlayerFilter(new Filter<>(this.onlinePlayers));
     }
 
     /**
@@ -107,7 +107,7 @@ public class CloudPlayerService extends CloudService {
             this.onlinePlayers.remove(cloudPlayer);
         }
         this.onlinePlayers.add(newPlayer);
-        CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(this.onlinePlayers));
+        Cloud.getInstance().setCloudPlayerFilter(new Filter<>(this.onlinePlayers));
     }
 
     /**

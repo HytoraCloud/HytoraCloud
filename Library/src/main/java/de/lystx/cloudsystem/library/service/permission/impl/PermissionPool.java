@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.cloudsystem.library.service.database.IDatabase;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import de.lystx.cloudsystem.library.service.uuid.UUIDService;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -50,11 +50,11 @@ public class PermissionPool implements Serializable {
      * Updates the permissionPool
      */
     public void update() {
-        CloudCache.getInstance().setPermissionPool(this);
-        if (CloudCache.getInstance().getCurrentCloudExecutor() == null) {
+        Cloud.getInstance().setPermissionPool(this);
+        if (Cloud.getInstance().getCurrentCloudExecutor() == null) {
             return;
         }
-        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(new PacketUpdatePermissionPool(this));
+        Cloud.getInstance().getCurrentCloudExecutor().sendPacket(new PacketUpdatePermissionPool(this));
     }
 
     public CloudPlayerData getDefaultData(UUID uuid, String name, String ip) {
@@ -168,7 +168,7 @@ public class PermissionPool implements Serializable {
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
         try {
-            CloudCache.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
+            Cloud.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerPermissionGroupRemoveEvent(playerName, group));
         } catch (NullPointerException e) {
             //IGnoring in setup
         }
@@ -268,7 +268,7 @@ public class PermissionPool implements Serializable {
         data.setPermissionEntries(permissionEntries);
         this.playerCache.add(data);
         try {
-            CloudCache.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerPermissionGroupAddEvent(playerName, group, i, validality));
+            Cloud.getInstance().getCurrentCloudExecutor().callEvent(new CloudPlayerPermissionGroupAddEvent(playerName, group, i, validality));
         } catch (NullPointerException e) {
             //IGnoring in setup
         }

@@ -14,7 +14,7 @@ import java.util.*;
 @Getter
 public class EventService extends CloudService {
 
-    private final Map<Object, List<ObjectMethod<SubscribeEvent>>> registeredClasses;
+    private final Map<Object, List<ObjectMethod<CloudEventHandler>>> registeredClasses;
 
     public EventService(CloudLibrary cloudLibrary, String name, CloudServiceType cloudType) {
         super(cloudLibrary, name, cloudType);
@@ -26,10 +26,10 @@ public class EventService extends CloudService {
      * @param o
      */
     public void registerEvent(Object o) {
-        List<ObjectMethod<SubscribeEvent>> eventMethods = new ArrayList<>();
+        List<ObjectMethod<CloudEventHandler>> eventMethods = new ArrayList<>();
 
         for (Method m : o.getClass().getDeclaredMethods()) {
-            SubscribeEvent annotation = m.getAnnotation(SubscribeEvent.class);
+            CloudEventHandler annotation = m.getAnnotation(CloudEventHandler.class);
 
             if (annotation != null) {
                 Class<?> parameterType = m.getParameterTypes()[0];
@@ -59,8 +59,8 @@ public class EventService extends CloudService {
     public boolean callEvent(Event event) {
         try {
             registeredClasses.forEach((object, methodList) -> {
-                for (ObjectMethod<SubscribeEvent> em : methodList) {
-                    if (em.getEvent().equals(event.getClass())) {
+                for (ObjectMethod<CloudEventHandler> em : methodList) {
+                    if (em.getAClass().equals(event.getClass())) {
                         try {
                             em.getMethod().invoke(em.getInstance(), event);
                         } catch (IllegalAccessException | InvocationTargetException e) {

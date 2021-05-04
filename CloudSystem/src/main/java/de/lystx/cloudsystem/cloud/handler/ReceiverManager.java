@@ -2,7 +2,6 @@ package de.lystx.cloudsystem.cloud.handler;
 
 import de.lystx.cloudsystem.cloud.CloudSystem;
 import de.lystx.cloudsystem.library.elements.other.ReceiverInfo;
-import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverFiles;
 import de.lystx.cloudsystem.library.elements.packets.receiver.PacketReceiverLoginResult;
 import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.io.FileService;
@@ -57,11 +56,6 @@ public class ReceiverManager {
     public void sendFilesToReceivers() {
         FileService fs = this.cloudSystem.getService(FileService.class);
 
-        PacketReceiverFiles packetReceiverFiles = new PacketReceiverFiles(
-                new File(fs.getVersionsDirectory(), "spigot.jar"),
-                new File(fs.getVersionsDirectory(), "bungeeCord.jar"),
-                new File("templates.zip")
-        );
         //this.cloudSystem.sendPacket(packetReceiverFiles);
     }
 

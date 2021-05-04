@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.library.service.io;
 import de.lystx.cloudsystem.library.CloudLibrary;
 import de.lystx.cloudsystem.library.enums.CloudType;
 import de.lystx.cloudsystem.library.service.CloudService;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import de.lystx.cloudsystem.library.service.util.Utils;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -113,7 +113,7 @@ public class FileService extends CloudService {
         this.backupDirectory = new File(this.globalDirectory, "backup/");
         this.backupFile = new File(this.backupDirectory, "backup.json");
 
-        if (!CloudCache.CLOUD_TYPE.equals(CloudType.CLOUDAPI)) {
+        if (!Cloud.getInstance().getCurrentCloudType().equals(CloudType.CLOUDAPI)) {
             this.check();
         }
     }

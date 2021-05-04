@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.library.elements.service.ServiceGroup;
 import de.lystx.cloudsystem.library.service.CloudService;
 import de.lystx.cloudsystem.library.service.io.FileService;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import io.vson.elements.VsonArray;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -41,7 +41,7 @@ public class GroupService extends CloudService {
                     try {
                         VsonObject document = new VsonObject(file, VsonSettings.OVERRITE_VALUES, VsonSettings.CREATE_FILE_IF_NOT_EXIST);
                         if (!document.has("receiver")) {
-                            document.append("receiver", CloudCache.INTERNAL_RECEIVER);
+                            document.append("receiver", Cloud.INTERNAL_RECEIVER);
                             document.save();
                         }
                         if (!document.has("values")) {

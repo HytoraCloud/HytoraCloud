@@ -45,7 +45,7 @@ import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
 import de.lystx.cloudsystem.library.service.server.other.process.Threader;
 import de.lystx.cloudsystem.library.elements.interfaces.Acceptable;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import de.lystx.cloudsystem.library.service.scheduler.Scheduler;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
@@ -100,9 +100,9 @@ public class CloudAPI implements CloudService {
         this.commandService = new CommandService(this.cloudLibrary, "Command", de.lystx.cloudsystem.library.service.CloudService.CloudServiceType.MANAGING);
         this.eventService = this.cloudLibrary.getService(EventService.class);
 
-        CloudCache.getInstance().setCurrentCloudExecutor(this.cloudClient);
-        CloudCache.getInstance().setPermissionPool(this.permissionPool);
-        CloudCache.getInstance().setCurrentCloudType(CloudType.CLOUDAPI);
+        Cloud.getInstance().setCurrentCloudExecutor(this.cloudClient);
+        Cloud.getInstance().setPermissionPool(this.permissionPool);
+        Cloud.getInstance().setCurrentCloudType(CloudType.CLOUDAPI);
         this.execute(LabyModAddon::load);
 
         this.chatFormat = "%prefix%%player% §8» §7%message%";

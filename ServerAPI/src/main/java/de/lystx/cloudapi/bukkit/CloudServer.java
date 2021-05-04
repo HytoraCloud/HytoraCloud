@@ -18,7 +18,7 @@ import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudExecutor;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import de.lystx.cloudsystem.library.service.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +48,7 @@ public class CloudServer extends JavaPlugin implements CloudService {
     public void onEnable() {
         CloudAPI.getInstance().execute(() -> {
             instance = this;
-            CloudCache.getInstance().setBukkitVersion(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
+            Cloud.getInstance().setBukkitVersion(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
 
             //Initializing Objects
             this.manager = new CloudManager(CloudAPI.getInstance());

@@ -1,7 +1,7 @@
 package de.lystx.cloudsystem.library.service.permission.impl;
 
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,13 +39,13 @@ public class PermissionGroup implements Serializable {
 
     /**
      * Updates the current group
-     * Not safe because {@link CloudCache#PERMISSION_POOL} might
+     * Not safe because {@link Cloud#PERMISSION_POOL} might
      * or could be null at any time when it's not set
      */
     public void update() {
         //TODO: SAFELY UPDATE AND SEND TO CLOUD
-        PermissionGroup group = CloudCache.getInstance().getPermissionPool().getPermissionGroupFromName(this.name);
-        CloudCache.getInstance().getPermissionPool().getPermissionGroups().set(CloudCache.getInstance().getPermissionPool().getPermissionGroups().indexOf(group), this);
-        CloudCache.getInstance().getPermissionPool().update();
+        PermissionGroup group = Cloud.getInstance().getPermissionPool().getPermissionGroupFromName(this.name);
+        Cloud.getInstance().getPermissionPool().getPermissionGroups().set(Cloud.getInstance().getPermissionPool().getPermissionGroups().indexOf(group), this);
+        Cloud.getInstance().getPermissionPool().update();
     }
 }

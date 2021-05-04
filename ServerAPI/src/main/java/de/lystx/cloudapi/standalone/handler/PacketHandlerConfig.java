@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.elements.packets.in.other.PacketUpdateNetwor
 import de.lystx.cloudsystem.library.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.packet.PacketHandler;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import de.lystx.cloudsystem.library.service.network.connection.adapter.PacketHandlerAdapter;
@@ -26,9 +26,9 @@ public class PacketHandlerConfig extends PacketHandlerAdapter {
             this.cloudAPI.getNetwork().setServices(info.getServices());
             this.cloudAPI.getCloudPlayers().setCloudPlayers(info.getCloudPlayers());
 
-            CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(info.getCloudPlayers()));
-            CloudCache.getInstance().setPermissionPool(this.cloudAPI.getPermissionPool());
-            CloudCache.getInstance().setServiceFilter(new Filter<>(this.cloudAPI.getNetwork().getServices()));
+            Cloud.getInstance().setCloudPlayerFilter(new Filter<>(info.getCloudPlayers()));
+            Cloud.getInstance().setPermissionPool(this.cloudAPI.getPermissionPool());
+            Cloud.getInstance().setServiceFilter(new Filter<>(this.cloudAPI.getNetwork().getServices()));
 
         }
     }

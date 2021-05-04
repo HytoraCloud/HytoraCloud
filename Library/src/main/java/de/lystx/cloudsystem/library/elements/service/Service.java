@@ -4,7 +4,7 @@ import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInServiceUpdate;
 import de.lystx.cloudsystem.library.enums.ServiceState;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import de.lystx.cloudsystem.library.service.util.ServerPinger;
 import io.vson.elements.object.Objectable;
 import lombok.Getter;
@@ -75,7 +75,7 @@ public class Service implements Serializable, Objectable<Service> {
      */
     public List<CloudPlayer> getOnlinePlayers() {
         List<CloudPlayer> list = new LinkedList<>();
-        for (CloudPlayer globalOnlinePlayer : CloudCache.CLOUDPLAYERS) {
+        for (CloudPlayer globalOnlinePlayer : Cloud.getInstance().getCloudPlayerFilter()) {
             if (!globalOnlinePlayer.getService().getName().equalsIgnoreCase(this.getName())) {
                 continue;
             }
@@ -117,7 +117,7 @@ public class Service implements Serializable, Objectable<Service> {
      * and syncs it all over the cloud
      */
     public void update() {
-        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(new PacketInServiceUpdate(this));
+        Cloud.getInstance().getCurrentCloudExecutor().sendPacket(new PacketInServiceUpdate(this));
     }
 
     @SneakyThrows

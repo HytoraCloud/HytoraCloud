@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.library.service.player.impl;
 import de.lystx.cloudsystem.library.elements.packets.both.player.PacketKickPlayer;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public class CloudConnection implements Serializable {
      * @param packet
      */
     public void sendPacket(Packet packet) {
-        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(packet);
+        Cloud.getInstance().getCurrentCloudExecutor().sendPacket(packet);
     }
 
 }

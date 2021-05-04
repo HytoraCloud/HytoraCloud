@@ -3,7 +3,7 @@ package de.lystx.cloudsystem.library.elements.service;
 import de.lystx.cloudsystem.library.elements.other.SerializableDocument;
 import de.lystx.cloudsystem.library.elements.packets.in.service.PacketInUpdateServiceGroup;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,7 +43,7 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
      * over the CloudNetwork
      */
     public void update() {
-        CloudCache.getInstance().getCurrentCloudExecutor().sendPacket(new PacketInUpdateServiceGroup(this));
+        Cloud.getInstance().getCurrentCloudExecutor().sendPacket(new PacketInUpdateServiceGroup(this));
     }
 
     /**
@@ -53,7 +53,7 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
      * @return List with CloudPlayers on this Group
      */
     public List<CloudPlayer> getOnlinePlayers() {
-        return new LinkedList<>(CloudCache.getInstance().getCloudPlayerFilter().find(cloudPlayer -> cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(this.getName())).findAll());
+        return new LinkedList<>(Cloud.getInstance().getCloudPlayerFilter().find(cloudPlayer -> cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(this.getName())).findAll());
     }
 
     /**
@@ -62,7 +62,7 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
      * @return
      */
     public List<Service> getServices() {
-        return new LinkedList<>(CloudCache.getInstance().getServiceFilter().find(service -> service.getServiceGroup().getName().equalsIgnoreCase(this.name)).findAll());
+        return new LinkedList<>(Cloud.getInstance().getServiceFilter().find(service -> service.getServiceGroup().getName().equalsIgnoreCase(this.name)).findAll());
     }
 
     public String toString() {

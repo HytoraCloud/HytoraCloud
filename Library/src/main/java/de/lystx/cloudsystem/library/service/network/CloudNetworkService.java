@@ -6,7 +6,7 @@ import de.lystx.cloudsystem.library.service.config.ConfigService;
 import de.lystx.cloudsystem.library.service.network.connection.packet.Packet;
 import de.lystx.cloudsystem.library.service.network.connection.packet.PacketState;
 import de.lystx.cloudsystem.library.service.network.defaults.CloudServer;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.Getter;
 
 import java.util.function.Consumer;
@@ -51,7 +51,7 @@ public class CloudNetworkService extends CloudService {
      */
     public void start() {
         this.cloudServer.connect(this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getHost(), this.getCloudLibrary().getService(ConfigService.class).getNetworkConfig().getPort());
-        CloudCache.getInstance().setCurrentCloudExecutor(this.cloudServer);
+        Cloud.getInstance().setCurrentCloudExecutor(this.cloudServer);
     }
 
     /**

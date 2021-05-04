@@ -30,7 +30,7 @@ import de.lystx.cloudsystem.library.service.server.other.manager.PortService;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStart;
 import de.lystx.cloudsystem.library.service.server.other.process.ServiceProviderStop;
 import de.lystx.cloudsystem.library.service.util.Action;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -197,7 +197,7 @@ public class ServerService extends CloudService {
             ReceiverInfo info = getCloudLibrary().getCustoms().getObject("receiverInfo", ReceiverInfo.class);
             return serviceGroup.getReceiver().equalsIgnoreCase(info.getName());
         } else if (getCloudLibrary().getType().equals(CloudType.CLOUDSYSTEM)) {
-            return serviceGroup.getReceiver().equalsIgnoreCase(CloudCache.INTERNAL_RECEIVER);
+            return serviceGroup.getReceiver().equalsIgnoreCase(Cloud.INTERNAL_RECEIVER);
         }
         return true;
     }
@@ -259,7 +259,7 @@ public class ServerService extends CloudService {
      * @param service
      */
     public void registerService(Service service) {
-        CloudCache.getInstance().setServiceFilter(new Filter<>(this.allServices()));
+        Cloud.getInstance().setServiceFilter(new Filter<>(this.allServices()));
         this.cloudLibrary.getService(PermissionService.class).getPermissionPool().update();
         List<Service> list = this.getServices(service.getServiceGroup());
         Service s = this.getService(service.getName());

@@ -8,6 +8,7 @@ package de.lystx.cloudsystem.library.service.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import de.lystx.cloudsystem.library.Cloud;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.lang.reflect.Constructor;
@@ -21,7 +22,7 @@ import io.netty.handler.codec.EncoderException;
 
 public class PacketUtils {
 
-    private final String version = CloudCache.getInstance().getBukkitVersion();
+    private final String version = Cloud.getInstance().getBukkitVersion();
     private Class<?> packetClass;
     private Class<?> packetPlayOutCustomPayloadClass;
     private Constructor<?> customPayloadConstructor;

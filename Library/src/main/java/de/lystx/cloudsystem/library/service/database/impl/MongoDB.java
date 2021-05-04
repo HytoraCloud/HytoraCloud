@@ -9,7 +9,7 @@ import de.lystx.cloudsystem.library.service.database.DatabaseService;
 import de.lystx.cloudsystem.library.service.permission.impl.PermissionEntry;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayerData;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.Getter;
 import org.bson.Document;
 
@@ -40,7 +40,7 @@ public class MongoDB implements IDatabase {
     @Override
     public void registerPlayer(CloudPlayer cloudPlayer) {
         if (!this.isRegistered(cloudPlayer.getUniqueId())) {
-            CloudPlayerData data = CloudCache.getInstance().getPermissionPool().getDefaultData(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayer.getIpAddress());
+            CloudPlayerData data = Cloud.getInstance().getPermissionPool().getDefaultData(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayer.getIpAddress());
             this.setPlayerData(cloudPlayer.getUniqueId(), data);
         } else {
             CloudPlayerData cloudPlayerData = this.getPlayerData(cloudPlayer.getUniqueId());

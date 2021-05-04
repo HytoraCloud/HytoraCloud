@@ -34,7 +34,7 @@ public class PacketHandlerPlayer {
 
     @PacketHandler
     public void handle(PacketUnregisterPlayer packet) {
-        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(packet.getName());
+        CloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayers().get(packet.getClass().getSimpleName());
         if (cloudPlayer != null) {
             cloudAPI.getCloudPlayers().remove(cloudPlayer);
         }

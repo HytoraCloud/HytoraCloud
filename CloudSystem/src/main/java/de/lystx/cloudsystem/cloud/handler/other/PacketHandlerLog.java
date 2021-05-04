@@ -10,7 +10,7 @@ import de.lystx.cloudsystem.library.service.player.CloudPlayerService;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
 import de.lystx.cloudsystem.library.service.screen.CloudScreen;
 import de.lystx.cloudsystem.library.service.screen.ScreenService;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -71,7 +71,7 @@ public class PacketHandlerLog extends PacketHandlerAdapter {
         byte[] postData = text.getBytes(StandardCharsets.UTF_8);
         int postDataLength = postData.length;
 
-        URL url = new URL(CloudCache.PASTE_SERVER_URL_DOCUMENTS);
+        URL url = new URL(Cloud.PASTE_SERVER_URL_DOCUMENTS);
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
         conn.setDoOutput(true);
         conn.setInstanceFollowRedirects(false);
@@ -95,7 +95,7 @@ public class PacketHandlerLog extends PacketHandlerAdapter {
         if (response.contains("\"key\"")) {
             response = response.substring(response.indexOf(":") + 2, response.length() - 2);
 
-            String postURL = raw ? CloudCache.PASTE_SERVER_URL_RAW : CloudCache.PASTE_SERVER_URL;
+            String postURL = raw ? Cloud.PASTE_SERVER_URL_RAW : Cloud.PASTE_SERVER_URL;
             response = postURL + response;
         }
 

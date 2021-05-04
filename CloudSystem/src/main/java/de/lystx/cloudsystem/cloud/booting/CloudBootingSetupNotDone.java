@@ -20,7 +20,7 @@ import de.lystx.cloudsystem.library.service.setup.impl.CloudSetup;
 import de.lystx.cloudsystem.library.service.setup.impl.DatabaseSetup;
 import de.lystx.cloudsystem.library.service.updater.Updater;
 import de.lystx.cloudsystem.library.service.util.Action;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import de.lystx.cloudsystem.library.service.util.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
@@ -88,7 +88,7 @@ public class CloudBootingSetupNotDone {
                     "Bungee",
                     "default",
                     ServiceType.PROXY,
-                    CloudCache.INTERNAL_RECEIVER,
+                    Cloud.INTERNAL_RECEIVER,
                     -1,
                     1,
                     512,
@@ -107,7 +107,7 @@ public class CloudBootingSetupNotDone {
                     "Lobby",
                     "default",
                     ServiceType.SPIGOT,
-                    CloudCache.INTERNAL_RECEIVER,
+                    Cloud.INTERNAL_RECEIVER,
                     -1,
                     1,
                     512,

@@ -71,7 +71,7 @@ public class PacketAdapter {
                         this.handelAdapterHandler(examplePacket);
                         continue;
                     }
-                    if (em.getEvent().equals(packet.getClass())) {
+                    if (em.getAClass().equals(packet.getClass())) {
                         try {
                             em.getMethod().invoke(em.getInstance(), packet);
                         } catch (IllegalAccessException | InvocationTargetException e) {

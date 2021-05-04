@@ -7,7 +7,7 @@ import de.lystx.cloudsystem.library.elements.packets.result.ResultPacket;
 import de.lystx.cloudsystem.library.elements.service.Service;
 import de.lystx.cloudsystem.library.elements.packets.result.player.ResultPacketCloudPlayer;
 import de.lystx.cloudsystem.library.service.player.impl.CloudPlayer;
-import de.lystx.cloudsystem.library.service.util.CloudCache;
+import de.lystx.cloudsystem.library.Cloud;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
@@ -102,7 +102,7 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
         } catch (IndexOutOfBoundsException ignored) {
             //Ignoring on Server change
         }
-        CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll()));
+        Cloud.getInstance().setCloudPlayerFilter(new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll()));
     }
 
     /**
@@ -237,11 +237,11 @@ public class CloudPlayers implements Iterable<CloudPlayer> {
      */
     public void remove(CloudPlayer cloudPlayer) {
         this.cloudPlayers.remove(cloudPlayer);
-        CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll()));
+        Cloud.getInstance().setCloudPlayerFilter(new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll()));
     }
 
     public void add(CloudPlayer cloudPlayer) {
         this.cloudPlayers.add(cloudPlayer);
-        CloudCache.getInstance().setCloudPlayerFilter(new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll()));
+        Cloud.getInstance().setCloudPlayerFilter(new Filter<>(CloudAPI.getInstance().getCloudPlayers().getAll()));
     }
 }

@@ -1,8 +1,6 @@
 package de.lystx.cloudsystem.library.service.network.connection.packet;
 
 import de.lystx.cloudsystem.library.service.util.CloudMap;
-import io.vson.elements.object.VsonObject;
-import io.vson.tree.VsonTree;
 
 import java.io.Serializable;
 import java.util.Map;
