@@ -9,14 +9,11 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>Library</module>
-        <module>CloudSystem</module>
-        <module>ServerAPI</module>
-        <module>Module-Notify</module>
-        <module>Module-Proxy</module>
-        <module>Module-Commands</module>
-        <module>Module-HubCommand</module>
-        <module>Module-ServerSelector</module>
+        <module>hytoracloud-bridge</module>
+        <module>hytoracloud-driver</module>
+        <module>hytoracloud-launcher</module>
+        <module>hytoracloud-module-serverselector</module>
+        <module>hytoracloud-netty</module>
     </modules>
 
     <properties>

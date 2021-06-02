@@ -1,0 +1,7 @@
+author: Lystx
+name: CloudAPI
+main: de.lystx.hytoracloud.bridge.proxy.CloudProxy
+version: 1.7.3
+load: STARTUP
+description: ServerAPI for HytoraCloud
+
