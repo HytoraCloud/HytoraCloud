@@ -77,7 +77,7 @@ public class PermsCommand {
 						Value<Integer> integerValue = new Value<>();
 						group.getInheritances().forEach(inheritance -> {
 							integerValue.increase();
-							if (group.getInheritances().size() > integerValue.getValue()) {
+							if (group.getInheritances().size() > integerValue.get()) {
 								message.append(inheritance).append("§8, §7");
 							} else {
 								message.append(inheritance);

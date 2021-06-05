@@ -53,11 +53,12 @@ public class ModuleLoader {
      * Loads all modules
      */
     public void loadModules() {
-        if (this.getSize() == 0) {
+        int size = this.getSize();
+        if (size == 0) {
             this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§cNo modules to §eload§c!");
         } else {
             try {
-                this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§9There are §b" + this.getSize() + " §9Modules to load!");
+                this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§7There " + (size == 1 ? "is" : "are")+ " §b" + size + " §7Cloud-Modules to load and enable!");
                 for (File file : Objects.requireNonNull(this.modulesDir.listFiles())) {
                     if (file.getName().endsWith(".jar")) {
                         HytoraClassLoader classLoader = new HytoraClassLoader(file);
@@ -74,8 +75,7 @@ public class ModuleLoader {
                             }
                             if (cl.getSuperclass().getName().equalsIgnoreCase(Module.class.getName())) {
                                 Module mod = (Module) cl.newInstance();
-                                final ModuleInfo moduleInfo = new ModuleInfo(document.getString("name"), document.getString("author"), document.getString("version"), new LinkedList<>(), ModuleCopyType.valueOf(document.getString("copyType").toUpperCase()));
-                                moduleInfo.setFile(file);
+                                final ModuleInfo moduleInfo = new ModuleInfo(document.getString("name"), document.getString("author"), document.getString("version"), new LinkedList<>(), ModuleCopyType.valueOf(document.getString("copyType").toUpperCase()), file);
                                 mod.setInfo(moduleInfo);
                                 File directory = new File(this.moduleService.getModuleDir(), mod.getInfo().getName());
                                 directory.mkdirs();
@@ -90,7 +90,7 @@ public class ModuleLoader {
                                 mod.onReload();
                                 moduleService.getModules().add(mod);
                                 ModuleInfo info = mod.getInfo();
-                                this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§7The Module §b" + info.getName() + " §7by §b" + info.getAuthor() + " §7Version §b" + info.getVersion() + " §7was loaded§8!");
+                                this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§7The Cloud-Module §b" + info.getName() + " §h[§7Author§b: " + info.getAuthor() + " §7| Version§b: " + info.getVersion() + " §7| Copy§b: " + info.getCopyType() + "§h] §7was loaded!");
                             } else {
                                 this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §cdoesn't extends the Module.class!");
                             }

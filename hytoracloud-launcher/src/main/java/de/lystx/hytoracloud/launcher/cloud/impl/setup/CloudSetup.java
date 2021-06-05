@@ -7,6 +7,19 @@ import lombok.Getter;
 @Getter
 public class CloudSetup extends AbstractSetup<CloudSetup> {
 
+
+    public CloudSetup() {
+        this.cancellable = false;
+        this.printHeader = false;
+        this.customHeader = "\n\n" +
+                "   _____      __            \n" +
+                "  / ___/___  / /___  ______ \n" +
+                "  \\__ \\/ _ \\/ __/ / / / __ \\\n" +
+                " ___/ /  __/ /_/ /_/ / /_/ /\n" +
+                "/____/\\___/\\__/\\__,_/ .___/ \n" +
+                "                   /_/      \n\n";
+    }
+
     @Setup(
             id = 1,
             question = "What's the ip of this CloudSystem? ",

@@ -38,8 +38,8 @@ public class CloudBootingSetupDone {
      */
     public CloudBootingSetupDone(CloudSystem cloudSystem) {
 
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§b\n" +
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§f\n" +
                 "    __  __      __                   ________                __\n" +
                 "   / / / /_  __/ /_____  _________ _/ ____/ /___  __  ______/ /\n" +
                 "  / /_/ / / / / __/ __ \\/ ___/ __ `/ /   / / __ \\/ / / / __  / \n" +
@@ -47,10 +47,10 @@ public class CloudBootingSetupDone {
                 "/_/ /_/\\__, /\\__/\\____/_/   \\__,_/\\____/_/\\____/\\__,_/\\__,_/   \n" +
                 "      /____/                                                   \n" +
                 "\n");
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§9Version §7: §b" + Updater.getCloudVersion());
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§9Developer §7: §bLystx");
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§bLoading §fCloudSystem§9...");
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Version §7: §b" + Updater.getCloudVersion());
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Developer §7: §bLystx");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Loading §3CloudSystem§f...");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
 
         CloudDriver.getInstance().getDatabaseManager().getDatabase().connect();
         CloudDriver.getInstance().getServiceRegistry().registerService(new NetworkService());

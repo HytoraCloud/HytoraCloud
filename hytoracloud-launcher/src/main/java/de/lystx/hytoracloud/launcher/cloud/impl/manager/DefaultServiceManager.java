@@ -16,6 +16,7 @@ import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
 import de.lystx.hytoracloud.driver.enums.ServiceState;
 import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.console.logger.LoggerService;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
@@ -143,7 +144,8 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
-        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7is §aqueued §7| §e" + service.getServiceGroup().getReceiver() + " §7| §bID " + service.getServiceID() + " §7| §bPort " + service.getPort() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name() );
+
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + service.getServiceGroup().getReceiver() + " §7was told to queue §3" + service.getName() + " §h[§7ID: §b" + service.getServiceID() + " §7| §7Port: §b" + service.getPort() + " §7| §7Mode: §b" + service.getServiceGroup().getServiceType() + " §7| §7Storage: §b" + (service.getServiceGroup().isDynamic() ? "DYNAMIC": "STATIC") + "§h]");
 
     }
 
@@ -164,7 +166,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
-        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7has §4stopped §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name());
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + service.getServiceGroup().getReceiver() + " §7stopped §c" + service.getName() + "§f!");
     }
 
     /**
@@ -310,7 +312,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
-        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§aChannel §7[§a" + service.getName() + "@" + service.getUniqueId() + "§7] §aconnected §7[§2" + action.getMS() + "s" + (action.getInformation() != null ? " + " + action.getInformation() : "") + "§7]");
+        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Service §b" + service.getName() + " §7has connected §h[§b" + service.getServiceGroup().getReceiver() + "@" + service.getHost() + "§h] §7in §b" + action.getMS() + "s§f!");
 
     }
 
@@ -536,7 +538,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             if (!already.contains(serviceGroup.getName())) {
                 already.add(serviceGroup.getName());
                 if (this.getDriver().getParent().getScreenPrinter().getScreen() == null && !this.getDriver().getParent().getScreenPrinter().isInScreen()) {
-                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7The services of the group §c" + serviceGroup.getName() + " §7are now §4shutting down §7| §bServices " + this.serviceMap.get(serviceGroup).size());
+                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Stopping services of the group §b" + serviceGroup.getName() + " §h[§7Amount: §b" + this.serviceMap.get(serviceGroup).size() + "§h]");
                 }
             }
         }
@@ -583,9 +585,9 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         try {
             for (Service service : new LinkedList<>(this.getServiceMap(serviceGroup))) {
                 this.stopService(service, false);
-                count.setValue(count.getValue() - 1);
+                count.setValue(count.get() - 1);
 
-                if (count.getValue() == 0 && newOnes) {
+                if (count.get() == 0 && newOnes) {
                     this.needServices(serviceGroup);
                 }
             }

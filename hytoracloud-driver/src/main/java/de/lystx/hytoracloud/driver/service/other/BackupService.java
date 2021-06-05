@@ -76,7 +76,7 @@ public class BackupService implements ICloudService {
         }
         Value<Integer> i = new Value<>(-1);
         this.getDriver().getInstance(Scheduler.class).scheduleRepeatingTask(() -> {
-            int finalInt = i.getValue() + 1;
+            int finalInt = i.get() + 1;
             i.setValue(finalInt);
             if (finalInt != 0) {
                 this.createBackup(UUID.randomUUID().toString());

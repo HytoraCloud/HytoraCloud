@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.driver.service.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.service.console.logger.LoggerService;
 import de.lystx.hytoracloud.driver.service.setup.AbstractSetup;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.service.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -73,7 +74,7 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     }
 
     public String getPrefix() {
-        return "§9Cloud§b@§7" + this.buffer.replace('-', ' ') + " §f» §7 ";
+        return "§h[§7" + Utils.getSimpleDateFormat().format(new Date()) + " §7| §bConsole§h] §f» §7 ";
     }
 
     @Override

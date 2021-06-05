@@ -427,7 +427,7 @@ public class JsonBuilder {
      * @return string as json
      */
     public static String toString(Object src) {
-        return new JsonBuilder().append(src).toString();
+        return GSON.toJson(src);
     }
     /**
      * Formats an Object directly

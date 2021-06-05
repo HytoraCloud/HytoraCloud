@@ -33,7 +33,7 @@ public abstract class AbstractSetup<T> {
     private Map.Entry<Field, Setup> currentPart;
     private Consumer<T> consumer;
 
-
+    protected String customHeader = null;
     protected boolean cancellable = true;
     protected boolean printHeader = true;
 
@@ -48,6 +48,11 @@ public abstract class AbstractSetup<T> {
 
         if (printHeader) {
             print();
+        }
+        if (this.customHeader != null) {
+            scanner.sendMessage("§8");
+            scanner.sendMessage(this.customHeader);
+            scanner.sendMessage("§8");
         }
         scanner.getLogger().sendMessage("§9");
         scanner.getLogger().sendMessage("§9");
@@ -65,9 +70,7 @@ public abstract class AbstractSetup<T> {
 
         this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
         this.cloudConsole.getLogger().sendMessage("SETUP", this.currentPart.getValue().question());
-        for (String s : this.currentPart.getValue().message()) {
-            this.cloudConsole.getLogger().sendMessage(s);
-        }
+        this.printExtraMessage();
         this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
 
 
@@ -87,8 +90,8 @@ public abstract class AbstractSetup<T> {
         this.consumer.accept((T) this);
         if (printHeader) {
             Utils.clearConsole();
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§b\n" +
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§7\n" +
                     "    __  __      __                   ________                __\n" +
                     "   / / / /_  __/ /_____  _________ _/ ____/ /___  __  ______/ /\n" +
                     "  / /_/ / / / / __/ __ \\/ ___/ __ `/ /   / / __ \\/ / / / __  / \n" +
@@ -96,10 +99,10 @@ public abstract class AbstractSetup<T> {
                     "/_/ /_/\\__, /\\__/\\____/_/   \\__,_/\\____/_/\\____/\\__,_/\\__,_/   \n" +
                     "      /____/                                                   \n" +
                     "\n");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§9Version §7: §b" + Updater.getCloudVersion());
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§9Developer §7: §bLystx");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§bSwitched back to §fCloudSystem§9...");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Version §7: §b" + Updater.getCloudVersion());
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Developer §7: §bLystx");
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Switched back to §bCloudSystem§f...");
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
         }
     }
 
@@ -191,29 +194,41 @@ public abstract class AbstractSetup<T> {
             }
             this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
             this.cloudConsole.getLogger().sendMessage("SETUP", "§b" + this.currentPart.getValue().question());
-            for (String s : this.currentPart.getValue().message()) {
+            this.printExtraMessage();
+            this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
+        }
+    }
+
+    public void printExtraMessage() {
+
+        for (String s : this.currentPart.getValue().message()) {
+            try {
+                String[] splits = s.split("%%");
+                String prefix = splits[0];
+                String message = splits[1];
+                this.cloudConsole.getLogger().sendMessage(prefix, message);
+            } catch (Exception e) {
                 this.cloudConsole.getLogger().sendMessage(s);
             }
-            this.cloudConsole.getLogger().getConsoleReader().setPrompt("");
         }
     }
 
     void print() {
         Utils.clearConsole();
 
-        this.cloudConsole.getLogger().sendMessage("§9-----------------------------------------");
-        this.cloudConsole.getLogger().sendMessage("§b\n" +
+        this.cloudConsole.getLogger().sendMessage("§8");
+        this.cloudConsole.getLogger().sendMessage("§7\n" +
                 "   _____      __            \n" +
                 "  / ___/___  / /___  ______ \n" +
                 "  \\__ \\/ _ \\/ __/ / / / __ \\\n" +
                 " ___/ /  __/ /_/ /_/ / /_/ /\n" +
                 "/____/\\___/\\__/\\__,_/ .___/ \n" +
                 "                   /_/      \n");
-        this.cloudConsole.getLogger().sendMessage("§9-----------------------------------------");
-        this.cloudConsole.getLogger().sendMessage("INFO", "§7» §bCancellable §f: " + (this.cancellable ? "Yes" : "No"));
-        this.cloudConsole.getLogger().sendMessage("INFO", "§7» §bSetup §f: " + getClass().getSimpleName());
-        this.cloudConsole.getLogger().sendMessage("INFO", "§7» §bQuestion §f: " + (this.current == 1 ? 1 : current ) + "/" + (this.setupParts.keySet().size() == 0 ? "Loading" : this.setupParts.keySet().size() + ""));
-        this.cloudConsole.getLogger().sendMessage("§9-----------------------------------------");
+        this.cloudConsole.getLogger().sendMessage("§8");
+        this.cloudConsole.getLogger().sendMessage("INFO", "§7» §7Cancellable §f: §b" + (this.cancellable ? "Yes" : "No"));
+        this.cloudConsole.getLogger().sendMessage("INFO", "§7» §7Setup §f: §b" + getClass().getSimpleName());
+        this.cloudConsole.getLogger().sendMessage("INFO", "§7» §7Question §f: §b" + (this.current == 1 ? 1 : current ) + "/" + (this.setupParts.keySet().size() == 0 ? "Loading" : this.setupParts.keySet().size() + ""));
+        this.cloudConsole.getLogger().sendMessage("§8");
     }
 
     /**

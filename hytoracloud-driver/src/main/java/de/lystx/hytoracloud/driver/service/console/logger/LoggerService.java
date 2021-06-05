@@ -7,11 +7,14 @@ import de.lystx.hytoracloud.driver.service.command.CommandService;
 import de.lystx.hytoracloud.driver.service.console.CloudCompleter;
 import de.lystx.hytoracloud.driver.service.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.service.util.Utils;
 import de.lystx.hytoracloud.driver.service.util.log.LogService;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Getter
 @ICloudServiceInfo(
@@ -46,16 +49,18 @@ public class LoggerService implements ICloudService {
 
     /**
      * Sends message with prefix
-     * @param prefix
-     * @param message
+     *
+     * @param prefix the prefix of the message
+     * @param message the message
      */
     public void sendMessage(String prefix, String message) {
-        this.sendMessage("§7[§9" + prefix.toUpperCase() + "§7] §b" + message);
+        this.sendMessage("§h[§7" + Utils.getSimpleDateFormat().format(new Date()) + " §7| §b" + prefix.toUpperCase() + "§h] §f" + message);
     }
 
     /**
      * Sends message to console
-     * @param message
+     *
+     * @param message the message to send
      */
     public void sendMessage(String message) {
         try {

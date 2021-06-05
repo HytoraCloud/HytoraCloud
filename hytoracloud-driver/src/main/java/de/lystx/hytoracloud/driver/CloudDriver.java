@@ -62,7 +62,6 @@ import io.thunder.packet.impl.response.IResponse;
 import io.thunder.packet.impl.response.PacketRespond;
 import io.thunder.packet.impl.response.Response;
 import io.thunder.packet.impl.response.ResponseStatus;
-import io.thunder.utils.logger.LogLevel;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -390,6 +389,19 @@ public class CloudDriver {
     }
 
     /**
+     * Responds to a packet
+     *
+     * @param packet the packet to respond for
+     * @param status the status
+     * @param message the message
+     */
+    public void respond(Packet packet, ResponseStatus status, String message) {
+        PacketRespond packetRespond = new PacketRespond(message, status);
+        packetRespond.setUniqueId(packet.getUniqueId());
+        this.sendPacket(packetRespond);
+    }
+
+    /**
      * Sends a packet with a consumer
      * @param packet the packet to send
      * @param consumer the consumer to accept the response
@@ -433,6 +445,37 @@ public class CloudDriver {
     public Response getResponse(Packet responsePacket, int timeOut) {
         return this.connection.transferToResponse(responsePacket, timeOut);
     }
+
+
+    public <T extends Packet> T packetToPacket(T packet) {
+        Value<T> response = new Value<>();
+        this.connection.getPacketAdapter().addHandler(new PacketHandler() {
+            @Override
+            public void handle(Packet p) {
+                System.out.println("[" + p.getClass().getSimpleName() + "@" + p.getUniqueId() + "]");
+                if (p.getClass().getSimpleName().equalsIgnoreCase(packet.getClass().getSimpleName())) {
+                    if (packet.getUniqueId() == p.getUniqueId()) {
+                        connection.getPacketAdapter().removeHandler(this);
+                        response.setValue((T) p);
+                    }
+                }
+            }
+        });
+
+        this.sendPacket(packet); //Sending packet
+
+        while (response.get() == null) {
+            try {
+                Thread.sleep(0L, 500000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        return response.get();
+    }
+
     /*
      * ======================================
      *         Service Managing
@@ -746,7 +789,7 @@ public class CloudDriver {
                 booleanValue.setValue(true);
             }
         });
-        return booleanValue.getValue();
+        return booleanValue.get();
     }
 
 

@@ -48,8 +48,8 @@ public class ReceiverBootingSetupNotDone {
             receiver.getInstance(CommandService.class).setActive(true);
 
             receiver.getParent().getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
-            Updater.download(spigot.getValue().getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading Spigot");
-            Updater.download(bungeeCord.getValue().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.getValue());
+            Updater.download(spigot.get().getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading Spigot");
+            Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get());
 
             receiver.getInstance(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(receiver.getInstance(FileService.class).getGlobalDirectory(), "server-icon.png"));
 

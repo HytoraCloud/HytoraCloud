@@ -17,7 +17,6 @@ public class PacketUpdatePlayer extends PacketCommunication {
     public void read(PacketBuffer buf) {
         super.read(buf);
 
-
         cloudPlayer = JsonBuilder.fromClass(buf.readString(), CloudPlayer.class);
     }
 

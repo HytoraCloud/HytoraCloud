@@ -42,18 +42,6 @@ public class CloudBootingSetupNotDone {
      */
     public CloudBootingSetupNotDone(CloudSystem cloudSystem) {
 
-        cloudSystem.getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
-        cloudSystem.getParent().getConsole().getLogger().sendMessage("§b\n" +
-                "   _____      __            \n" +
-                "  / ___/___  / /___  ______ \n" +
-                "  \\__ \\/ _ \\/ __/ / / / __ \\\n" +
-                " ___/ /  __/ /_/ /_/ / /_/ /\n" +
-                "/____/\\___/\\__/\\__,_/ .___/ \n" +
-                "                   /_/      \n");
-        cloudSystem.getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
-        cloudSystem.getParent().getConsole().getLogger().sendMessage("INFO", "§7» §b" + Updater.getCloudVersion());
-        cloudSystem.getParent().getConsole().getLogger().sendMessage("INFO", "§7» §b" + new SimpleDateFormat("hh:mm:ss").format(new Date()));
-        cloudSystem.getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
         cloudSystem.getInstance(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
         Value<Spigot> spigot = new Value<>();
@@ -122,7 +110,7 @@ public class CloudBootingSetupNotDone {
                     true,
                     new SerializableDocument()
             ));
-            if (spigot.getValue() == null) {
+            if (spigot.get() == null) {
                 cloudSystem.getParent().getConsole().getLogger().sendMessage("ERROR", "§cPlease redo the setup and provide a §evalid spigot version§c!");
                 System.exit(0);
                 return;
@@ -159,13 +147,13 @@ public class CloudBootingSetupNotDone {
             cloudSystem.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
                 Action action = new Action();
 
-                Updater.download(spigot.getValue().getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading " + spigot.getValue().getJarName());
-                Updater.download(bungeeCord.getValue().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.getValue().toUpperCase());
+                Updater.download(spigot.get().getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading " + spigot.get().getJarName());
+                Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get().toUpperCase());
 
                 cloudSystem.getInstance(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getInstance(FileService.class).getGlobalDirectory(), "server-icon.png"));
 
-                cloudSystem.getParent().getConsole().sendMessage("INFO", "§aDownloading newest §2Spigot §aand §2BungeeCord §atook §h[§e" + action.getMS() + "s§h]");
-                cloudSystem.getParent().getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The cloud will now stop and you will have to restart it...");
+                cloudSystem.getParent().getConsole().sendMessage("INFO", "§7Downloading newest §3Spigot §fand §3BungeeCord §7took §h[§b" + action.getMS() + "s§h]");
+                cloudSystem.getParent().getConsole().getLogger().sendMessage("SETUP", "§7The setup is now §3complete§f! The cloud will now stop and you will have to §3restart §fit...");
                 cloudSystem.getDatabaseManager().getDatabase().connect();
                 PermissionPool permissionPool = CloudDriver.getInstance().getPermissionPool();
                 permissionPool.addPermissionGroupToUser(permissionPool.getUUIDByName(setup.getFirstAdmin()), permissionPool.getPermissionGroupByName("Admin"), -1, PermissionValidity.LIFETIME);

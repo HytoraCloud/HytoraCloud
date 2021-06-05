@@ -75,7 +75,7 @@ public class Value<T> {
      * Returns value
      * @return
      */
-    public T getValue() {
+    public T get() {
         return value;
     }
 }

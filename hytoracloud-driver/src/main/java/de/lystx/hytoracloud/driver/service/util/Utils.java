@@ -14,7 +14,9 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +50,9 @@ public class Utils {
         }
     }
 
+    public static SimpleDateFormat getSimpleDateFormat() {
+        return new SimpleDateFormat("hh:mm:ss");
+    }
 
     /**
      * Checks if a {@link Method} should be executed async or sync

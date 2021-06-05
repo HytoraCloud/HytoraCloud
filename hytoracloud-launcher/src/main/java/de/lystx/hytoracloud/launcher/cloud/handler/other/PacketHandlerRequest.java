@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
+import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
 import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -16,6 +17,7 @@ import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
 import io.thunder.packet.Packet;
 import io.thunder.packet.handler.PacketHandler;
+import io.thunder.packet.impl.response.PacketRespond;
 import io.thunder.packet.impl.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -87,11 +89,17 @@ public class PacketHandlerRequest implements PacketHandler {
 
         } else if (packet instanceof PacketRequestModules) {
 
+            PacketRequestModules packetRequestModules = (PacketRequestModules)packet;
+
             List<ModuleInfo> list = new LinkedList<>();
             for (Module module : CloudDriver.getInstance().getInstance(ModuleService.class).getModules()) {
                 list.add(module.getInfo());
             }
-            packet.respond(ResponseStatus.SUCCESS, list);
+            packetRequestModules.setModuleInfos(list);
+            CloudDriver.getInstance().sendPacket(packetRequestModules);
+            
+            //packet.respond(ResponseStatus.SUCCESS, list);
+
 
         } else if (packet instanceof PacketRequestPermissionGroup) {
 

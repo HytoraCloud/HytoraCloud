@@ -10,6 +10,7 @@ import de.lystx.hytoracloud.bridge.standalone.impl.CloudSidePlayerManager;
 import de.lystx.hytoracloud.bridge.standalone.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestModules;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
 import de.lystx.hytoracloud.driver.enums.CloudType;
@@ -29,6 +30,7 @@ import io.thunder.packet.Packet;
 
 import de.lystx.hytoracloud.driver.service.player.featured.labymod.LabyModAddon;
 import io.thunder.packet.impl.PacketHandshake;
+import io.thunder.packet.impl.response.Response;
 import io.thunder.utils.objects.ThunderOption;
 import lombok.Getter;
 import lombok.Setter;
@@ -119,6 +121,11 @@ public class CloudBridge {
                 thisService.setAuthenticated(true);
                 thisService.setHost(InetAddress.getLocalHost().getHostAddress());
                 thisService.update();
+
+
+                PacketRequestModules packetRequestModules = CloudDriver.getInstance().packetToPacket(new PacketRequestModules());
+
+                System.out.println(packetRequestModules.getModuleInfos().size() + " modules loaded");
             }
 
             @Override
