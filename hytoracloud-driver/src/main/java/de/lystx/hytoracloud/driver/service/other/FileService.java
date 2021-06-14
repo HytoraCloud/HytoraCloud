@@ -118,7 +118,7 @@ public class FileService implements ICloudService {
         this.backupDirectory = new File(this.globalDirectory, "backup/");
         this.backupFile = new File(this.backupDirectory, "backup.json");
 
-        if (!CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDAPI)) {
+        if (!CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
             this.check();
         }
     }

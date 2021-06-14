@@ -53,7 +53,7 @@ public class DefaultDatabaseMongoDB implements IDatabase {
             List<PermissionEntry> permissionEntries = new LinkedList<>();
             for (String s : entries.keySet()) {
                 Document sub = entries.get(s, Document.class);
-                permissionEntries.add(new PermissionEntry(uuid, sub.getString("group"), sub.getString("validTime")));
+                permissionEntries.add(new PermissionEntry(sub.getString("group"), sub.getString("validTime")));
             }
             return new PlayerInformation(
                     uuid,
@@ -73,7 +73,6 @@ public class DefaultDatabaseMongoDB implements IDatabase {
     public void saveOfflinePlayer(UUID uuid, PlayerInformation data) {
         Document entries = new Document();
         for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
-            uuid = permissionEntry.getUuid();
             entries.append(UUID.randomUUID().toString(), new Document().append("group", permissionEntry.getPermissionGroup()).append("validTime", permissionEntry.getValidTime()));
         }
         Document document = this.getDocument("uuid", uuid);

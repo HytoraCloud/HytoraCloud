@@ -93,28 +93,13 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     }
 
     @Override
-    public void kick(String reason) {
-        throw new UnsupportedOperationException("Console doesn't support : kick" );
-    }
-
-    @Override
-    public void fallback() {
-        throw new UnsupportedOperationException("Console doesn't support : fallback" );
-    }
-
-    @Override
-    public void update() {
-        throw new UnsupportedOperationException("Console doesn't support : update" );
-    }
-
-    @Override
     public void sendMessage(Object message) {
         this.logger.sendMessage(message.toString());
     }
 
     @Override
     public void sendComponent(CloudComponent cloudComponent) {
-        throw new UnsupportedOperationException("Console doesn't support : sendComponent" );
+        this.sendMessage(cloudComponent.toString());
     }
 
     @Override

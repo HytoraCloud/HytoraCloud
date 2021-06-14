@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.launcher.global.commands;
 
+import de.lystx.hytoracloud.driver.enums.SpigotVersion;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.enums.Spigot;
 import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
 import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
@@ -27,7 +27,7 @@ public class DownloadCommand implements TabCompletable {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("INFO", "§9Spigot Versions§7:");
-                for (Spigot value : Spigot.values()) {
+                for (SpigotVersion value : SpigotVersion.values()) {
                     sender.sendMessage("INFO", "§9" + value.name() + " §7| §b" + value.getId() + " §7| §a" + value.getUrl());
                 }
 
@@ -38,31 +38,31 @@ public class DownloadCommand implements TabCompletable {
             if (args[0].equalsIgnoreCase("download")) {
                 try {
                     int id = Integer.parseInt(args[1]);
-                    Spigot spigot = Spigot.byID(id);
-                    if (spigot == null) {
+                    SpigotVersion spigotVersion = SpigotVersion.byID(id);
+                    if (spigotVersion == null) {
                         sender.sendMessage("ERROR", "§cA SpigotVersion with id §e" + id + " §cdoesn't exist!");
                         return;
                     }
                     FileService fs = cloudInstance.getInstance(FileService.class);
                     Action action = new Action();
                     sender.sendMessage("INFO", "§aStarting download! This might take §2some time§a!");
-                    fs.download(spigot.getUrl(), new File(fs.getSpigotVersionsDirectory(), spigot.getJarName()));
-                    sender.sendMessage("INFO", "§7Spigot version §b" + spigot.getJarName() + " §7was §adownloaded §7[§a" + action.getMS() + "s§7]");
+                    fs.download(spigotVersion.getUrl(), new File(fs.getSpigotVersionsDirectory(), spigotVersion.getJarName()));
+                    sender.sendMessage("INFO", "§7Spigot version §b" + spigotVersion.getJarName() + " §7was §adownloaded §7[§a" + action.getMS() + "s§7]");
                 } catch (NumberFormatException e) {
                     sender.sendMessage("ERROR", "§cPlease provide a valid number!");
                 }
             } else if (args[0].equalsIgnoreCase("activate")) {
                 try {
                     int id = Integer.parseInt(args[1]);
-                    Spigot spigot = Spigot.byID(id);
-                    if (spigot == null) {
+                    SpigotVersion spigotVersion = SpigotVersion.byID(id);
+                    if (spigotVersion == null) {
                         sender.sendMessage("ERROR", "§cA SpigotVersion with id §e" + id + " §cdoesn't exist!");
                         return;
                     }
                     FileService fs = cloudInstance.getInstance(FileService.class);
-                    File newSpigot = new File(fs.getSpigotVersionsDirectory(), spigot.getJarName());
+                    File newSpigot = new File(fs.getSpigotVersionsDirectory(), spigotVersion.getJarName());
                     if (!newSpigot.exists()) {
-                        sender.sendMessage("INFO", "§cSpigot version §e" + spigot.getJarName() + " §chasn't been downloaded yet!");
+                        sender.sendMessage("INFO", "§cSpigot version §e" + spigotVersion.getJarName() + " §chasn't been downloaded yet!");
                         return;
                     }
                     File current = new File(fs.getVersionsDirectory(), "spigot.jar");
@@ -76,7 +76,7 @@ public class DownloadCommand implements TabCompletable {
                         sender.sendMessage("ERROR", "§cSpigot couldn't be copied! Try again!");
                     }
                     renameTo.delete();
-                    sender.sendMessage("INFO", "§7Spigot version §b" + spigot.getJarName() + " §7was §aactivated §7and old spigot was renamed to §e" + renameTo.getName());
+                    sender.sendMessage("INFO", "§7Spigot version §b" + spigotVersion.getJarName() + " §7was §aactivated §7and old spigot was renamed to §e" + renameTo.getName());
                 } catch (NumberFormatException e) {
                     sender.sendMessage("ERROR", "§cPlease provide a valid number!");
                 }

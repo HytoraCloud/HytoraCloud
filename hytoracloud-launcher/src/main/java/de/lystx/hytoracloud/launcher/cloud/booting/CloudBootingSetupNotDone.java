@@ -1,5 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.booting;
 
+import de.lystx.hytoracloud.driver.enums.ProxyVersion;
+import de.lystx.hytoracloud.driver.enums.SpigotVersion;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
@@ -7,7 +9,6 @@ import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
 import de.lystx.hytoracloud.driver.elements.service.Template;
-import de.lystx.hytoracloud.driver.enums.Spigot;
 import de.lystx.hytoracloud.driver.service.command.CommandService;
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
 import de.lystx.hytoracloud.driver.service.config.impl.proxy.ProxyConfig;
@@ -29,8 +30,6 @@ import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
 
 public class CloudBootingSetupNotDone {
@@ -44,7 +43,7 @@ public class CloudBootingSetupNotDone {
 
         cloudSystem.getInstance(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
-        Value<Spigot> spigot = new Value<>();
+        Value<SpigotVersion> spigot = new Value<>();
         Value<String> bungeeCord = new Value<>();
 
         cloudSetup.start(cloudSystem.getParent().getConsole(), setup -> {
@@ -68,7 +67,7 @@ public class CloudBootingSetupNotDone {
             document.append("proxyProtocol", setup.isProxyProtocol());
             document.append("autoUpdater", setup.isAutoUpdater());
             document.save();
-            spigot.setValue(Spigot.byKey(setup.getSpigotVersion()));
+            spigot.setValue(SpigotVersion.byKey(setup.getSpigotVersion()));
             bungeeCord.setValue(setup.getBungeeCordType());
 
             ProxyConfig config = ProxyConfig.defaultConfig();
@@ -148,7 +147,7 @@ public class CloudBootingSetupNotDone {
                 Action action = new Action();
 
                 Updater.download(spigot.get().getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading " + spigot.get().getJarName());
-                Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get().toUpperCase());
+                Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? ProxyVersion.WATERFALL.getUrl() : ProxyVersion.BUNGEECORD.getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get().toUpperCase());
 
                 cloudSystem.getInstance(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getInstance(FileService.class).getGlobalDirectory(), "server-icon.png"));
 

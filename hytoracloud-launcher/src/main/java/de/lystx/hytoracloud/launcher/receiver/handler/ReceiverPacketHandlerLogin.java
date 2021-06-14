@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.receiver.handler;
 
 import de.lystx.hytoracloud.driver.elements.packets.receiver.PacketReceiverLoginResult;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import io.thunder.packet.Packet;
 import io.thunder.packet.handler.PacketHandler;

@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.screen.ServiceOutputScreen;
+import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -74,7 +74,7 @@ public class TemplateService implements ICloudService {
      */
     @SneakyThrows
     public void copy(Service service, String template, String dir) {
-        ServiceOutputScreen screen = this.getDriver().getInstance(CloudScreenService.class).getMap().get(service.getName());
+        CloudScreen screen = this.getDriver().getInstance(CloudScreenService.class).getMap().get(service.getName());
         if (screen == null) {
             return;
         }

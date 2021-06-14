@@ -5,6 +5,7 @@ import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerPermissionG
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerPermissionGroupRemoveCloudEvent;
 import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketUpdatePermissionPool;
+import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestKey;
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.service.database.IDatabase;
 import de.lystx.hytoracloud.driver.service.other.FileService;
@@ -14,6 +15,8 @@ import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
 
 import de.lystx.hytoracloud.driver.service.uuid.UUIDService;
 import io.thunder.packet.PacketBuffer;
+import io.thunder.packet.impl.response.IResponse;
+import io.thunder.packet.impl.response.Response;
 import io.thunder.utils.objects.ThunderObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -146,7 +149,7 @@ public class PermissionPool implements Serializable, ThunderObject {
 
         PlayerInformation playerInformation = this.getPlayerInformationOrDefault(uniqueId);
         List<PermissionEntry> permissionEntries = new LinkedList<>(playerInformation.getPermissionEntries()); //Safely defining list value
-        PermissionEntry entry = new PermissionEntry(uniqueId, group.getName(), "");
+        PermissionEntry entry = new PermissionEntry(group.getName(), "");
         permissionEntries.removeIf(permissionEntry -> permissionEntry.getPermissionGroup().equalsIgnoreCase(group.getName()));//Removing old group
 
         permissionEntries.add(entry); //add group to entries
@@ -179,7 +182,7 @@ public class PermissionPool implements Serializable, ThunderObject {
             data = this.getDefaultPlayerInformation(uniqueId, getNameByUUID(uniqueId), "-1"); //Setting ip to default
         }
 
-        return new LinkedList<>(data.getAllPermissionGroups());
+        return new LinkedList<>(data.getPermissionGroups());
     }
 
     /**
@@ -325,7 +328,7 @@ public class PermissionPool implements Serializable, ThunderObject {
         PlayerInformation offlinePlayer = this.getPlayerInformation(uniqueId);
         if (offlinePlayer != null) {
             if (offlinePlayer.getPermissionEntries().isEmpty()) {
-                offlinePlayer.getPermissionEntries().add(new PermissionEntry(uniqueId, this.getLowestPermissionGroupOrDefault().getName(), ""));
+                offlinePlayer.getPermissionEntries().add(new PermissionEntry(this.getLowestPermissionGroupOrDefault().getName(), ""));
                 this.updatePlayer(offlinePlayer);
                 this.update();
             }
@@ -512,7 +515,7 @@ public class PermissionPool implements Serializable, ThunderObject {
      * @return created player
      */
     public PlayerInformation getDefaultPlayerInformation(UUID uuid, String name, String ip) {
-        PlayerInformation playerInformation = new PlayerInformation(uuid, name, Collections.singletonList(new PermissionEntry(uuid, this.getLowestPermissionGroupOrDefault().getName(), "")), new LinkedList<>(), ip, true, new Date().getTime(), 0L);
+        PlayerInformation playerInformation = new PlayerInformation(uuid, name, Collections.singletonList(new PermissionEntry(this.getLowestPermissionGroupOrDefault().getName(), "")), new LinkedList<>(), ip, true, new Date().getTime(), 0L);
         playerInformation.setDefault(true);
         return playerInformation;
     }
@@ -530,6 +533,16 @@ public class PermissionPool implements Serializable, ThunderObject {
                 ).findFirst()
                 .orElse(this.getDefaultPlayerInformation(this.getUUIDByName(playerName), playerName, "-1"));
     }
+
+
+    public IResponse<PlayerInformation> query(UUID uniqueId) {
+        PacketRequestKey packetRequestKey = new PacketRequestKey("playerInformation::" + uniqueId);
+
+        Response response = CloudDriver.getInstance().getResponse(packetRequestKey);
+
+        return response.toIResponse(response.get(0).asCustom(PlayerInformation.class));
+    }
+
     /**
      * Gets the {@link PlayerInformation} by name
      *

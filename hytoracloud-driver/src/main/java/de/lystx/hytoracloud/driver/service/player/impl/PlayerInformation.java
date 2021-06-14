@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.driver.service.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.service.player.IPermissionUser;
+import de.lystx.hytoracloud.driver.service.util.other.WrappedObject;
 import io.thunder.packet.PacketBuffer;
 import io.thunder.packet.impl.response.IResponse;
 import io.thunder.utils.objects.ThunderObject;
@@ -168,7 +169,6 @@ public class PlayerInformation implements ThunderObject, IPermissionUser, Object
 
         buf.nullSafe().writeInt(getPermissionEntries().size());
         for (PermissionEntry permissionEntry : getPermissionEntries()) {
-            buf.nullSafe().writeUUID(permissionEntry.getUuid());
             buf.nullSafe().writeString(permissionEntry.getPermissionGroup());
             buf.nullSafe().writeString(permissionEntry.getValidTime());
         }
@@ -201,10 +201,9 @@ public class PlayerInformation implements ThunderObject, IPermissionUser, Object
         int size = buf.nullSafe().readInt();
         setPermissionEntries(new ArrayList<>(size));
         for (int i = 0; i < size; i++) {
-            UUID uuid = buf.nullSafe().readUUID();
             String group = buf.nullSafe().readString();
             String time = buf.nullSafe().readString();
-            getPermissionEntries().add(new PermissionEntry(uuid, group, time));
+            getPermissionEntries().add(new PermissionEntry(group, time));
         }
 
         size = buf.nullSafe().readInt();

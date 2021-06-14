@@ -1,6 +1,8 @@
 package de.lystx.hytoracloud.driver.service.command;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketCommand;
+import de.lystx.hytoracloud.driver.service.command.base.CommandUsage;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
@@ -8,7 +10,6 @@ import de.lystx.hytoracloud.driver.service.command.command.CommandInfo;
 import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
 import de.lystx.hytoracloud.driver.service.console.CloudConsole;
-import de.lystx.hytoracloud.driver.service.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -62,7 +63,7 @@ public class CommandService implements ICloudService {
                 }
                 this.commandClasses.put(command.name().toLowerCase(), list);
                 this.invokers.put(command.name().toLowerCase(), classObject);
-                this.commandInfos.add(new CommandInfo(command.name().toLowerCase(), command.description(), command.aliases()));
+                this.commandInfos.add(new CommandInfo(command.name().toLowerCase(), command.description(), command.aliases(), command.usage()));
             }
         }
     }
@@ -118,7 +119,53 @@ public class CommandService implements ICloudService {
                 if (command.equalsIgnoreCase(commandText)) {
                     for (Method method : methods) {
                         try {
-                            method.invoke(invokers.get(command), sender, args.toArray(new String[0]));
+                            String[] strings = args.toArray(new String[0]);
+                            Object o = invokers.get(command);
+                            CommandInfo commandInfo = this.getCommand(command);
+                            CommandUsage commandUsage = commandInfo.getCommandUsage();
+
+                            int allArgs = commandUsage.exactArgs();
+                            int minArgs = commandUsage.minArgs();
+                            int maxArgs = commandUsage.maxArgs();
+                            int notArgs = commandUsage.notArgs();
+                            String[] trigger = commandUsage.trigger();
+
+                            boolean print = false;
+                            if (minArgs != -1) {
+                                print = strings.length < minArgs;
+                            } else if (maxArgs != -1) {
+                                print = strings.length > maxArgs;
+                            } else if (notArgs != -1) {
+                                print = strings.length != notArgs;
+                            } else if (allArgs != -1) {
+                                print = strings.length == allArgs;
+                            }
+
+                            try {
+                                int pos = trigger[0].equalsIgnoreCase("example") ? -1 : Integer.parseInt(trigger[1]);
+                                if (!trigger[0].equalsIgnoreCase("example") && strings[pos].equalsIgnoreCase(trigger[0])) {
+                                    print = true;
+                                }
+                            } catch (Exception e) {
+                                //Mybe not enough indexes
+                            }
+
+                            if (print) {
+                                for (String s : commandUsage.usage()) {
+                                    try {
+                                        String[] splits = s.split("%%");
+                                        String p = splits[0];
+                                        String message = splits[1];
+                                        CloudDriver.getInstance().getParent().getConsole().sendMessage(p, message);
+                                    } catch (Exception e) {
+                                        CloudDriver.getInstance().getParent().getConsole().sendMessage(s);
+                                    }
+                                }
+
+                            }
+                            if (!print || commandUsage.invokeAnyways()) {
+                                method.invoke(o, sender, strings);
+                            }
                         } catch (IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }

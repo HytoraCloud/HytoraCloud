@@ -38,7 +38,6 @@ import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudPlayer
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.service.server.IServiceManager;
 import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
-import de.lystx.hytoracloud.driver.service.server.other.process.Threader;
 import de.lystx.hytoracloud.driver.service.util.Utils;
 import de.lystx.hytoracloud.driver.service.util.log.Loggers;
 import de.lystx.hytoracloud.driver.service.util.minecraft.TicksPerSecond;
@@ -59,7 +58,6 @@ import de.lystx.hytoracloud.driver.service.other.FileService;
 import de.lystx.hytoracloud.driver.service.lib.LibraryService;
 import io.thunder.packet.handler.PacketHandler;
 import io.thunder.packet.impl.response.IResponse;
-import io.thunder.packet.impl.response.PacketRespond;
 import io.thunder.packet.impl.response.Response;
 import io.thunder.packet.impl.response.ResponseStatus;
 import io.vson.elements.object.VsonObject;
@@ -74,6 +72,7 @@ import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 
@@ -194,7 +193,38 @@ public class CloudDriver {
     private final IEventService eventService;
 
     /**
-     * Inits the Driver with a Type
+     * Used to execute tasks
+     */
+    @Getter
+    private final ExecutorService executorService = Executors.newCachedThreadPool(runnable -> {
+
+        ThreadFactory threadFactory = Executors.defaultThreadFactory();
+
+        Thread thread = threadFactory.newThread(runnable);
+        thread.setName(String.format(Locale.ROOT, "PoolThread-%d", ThreadLocalRandom.current().nextInt(99999)));
+        thread.setUncaughtExceptionHandler((thread1, e) -> {
+            if (thread1 != null && !thread1.isInterrupted()) {
+                thread1.interrupt();
+            }
+        });
+        thread.setDaemon(true);
+        return thread;
+    });
+
+
+    /**
+     * Loads the drivier and links to method
+     * {@link CloudDriver#CloudDriver(CloudType)}
+     *
+     * @param cloudType the type of this instance
+     */
+    public static void loadDriver(CloudType cloudType) {
+        instance = new CloudDriver(cloudType);
+    }
+
+    /**
+     * Initialises the Driver with a Type
+     *
      * @param driverType the type
      */
     public CloudDriver(CloudType driverType) {
@@ -204,6 +234,14 @@ public class CloudDriver {
             @Override
             public void onError(Exception e) {
                 if (e.getClass().getSimpleName().equals("SocketException")) {
+                    return;
+                }
+                if (driverType.isInstance()) {
+                    parent.getConsole().sendMessage("§cERROR", "§7Thunder-Networking-Error");
+                    for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                        parent.getConsole().sendMessage("§cERROR", "§7" + stackTraceElement.toString());
+                    }
+                    parent.getConsole().sendMessage("§7");
                     return;
                 }
                 e.printStackTrace();
@@ -249,6 +287,7 @@ public class CloudDriver {
 
         //Register extra features
         this.ticksPerSecond = new TicksPerSecond(this);
+        this.serviceRegistry.registerService(new CommandService());
 
         //Check for dependencies
         this.needsDependencies = !Utils.existsClass("jline.console.ConsoleReader");
@@ -264,6 +303,7 @@ public class CloudDriver {
 
     /**
      * Registers a Command
+     *
      * @param commandObject the command
      */
     public void registerCommand(Object commandObject) {
@@ -272,6 +312,7 @@ public class CloudDriver {
 
     /**
      * Unregisters a Command
+     *
      * @param commandObject the command
      */
     public void unregisterCommand(Object commandObject) {
@@ -280,6 +321,7 @@ public class CloudDriver {
 
     /**
      * Calls an Event with the
+     *
      * @param cloudEvent the event to call
      */
     public boolean callEvent(CloudEvent cloudEvent) {
@@ -307,7 +349,6 @@ public class CloudDriver {
         return this.serviceRegistry.getInstance(tClass);
     }
 
-
     /*
      * ======================================
      * Communication between Client and CloudSystem
@@ -326,6 +367,7 @@ public class CloudDriver {
 
     /**
      * Sends a message to the cloudSystem
+     *
      * @param prefix > Prefix of action
      * @param message > The message after prefix
      */
@@ -333,25 +375,6 @@ public class CloudDriver {
         this.messageCloud(prefix, String.valueOf(message), true);
     }
 
-
-    /**
-     * Sends a packet and waits till another is send back
-     * and it it matches the expected class the consumer will accept
-     *
-     * @param packet the packet to send
-     * @param packetToExpect the class to expect
-     */
-    public <T extends Packet> void waitForPacket(Packet packet, Class<T> packetToExpect, Consumer<T> consumer) {
-        this.sendPacket(packet);
-        this.registerPacketHandler(new PacketHandler() {
-            @Override
-            public void handle(Packet packet) {
-                if (packet.getClass().equals(packetToExpect)) {
-                    consumer.accept((T) packet);
-                }
-            }
-        });
-    }
 
     /*
      * ======================================
@@ -389,19 +412,6 @@ public class CloudDriver {
     }
 
     /**
-     * Responds to a packet
-     *
-     * @param packet the packet to respond for
-     * @param status the status
-     * @param message the message
-     */
-    public void respond(Packet packet, ResponseStatus status, String message) {
-        PacketRespond packetRespond = new PacketRespond(message, status);
-        packetRespond.setUniqueId(packet.getUniqueId());
-        this.sendPacket(packetRespond);
-    }
-
-    /**
      * Sends a packet with a consumer
      * @param packet the packet to send
      * @param consumer the consumer to accept the response
@@ -416,6 +426,7 @@ public class CloudDriver {
 
     /**
      * Sends a packet with a consumer
+     *
      * @param packet the packet to send
      * @param timeOut the timeOut for the response
      * @param consumer the consumer to accept the response
@@ -516,7 +527,7 @@ public class CloudDriver {
      * @return inetAddress
      */
     public InetSocketAddress getHost() {
-        if (driverType == CloudType.CLOUDAPI) {
+        if (driverType == CloudType.BRIDGE) {
             JsonBuilder jsonBuilder = new JsonBuilder(new File("./CLOUD/cloud.json"));
             return new InetSocketAddress(jsonBuilder.getString("host"), jsonBuilder.getInteger("port"));
         } else if (driverType == CloudType.CLOUDSYSTEM) {
@@ -533,7 +544,7 @@ public class CloudDriver {
      * @return the proxyConfig
      */
     public ProxyConfig getProxyConfig() {
-        if (driverType != CloudType.CLOUDAPI) {
+        if (driverType != CloudType.BRIDGE) {
             throw new UnsupportedOperationException("Not available for " + driverType + "!");
         }
 
@@ -552,7 +563,7 @@ public class CloudDriver {
      * @return config
      */
     public NetworkConfig getNetworkConfig() {
-        if (driverType == CloudType.CLOUDAPI || driverType == CloudType.RECEIVER) {
+        if (driverType == CloudType.BRIDGE || driverType == CloudType.RECEIVER) {
             return implementedData.getObject("networkConfig", NetworkConfig.class);
         } else {
             return getInstance(ConfigService.class).getNetworkConfig();
@@ -611,7 +622,7 @@ public class CloudDriver {
      */
     @SneakyThrows
     public Statistics getStatistics() {
-        if (this.driverType == CloudType.CLOUDAPI) {
+        if (this.driverType == CloudType.BRIDGE) {
             return new Statistics(new VsonObject(connection.transferToResponse(new ResultPacketStatistics()).getMessage()));
         } else {
             return getInstance(StatsService.class).getStatistics();
@@ -645,44 +656,22 @@ public class CloudDriver {
      */
     public IResponse<List<ModuleInfo>> getModules() {
 
-        if (driverType == CloudType.CLOUDAPI) {
+        if (driverType == CloudType.BRIDGE) {
             Response response = connection.transferToResponse(new PacketRequestModules(), 5000);
             return response.toIResponse(response.get(0).asList(ModuleInfo.class));
         } else {
 
+            Response response = new Response(ResponseStatus.SUCCESS);
 
-            return new IResponse<List<ModuleInfo>>() {
-                @Override
-                public List<ModuleInfo> get() {
-                    List<ModuleInfo> list = new LinkedList<>();
-                    if (getInstance(ModuleService.class) != null) {
-                        for (Module module : getInstance(ModuleService.class).getModules()) {
-                            list.add(module.getInfo());
-                        }
-                    }
-                    return list;
-                }
+            List<ModuleInfo> list = new LinkedList<>();
 
-                @Override
-                public ResponseStatus getStatus() {
-                    return ResponseStatus.SUCCESS;
+            if (this.getInstance(ModuleService.class) != null) {
+                for (Module module : getInstance(ModuleService.class).getModules()) {
+                    list.add(module.getInfo());
                 }
+            }
 
-                @Override
-                public UUID getUniqueId() {
-                    return UUID.randomUUID();
-                }
-
-                @Override
-                public String getMessage() {
-                    return "No Message";
-                }
-
-                @Override
-                public Response raw() {
-                    return null;
-                }
-            };
+            return response.toIResponse(list);
         }
     }
 
@@ -694,7 +683,7 @@ public class CloudDriver {
      */
     @SneakyThrows
     public ModuleInfo getModule(String name) {
-        if (this.driverType == CloudType.CLOUDAPI) {
+        if (this.driverType == CloudType.BRIDGE) {
             IResponse<List<ModuleInfo>> iResponse = this.getModules();
 
             return iResponse.raw().get(0).asList(ModuleInfo.class)
@@ -712,13 +701,24 @@ public class CloudDriver {
 
 
     /**
-     * This will lead to {@link Threader#execute(Runnable)}
-     * to execute something in a thread created with
+     * execute something in a thread created with
      * a {@link java.util.concurrent.ThreadFactory}
+     *
      * @param runnable the runnable to run
      */
     public void execute(Runnable runnable) {
-        Threader.getInstance().execute(runnable);
+        this.executorService.execute(runnable);
+    }
+
+    /**
+     * Executes a task delayed but thread-safe
+     *
+     * @param runnable the task to run
+     * @param interval the interval (e.g. 1)
+     * @param timeUnit the unit (e.g. SECONDS)
+     */
+    public void execute(Runnable runnable, long interval, TimeUnit timeUnit) {
+        this.getScheduler().scheduleDelayedTask(() -> this.execute(runnable), timeUnit.toMillis(interval));
     }
 
 
@@ -730,8 +730,9 @@ public class CloudDriver {
 
     /**
      * Copies a server into a specific Template
-     * @param service
-     * @param template
+     *
+     * @param service the service to copy
+     * @param template the template to copy it to
      */
     public void copyTemplate(Service service, String template) {
         this.copyTemplate(service, template, null);
@@ -741,11 +742,13 @@ public class CloudDriver {
      * Copies a server into a specific Template
      * but it only copies a specific folder like "world"
      * or the "plugins" folder or "plugins/YourFolder"
-     * @param service
-     * @param template
+     *
+     * @param service the service
+     * @param template the template
+     * @param specificDirectory a specific directory
      */
     public void copyTemplate(Service service, String template, String specificDirectory) {
-        if (driverType == CloudType.CLOUDAPI) {
+        if (driverType == CloudType.BRIDGE) {
             PacketInCopyTemplate packetInCopyTemplate = new PacketInCopyTemplate(service, template, specificDirectory);
             this.sendPacket(packetInCopyTemplate);
             return;
@@ -757,11 +760,12 @@ public class CloudDriver {
 
     /**
      * Creates a Template for a group
-     * @param group
-     * @param template
+     *
+     * @param group the group to copy
+     * @param template the template
      */
     public void createTemplate(ServiceGroup group, String template) {
-        if (driverType == CloudType.CLOUDAPI) {
+        if (driverType == CloudType.BRIDGE) {
             PacketInCreateTemplate packetInCreateTemplate = new PacketInCreateTemplate(group, template);
             this.sendPacket(packetInCreateTemplate);
             return;
@@ -779,8 +783,9 @@ public class CloudDriver {
 
     /**
      * Checks if player is fallback
-     * @param player
-     * @return
+     *
+     * @param player the player
+     * @return boolean
      */
     public boolean isFallback(CloudPlayer player) {
         Value<Boolean> booleanValue = new Value<>(false);
@@ -796,8 +801,9 @@ public class CloudDriver {
     /**
      * Returns {@link Service} of
      * Fallback for {@link CloudPlayer}
-     * @param player
-     * @return
+     *
+     * @param player the player
+     * @return fallback for player
      */
     public Service getFallback(CloudPlayer player) {
         try {
@@ -817,8 +823,9 @@ public class CloudDriver {
     /**
      * Gets Fallback with highest
      * ID (Example sorting 1, 2, 3)
-     * @param player
-     * @return
+     *
+     * @param player the player
+     * @return fallback
      */
     public Fallback getHighestFallback(CloudPlayer player) {
         List<Fallback> list = this.getFallbacks(player);
@@ -831,8 +838,9 @@ public class CloudDriver {
      * if permission of fallback is null
      * or player has fallback permission
      * adds it to a list
-     * @param player
-     * @return
+     *
+     * @param player the player
+     * @return list of available fallbacks for a player
      */
     public List<Fallback> getFallbacks(CloudPlayer player) {
         List<Fallback> list = new LinkedList<>();

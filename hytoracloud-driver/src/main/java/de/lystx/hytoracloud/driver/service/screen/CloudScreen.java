@@ -6,13 +6,15 @@ import lombok.Setter;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 @Getter @Setter
-public class ServiceOutputScreen extends Thread {
+public class CloudScreen extends Thread {
 
     private final Thread thread;
     private final Process process;
@@ -30,7 +32,7 @@ public class ServiceOutputScreen extends Thread {
 
     private boolean runningOnThisCloudInstance;
 
-    public ServiceOutputScreen(Thread thread, Process process, File serverDir, String screenName) {
+    public CloudScreen(Thread thread, Process process, File serverDir, String screenName) {
         this.thread = thread;
         this.process = process;
         this.serverDir = serverDir;
@@ -59,7 +61,7 @@ public class ServiceOutputScreen extends Thread {
     public void run() {
         this.running = true;
         this.inputStream = process.getInputStream();
-        this.reader = new Scanner(inputStream);
+        this.reader = new Scanner(inputStream, "UTF-8");
         while (this.running && this.inputStream != null && this.reader != null) {
             try {
                 String line = reader.nextLine();
@@ -69,7 +71,7 @@ public class ServiceOutputScreen extends Thread {
                 this.cachedLines.add(line);
                 if (screenPrinter != null && cloudConsole != null && screenPrinter.getScreen() != null) {
                     if (screenPrinter.getScreen().getScreenName().equalsIgnoreCase(this.screenName)) {
-                        this.cloudConsole.getLogger().sendMessage("§9[§b" + this.screenName + "§9]§f " + line);
+                        this.cloudConsole.getLogger().sendMessage(this.screenName, line);
                     }
                 }
             } catch (NoSuchElementException e) {

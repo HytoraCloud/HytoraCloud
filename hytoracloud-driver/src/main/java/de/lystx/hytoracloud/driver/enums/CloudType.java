@@ -2,9 +2,43 @@ package de.lystx.hytoracloud.driver.enums;
 
 public enum CloudType {
 
-    RECEIVER, // "Wrapper"
-    CLOUDSYSTEM, // "Master"
-    DRIVER, // Internal managing
-    CLOUDAPI, // Spigot or Proxy
-    NONE
+    /**
+     * This is the "Wrapper"
+     */
+    RECEIVER,
+
+    /**
+     * This is the "Master"
+     */
+    CLOUDSYSTEM,
+
+    /**
+     * Type of module
+     */
+    MODULE,
+
+    /**
+     * The internal driver to manage
+     */
+    DRIVER,
+
+    /**
+     * The spigot or proxy bridge
+     */
+    BRIDGE,
+
+    /**
+     * None of the above
+     */
+    NONE;
+
+    /**
+     * Checks if the current type is
+     * either cloudSystem or receiver (Master or Wrapper)
+     *
+     * @return boolean
+     */
+    public boolean isInstance() {
+        return name().equals(RECEIVER.name()) || name().equalsIgnoreCase(CLOUDSYSTEM.name());
+    }
 }

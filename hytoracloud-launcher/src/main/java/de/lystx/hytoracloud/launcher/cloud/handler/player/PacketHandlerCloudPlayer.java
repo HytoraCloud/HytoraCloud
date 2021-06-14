@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.player;
 
+import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestKey;
 import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerChangeServerCloudEvent;
@@ -22,6 +23,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import io.thunder.packet.impl.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PacketHandlerCloudPlayer implements PacketHandler {
@@ -47,6 +50,15 @@ public class PacketHandlerCloudPlayer implements PacketHandler {
                     //IGNORING
                 }
             }
+        }
+        if (packet instanceof PacketRequestKey && ((PacketRequestKey) packet).getKey().startsWith("playerInformation::")) {
+
+            PacketRequestKey packetRequestKey = (PacketRequestKey)packet;
+            String key = packetRequestKey.getKey();
+            UUID uniqueId = UUID.fromString(key.split("::")[1]);
+            PlayerInformation playerInformation = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(uniqueId);
+
+            packet.respond(ResponseStatus.SUCCESS, playerInformation);
         }
         if (packet instanceof PacketUpdatePlayer) {
             PacketUpdatePlayer packetUpdatePlayer = (PacketUpdatePlayer)packet;

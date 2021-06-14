@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.driver.elements.packets.in.PacketInGetLog;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.screen.ServiceOutputScreen;
+import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;
@@ -41,7 +41,7 @@ public class PacketHandlerLog implements PacketHandler {
             if (cloudPlayer == null) {
                 return;
             }
-            ServiceOutputScreen screen = cloudSystem.getInstance(CloudScreenService.class).getMap().get(service.getName());
+            CloudScreen screen = cloudSystem.getInstance(CloudScreenService.class).getMap().get(service.getName());
             if (screen == null) {
                 cloudPlayer.sendMessage(this.cloudSystem.getInstance(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + "§cThe screen for this §eserver §ccouldn't be found!");
                 return;

@@ -14,6 +14,7 @@
         <module>hytoracloud-launcher</module>
         <module>hytoracloud-module-serverselector</module>
         <module>hytoracloud-netty</module>
+        <module>hytoracloud-discordbot</module>
     </modules>
 
     <properties>

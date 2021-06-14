@@ -26,5 +26,12 @@ public @interface Command {
      * @return aliases as String-Array
      */
     String[] aliases() default {};
+
+    /**
+     * The usage of the command
+     *
+     * @return usage
+     */
+    CommandUsage usage() default @CommandUsage(exactArgs = -1, trigger = "null", usage = {});
 }
 

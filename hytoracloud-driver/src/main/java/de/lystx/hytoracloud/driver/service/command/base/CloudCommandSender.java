@@ -14,23 +14,6 @@ public interface CloudCommandSender extends Identifiable {
     boolean hasPermission(String permission);
 
     /**
-     * Kicks for reason
-     *
-     * @param reason the reason
-     */
-    void kick(String reason);
-
-    /**
-     * Fallbacks
-     */
-    void fallback();
-
-    /**
-     * Updates data
-     */
-    void update();
-
-    /**
      * Sends message
      *
      * @param message the message to send

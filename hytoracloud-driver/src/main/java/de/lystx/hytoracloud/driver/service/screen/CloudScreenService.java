@@ -20,8 +20,8 @@ import java.util.*;
 public class CloudScreenService implements ICloudService {
 
 
-    private final Map<String, ServiceOutputScreen> map;
-    private final Map<ServiceOutputScreen, List<String>> cachedLines;
+    private final Map<String, CloudScreen> map;
+    private final Map<CloudScreen, List<String>> cachedLines;
 
     public CloudScreenService() {
         this.map = new HashMap<>();

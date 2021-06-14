@@ -16,7 +16,7 @@ public class CloudScreenPrinter {
     private final CloudDriver hytoraLibrary;
     private final Map<String, List<String>> cachedLines;
 
-    private ServiceOutputScreen screen;
+    private CloudScreen screen;
     private InputStream inputStream;
     private Scanner reader;
     private boolean inScreen;
@@ -30,10 +30,10 @@ public class CloudScreenPrinter {
     /**
      * Sets current screen
      *
-     * @param serviceOutputScreen the screen
+     * @param cloudScreen the screen
      */
-    public void create(ServiceOutputScreen serviceOutputScreen) {
-        this.screen = serviceOutputScreen;
+    public void create(CloudScreen cloudScreen) {
+        this.screen = cloudScreen;
         this.inputStream = null;
         this.reader = null;
         this.inScreen = true;

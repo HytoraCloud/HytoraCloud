@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
 import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.screen.ServiceOutputScreen;
+import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
 import lombok.AllArgsConstructor;
 
@@ -70,7 +70,7 @@ public class LogCommand implements TabCompletable {
 
     public String getLog(Service service, CloudDriver cloudDriver) {
 
-        ServiceOutputScreen screen = cloudDriver.getInstance(CloudScreenService.class).getMap().get(service.getName());
+        CloudScreen screen = cloudDriver.getInstance(CloudScreenService.class).getMap().get(service.getName());
         if (screen == null) {
             return null;
         }

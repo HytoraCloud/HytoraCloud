@@ -107,7 +107,7 @@ public class Item {
     }
 
     public Item setUnbreakable(boolean value) {
-        meta.spigot().setUnbreakable(value);
+        //meta.spigot().setUnbreakable(value);
         return this;
     }
 

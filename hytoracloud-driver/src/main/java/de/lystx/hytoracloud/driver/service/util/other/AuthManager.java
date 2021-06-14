@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.service.util.other;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.util.random.Random;
-import de.lystx.hytoracloud.driver.service.server.other.process.Threader;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +17,7 @@ public class AuthManager {
      */
     public void createKey() {
         if (!this.keyFile.exists()) {
-            Threader.getInstance().execute(() -> {
+            CloudDriver.getInstance().execute(() -> {
                 StringCreator stringCreator = new StringCreator();
                 for (int i = 0; i < 100; i++) {
                     stringCreator.append(Random.current().getString().next(200));

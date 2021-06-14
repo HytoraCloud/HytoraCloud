@@ -40,9 +40,13 @@ public class HubManager {
      * @return
      */
     public ServerInfo getInfo(ProxiedPlayer player) {
-        return ProxyServer.getInstance().getServerInfo(CloudDriver.getInstance().getFallback(
-                CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName())
-        ).getName());
+        try {
+            return ProxyServer.getInstance().getServerInfo(CloudDriver.getInstance().getFallback(
+                    CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName())
+            ).getName());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
 

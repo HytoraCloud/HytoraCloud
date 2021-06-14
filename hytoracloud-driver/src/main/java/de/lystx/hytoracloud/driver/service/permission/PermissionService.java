@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.service.permission;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.elements.interfaces.BooleanRequest;
 import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
@@ -30,11 +31,17 @@ public class PermissionService implements ICloudService {
 
     private final File file;
     private boolean ignore;
+    private boolean loaded;
 
     public PermissionService() {
 
         this.file = CloudDriver.getInstance().getInstance(FileService.class).getPermissionsFile();
-        this.reload();
+        CloudDriver.getInstance().executeIf(this::reload, new BooleanRequest() {
+            @Override
+            public boolean isAccepted() {
+                return CloudDriver.getInstance().getDatabaseManager() != null;
+            }
+        });
     }
 
     /**
@@ -49,6 +56,10 @@ public class PermissionService implements ICloudService {
             return;
         }
         CloudDriver.getInstance().getPermissionPool().setCachedCloudPlayers(CloudDriver.getInstance().getDatabaseManager().getDatabase().loadEntries());
+        if (!loaded) {
+            loaded = true;
+            CloudDriver.getInstance().getParent().getConsole().sendMessage("DATABASE", "§7Loaded §b" + CloudDriver.getInstance().getPermissionPool().getCachedCloudPlayers().size() + " PlayerEntries §ffrom Database §h[§7Type: §b" + CloudDriver.getInstance().getDatabaseManager().getDatabase().getType().name() + "§h]!");
+        }
     }
 
     /**

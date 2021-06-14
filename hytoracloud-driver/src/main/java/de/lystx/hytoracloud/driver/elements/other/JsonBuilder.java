@@ -47,6 +47,18 @@ public class JsonBuilder {
     }
 
     /**
+     * Constructs a document from reader
+     */
+    public JsonBuilder(Reader reader) {
+        this();
+        try {
+            jsonObject = (JsonObject) parser.parse(reader);
+        } catch (Exception e) {
+            jsonObject = new JsonObject();
+        }
+    }
+
+    /**
      * Parses the object from file
      *
      * @param file the file
@@ -306,7 +318,7 @@ public class JsonBuilder {
      * @param key the key where its stored
      * @return document
      */
-    public JsonBuilder getDocument(String key) {
+    public JsonBuilder getJson(String key) {
         return new JsonBuilder(this.getJsonObject(key));
     }
 
@@ -394,6 +406,15 @@ public class JsonBuilder {
      */
     public void save(File file) {
         try (PrintWriter w = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), true)) {
+            w.print(GSON.toJson(this.getJsonObject()));
+            w.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void save(OutputStream outputStream) {
+        try (PrintWriter w = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true)) {
             w.print(GSON.toJson(this.getJsonObject()));
             w.flush();
         } catch (Exception e) {

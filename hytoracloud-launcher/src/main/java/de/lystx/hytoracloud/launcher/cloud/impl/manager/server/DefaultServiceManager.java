@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.launcher.cloud.impl.manager;
+package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -16,7 +16,6 @@ import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
 import de.lystx.hytoracloud.driver.enums.ServiceState;
 import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.console.logger.LoggerService;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
@@ -24,15 +23,13 @@ import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.service.other.FileService;
 import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.screen.ServiceOutputScreen;
+import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
 import de.lystx.hytoracloud.driver.service.server.IServiceManager;
 import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
-import de.lystx.hytoracloud.driver.service.server.other.manager.IDService;
-import de.lystx.hytoracloud.driver.service.server.other.manager.PortService;
-import de.lystx.hytoracloud.driver.service.server.other.process.ServiceProviderStart;
-import de.lystx.hytoracloud.driver.service.server.other.process.ServiceProviderStop;
+import de.lystx.hytoracloud.driver.service.server.impl.ServiceStarter;
+import de.lystx.hytoracloud.driver.service.server.impl.ServiceStopper;
 import de.lystx.hytoracloud.driver.service.util.Utils;
 import de.lystx.hytoracloud.driver.service.util.other.Action;
 import de.lystx.hytoracloud.driver.service.util.utillity.Value;
@@ -41,6 +38,7 @@ import lombok.Setter;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * The {@link DefaultServiceManager} manages the whole network.
@@ -75,9 +73,6 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
     private boolean running = true;
 
-    private final ServiceProviderStart providerStart;
-    private final ServiceProviderStop providerStop;
-
     private List<ServiceGroup> serviceGroups;
 
     public DefaultServiceManager(List<ServiceGroup> serviceGroups) {
@@ -100,8 +95,6 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             this.portService = new PortService(Integer.parseInt((receiverInfo.getValues().get("proxyStartPort") + "").split("\\.")[0]), Integer.parseInt((receiverInfo.getValues().get("serverStartPort") + "").split("\\.")[0]));
         }
         FileService fs = CloudDriver.getInstance().getInstance(FileService.class);
-        this.providerStart = new ServiceProviderStart(CloudDriver.getInstance(), fs.getTemplatesDirectory(), fs.getSpigotPluginsDirectory(), fs.getBungeeCordPluginsDirectory(), fs.getGlobalDirectory(), fs.getVersionsDirectory());
-        this.providerStop = new ServiceProviderStop(CloudDriver.getInstance(), this);
 
         CloudDriver.getInstance().registerNetworkHandler(this);
 
@@ -119,7 +112,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
         for (Service service : this.getServiceMap(this.getServiceGroup(group.getName()))) {
             service.setServiceGroup(newGroup);
-            ServiceOutputScreen screen = this.getDriver().getInstance(CloudScreenService.class).getMap().get(service.getName());
+            CloudScreen screen = this.getDriver().getInstance(CloudScreenService.class).getMap().get(service.getName());
 
             JsonBuilder jsonBuilder = new JsonBuilder(new File(screen.getServerDir(), "CLOUD/connection.json"));
             jsonBuilder.append(service);
@@ -387,15 +380,32 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         }
 
         this.actions.put(service.getName(), new Action());
-        if (this.providerStart.autoStartService(service, properties)) {
-            getDriver().sendPacket(new PacketOutStartedServer(service.getName()));
-            this.notifyStart(service);
-            CloudDriver.getInstance().callEvent(new CloudServiceStartEvent(service));
-            for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-                networkHandler.onServerStart(service);
+
+
+        ServiceStarter serviceStarter = new ServiceStarter(service, properties);
+
+        if (serviceStarter.checkForSpigot()) {
+            try {
+                serviceStarter.copyFiles();
+                serviceStarter.createProperties();
+                serviceStarter.createCloudFiles();
+                serviceStarter.start(new Consumer<Service>() {
+                    @Override
+                    public void accept(Service service) {
+                        CloudDriver.getInstance().sendPacket(new PacketOutStartedServer(service.getName()));
+                        notifyStart(service);
+                        CloudDriver.getInstance().callEvent(new CloudServiceStartEvent(service));
+
+                        for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
+                            networkHandler.onServerStart(service);
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            return;
         }
+
         return;
     }
 
@@ -477,15 +487,20 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             services.remove(remove);
             this.serviceMap.put(this.getServiceGroup(service.getServiceGroup().getName()), services);
 
+
+            ServiceStopper serviceStopper = new ServiceStopper(service);
             if (!CloudDriver.getInstance().callEvent(new CloudServiceStopEvent(service))) {
-                this.providerStop.stopService(service, service1 -> {
-                    if (!newServices) {
-                        return;
+                serviceStopper.stop(new Consumer<Service>() {
+                    @Override
+                    public void accept(Service service) {
+                        if (!newServices) {
+                            return;
+                        }
+                        needServices(service.getServiceGroup());
                     }
-                    needServices(service1.getServiceGroup());
                 });
             }
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -538,7 +553,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             if (!already.contains(serviceGroup.getName())) {
                 already.add(serviceGroup.getName());
                 if (this.getDriver().getParent().getScreenPrinter().getScreen() == null && !this.getDriver().getParent().getScreenPrinter().isInScreen()) {
-                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Stopping services of the group §b" + serviceGroup.getName() + " §h[§7Amount: §b" + this.serviceMap.get(serviceGroup).size() + "§h]");
+                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Stopping services of the group §3" + serviceGroup.getName() + " §h[§7Services: §3" + this.serviceMap.get(serviceGroup).size() + "§h]");
                 }
             }
         }

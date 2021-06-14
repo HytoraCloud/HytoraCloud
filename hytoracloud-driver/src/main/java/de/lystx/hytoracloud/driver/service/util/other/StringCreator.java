@@ -73,6 +73,14 @@ public class StringCreator implements Iterable<String> {
         return s;
     }
 
+    public String build() {
+        return toString();
+    }
+
+    public String create() {
+        return toString();
+    }
+
     @NotNull
     @Override
     public Iterator<String> iterator() {

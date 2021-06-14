@@ -1,7 +1,8 @@
 package de.lystx.hytoracloud.launcher.receiver.booting;
 
 import de.lystx.hytoracloud.driver.elements.other.ReceiverInfo;
-import de.lystx.hytoracloud.driver.enums.Spigot;
+import de.lystx.hytoracloud.driver.enums.ProxyVersion;
+import de.lystx.hytoracloud.driver.enums.SpigotVersion;
 import de.lystx.hytoracloud.driver.service.command.CommandService;
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
 import de.lystx.hytoracloud.driver.service.other.FileService;
@@ -20,7 +21,7 @@ public class ReceiverBootingSetupNotDone {
 
     public ReceiverBootingSetupNotDone(Receiver receiver) {
 
-        Value<Spigot> spigot = new Value<>();
+        Value<SpigotVersion> spigot = new Value<>();
         Value<String> bungeeCord = new Value<>();
 
         receiver.getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");
@@ -43,13 +44,13 @@ public class ReceiverBootingSetupNotDone {
                 System.exit(0);
                 return;
             }
-            spigot.setValue(Spigot.byKey(setup.getSpigotVersion()));
+            spigot.setValue(SpigotVersion.byKey(setup.getSpigotVersion()));
             bungeeCord.setValue(setup.getBungeeCordType());
             receiver.getInstance(CommandService.class).setActive(true);
 
             receiver.getParent().getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
             Updater.download(spigot.get().getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading Spigot");
-            Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? "https://papermc.io/api/v2/projects/waterfall/versions/1.16/builds/401/downloads/waterfall-1.16-401.jar" : "https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar", new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get());
+            Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? ProxyVersion.WATERFALL.getUrl() : ProxyVersion.BUNGEECORD.getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get());
 
             receiver.getInstance(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(receiver.getInstance(FileService.class).getGlobalDirectory(), "server-icon.png"));
 

@@ -161,7 +161,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
 
     
     public IResponse<PermissionGroup> getPermissionGroup() {
-        if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDAPI)) {
+        if (CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
             PacketRequestPermissionGroupGet groupGet = new PacketRequestPermissionGroupGet(this.getUniqueId());
             Response response = CloudDriver.getInstance().getResponse(groupGet);
             return response.toIResponse(response.get(0).asCustom(PermissionGroup.class));
@@ -219,7 +219,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
     }
 
     public void sendMessage(Object message) {
-        if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDAPI)) {
+        if (CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
             Object player;
             if (CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType() == ServiceType.SPIGOT) {
                 player = Reflections.getBukkitPlayer(this.getName());
@@ -249,7 +249,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
 
     @SneakyThrows
     public void playSound(Enum<?> sound, Float v1, Float v2) {
-        if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDAPI) && CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType() == ServiceType.SPIGOT) {
+        if (CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE) && CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType() == ServiceType.SPIGOT) {
             Object player = Reflections.getBukkitPlayer(this.getName());
             Reflections.callMethod(player, "playSound", sound, v1, v2);
             return;
@@ -263,7 +263,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
 
     
     public ResponseStatus addProperty(String name, JsonObject jsonObject) {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDAPI) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             return CloudDriver.getInstance().getResponse(new PacketRequestAddProperty(this.getUniqueId(), name, jsonObject)).getStatus();
         }
         playerInformation.addProperty(name, jsonObject);
@@ -273,7 +273,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
 
     
     public IResponse<JsonObject> getProperty(String name) {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDAPI) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             Response response = CloudDriver.getInstance().getResponse(new PacketRequestGetProperty(this.getUniqueId(), name));
             return response.toIResponse((JsonObject) new JsonParser().parse(response.getMessage()));
         } else {

@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 @Getter @AllArgsConstructor
-public enum Spigot {
+public enum SpigotVersion {
 
     V1_8_8("https://cdn.getbukkit.org/spigot/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar", "spigot-1.8.8-R0.1-SNAPSHOT-latest.jar", 1, "1.8.8"),
     V1_9("https://cdn.getbukkit.org/spigot/spigot-1.9-R0.1-SNAPSHOT-latest.jar", "spigot-1.9-R0.1-SNAPSHOT-latest.jar", 2, "1.9"),
@@ -43,11 +43,11 @@ public enum Spigot {
     private final String key;
 
 
-    public static Spigot byID(int id) {
+    public static SpigotVersion byID(int id) {
         return Arrays.stream(values()).filter(spigot -> spigot.getId() == id).findFirst().orElse(null);
     }
 
-    public static Spigot byKey(String key) {
+    public static SpigotVersion byKey(String key) {
         return Arrays.stream(values()).filter(spigot -> spigot.getKey().equalsIgnoreCase(key)).findFirst().orElse(null);
     }
 

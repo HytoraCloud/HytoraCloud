@@ -18,11 +18,6 @@ public class ReloadCommand {
     public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
 
-            PacketRequestKey packet = new PacketRequestKey("test::give||me");
-            Response response = CloudDriver.getInstance().getResponse(packet);
-
-            sender.sendMessage("RESPONSE", response.getStatus() + " -> " + response.getMessage());
-
             sender.sendMessage("COMMAND", "§2Debug!");
             return;
         }

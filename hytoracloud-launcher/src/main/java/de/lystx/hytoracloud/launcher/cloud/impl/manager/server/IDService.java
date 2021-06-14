@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.driver.service.server.other.manager;
+package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
 import lombok.Getter;
 
@@ -15,6 +15,9 @@ import java.util.*;
 @Getter
 public class IDService {
 
+    /**
+     * The used id stored with the groups
+     */
     private final Map<String, List<String>> serverIdList;
 
     public IDService() {
@@ -22,9 +25,10 @@ public class IDService {
     }
 
     /**
-     * Returns free ID
-     * @param group
-     * @return
+     * Returns free ID of a group which is not used
+     *
+     * @param group the group to get an id
+     * @return free id
      */
     public int getFreeID(String group) {
         if (!this.serverIdList.containsKey(group)) {
@@ -47,8 +51,9 @@ public class IDService {
 
     /**
      * Marks ID as unused
-     * @param group
-     * @param id
+     *
+     * @param group the group
+     * @param id the id to remove
      */
     public void removeID(String group, int id) {
         List<String> ids = this.serverIdList.getOrDefault(group, new LinkedList<>());

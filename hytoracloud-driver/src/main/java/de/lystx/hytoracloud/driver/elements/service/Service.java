@@ -147,7 +147,7 @@ public class Service implements Serializable, Objectable<Service> {
      * and syncs it all over the cloud
      */
     public void update() {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDAPI) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             JsonBuilder jsonBuilder = new JsonBuilder(new File("./CLOUD/connection.json"));
             jsonBuilder.append(this);
             jsonBuilder.save();

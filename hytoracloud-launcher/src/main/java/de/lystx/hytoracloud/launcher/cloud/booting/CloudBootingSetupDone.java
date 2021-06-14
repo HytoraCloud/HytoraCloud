@@ -25,7 +25,7 @@ import de.lystx.hytoracloud.driver.service.module.ModuleService;
 import de.lystx.hytoracloud.driver.service.other.NetworkService;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.service.util.Utils;
 import de.lystx.hytoracloud.driver.service.util.minecraft.NetworkInfo;
 

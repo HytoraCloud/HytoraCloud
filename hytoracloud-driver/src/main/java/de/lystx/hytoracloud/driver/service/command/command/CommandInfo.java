@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.service.command.command;
 
 
+import de.lystx.hytoracloud.driver.service.command.base.CommandUsage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,4 +23,8 @@ public class CommandInfo {
      */
     private final String[] aliases;
 
+    /**
+     * The usage for this command
+     */
+    private final CommandUsage commandUsage;
 }

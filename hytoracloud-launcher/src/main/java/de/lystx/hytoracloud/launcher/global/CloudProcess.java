@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.global;
 
+import de.lystx.hytoracloud.driver.service.permission.PermissionService;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 //import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -26,7 +27,7 @@ import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenPrinter;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
 import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.service.util.log.LogService;
 import de.lystx.hytoracloud.driver.service.util.minecraft.NetworkInfo;
 import de.lystx.hytoracloud.driver.service.webserver.WebServer;
@@ -160,13 +161,13 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         }
 
         try {
-            ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceGroups(this.getInstance(GroupService.class).getGroups());
-            this.getInstance(ConfigService.class).reload();
-
             CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
                     CloudDriver.getInstance().getNetworkConfig(),
                     CloudDriver.getInstance().getServiceManager().getServiceMap()
             ));
+            ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceGroups(this.getInstance(GroupService.class).getGroups());
+            this.getInstance(ConfigService.class).reload();
+
         } catch (NullPointerException e) {
             e.printStackTrace();
         }

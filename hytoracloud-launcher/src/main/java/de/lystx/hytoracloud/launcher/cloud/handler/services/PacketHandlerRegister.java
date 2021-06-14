@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.services;
 
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketRegisterService;
 import de.lystx.hytoracloud.driver.elements.service.Service;

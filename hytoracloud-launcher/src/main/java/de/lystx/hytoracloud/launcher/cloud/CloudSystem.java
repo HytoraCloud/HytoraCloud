@@ -8,19 +8,15 @@ import de.lystx.hytoracloud.launcher.cloud.handler.ReceiverManager;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.launcher.global.impl.DefaultChannelMessenger;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
 import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.service.command.CommandService;
 import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultDatabaseService;
 import de.lystx.hytoracloud.driver.service.other.FileService;
 import de.lystx.hytoracloud.driver.service.permission.PermissionService;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultICloudPlayerManager;
-import de.lystx.hytoracloud.driver.service.screen.ServiceOutputScreen;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultCloudPlayerManager;
 import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.service.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +45,7 @@ public class CloudSystem extends CloudProcess {
         CloudDriver.getInstance().getServiceRegistry().registerService(new PermissionService());
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "databaseManager", new DefaultDatabaseService());
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "cloudPlayerManager", new DefaultICloudPlayerManager());
+        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "cloudPlayerManager", new DefaultCloudPlayerManager());
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "channelMessenger", new DefaultChannelMessenger());
 
 

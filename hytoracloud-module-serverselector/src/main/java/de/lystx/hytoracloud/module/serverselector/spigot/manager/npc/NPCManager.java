@@ -115,9 +115,9 @@ public class NPCManager {
             this.npcs.keySet().forEach(npc -> npc.destroy(player));
         }
         jsonBuilder.keys().forEach(key -> {
-            JsonBuilder doc = jsonBuilder.getDocument(key);
+            JsonBuilder doc = jsonBuilder.getJson(key);
             try {
-                VsonObject loc = new VsonObject(doc.getDocument("location").toString());
+                VsonObject loc = new VsonObject(doc.getJson("location").toString());
                 if (loc.isEmpty()) {
                     return;
                 }

@@ -34,16 +34,16 @@ import java.util.function.Consumer;
         },
         version = 1.4
 )
-public class DefaultICloudPlayerManager implements ICloudService, PacketHandler, ICloudPlayerManager {
+public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, ICloudPlayerManager {
 
     private List<CloudPlayer> onlinePlayers;
     private final IDatabase database;
 
-    public DefaultICloudPlayerManager() {
+    public DefaultCloudPlayerManager() {
         this.onlinePlayers = new LinkedList<>();
         this.database = this.getDriver().getDatabaseManager().getDatabase();
 
-        CloudDriver.getInstance().executeIf(() -> CloudDriver.getInstance().getConnection().addPacketHandler(DefaultICloudPlayerManager.this), () -> CloudDriver.getInstance().getConnection() != null);
+        CloudDriver.getInstance().executeIf(() -> CloudDriver.getInstance().getConnection().addPacketHandler(DefaultCloudPlayerManager.this), () -> CloudDriver.getInstance().getConnection() != null);
         if (this.getDriver().getParent().getWebServer() == null) {
             return;
         }

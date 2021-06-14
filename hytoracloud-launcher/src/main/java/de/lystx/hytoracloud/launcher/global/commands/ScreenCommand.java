@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
 import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.screen.ServiceOutputScreen;
+import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenPrinter;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class ScreenCommand implements TabCompletable {
                 cloudInstance.getInstance(CloudScreenService.class).getMap().forEach((s, screen) -> sender.sendMessage("INFO", s));
             } else {
                 String serverName = args[0];
-                ServiceOutputScreen screen = cloudInstance.getInstance(CloudScreenService.class).getMap().get(serverName);
+                CloudScreen screen = cloudInstance.getInstance(CloudScreenService.class).getMap().get(serverName);
                 if (screen != null) {
                     if (screen.isRunningOnThisCloudInstance()) {
                         if (screen.getCachedLines().isEmpty()) {

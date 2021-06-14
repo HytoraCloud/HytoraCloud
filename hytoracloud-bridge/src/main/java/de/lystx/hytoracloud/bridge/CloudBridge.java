@@ -30,7 +30,6 @@ import io.thunder.packet.Packet;
 
 import de.lystx.hytoracloud.driver.service.player.featured.labymod.LabyModAddon;
 import io.thunder.packet.impl.PacketHandshake;
-import io.thunder.packet.impl.response.Response;
 import io.thunder.utils.objects.ThunderOption;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,11 +49,11 @@ public class CloudBridge {
     public CloudBridge() {
         instance = this;
 
-        this.cloudDriver = new CloudDriver(CloudType.CLOUDAPI);
+        this.cloudDriver = new CloudDriver(CloudType.BRIDGE);
         this.cloudClient = Thunder.createClient();
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.cloudClient);
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "driverType", CloudType.CLOUDAPI);
+        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "driverType", CloudType.BRIDGE);
 
         CloudDriver.getInstance().execute(LabyModAddon::load);
 

@@ -10,10 +10,26 @@ import java.util.*;
 @Getter
 public class CloudComponent implements Serializable, ThunderObject {
 
+    /**
+     * The message of this component
+     */
     private String message;
+
+    /**
+     * The list of other components
+     */
     private List<CloudComponent> cloudComponents;
+
+    /**
+     * A map containing actions
+     */
     private Map<CloudComponentAction, Object[]> actions;
 
+    /**
+     * Constructs a component with a message
+     *
+     * @param message the message
+     */
     public CloudComponent(String message) {
         this.message = message;
         this.actions = new HashMap<>();
@@ -21,10 +37,11 @@ public class CloudComponent implements Serializable, ThunderObject {
     }
 
     /**
-     * Adds events like click or hover
-     * @param action
-     * @param value
-     * @return
+     * Adds an events like click or hover
+     *
+     * @param action the action (if should open website)
+     * @param value the value (url for website)
+     * @return this component
      */
     public CloudComponent addEvent(CloudComponentAction action, Object... value) {
         this.actions.put(action, value);
@@ -33,8 +50,9 @@ public class CloudComponent implements Serializable, ThunderObject {
 
     /**
      * Adds another component to chain
-     * @param cloudComponent
-     * @return
+     *
+     * @param cloudComponent the component to add
+     * @return this component
      */
     public CloudComponent append(CloudComponent cloudComponent) {
         this.cloudComponents.add(cloudComponent);
