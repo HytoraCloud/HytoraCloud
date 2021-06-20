@@ -12,15 +12,26 @@ import de.lystx.hytoracloud.driver.CloudDriver;
  */
 public class TicksPerSecond {
 
+    /**
+     * The tick count (mostly 20)
+     */
     public int tickCount;
+
+    /**
+     * The current ticks
+     */
     public long[] ticks;
+
+    /**
+     * And the last tick
+     */
     public long lastTick;
 
-    public TicksPerSecond(CloudDriver cloudDriver) {
+    public TicksPerSecond() {
         this.tickCount = 0;
         this.lastTick = 0L;
-        this.ticks= new long[600];
-        cloudDriver.getScheduler().scheduleRepeatingTask(() -> {
+        this.ticks = new long[600];
+        CloudDriver.getInstance().getScheduler().scheduleRepeatingTask(() -> {
             ticks[(tickCount% ticks.length)] = System.currentTimeMillis();
             tickCount+= 1;
         }, 100L, 1L);
@@ -28,7 +39,8 @@ public class TicksPerSecond {
 
     /**
      * Gets TPS by 100 ticks
-     * @return
+     *
+     * @return the fps as double
      */
     public double getTPS() {
         return this.getTPS(100);
@@ -36,7 +48,8 @@ public class TicksPerSecond {
 
     /**
      * Raw TPS Method
-     * @param tickss
+     *
+     * @param tickss the ticks
      * @return TPS double
      */
     public double getTPS(int tickss) {

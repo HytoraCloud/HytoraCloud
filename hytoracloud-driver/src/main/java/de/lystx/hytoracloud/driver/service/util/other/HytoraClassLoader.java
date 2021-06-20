@@ -21,11 +21,15 @@ import java.util.jar.JarFile;
 @Getter @AllArgsConstructor
 public class HytoraClassLoader {
 
+    /**
+     * The file (mostly a jar file)
+     */
     private final File file;
 
     /**
      * Used for {loadJson}
-     * @param filename
+     *
+     * @param filename the name of the file to load
      * @return content of provided file
      */
     public String loadFile(String filename) {
@@ -50,8 +54,9 @@ public class HytoraClassLoader {
     }
 
     /**
+     * Loads a {@link JsonObject} from a File
      *
-     * @param filename
+     * @param filename the name of the file
      * @return JsonObject from File content
      */
     public JsonObject loadJson(String filename) {
@@ -60,7 +65,8 @@ public class HytoraClassLoader {
 
     /**
      * Finds a class
-     * @param name
+     *
+     * @param name the name of the class
      * @return class by name
      */
     public Class<?> findClass(String name) {
@@ -75,8 +81,9 @@ public class HytoraClassLoader {
     }
 
     /**
-     * Finds a class
-     * @param name
+     * Finds a class via jar entry
+     *
+     * @param name the name of the class
      * @return class by name but uses JarEntry
      */
     public Class<?> findClassWithJarEntry(String name) {

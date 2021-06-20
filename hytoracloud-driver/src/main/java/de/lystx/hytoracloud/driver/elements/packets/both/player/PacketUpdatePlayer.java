@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.elements.packets.both.player;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import io.thunder.packet.PacketBuffer;
@@ -17,7 +17,7 @@ public class PacketUpdatePlayer extends PacketCommunication {
     public void read(PacketBuffer buf) {
         super.read(buf);
 
-        cloudPlayer = JsonBuilder.fromClass(buf.readString(), CloudPlayer.class);
+        cloudPlayer = JsonEntity.fromClass(buf.readString(), CloudPlayer.class);
     }
 
 
@@ -25,6 +25,6 @@ public class PacketUpdatePlayer extends PacketCommunication {
     public void write(PacketBuffer buf) {
         super.write(buf);
 
-        JsonBuilder.toBuffer(buf, cloudPlayer);
+        JsonEntity.toBuffer(buf, cloudPlayer);
     }
 }

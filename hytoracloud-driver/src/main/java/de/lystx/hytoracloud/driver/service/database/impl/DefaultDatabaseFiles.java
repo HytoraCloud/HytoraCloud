@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.service.database.impl;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.service.database.DatabaseType;
 import de.lystx.hytoracloud.driver.service.database.IDatabase;
 import de.lystx.hytoracloud.driver.service.other.FileService;
@@ -49,8 +49,8 @@ public class DefaultDatabaseFiles implements IDatabase {
     public PlayerInformation getOfflinePlayer(UUID uuid) {
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         File file = new File(dir, uuid + ".json");
-        JsonBuilder jsonBuilder = new JsonBuilder(file);
-        return jsonBuilder.getAs(PlayerInformation.class);
+        JsonEntity jsonEntity = new JsonEntity(file);
+        return jsonEntity.getAs(PlayerInformation.class);
     }
 
     @Override
@@ -58,10 +58,10 @@ public class DefaultDatabaseFiles implements IDatabase {
         playerInformation.setDefault(false);
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         File file = new File(dir, uuid + ".json");
-        JsonBuilder jsonBuilder = new JsonBuilder(file);
-        jsonBuilder.clear();
-        jsonBuilder.append(playerInformation);
-        jsonBuilder.save();
+        JsonEntity jsonEntity = new JsonEntity(file);
+        jsonEntity.clear();
+        jsonEntity.append(playerInformation);
+        jsonEntity.save();
     }
 
     @Override
@@ -69,8 +69,8 @@ public class DefaultDatabaseFiles implements IDatabase {
         List<PlayerInformation> list = new LinkedList<>();
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         for (File listFile : Objects.requireNonNull(dir.listFiles())) {
-            JsonBuilder jsonBuilder = new JsonBuilder(listFile);
-            PlayerInformation playerData = jsonBuilder.getAs(PlayerInformation.class);
+            JsonEntity jsonEntity = new JsonEntity(listFile);
+            PlayerInformation playerData = jsonEntity.getAs(PlayerInformation.class);
             if (playerData == null) {
                 continue;
             }

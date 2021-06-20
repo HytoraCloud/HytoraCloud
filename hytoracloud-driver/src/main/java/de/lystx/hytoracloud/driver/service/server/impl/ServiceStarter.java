@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.service.server.impl;
 
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
@@ -267,16 +267,16 @@ public class ServiceStarter {
             hytoraCloud.createNewFile();
         }
 
-        JsonBuilder jsonBuilder = new JsonBuilder(file);
+        JsonEntity jsonEntity = new JsonEntity(file);
 
-        jsonBuilder.append(service);
-        jsonBuilder.save();
+        jsonEntity.append(service);
+        jsonEntity.save();
 
-        jsonBuilder = new JsonBuilder(hytoraCloud);
-        jsonBuilder.append("@logType", CloudDriver.getInstance().getHost().getClass().getName());
-        jsonBuilder.append("host", CloudDriver.getInstance().getHost().getAddress().getHostAddress());
-        jsonBuilder.append("port", CloudDriver.getInstance().getHost().getPort());
-        jsonBuilder.save();
+        jsonEntity = new JsonEntity(hytoraCloud);
+        jsonEntity.append("@logType", CloudDriver.getInstance().getHost().getClass().getName());
+        jsonEntity.append("host", CloudDriver.getInstance().getHost().getAddress().getHostAddress());
+        jsonEntity.append("port", CloudDriver.getInstance().getHost().getPort());
+        jsonEntity.save();
     }
 
     /**

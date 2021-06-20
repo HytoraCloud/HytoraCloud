@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.bridge.bukkit.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.Service;
@@ -39,10 +39,10 @@ public class PacketHandlerBukkitServerUpdate implements PacketHandler {
             PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;
             Service service = packetServiceUpdate.getService();
             if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getThisService().getName())) {
-                JsonBuilder jsonBuilder = new JsonBuilder(new File("./CLOUD/connection.json"));
-                jsonBuilder.clear();
-                jsonBuilder.append(service);
-                jsonBuilder.save();
+                JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/connection.json"));
+                jsonEntity.clear();
+                jsonEntity.append(service);
+                jsonEntity.save();
             }
         }
     }

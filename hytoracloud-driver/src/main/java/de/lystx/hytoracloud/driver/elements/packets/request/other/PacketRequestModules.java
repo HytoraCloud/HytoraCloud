@@ -1,10 +1,8 @@
 package de.lystx.hytoracloud.driver.elements.packets.request.other;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
 import de.lystx.hytoracloud.driver.service.module.ModuleInfo;
 import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
-import io.thunder.packet.impl.EmptyPacket;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

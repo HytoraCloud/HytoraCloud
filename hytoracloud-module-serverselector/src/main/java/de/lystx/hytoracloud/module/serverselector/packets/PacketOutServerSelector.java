@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.module.serverselector.packets;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCConfig;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
@@ -24,7 +24,7 @@ public class PacketOutServerSelector extends Packet implements Serializable {
 
 
     private NPCConfig npcConfig;
-    private JsonBuilder npcs;
+    private JsonEntity npcs;
 
 
     @Override @SneakyThrows
@@ -40,7 +40,7 @@ public class PacketOutServerSelector extends Packet implements Serializable {
         }
 
         this.signLayOut = new VsonObject(buf.readString());
-        this.npcs = new JsonBuilder(buf.readString());
+        this.npcs = new JsonEntity(buf.readString());
 
 
         int inventoryRows = buf.readInt();
@@ -61,7 +61,7 @@ public class PacketOutServerSelector extends Packet implements Serializable {
         int itemSize = buf.readInt();
         List<SerializableDocument> items = new ArrayList<>(itemSize);
         for (int i = 0; i < itemSize; i++) {
-            items.add(SerializableDocument.fromDocument(new JsonBuilder(buf.readString())));
+            items.add(SerializableDocument.fromDocument(new JsonEntity(buf.readString())));
         }
 
         this.npcConfig = new NPCConfig(inventoryRows, title, corners, message, itemName, lore, itemType, items);

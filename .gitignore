@@ -132,7 +132,7 @@ flycheck_*.el
 *.war
 *.nar
 *.ear
-*.zip
+*.fileZipper
 *.tar.gz
 *.rar
 

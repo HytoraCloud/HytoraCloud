@@ -108,6 +108,7 @@ public class LibraryService {
         this.install("com.google.guava", "guava", "25.1-jre", Repository.CENTRAL);
         this.install("com.google.j2objc", "j2objc-annotations", "1.1", Repository.CENTRAL);
         this.install("com.google.protobuf", "protobuf-java", "3.14.0", Repository.CENTRAL);
+        this.install("dnsjava", "dnsjava", "3.3.1", Repository.CENTRAL);
     }
 
 

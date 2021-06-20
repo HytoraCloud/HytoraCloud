@@ -2,13 +2,12 @@ package de.lystx.hytoracloud.module.serverselector.cloud.manager.npc;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.module.serverselector.cloud.ModuleSelector;
-import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -37,8 +36,8 @@ import java.util.List;
 )
 public class NPCService implements ICloudService {
 
-    private JsonBuilder jsonBuilder;
-    private JsonBuilder config;
+    private JsonEntity jsonEntity;
+    private JsonEntity config;
 
     private final File npcDirectory;
     private final File npcFile;
@@ -62,8 +61,8 @@ public class NPCService implements ICloudService {
      */
     public void load() {
         try {
-            this.jsonBuilder = new JsonBuilder(npcFile);
-            this.config = new JsonBuilder(npcLayout);
+            this.jsonEntity = new JsonEntity(npcFile);
+            this.config = new JsonEntity(npcLayout);
 
             if (this.npcFile.exists()) {
                 this.npcFile.createNewFile();
@@ -116,7 +115,7 @@ public class NPCService implements ICloudService {
         JsonArray jsonArray = this.config.getArray("items");
         List<SerializableDocument> vsonObjects = new LinkedList<>();
         for (JsonElement jsonElement : jsonArray) {
-            vsonObjects.add(SerializableDocument.fromDocument(new JsonBuilder(jsonElement.toString())));
+            vsonObjects.add(SerializableDocument.fromDocument(new JsonEntity(jsonElement.toString())));
         }
 
         return new NPCConfig(this.config.getInteger("inventoryRows", 0), this.config.getString("inventoryTitle"), this.config.getBoolean("corners"), this.config.getString("connectingMessage"), this.config.getString("itemName"), this.config.getList("lore", String.class), this.config.getString("itemType"), vsonObjects);
@@ -127,8 +126,8 @@ public class NPCService implements ICloudService {
      * @param key
      * @param vsonObject
      */
-    public void append(String key, JsonBuilder vsonObject) {
-        this.jsonBuilder.append(key, vsonObject);
+    public void append(String key, JsonEntity vsonObject) {
+        this.jsonEntity.append(key, vsonObject);
     }
 
     /**
@@ -136,7 +135,7 @@ public class NPCService implements ICloudService {
      * @param key
      */
     public void remove(String key) {
-        this.jsonBuilder.remove(key);
+        this.jsonEntity.remove(key);
     }
 
     /**
@@ -144,7 +143,7 @@ public class NPCService implements ICloudService {
      */
     public void save() {
         try {
-            this.jsonBuilder.save(this.npcFile);
+            this.jsonEntity.save(this.npcFile);
             this.config.save(this.npcLayout);
         } catch (Exception e) {
             // Not saved because of Receiver!

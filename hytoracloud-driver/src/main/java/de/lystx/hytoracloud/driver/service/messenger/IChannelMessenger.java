@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.service.messenger;
 
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 
 import java.util.List;
 
@@ -60,7 +60,7 @@ public interface IChannelMessenger {
      * @param data the data
      * @param targetComponents the target components
      */
-    default void sendChannelMessage(String channel, String identifier, JsonBuilder data, String... targetComponents) {
+    default void sendChannelMessage(String channel, String identifier, JsonEntity data, String... targetComponents) {
         this.sendChannelMessage(new ChannelMessage(channel, data, identifier, targetComponents));
     }
 
@@ -70,7 +70,7 @@ public interface IChannelMessenger {
      * @param identifier the identifier to identify it
      * @param data the data
      */
-    default void sendProxyChannelMessage(String channel, String identifier, JsonBuilder data) {
+    default void sendProxyChannelMessage(String channel, String identifier, JsonEntity data) {
         this.sendChannelMessage(new ChannelMessage(channel, data, identifier, "only_proxy"));
     }
     /**
@@ -79,7 +79,7 @@ public interface IChannelMessenger {
      * @param identifier the identifier to identify it
      * @param data the data
      */
-    default void sendBukkitChannelMessage(String channel, String identifier, JsonBuilder data) {
+    default void sendBukkitChannelMessage(String channel, String identifier, JsonEntity data) {
         this.sendChannelMessage(new ChannelMessage(channel, data, identifier, "only_bukkit"));
     }
 

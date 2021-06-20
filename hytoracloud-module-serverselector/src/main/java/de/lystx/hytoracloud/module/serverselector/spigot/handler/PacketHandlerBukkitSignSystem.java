@@ -33,7 +33,7 @@ public class PacketHandlerBukkitSignSystem implements PacketHandler {
                 return;
             }
             SpigotSelector.getInstance().getNpcManager().setNpcConfig(info.getNpcConfig());
-            SpigotSelector.getInstance().getNpcManager().setJsonBuilder(info.getNpcs());
+            SpigotSelector.getInstance().getNpcManager().setJsonEntity(info.getNpcs());
             SpigotSelector.getInstance().getNpcManager().updateNPCS();
         } else if (packet instanceof PacketOutStopServer) {
             SpigotSelector.getInstance().getSignManager().getSignUpdater().removeService(((PacketOutStopServer) packet).getService());

@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.service.permission;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.interfaces.BooleanRequest;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
@@ -106,7 +106,7 @@ public class PermissionService implements ICloudService {
             return;
         }
 
-        JsonBuilder jsonBuilder = new JsonBuilder(file);
+        JsonEntity jsonEntity = new JsonEntity(file);
         if (!this.file.exists()) {
             PermissionGroup defaultGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
             PermissionGroup adminGroup = new PermissionGroup(
@@ -136,21 +136,21 @@ public class PermissionService implements ICloudService {
                     Collections.singletonList(defaultGroup.getName()),
                     new HashMap<>()
             );
-            jsonBuilder.append("enabled", true);
-            jsonBuilder.append(defaultGroup.getName(), defaultGroup);
-            jsonBuilder.append(adminGroup.getName(), adminGroup);
-            jsonBuilder.save();
+            jsonEntity.append("enabled", true);
+            jsonEntity.append(defaultGroup.getName(), defaultGroup);
+            jsonEntity.append(adminGroup.getName(), adminGroup);
+            jsonEntity.save();
         }
 
 
 
         List<PermissionGroup> groups = new ArrayList<>();
-        for (String key : jsonBuilder.keys()) {
+        for (String key : jsonEntity.keys()) {
             if (key.equalsIgnoreCase("enabled")) {
-                CloudDriver.getInstance().getPermissionPool().setEnabled(jsonBuilder.getBoolean(key));
+                CloudDriver.getInstance().getPermissionPool().setEnabled(jsonEntity.getBoolean(key));
                 continue;
             }
-            PermissionGroup group = jsonBuilder.getObject(key, PermissionGroup.class);
+            PermissionGroup group = jsonEntity.getObject(key, PermissionGroup.class);
             groups.add(group);
         }
 
@@ -178,14 +178,14 @@ public class PermissionService implements ICloudService {
                 this.ignore = true;
                 this.loadGroups();
             }
-            JsonBuilder jsonBuilder = new JsonBuilder(file);
-            jsonBuilder.append("enabled", CloudDriver.getInstance().getPermissionPool().isEnabled()); //If Enabled
+            JsonEntity jsonEntity = new JsonEntity(file);
+            jsonEntity.append("enabled", CloudDriver.getInstance().getPermissionPool().isEnabled()); //If Enabled
 
             //Saves PermissionGroups
             for (PermissionGroup permissionGroup : new LinkedList<>(CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups())) {
-                jsonBuilder.append(permissionGroup.getName(), permissionGroup);
+                jsonEntity.append(permissionGroup.getName(), permissionGroup);
             }
-            jsonBuilder.save(); //Saves all the perms.json
+            jsonEntity.save(); //Saves all the perms.json
 
             //Saves PlayerData
             if (database != null) {

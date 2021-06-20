@@ -10,14 +10,19 @@ import java.net.URI;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class Zip {
+/**
+ * This class is used to Zip files
+ * into a ".zip"-file
+ */
+public class FileZipper {
 
     /**
      * Adds a file to a zpfile
-     * @param base
-     * @param filePath
-     * @param outZipStream
-     * @throws IOException
+     *
+     * @param base the base file
+     * @param filePath the path
+     * @param outZipStream the zip stream
+     * @throws IOException if something goes wrong
      */
     private void addFileToZip(File base, String filePath, ZipOutputStream outZipStream) throws IOException {
         try (FileInputStream inputStream = new FileInputStream(new File(base, filePath)); ) {
@@ -35,10 +40,11 @@ public class Zip {
 
     /**
      * Adds a directory to a zipFile
-     * @param base
-     * @param directory
-     * @param outZipStream
-     * @throws IOException
+     *
+     * @param base the base file
+     * @param directory the directory
+     * @param outZipStream the zip stream
+     * @throws IOException if something goes wrong
      */
     private void addDirectoryToZip(File base, String directory, ZipOutputStream outZipStream) throws IOException {
         File fullPath = new File(base, directory).getAbsoluteFile();
@@ -61,9 +67,10 @@ public class Zip {
 
     /**
      * Main method to zip a directory
-     * @param directory
-     * @param outFile
-     * @throws IOException
+     *
+     * @param directory the directory
+     * @param outFile the file to zip to
+     * @throws IOException if something goes wrong
      */
     public void zip(File directory, File outFile) {
         try {

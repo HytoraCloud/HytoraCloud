@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.bukkit.events.network;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -11,20 +11,20 @@ public class CloudServerSubChannelMessageEvent extends Event {
 
     private final String channel;
     private final String key;
-    private final JsonBuilder jsonBuilder;
+    private final JsonEntity jsonEntity;
 
-    public CloudServerSubChannelMessageEvent(String channel, String key, JsonBuilder jsonBuilder) {
+    public CloudServerSubChannelMessageEvent(String channel, String key, JsonEntity jsonEntity) {
         this.channel = channel;
         this.key = key;
-        this.jsonBuilder = jsonBuilder;
+        this.jsonEntity = jsonEntity;
     }
 
     public String getChannel() {
         return channel;
     }
 
-    public JsonBuilder getDocument() {
-        return jsonBuilder;
+    public JsonEntity getDocument() {
+        return jsonEntity;
     }
 
     public String getKey() {

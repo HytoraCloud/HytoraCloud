@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.service.server.impl;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
@@ -42,8 +42,8 @@ public class GroupService implements ICloudService {
         if (getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             for (File file : Objects.requireNonNull(this.getDriver().getInstance(FileService.class).getGroupsDirectory().listFiles())) {
                 if (file.getName().endsWith(".json")) {
-                    JsonBuilder jsonBuilder = new JsonBuilder(file);
-                    this.groups.add(jsonBuilder.getAs(ServiceGroup.class));
+                    JsonEntity jsonEntity = new JsonEntity(file);
+                    this.groups.add(jsonEntity.getAs(ServiceGroup.class));
                 }
             }
         }
@@ -57,9 +57,9 @@ public class GroupService implements ICloudService {
         if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
-        JsonBuilder jsonBuilder = new JsonBuilder(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        jsonBuilder.append(serviceGroup);
-        jsonBuilder.save();
+        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
+        jsonEntity.append(serviceGroup);
+        jsonEntity.save();
         this.groups.add(serviceGroup);
         this.getDriver().getInstance(TemplateService.class).createTemplate(serviceGroup);
     }
@@ -72,11 +72,11 @@ public class GroupService implements ICloudService {
         if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
-        JsonBuilder jsonBuilder = new JsonBuilder(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        jsonBuilder.clear();
+        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
+        jsonEntity.clear();
         this.groups.remove(this.getGroup(serviceGroup.getName()));
         serviceGroup.deleteAllTemplates();
-        this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> jsonBuilder.getFile().delete(), 40L);
+        this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> jsonEntity.getFile().delete(), 40L);
 
     }
 
@@ -88,10 +88,10 @@ public class GroupService implements ICloudService {
         if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
-        JsonBuilder jsonBuilder = new JsonBuilder(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), newServiceGroup.getName() + ".json"));
-        jsonBuilder.clear();
-        jsonBuilder.append(newServiceGroup);
-        jsonBuilder.save();
+        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), newServiceGroup.getName() + ".json"));
+        jsonEntity.clear();
+        jsonEntity.append(newServiceGroup);
+        jsonEntity.save();
         this.groups.remove(this.getGroup(newServiceGroup.getName()));
         this.groups.add(newServiceGroup);
 

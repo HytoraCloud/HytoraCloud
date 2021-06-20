@@ -1,30 +1,22 @@
 package net.hytora.discordbot.manager.ticket;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import lombok.Getter;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.hytora.discordbot.Hytora;
 import net.hytora.discordbot.manager.suggestion.Suggestion;
 import net.hytora.discordbot.util.button.DiscordButton;
 import net.hytora.discordbot.util.button.DiscordButtonAction;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -37,14 +29,14 @@ public class TicketManager extends ListenerAdapter {
    private final List<Ticket> tickets;
 
     /**
-     * The file for the {@link JsonBuilder}
+     * The file for the {@link JsonEntity}
      */
     private final File file;
 
     /**
      * The stored {@link Suggestion}s
      */
-    private final JsonBuilder jsonBuilder;
+    private final JsonEntity jsonEntity;
 
     /**
      * The ticket channel
@@ -68,11 +60,11 @@ public class TicketManager extends ListenerAdapter {
             e.printStackTrace();
         }
 
-        this.jsonBuilder = new JsonBuilder(this.file);
-        this.jsonBuilder.save();
+        this.jsonEntity = new JsonEntity(this.file);
+        this.jsonEntity.save();
 
         //Load saved tickets
-        this.jsonBuilder.forEach(Ticket.class, this.tickets::add);
+        this.jsonEntity.forEach(Ticket.class, this.tickets::add);
         this.checkCreator();
         Hytora.getHytora().getLogManager().log("TICKETS", "§7Loaded §b" + this.tickets.size() + " §7Opened §3Tickets§8!");
     }
@@ -108,11 +100,11 @@ public class TicketManager extends ListenerAdapter {
      * Saves all {@link Ticket}s
      */
     public void save() {
-        this.jsonBuilder.clear();
+        this.jsonEntity.clear();
         for (Ticket ticket : this.tickets) {
-            this.jsonBuilder.append(ticket.getId() + "", ticket);
+            this.jsonEntity.append(ticket.getId() + "", ticket);
         }
-        this.jsonBuilder.save(this.file);
+        this.jsonEntity.save(this.file);
     }
 
     /**

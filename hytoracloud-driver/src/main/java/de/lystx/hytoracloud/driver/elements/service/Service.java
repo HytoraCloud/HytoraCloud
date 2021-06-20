@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.elements.service;
 
 import com.google.gson.JsonObject;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.service.ServicePacket;
 import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.enums.CloudType;
@@ -148,9 +148,9 @@ public class Service implements Serializable, Objectable<Service> {
      */
     public void update() {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            JsonBuilder jsonBuilder = new JsonBuilder(new File("./CLOUD/connection.json"));
-            jsonBuilder.append(this);
-            jsonBuilder.save();
+            JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/connection.json"));
+            jsonEntity.append(this);
+            jsonEntity.save();
         }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketServiceUpdate(this));
     }
@@ -210,7 +210,7 @@ public class Service implements Serializable, Objectable<Service> {
         int port = buf.readInt();
         String host = buf.readString();
         ServiceState state = buf.readEnum(ServiceState.class);
-        JsonObject properties = new JsonBuilder(buf.readString()).build();
+        JsonObject properties = new JsonEntity(buf.readString()).build();
         ServiceGroup serviceGroup = ServiceGroup.readFromBuf(buf);
         boolean authenticated = buf.readBoolean();
 

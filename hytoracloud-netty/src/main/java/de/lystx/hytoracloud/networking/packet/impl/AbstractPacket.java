@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.networking.packet.impl;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.networking.events.CloudPacketQueueEvent;
 import de.lystx.hytoracloud.networking.packet.PacketBuffer;
 import de.lystx.hytoracloud.networking.packet.manager.PacketMessenger;
@@ -9,7 +9,6 @@ import de.lystx.hytoracloud.networking.provided.other.NettyUtil;
 import de.lystx.hytoracloud.networking.packet.impl.response.PacketRespond;
 import de.lystx.hytoracloud.networking.packet.impl.response.Response;
 import de.lystx.hytoracloud.networking.packet.impl.response.ResponseStatus;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -97,11 +95,11 @@ public abstract class AbstractPacket implements Serializable {
         this.respond(new PacketRespond(message, status));
     }
 
-    public void respond(ResponseStatus status, JsonBuilder builder) {
+    public void respond(ResponseStatus status, JsonEntity builder) {
         this.respond(status, builder.toString());
     }
 
-    public void respond(JsonBuilder builder) {
+    public void respond(JsonEntity builder) {
         this.respond(builder.toString());
     }
 
@@ -114,11 +112,11 @@ public abstract class AbstractPacket implements Serializable {
     }
 
     public void respond(Object... objects) {
-        JsonBuilder jsonBuilder = new JsonBuilder();
+        JsonEntity jsonEntity = new JsonEntity();
         for (int i = 0; i < objects.length; i++) {
-            jsonBuilder.append(String.valueOf(i), objects[i]);
+            jsonEntity.append(String.valueOf(i), objects[i]);
         }
-        this.respond(jsonBuilder.toString());
+        this.respond(jsonEntity.toString());
     }
 
     /**

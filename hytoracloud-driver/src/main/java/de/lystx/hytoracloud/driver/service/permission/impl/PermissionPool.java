@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.service.permission.impl;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerPermissionGroupAddCloudEvent;
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerPermissionGroupRemoveCloudEvent;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestKey;
 import de.lystx.hytoracloud.driver.enums.CloudType;
@@ -426,10 +426,10 @@ public class PermissionPool implements Serializable, ThunderObject {
      */
     public void loadGroupsFromFile(File file) {
         cachedPermissionGroups.clear();
-        JsonBuilder jsonBuilder = new JsonBuilder(file);
-        for (String key : jsonBuilder.keys()) {
+        JsonEntity jsonEntity = new JsonEntity(file);
+        for (String key : jsonEntity.keys()) {
             if (!key.equalsIgnoreCase("enabled")) {
-                PermissionGroup permissionGroup = jsonBuilder.getObject(key, PermissionGroup.class);
+                PermissionGroup permissionGroup = jsonEntity.getObject(key, PermissionGroup.class);
                 this.cachedPermissionGroups.add(permissionGroup);
             }
         }

@@ -17,7 +17,7 @@ import de.lystx.hytoracloud.bridge.proxy.impl.listener.server.ServerConnectListe
 import de.lystx.hytoracloud.bridge.proxy.impl.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.bridge.proxy.manager.HubManager;
 import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.service.messenger.ChannelMessageListener;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
@@ -203,7 +203,7 @@ public class CloudProxy extends Plugin{
 
         CloudDriver.getInstance().getChannelMessenger().registerChannelListener("hytoraCloud::player", new ChannelMessageListener() {
             @Override
-            public void onReceiveMessage(String identifier, JsonBuilder data, String[] targetComponents) {
+            public void onReceiveMessage(String identifier, JsonEntity data, String[] targetComponents) {
                 if (identifier.equalsIgnoreCase("chatMessage")) {
                     String player = data.getString("player");
                     String chatMessage = data.getString("message");

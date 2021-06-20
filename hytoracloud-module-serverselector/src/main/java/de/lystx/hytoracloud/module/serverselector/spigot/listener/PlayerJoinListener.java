@@ -27,7 +27,7 @@ public class PlayerJoinListener implements Listener {
             try {
                 packetReader.inject();
                 SpigotSelector.PACKET_READERS.put(player.getUniqueId(), packetReader);
-                SpigotSelector.getInstance().getNpcManager().updateNPCS(SpigotSelector.getInstance().getNpcManager().getJsonBuilder(), player, true);
+                SpigotSelector.getInstance().getNpcManager().updateNPCS(SpigotSelector.getInstance().getNpcManager().getJsonEntity(), player, true);
 
             } catch (NoSuchElementException e){
                 e.printStackTrace();

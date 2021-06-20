@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.service.messenger;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import io.thunder.packet.PacketBuffer;
 import io.thunder.utils.objects.ThunderObject;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class ChannelMessage implements ThunderObject {
      * The document containing all the data
      * (e.g. ban reasons or rank updates or sth)
      */
-    private JsonBuilder jsonBuilder;
+    private JsonEntity jsonEntity;
 
     /**
      * The identifier (header) (e.g. "playerUpdate")
@@ -30,9 +30,9 @@ public class ChannelMessage implements ThunderObject {
      */
     private String[] targetComponents;
 
-    public ChannelMessage(String channel, JsonBuilder jsonBuilder, String identifier, String... targetComponents) {
+    public ChannelMessage(String channel, JsonEntity jsonEntity, String identifier, String... targetComponents) {
         this.channel = channel;
-        this.jsonBuilder = jsonBuilder;
+        this.jsonEntity = jsonEntity;
         this.identifier = identifier;
         this.targetComponents = targetComponents;
     }
@@ -40,7 +40,7 @@ public class ChannelMessage implements ThunderObject {
     @Override
     public void write(PacketBuffer buf) {
         buf.writeString(channel); //writes channel
-        buf.writeString(jsonBuilder.toString()); //writes document
+        buf.writeString(jsonEntity.toString()); //writes document
         buf.writeString(identifier); //writes identifier
 
         //checks if components are null
@@ -60,7 +60,7 @@ public class ChannelMessage implements ThunderObject {
     @Override
     public void read(PacketBuffer buf) {
         channel = buf.readString(); //the channel name
-        jsonBuilder = new JsonBuilder(buf.readString()); //reads the document
+        jsonEntity = new JsonEntity(buf.readString()); //reads the document
         identifier = buf.readString(); //the identifier
 
         if (buf.readBoolean()) { //checks if components are null

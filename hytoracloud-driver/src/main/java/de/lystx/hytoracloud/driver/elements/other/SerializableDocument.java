@@ -23,8 +23,8 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
      * @return
      */
     public SerializableDocument append(String key, Object value) {
-        if (value instanceof JsonBuilder) {
-            this.put(key, ((JsonBuilder) value).getJsonObject());
+        if (value instanceof JsonEntity) {
+            this.put(key, ((JsonEntity) value).getJsonObject());
         } else {
             this.put(key, value);
         }
@@ -117,13 +117,13 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
 
     /**
      * Returns from Document.class
-     * @param jsonBuilder
+     * @param jsonEntity
      * @return
      */
-    public static SerializableDocument fromDocument(JsonBuilder jsonBuilder) {
+    public static SerializableDocument fromDocument(JsonEntity jsonEntity) {
         SerializableDocument serializableDocument = new SerializableDocument();
-        for (String key : jsonBuilder.keys()) {
-            serializableDocument.append(key, jsonBuilder.getObject(key));
+        for (String key : jsonEntity.keys()) {
+            serializableDocument.append(key, jsonEntity.getObject(key));
         }
         return serializableDocument;
     }
@@ -132,12 +132,12 @@ public class SerializableDocument extends HashMap<String, Object> implements Ser
      * Returns Document.class object
      * @return
      */
-    public JsonBuilder toDocument() {
-        JsonBuilder jsonBuilder = new JsonBuilder();
+    public JsonEntity toDocument() {
+        JsonEntity jsonEntity = new JsonEntity();
         for (String s : this.keySet()) {
-            jsonBuilder.append(s, this.get(s));
+            jsonEntity.append(s, this.get(s));
         }
-        return jsonBuilder;
+        return jsonEntity;
     }
 
     /**

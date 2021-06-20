@@ -1,17 +1,12 @@
 package net.hytora.discordbot.manager.other;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.service.util.other.StringCreator;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.hytora.discordbot.Hytora;
-import net.hytora.discordbot.manager.ticket.Ticket;
-import net.hytora.discordbot.util.button.DiscordButton;
-import net.hytora.discordbot.util.button.DiscordButtonAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -30,16 +25,16 @@ public class ReactionRolesManager extends ListenerAdapter {
      */
     private final Map<String, String> rolesAndEmotes;
 
-    public ReactionRolesManager(String channel, JsonBuilder jsonBuilder) {
+    public ReactionRolesManager(String channel, JsonEntity jsonEntity) {
 
         this.rolesAndEmotes = new HashMap<>();
         this.textChannel = Hytora.getHytora().getDiscord().getTextChannelById(channel);
 
-        for (String role : jsonBuilder.keysExclude("channel")) {
+        for (String role : jsonEntity.keysExclude("channel")) {
 
 
             Hytora.getHytora().createRole(
-                    new JsonBuilder()
+                    new JsonEntity()
                             .append("color", "GRAY")
                             .append("name", role)
                             .append("mentionable", true)
@@ -48,7 +43,7 @@ public class ReactionRolesManager extends ListenerAdapter {
                         Hytora.getHytora().getLogManager().log("REACTION", "§7ReactionRoles created §b" + newRole.getName() + "§8!");
                     });
 
-            this.rolesAndEmotes.put(role, jsonBuilder.getString(role));
+            this.rolesAndEmotes.put(role, jsonEntity.getString(role));
         }
         this.checkForChannel();
         Hytora.getHytora().getDiscord().addEventListener(this);

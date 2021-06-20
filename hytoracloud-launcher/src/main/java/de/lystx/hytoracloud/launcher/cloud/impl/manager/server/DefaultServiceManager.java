@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.other.ReceiverInfo;
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.elements.events.other.CloudServiceStartEvent;
@@ -114,9 +114,9 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             service.setServiceGroup(newGroup);
             CloudScreen screen = this.getDriver().getInstance(CloudScreenService.class).getMap().get(service.getName());
 
-            JsonBuilder jsonBuilder = new JsonBuilder(new File(screen.getServerDir(), "CLOUD/connection.json"));
-            jsonBuilder.append(service);
-            jsonBuilder.save();
+            JsonEntity jsonEntity = new JsonEntity(new File(screen.getServerDir(), "CLOUD/connection.json"));
+            jsonEntity.append(service);
+            jsonEntity.save();
         }
     }
 

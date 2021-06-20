@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.elements.service;
 
 import de.lystx.hytoracloud.driver.elements.list.Filter;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.enums.CloudType;
@@ -209,7 +209,7 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
                 buf.readBoolean(),
                 buf.readBoolean(),
                 buf.readBoolean(),
-                SerializableDocument.fromDocument(new JsonBuilder(buf.readString()))
+                SerializableDocument.fromDocument(new JsonEntity(buf.readString()))
         );
     }
 }

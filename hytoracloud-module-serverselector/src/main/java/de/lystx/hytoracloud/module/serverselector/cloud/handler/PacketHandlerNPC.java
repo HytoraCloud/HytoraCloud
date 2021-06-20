@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.module.serverselector.cloud.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCService;
 import io.thunder.packet.handler.PacketHandler;
@@ -27,7 +27,7 @@ public class PacketHandlerNPC implements PacketHandler {
             PacketInformation information = (PacketInformation)packet;
             if (information.getKey().equalsIgnoreCase("PacketInCreateNPC")) {
                 String key = (String) information.getObjectMap().get("key");
-                JsonBuilder vsonObject = new JsonBuilder(VsonObject.encode((Map<String, Object>) information.getObjectMap().get("vsonObject")).toJson());
+                JsonEntity vsonObject = new JsonEntity(VsonObject.encode((Map<String, Object>) information.getObjectMap().get("vsonObject")).toJson());
                 this.cloudDriver.getInstance(NPCService.class).append(key, vsonObject);
                 this.cloudDriver.getInstance(NPCService.class).save();
                 this.cloudDriver.getInstance(NPCService.class).load();

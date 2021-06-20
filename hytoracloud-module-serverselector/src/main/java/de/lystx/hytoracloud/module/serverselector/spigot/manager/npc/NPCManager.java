@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.manager.npc;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.driver.service.util.utillity.CloudMap;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCConfig;
@@ -31,13 +31,13 @@ public class NPCManager {
 
     private final Map<NPC, String> npcs;
     private final Map<NPC, String> groupNPCS;
-    private JsonBuilder jsonBuilder;
+    private JsonEntity jsonEntity;
     private NPCConfig npcConfig;
 
     public NPCManager() {
         this.npcs = new HashMap<>();
         this.groupNPCS = new HashMap<>();
-        this.jsonBuilder = new JsonBuilder();
+        this.jsonEntity = new JsonEntity();
     }
 
     /**
@@ -92,19 +92,19 @@ public class NPCManager {
      * Updates NPCS for all Players
      */
     public void updateNPCS() {
-        Bukkit.getOnlinePlayers().forEach(player -> this.updateNPCS(jsonBuilder, player, false));
+        Bukkit.getOnlinePlayers().forEach(player -> this.updateNPCS(jsonEntity, player, false));
     }
 
     /**
      * Updates all NPCs for a specific Player
      * with a custom {@link NPCConfig}
      *
-     * @param jsonBuilder > NPCConfig parsed as {@link VsonObject}
+     * @param jsonEntity > NPCConfig parsed as {@link VsonObject}
      * @param player > Player to update NPCs for
      * @param join > If update is on join
      */
-    public void updateNPCS(JsonBuilder jsonBuilder, Player player, boolean join) {
-        this.jsonBuilder = jsonBuilder;
+    public void updateNPCS(JsonEntity jsonEntity, Player player, boolean join) {
+        this.jsonEntity = jsonEntity;
         if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
             return;
         }
@@ -114,8 +114,8 @@ public class NPCManager {
         if (join) {
             this.npcs.keySet().forEach(npc -> npc.destroy(player));
         }
-        jsonBuilder.keys().forEach(key -> {
-            JsonBuilder doc = jsonBuilder.getJson(key);
+        jsonEntity.keys().forEach(key -> {
+            JsonEntity doc = jsonEntity.getJson(key);
             try {
                 VsonObject loc = new VsonObject(doc.getJson("location").toString());
                 if (loc.isEmpty()) {

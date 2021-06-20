@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.networking.packet;
 
 import com.google.common.base.Charsets;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
@@ -357,7 +357,7 @@ public class PacketBuffer {
             return null;
         }
         String objectClass = this.readString();
-        return new JsonBuilder(this.readString()).getAs((Class<T>) Class.forName(objectClass));
+        return new JsonEntity(this.readString()).getAs((Class<T>) Class.forName(objectClass));
     }
 
 

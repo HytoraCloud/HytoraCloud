@@ -3,8 +3,6 @@ package de.lystx.hytoracloud.driver.service.util;
 import de.lystx.hytoracloud.driver.elements.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.elements.interfaces.RunTaskSynchronous;
 import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.util.other.ITask;
-import de.lystx.hytoracloud.driver.service.util.other.ITaskListener;
 import lombok.SneakyThrows;
 
 import java.io.*;
@@ -18,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 /**
  * Class for utiliities
@@ -32,6 +31,65 @@ public class Utils {
     public static final String PASTE_SERVER_URL = "https://paste.labymod.net/";
     public static final String PASTE_SERVER_URL_RAW = "https://paste.labymod.net/raw/";
 
+    public static final byte PACKET_HANDSHAKE = 0x00, PACKET_STATUSREQUEST = 0x00, PACKET_PING = 0x01;
+    public static final int PROTOCOL_VERSION = 4;
+    public static final int STATUS_HANDSHAKE = 1;
+    public static final char COLOR_CHAR = '\u00A7';
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR) + "[0-9A-FK-OR]");
+
+
+    /**
+     * Strips the given message of all color codes
+     *
+     * @param input String to strip of color
+     * @return A copy of the input string, without any coloring
+     */
+    public static String stripColors(String input) {
+        return input == null ? null : STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
+    }
+
+    public static void io(boolean b, final String m) throws IOException {
+        if (b) {
+            throw new IOException(m);
+        }
+    }
+
+    /**
+     */
+    public static int readVarInt(DataInputStream in) throws IOException {
+        int i = 0;
+        int j = 0;
+        while (true) {
+            int k = in.readByte();
+
+            i |= (k & 0x7F) << j++ * 7;
+
+            if (j > 5) {
+                throw new RuntimeException("VarInt too big");
+            }
+
+            if ((k & 0x80) != 128) {
+                break;
+            }
+        }
+
+        return i;
+    }
+
+    /**
+     * @throws IOException
+     */
+    public static void writeVarInt(DataOutputStream out, int paramInt) throws IOException {
+        while (true) {
+            if ((paramInt & 0xFFFFFF80) == 0) {
+                out.writeByte(paramInt);
+                return;
+            }
+
+            out.writeByte(paramInt & 0x7F | 0x80);
+            paramInt >>>= 7;
+        }
+    }
 
 
     /**
@@ -190,65 +248,5 @@ public class Utils {
     public static void createFile(File file) {
         file.createNewFile();
 
-    }
-
-    public static class DefaultTask<T> implements ITask<T> {
-
-        private final List<ITaskListener<T>> iTaskListeners;
-        private final T object;
-        private final Consumer<ITask<T>> consumer;
-
-        public DefaultTask(T object, Consumer<ITask<T>> consumer) {
-            this.object = object;
-            this.consumer = consumer;
-            this.iTaskListeners = new ArrayList<>();
-            this.runTask();
-        }
-
-        public void error(Throwable throwable) {
-            for (ITaskListener<T> iTaskListener : this.iTaskListeners) {
-                iTaskListener.onFailure(throwable);
-            }
-        }
-
-        public void success(T object) {
-            for (ITaskListener<T> iTaskListener : this.iTaskListeners) {
-                iTaskListener.onSuccess(object);
-            }
-        }
-
-        public void nulled(Class<?> nulledClass) {
-            for (ITaskListener<T> iTaskListener : this.iTaskListeners) {
-                iTaskListener.onNull(nulledClass);
-            }
-        }
-
-        @Override
-        public ITask<T> addListener(ITaskListener<T> taskListener) {
-            iTaskListeners.add(taskListener);
-            return this;
-        }
-
-        @Override
-        public ITask<T> removeListener(ITaskListener<T> taskListener) {
-            iTaskListeners.remove(taskListener);
-            return this;
-        }
-
-        @Override
-        public ITask<T> clearListeners() {
-            iTaskListeners.clear();
-            return this;
-        }
-
-        @Override
-        public void runTask() {
-            this.consumer.accept(this);
-        }
-
-        @Override
-        public T get() {
-            return this.object;
-        }
     }
 }

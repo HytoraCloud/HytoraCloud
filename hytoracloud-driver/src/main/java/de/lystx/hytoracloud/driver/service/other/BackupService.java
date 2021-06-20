@@ -5,8 +5,8 @@ import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.service.util.other.FileZipper;
 import de.lystx.hytoracloud.driver.service.util.utillity.Value;
-import de.lystx.hytoracloud.driver.service.util.other.Zip;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -33,6 +33,7 @@ public class BackupService implements ICloudService {
     private int interval;
     private long lastBackup;
     private boolean enabled;
+
 
     public BackupService() {
         VsonObject finalDocument = null;
@@ -94,8 +95,8 @@ public class BackupService implements ICloudService {
         this.lastBackup = new Date().getTime();
 
         File src = this.getDriver().getInstance(FileService.class).getCloudDirectory();
-        Zip zip = new Zip();
-        zip.zip(src, new File(getDriver().getInstance(FileService.class).getBackupDirectory(), name + ".zip"));
+        FileZipper fileZipper = new FileZipper();
+        fileZipper.zip(src, new File(getDriver().getInstance(FileService.class).getBackupDirectory(), name + ".zip"));
 
     }
 }

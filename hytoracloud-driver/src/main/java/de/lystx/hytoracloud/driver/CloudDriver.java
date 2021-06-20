@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver;
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.hytoracloud.driver.elements.interfaces.BooleanRequest;
 import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.other.ReceiverInfo;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketCallEvent;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInCopyTemplate;
@@ -286,7 +286,7 @@ public class CloudDriver {
         CloudDriver.getInstance().getServiceRegistry().registerService(new CommandService());
 
         //Register extra features
-        this.ticksPerSecond = new TicksPerSecond(this);
+        this.ticksPerSecond = new TicksPerSecond();
         this.serviceRegistry.registerService(new CommandService());
 
         //Check for dependencies
@@ -518,7 +518,7 @@ public class CloudDriver {
      * @return service
      */
     public Service getThisService() {
-        return new JsonBuilder(new File("./CLOUD/connection.json")).getAs(Service.class);
+        return new JsonEntity(new File("./CLOUD/connection.json")).getAs(Service.class);
     }
 
     /**
@@ -528,8 +528,8 @@ public class CloudDriver {
      */
     public InetSocketAddress getHost() {
         if (driverType == CloudType.BRIDGE) {
-            JsonBuilder jsonBuilder = new JsonBuilder(new File("./CLOUD/cloud.json"));
-            return new InetSocketAddress(jsonBuilder.getString("host"), jsonBuilder.getInteger("port"));
+            JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+            return new InetSocketAddress(jsonEntity.getString("host"), jsonEntity.getInteger("port"));
         } else if (driverType == CloudType.CLOUDSYSTEM) {
             NetworkConfig networkConfig = getInstance(ConfigService.class).getNetworkConfig();
             return new InetSocketAddress(networkConfig.getHost(), networkConfig.getPort());

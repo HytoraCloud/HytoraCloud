@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 @Getter @Setter
-public class JsonBuilder implements Iterable<JsonElement> {
+public class JsonEntity implements Iterable<JsonElement> {
 
     /**
      * Gson constant to (de-)serialize Objects
@@ -37,21 +37,21 @@ public class JsonBuilder implements Iterable<JsonElement> {
     /**
      * Constructs an Empty Document
      */
-    public JsonBuilder() {
+    public JsonEntity() {
         this(new JsonObject());
     }
 
     /**
      * Constructs a document from File
      */
-    public JsonBuilder(File file) {
+    public JsonEntity(File file) {
         this(new JsonObject(), file, null);
     }
 
     /**
      * Constructs a document from reader
      */
-    public JsonBuilder(Reader reader) {
+    public JsonEntity(Reader reader) {
         this();
         try {
             jsonObject = (JsonObject) parser.parse(reader);
@@ -65,7 +65,7 @@ public class JsonBuilder implements Iterable<JsonElement> {
      *
      * @param file the file
      */
-    public JsonBuilder readFile(String file) {
+    public JsonEntity readFile(String file) {
         File file1 = new File(file);
         if (file1.exists()) {
             try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
@@ -82,7 +82,7 @@ public class JsonBuilder implements Iterable<JsonElement> {
      *
      * @param input the string
      */
-    public JsonBuilder(String input) {
+    public JsonEntity(String input) {
         this(new JsonObject(), null, input);
     }
 
@@ -91,7 +91,7 @@ public class JsonBuilder implements Iterable<JsonElement> {
      *
      * @param object the data object
      */
-    public JsonBuilder(JsonObject object) {
+    public JsonEntity(JsonObject object) {
         this(object, null, null);
     }
 
@@ -102,7 +102,7 @@ public class JsonBuilder implements Iterable<JsonElement> {
      * @param file the file for it
      * @param input the inputString
      */
-    public JsonBuilder(JsonObject object, File file, String input) {
+    public JsonEntity(JsonObject object, File file, String input) {
         this.jsonObject = object;
         this.parser = new JsonParser();
         this.file = file;
@@ -131,13 +131,13 @@ public class JsonBuilder implements Iterable<JsonElement> {
      * @param value the value
      * @return current Document
      */
-    public JsonBuilder append(String key, Object value) {
+    public JsonEntity append(String key, Object value) {
         try {
             if (value == null) {
                 return this;
             }
-            if (value instanceof JsonBuilder) {
-                this.jsonObject.add(key, ((JsonBuilder) value).getJsonObject());
+            if (value instanceof JsonEntity) {
+                this.jsonObject.add(key, ((JsonEntity) value).getJsonObject());
             } else {
                 this.jsonObject.add(key, GSON.toJsonTree(value));
             }
@@ -153,7 +153,7 @@ public class JsonBuilder implements Iterable<JsonElement> {
      * @param value the value to add
      * @return current Document
      */
-    public JsonBuilder append(Object value) {
+    public JsonEntity append(Object value) {
         if (value == null) {
             return this;
         }
@@ -167,7 +167,7 @@ public class JsonBuilder implements Iterable<JsonElement> {
      * @param key the key where the object is stored
      * @return current Document
      */
-    public JsonBuilder remove(String key) {
+    public JsonEntity remove(String key) {
         this.jsonObject.remove(key);
         return this;
     }
@@ -341,8 +341,8 @@ public class JsonBuilder implements Iterable<JsonElement> {
      * @param key the key where its stored
      * @return document
      */
-    public JsonBuilder getJson(String key) {
-        return new JsonBuilder(this.getJsonObject(key));
+    public JsonEntity getJson(String key) {
+        return new JsonEntity(this.getJsonObject(key));
     }
 
     /**
@@ -495,7 +495,7 @@ public class JsonBuilder implements Iterable<JsonElement> {
      * @return object
      */
     public static <T> T fromClass(String input, Class<T> tClass) {
-        return new JsonBuilder(input).getAs(tClass);
+        return new JsonEntity(input).getAs(tClass);
     }
 
     /**
@@ -523,6 +523,20 @@ public class JsonBuilder implements Iterable<JsonElement> {
             objects.add(this.jsonObject.get(key));
         }
         return objects.iterator();
+    }
+
+
+    /**
+     * Transforms this entity to a serializable map
+     *
+     * @return map filled with all objects
+     */
+    public Map<String, Object> toSerializableMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (String key : this.keys()) {
+            map.getOrDefault(key, this.getObject(key));
+        }
+        return map;
     }
 
 }

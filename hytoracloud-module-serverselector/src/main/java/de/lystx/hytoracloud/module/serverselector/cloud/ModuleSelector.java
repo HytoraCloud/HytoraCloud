@@ -48,6 +48,6 @@ public class ModuleSelector extends Module {
         NPCService npcService = CloudDriver.getInstance().getInstance(NPCService.class);
         npcService.load();
 
-        CloudDriver.getInstance().sendPacket(new PacketOutServerSelector(service.getCloudSigns(), service.getSignLayOut().getDocument(), npcService.getNPCConfig(), npcService.getJsonBuilder()));
+        CloudDriver.getInstance().sendPacket(new PacketOutServerSelector(service.getCloudSigns(), service.getSignLayOut().getDocument(), npcService.getNPCConfig(), npcService.getJsonEntity()));
     }
 }

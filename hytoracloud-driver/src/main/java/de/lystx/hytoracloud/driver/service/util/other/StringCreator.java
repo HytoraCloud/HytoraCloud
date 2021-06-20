@@ -58,7 +58,6 @@ public class StringCreator implements Iterable<String> {
      * @return current creator
      */
     public StringCreator singleAppend(String line) {
-
         this.lines.add(line);
         return this;
     }

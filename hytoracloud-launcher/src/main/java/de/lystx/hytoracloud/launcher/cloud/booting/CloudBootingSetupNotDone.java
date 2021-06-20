@@ -4,7 +4,7 @@ import de.lystx.hytoracloud.driver.enums.ProxyVersion;
 import de.lystx.hytoracloud.driver.enums.SpigotVersion;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
@@ -120,7 +120,7 @@ public class CloudBootingSetupNotDone {
                 cloudSystem.getParent().getConsole().getLogger().sendMessage("§9");
                 DatabaseSetup databaseSetup = new DatabaseSetup();
                 databaseSetup.start(cloudSystem.getParent().getConsole(), ds -> {
-                    JsonBuilder jsonBuilder1 = new JsonBuilder()
+                    JsonEntity jsonEntity1 = new JsonEntity()
                             .append("type", setup.getDatabase().toUpperCase())
                             .append("host", ds.getHost())
                             .append("port", ds.getPort())
@@ -128,7 +128,7 @@ public class CloudBootingSetupNotDone {
                             .append("defaultDatabase", ds.getDefaultDatabase())
                             .append("collectionOrTable", ds.getCollectionOrTable())
                             .append("password", ds.getPassword());
-                    jsonBuilder1.save(new File(cloudSystem.getInstance(FileService.class).getDatabaseDirectory(), "database.json"));
+                    jsonEntity1.save(new File(cloudSystem.getInstance(FileService.class).getDatabaseDirectory(), "database.json"));
 
                     cloudSystem.getDatabaseManager().load(
                             ds.getHost(),

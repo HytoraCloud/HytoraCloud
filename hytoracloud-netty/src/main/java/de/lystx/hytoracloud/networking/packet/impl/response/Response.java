@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.networking.packet.impl.response;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.networking.provided.objects.NetworkObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,8 +56,8 @@ public class Response {
      *
      * @return jsonBuilder
      */
-    public JsonBuilder toJson() {
-        return new JsonBuilder(this.message);
+    public JsonEntity toJson() {
+        return new JsonEntity(this.message);
     }
 
     /**

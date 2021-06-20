@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.database.DatabaseType;
@@ -27,7 +27,7 @@ import java.io.IOException;
 public class DefaultDatabaseService implements ICloudService, IDatabaseManager {
 
     private IDatabase database;
-    private JsonBuilder jsonBuilder;
+    private JsonEntity jsonEntity;
     private DatabaseType databaseType;
     private String host;
     private String username;
@@ -40,36 +40,36 @@ public class DefaultDatabaseService implements ICloudService, IDatabaseManager {
         this.database = new DefaultDatabaseFiles();
         File file = new File(CloudDriver.getInstance().getInstance(FileService.class).getDatabaseDirectory(), "database.json");
         if (file.exists()) {
-            this.jsonBuilder = new JsonBuilder(file);
+            this.jsonEntity = new JsonEntity(file);
         } else {
             try {
                 file.createNewFile();
-                this.jsonBuilder = new JsonBuilder(file);
+                this.jsonEntity = new JsonEntity(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        this.reload(jsonBuilder);
+        this.reload(jsonEntity);
     }
 
     /**
      * Saves settings
-     * @param jsonBuilder
+     * @param jsonEntity
      */
-    public void reload(JsonBuilder jsonBuilder) {
+    public void reload(JsonEntity jsonEntity) {
 
         this.load(
-                jsonBuilder.getString("host", "127.0.0.1"),
-                jsonBuilder.getInteger("port", 3306),
-                jsonBuilder.getString("username", "root"),
-                jsonBuilder.getString("password", "pw"),
-                jsonBuilder.getString("collectionOrTable", "value"),
-                jsonBuilder.getString("defaultDatabase", "database"),
-                DatabaseType.valueOf(jsonBuilder.getString("type", "FILES"))
+                jsonEntity.getString("host", "127.0.0.1"),
+                jsonEntity.getInteger("port", 3306),
+                jsonEntity.getString("username", "root"),
+                jsonEntity.getString("password", "pw"),
+                jsonEntity.getString("collectionOrTable", "value"),
+                jsonEntity.getString("defaultDatabase", "database"),
+                DatabaseType.valueOf(jsonEntity.getString("type", "FILES"))
         );
 
-        this.jsonBuilder = jsonBuilder;
-        jsonBuilder.save();
+        this.jsonEntity = jsonEntity;
+        jsonEntity.save();
     }
 
     @Override

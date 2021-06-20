@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.proxy.impl.listener.player;
 import de.lystx.hytoracloud.bridge.proxy.events.other.ProxyServerLoginFailEvent;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerChangeServerCloudEvent;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.service.player.impl.PlayerConnection;
@@ -114,7 +114,7 @@ public class PlayerListener implements Listener {
         String message = event.getMessage();
         String player = ((ProxiedPlayer)event.getSender()).getName();
 
-        CloudDriver.getInstance().getChannelMessenger().sendProxyChannelMessage("hytoraCloud::player", "chatMessage", new JsonBuilder().append("player", player).append("message", message));
+        CloudDriver.getInstance().getChannelMessenger().sendProxyChannelMessage("hytoraCloud::player", "chatMessage", new JsonEntity().append("player", player).append("message", message));
     }
 
     @EventHandler

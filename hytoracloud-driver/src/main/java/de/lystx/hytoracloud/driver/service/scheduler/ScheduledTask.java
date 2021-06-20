@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * you can cancel the Task at any time
  */
 @Getter @RequiredArgsConstructor @Setter
-public class Task implements Runnable {
+public class ScheduledTask implements Runnable {
 
 	//Constructor parameters
 	private final boolean sync;
@@ -29,7 +29,7 @@ public class Task implements Runnable {
 	private boolean cancelled;
 	private boolean error;
 
-	private List<Consumer<Task>> taskConsumers = new ArrayList<>();
+	private List<Consumer<ScheduledTask>> taskConsumers = new ArrayList<>();
 	private List<BooleanRequest> cancelWhens = new ArrayList<>();
 
 	/**
@@ -37,7 +37,7 @@ public class Task implements Runnable {
 	 *
 	 * @param consumer the consumer
 	 */
-	public Task addConsumer(Consumer<Task> consumer) {
+	public ScheduledTask addConsumer(Consumer<ScheduledTask> consumer) {
 		this.taskConsumers.add(consumer);
 		return this;
 	}
@@ -47,7 +47,7 @@ public class Task implements Runnable {
 	 *
 	 * @param booleanRequest the request
 	 */
-	public Task cancelIf(BooleanRequest booleanRequest) {
+	public ScheduledTask cancelIf(BooleanRequest booleanRequest) {
 		this.cancelWhens.add(booleanRequest);
 		return this;
 	}
@@ -70,7 +70,7 @@ public class Task implements Runnable {
 		this.runTimes++;
 		try {
 			this.runnable.run();
-			for (Consumer<Task> taskConsumer : this.taskConsumers) {
+			for (Consumer<ScheduledTask> taskConsumer : this.taskConsumers) {
 				taskConsumer.accept(this);
 			}
 		} catch (Exception e) {

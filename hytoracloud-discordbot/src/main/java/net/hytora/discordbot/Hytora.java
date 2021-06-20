@@ -1,7 +1,7 @@
 package net.hytora.discordbot;
 
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.service.util.Utils;
 import net.dv8tion.jda.api.*;
@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.dv8tion.jda.internal.interactions.ButtonImpl;
 import net.hytora.discordbot.commands.HelpCommand;
 import net.hytora.discordbot.commands.SuggestCommand;
 import net.hytora.discordbot.listener.*;
@@ -22,7 +21,6 @@ import net.hytora.discordbot.manager.logger.LogManager;
 import net.hytora.discordbot.manager.other.ReactionRolesManager;
 import net.hytora.discordbot.manager.suggestion.SuggestionManager;
 import net.hytora.discordbot.manager.ticket.TicketManager;
-import net.hytora.discordbot.util.MultiConsumer;
 import net.hytora.discordbot.util.button.DiscordButton;
 import net.hytora.discordbot.util.button.DiscordButtonAction;
 
@@ -74,7 +72,7 @@ public class Hytora {
     /**
      * The config where all values are stored
      */
-    private JsonBuilder jsonConfig;
+    private JsonEntity jsonConfig;
 
     /**
      * The JDA to manage all discord stuff
@@ -247,9 +245,9 @@ public class Hytora {
     public void manageDefaultRoles() {
 
         //Roles
-        JsonBuilder roles = this.jsonConfig.getJson("roles");
-        JsonBuilder defaultRole = roles.getJson("default");
-        JsonBuilder supportRole = roles.getJson("support");
+        JsonEntity roles = this.jsonConfig.getJson("roles");
+        JsonEntity defaultRole = roles.getJson("default");
+        JsonEntity supportRole = roles.getJson("support");
 
         this.createRole(defaultRole, df -> {
 
@@ -274,15 +272,15 @@ public class Hytora {
     /**
      * Creates a new {@link Role} and accepts the consumer
      *
-     * @param jsonBuilder the data for the role
+     * @param jsonEntity the data for the role
      * @param consumer the consumer
      */
-    public void createRole(JsonBuilder jsonBuilder, Consumer<Role> consumer) {
+    public void createRole(JsonEntity jsonEntity, Consumer<Role> consumer) {
 
-        String name = jsonBuilder.getString("name");
-        String color = jsonBuilder.getString("color");
-        boolean showOrder = jsonBuilder.getBoolean("showOrder");
-        boolean mentionable = jsonBuilder.getBoolean("mentionable");
+        String name = jsonEntity.getString("name");
+        String color = jsonEntity.getString("color");
+        boolean showOrder = jsonEntity.getBoolean("showOrder");
+        boolean mentionable = jsonEntity.getBoolean("mentionable");
 
         Role role = guild.getRoles().stream().filter(role1 -> role1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
 
@@ -322,19 +320,19 @@ public class Hytora {
             this.botManaging = this.guild.getTextChannelById(botManagingId);
 
             //Suggestions
-            JsonBuilder suggestions = this.jsonConfig.getJson("suggestions");
+            JsonEntity suggestions = this.jsonConfig.getJson("suggestions");
             String commands = suggestions.getString("commands");
             String suggestionsChannel = suggestions.getString("suggestions");
 
             this.suggestionManager = new SuggestionManager(suggestionsChannel);
 
 
-            JsonBuilder tickets = this.jsonConfig.getJson("tickets");
+            JsonEntity tickets = this.jsonConfig.getJson("tickets");
             String channel = tickets.getString("channel");
             this.ticketManager = new TicketManager(channel);
 
 
-            JsonBuilder reactionRoles = this.jsonConfig.getJson("reactionRoles");
+            JsonEntity reactionRoles = this.jsonConfig.getJson("reactionRoles");
             this.reactionRolesManager = new ReactionRolesManager(reactionRoles.getString("channel"), reactionRoles);
 
             return true;
@@ -352,7 +350,7 @@ public class Hytora {
 
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Hytora.class.getResourceAsStream("/config.json"))));
-            this.jsonConfig = new JsonBuilder(reader);
+            this.jsonConfig = new JsonEntity(reader);
             return !this.jsonConfig.isEmpty();
         } catch (Exception e) {
             return false;
@@ -439,7 +437,7 @@ public class Hytora {
         return commandManager;
     }
 
-    public JsonBuilder getJsonConfig() {
+    public JsonEntity getJsonConfig() {
         return jsonConfig;
     }
 

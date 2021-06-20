@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.bridge.standalone.manager.DefaultServiceManager;
 import de.lystx.hytoracloud.bridge.standalone.impl.CloudSidePlayerManager;
 import de.lystx.hytoracloud.bridge.standalone.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestModules;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
@@ -144,12 +144,12 @@ public class CloudBridge {
             }
         });
 
-        JsonBuilder jsonBuilder = new JsonBuilder(new File("./CLOUD/cloud.json"));
+        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
         if (this.cloudClient.isConnected()) {
             return;
         }
-        int port = jsonBuilder.getInteger("port");
-        String host = jsonBuilder.getString("host");
+        int port = jsonEntity.getInteger("port");
+        String host = jsonEntity.getString("host");
         System.out.println("[CloudAPI] Connecting to CloudSystem [" + host + ":" + port + "]");
         this.cloudClient.connect(host, port).perform();
 

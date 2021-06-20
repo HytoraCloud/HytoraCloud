@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Scheduler implements ICloudService {
 
 	private static Scheduler instance;
-	private final Map<Integer, Task> schedulerMap;
+	private final Map<Integer, ScheduledTask> schedulerMap;
 
 	public Scheduler() {
 		this.schedulerMap = new ConcurrentHashMap<>();
@@ -32,7 +32,7 @@ public class Scheduler implements ICloudService {
 	 * @param id
 	 * @return Task by ID
 	 */
-	public Task getTask(int id) {
+	public ScheduledTask getTask(int id) {
 		return schedulerMap.getOrDefault(id, null);
 	}
 
@@ -48,7 +48,7 @@ public class Scheduler implements ICloudService {
 	 * Cancels a single Task
 	 * @param id
 	 */
-	public void cancelTask(Task id) {
+	public void cancelTask(ScheduledTask id) {
 		if (id != null) {
 			id.setCancelled(true);
 			schedulerMap.remove(id.getId());
@@ -74,9 +74,9 @@ public class Scheduler implements ICloudService {
 	 */
 	public int scheduleAsyncWhile(Runnable run, long delay, long repeat) {
 		int taskid = new Random().nextInt(2147483647);
-		Task task = new Task(true, run, taskid, false);
-		this.schedulerMap.put(taskid, task);
-		return task.getId();
+		ScheduledTask scheduledTask = new ScheduledTask(true, run, taskid, false);
+		this.schedulerMap.put(taskid, scheduledTask);
+		return scheduledTask.getId();
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class Scheduler implements ICloudService {
 	 * @param times
 	 * @return task ID
 	 */
-	public Task scheduleRepeatingTaskForTimes(Runnable task, long delay, long period, long times) {
+	public ScheduledTask scheduleRepeatingTaskForTimes(Runnable task, long delay, long period, long times) {
 		return scheduleRepeatingTaskForTimes(task, delay, period, times, false);
 	}
 
@@ -100,7 +100,7 @@ public class Scheduler implements ICloudService {
 	 * @param times
 	 * @return task ID
 	 */
-	public Task scheduleRepeatingTaskAsync(Runnable task, long delay, long period, long times) {
+	public ScheduledTask scheduleRepeatingTaskAsync(Runnable task, long delay, long period, long times) {
 		return scheduleRepeatingTaskForTimes(task, delay, period, times, true);
 	}
 
@@ -111,7 +111,7 @@ public class Scheduler implements ICloudService {
 	 * @param period
 	 * @return task ID
 	 */
-	public Task scheduleRepeatingTask(Runnable task, long delay, long period) {
+	public ScheduledTask scheduleRepeatingTask(Runnable task, long delay, long period) {
 		return scheduleRepeatingTask(task, delay, period, false);
 	}
 
@@ -123,7 +123,7 @@ public class Scheduler implements ICloudService {
 	 * @param period
 	 * @return task ID
 	 */
-	public Task scheduleRepeatingTaskAsync(Runnable task, long delay, long period) {
+	public ScheduledTask scheduleRepeatingTaskAsync(Runnable task, long delay, long period) {
 		return scheduleRepeatingTask(task, delay, period, true);
 	}
 
@@ -132,10 +132,10 @@ public class Scheduler implements ICloudService {
 	 * @param task
 	 * @return task
 	 */
-	public Task runTask(Runnable task) {
-		Task task1 = this.runTask(task, false, false);
-		new Thread(() -> { cancelTask(task1);Thread.interrupted();}).start();
-		return task1;
+	public ScheduledTask runTask(Runnable task) {
+		ScheduledTask scheduledTask1 = this.runTask(task, false, false);
+		new Thread(() -> { cancelTask(scheduledTask1);Thread.interrupted();}).start();
+		return scheduledTask1;
 	}
 
 	/**
@@ -144,10 +144,10 @@ public class Scheduler implements ICloudService {
 	 * @param task
 	 * @return task
 	 */
-	public Task runTaskAsync(Runnable task) {
-		Task task1 = runTask(task, true, false);
-		new Thread(() -> { task1.run();cancelTask(task1);Thread.interrupted(); }).start();
-		return task1;
+	public ScheduledTask runTaskAsync(Runnable task) {
+		ScheduledTask scheduledTask1 = runTask(task, true, false);
+		new Thread(() -> { scheduledTask1.run();cancelTask(scheduledTask1);Thread.interrupted(); }).start();
+		return scheduledTask1;
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class Scheduler implements ICloudService {
 	 * @param delay
 	 * @return task
 	 */
-	public Task scheduleDelayedTask(Runnable task, long delay) {
+	public ScheduledTask scheduleDelayedTask(Runnable task, long delay) {
 		return delayTask(task, delay, false);
 	}
 
@@ -167,7 +167,7 @@ public class Scheduler implements ICloudService {
 	 * @param delay
 	 * @return task
 	 */
-	public Task scheduleDelayedTaskAsync(Runnable task, long delay) {
+	public ScheduledTask scheduleDelayedTaskAsync(Runnable task, long delay) {
 		return delayTask(task, delay, true);
 	}
 
@@ -178,7 +178,7 @@ public class Scheduler implements ICloudService {
 	 * @param multipleTimes
 	 * @return task
 	 */
-	private Task runTask(Runnable task, boolean async, boolean multipleTimes) {
+	private ScheduledTask runTask(Runnable task, boolean async, boolean multipleTimes) {
 		if (task == null) {
 			return null;
 		}
@@ -190,7 +190,7 @@ public class Scheduler implements ICloudService {
 			}
 		}
 		try {
-			schedulerMap.put(id, new Task(!async, task, id, multipleTimes));
+			schedulerMap.put(id, new ScheduledTask(!async, task, id, multipleTimes));
 		} catch (Exception e) {
 			//ignoring this error
 		}
@@ -204,11 +204,11 @@ public class Scheduler implements ICloudService {
 	 * @param async
 	 * @return task
 	 */
-	public Task delayTask(Runnable task, long delay, boolean async) {
+	public ScheduledTask delayTask(Runnable task, long delay, boolean async) {
 		if (delay < 0) {
 			return null;
 		}
-		Task t = runTask(task, async, false);
+		ScheduledTask t = runTask(task, async, false);
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 					t.run();
@@ -228,14 +228,14 @@ public class Scheduler implements ICloudService {
 	 * @param async
 	 * @return Task
 	 */
-	private Task scheduleRepeatingTask(Runnable task, long delay, long period, boolean async) {
+	private ScheduledTask scheduleRepeatingTask(Runnable task, long delay, long period, boolean async) {
 		if (period < 0) {
 			return null;
 		}
 		if (delay < 0) {
 			return null;
 		}
-		Task t = runTask(task, async, true);
+		ScheduledTask t = runTask(task, async, true);
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 					t.run();
@@ -258,7 +258,7 @@ public class Scheduler implements ICloudService {
 	 * @param async
 	 * @return Task
 	 */
-	private Task scheduleRepeatingTaskForTimes(Runnable task, long delay, long period, final long times, boolean async) {
+	private ScheduledTask scheduleRepeatingTaskForTimes(Runnable task, long delay, long period, final long times, boolean async) {
 		if (times <= 0) {
 			return null;
 		}
@@ -268,7 +268,7 @@ public class Scheduler implements ICloudService {
 		if (delay < 0) {
 			return null;
 		}
-		final Task t = runTask(task, async, true);
+		final ScheduledTask t = runTask(task, async, true);
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 					t.run();

@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.service.messenger;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 
 public interface ChannelMessageListener {
 
@@ -12,7 +12,7 @@ public interface ChannelMessageListener {
      * @param data the data
      * @param targetComponents extra components
      */
-    void onReceiveMessage(String identifier, JsonBuilder data, String[] targetComponents);
+    void onReceiveMessage(String identifier, JsonEntity data, String[] targetComponents);
 
     /**
      * Only used to make this easier to handle
@@ -20,6 +20,6 @@ public interface ChannelMessageListener {
      * @param channelMessage the message
      */
     default void onReceiveRaw(ChannelMessage channelMessage) {
-        this.onReceiveMessage(channelMessage.getIdentifier(), channelMessage.getJsonBuilder(), channelMessage.getTargetComponents());
+        this.onReceiveMessage(channelMessage.getIdentifier(), channelMessage.getJsonEntity(), channelMessage.getTargetComponents());
     }
 }

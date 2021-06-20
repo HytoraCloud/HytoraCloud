@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.driver.service.util.other;
 
 import de.lystx.hytoracloud.driver.service.event.CloudEventHandler;
 
+import io.thunder.packet.handler.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

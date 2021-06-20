@@ -27,7 +27,6 @@ public class PacketUtils {
     private Class<?> packetPlayOutCustomPayloadClass;
     private Constructor<?> customPayloadConstructor;
     private boolean customPayloadHasBytes;
-    private Class<?> packetDataSerializerClass;
     private Constructor<?> packetDataSerializerConstructor;
     private Method getHandleMethod;
     private Field playerConnectionField;
@@ -58,8 +57,8 @@ public class PacketUtils {
 
             if (!this.customPayloadHasBytes) {
                 try {
-                    this.packetDataSerializerClass = this.getNmsClass("PacketDataSerializer");
-                    this.packetDataSerializerConstructor = this.packetDataSerializerClass.getDeclaredConstructor(ByteBuf.class);
+                    Class<?> packetDataSerializerClass = this.getNmsClass("PacketDataSerializer");
+                    this.packetDataSerializerConstructor = packetDataSerializerClass.getDeclaredConstructor(ByteBuf.class);
                 } catch (Exception var5) {
                     var5.printStackTrace();
                 }

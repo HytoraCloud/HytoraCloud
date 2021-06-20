@@ -1,10 +1,6 @@
 package net.hytora.discordbot.manager.suggestion;
 
-import com.google.gson.JsonElement;
-import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.util.other.StringCreator;
-import lombok.Getter;
+import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -35,14 +31,14 @@ public class SuggestionManager extends ListenerAdapter {
     private final String channel;
 
     /**
-     * The file for the {@link JsonBuilder}
+     * The file for the {@link JsonEntity}
      */
     private final File file;
 
     /**
      * The stored {@link Suggestion}s
      */
-    private final JsonBuilder jsonBuilder;
+    private final JsonEntity jsonEntity;
 
     public SuggestionManager(String channel) {
         this.pendingSuggestions = new LinkedList<>();
@@ -57,11 +53,11 @@ public class SuggestionManager extends ListenerAdapter {
             e.printStackTrace();
         }
 
-        this.jsonBuilder = new JsonBuilder(this.file);
-        this.jsonBuilder.save();
+        this.jsonEntity = new JsonEntity(this.file);
+        this.jsonEntity.save();
 
         //Load saved suggestions
-        this.jsonBuilder.forEach(Suggestion.class, this.pendingSuggestions::add);
+        this.jsonEntity.forEach(Suggestion.class, this.pendingSuggestions::add);
         Hytora.getHytora().getLogManager().log("SUGGESTIONS", "§7Loaded §b" + this.pendingSuggestions.size() + " §7Pending §3Suggestions§8!");
 
         Hytora.getHytora().getDiscord().addEventListener(this);
@@ -72,11 +68,11 @@ public class SuggestionManager extends ListenerAdapter {
      * Saves all {@link Suggestion}s
      */
     public void save() {
-        this.jsonBuilder.clear();
+        this.jsonEntity.clear();
         for (Suggestion pendingSuggestion : this.pendingSuggestions) {
-            this.jsonBuilder.append(pendingSuggestion.getUniqueId().toString(), pendingSuggestion);
+            this.jsonEntity.append(pendingSuggestion.getUniqueId().toString(), pendingSuggestion);
         }
-        this.jsonBuilder.save(this.file);
+        this.jsonEntity.save(this.file);
     }
 
     /**
@@ -279,7 +275,7 @@ public class SuggestionManager extends ListenerAdapter {
         return file;
     }
 
-    public JsonBuilder getJsonBuilder() {
-        return jsonBuilder;
+    public JsonEntity getJsonBuilder() {
+        return jsonEntity;
     }
 }
