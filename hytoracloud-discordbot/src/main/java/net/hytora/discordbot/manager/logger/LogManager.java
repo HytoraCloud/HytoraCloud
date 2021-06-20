@@ -95,7 +95,7 @@ public class LogManager {
      * @param requester the requester
      */
     public void preset(TextChannel textChannel, String title, User requester, Consumer<Message> consumer, String... message) {
-        this.preset(textChannel, title, requester, consumer, new Button[0], message);
+        textChannel.sendMessage(this.embedBuilder(java.awt.Color.CYAN, title, requester, message).build()).queue(consumer);
     }
 
     /**
@@ -121,8 +121,8 @@ public class LogManager {
     public EmbedBuilder embedBuilder(java.awt.Color color, String title, User requester, String... message) {
         StringCreator stringCreator = new StringCreator();
 
-        for (String s : message) {
-            stringCreator.append(s);
+        for (String msg : message) {
+            stringCreator.append(msg);
         }
 
        return new EmbedBuilder()

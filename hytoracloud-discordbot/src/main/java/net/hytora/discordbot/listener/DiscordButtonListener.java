@@ -9,11 +9,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.hytora.discordbot.Hytora;
+import net.hytora.discordbot.util.button.DiscordButton;
+import net.hytora.discordbot.util.button.DiscordButtonAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
-public class BotStopListener extends ListenerAdapter {
+public class DiscordButtonListener extends ListenerAdapter {
 
 
     @Override
@@ -22,16 +24,16 @@ public class BotStopListener extends ListenerAdapter {
         TextChannel textChannel = event.getTextChannel();
         Message message = event.getMessage();
 
-        if (button != null && button.getStyle() == ButtonStyle.DANGER && message != null) {
-            if (textChannel.getId().equalsIgnoreCase(Hytora.getHytora().getBotManaging().getId())) {
-                EmbedBuilder embedBuilder = Hytora.getHytora().getLogManager().embedBuilder(Color.DARK_GRAY,"Shutdown", event.getUser(), "The HytoraCloud Bot", "Is shutting down in 1 Second...");
-                message.editMessage(embedBuilder.build()
-                ).queue(message1 -> {
-                    Scheduler.getInstance().scheduleDelayedTask(() -> {
-                        message1.delete().queue(unused -> Hytora.getHytora().shutdown());
-                    }, 20L);
-                });
+        if (button != null && message != null) {
+
+            DiscordButton discordButton = Hytora.getHytora().getDiscordButtons().stream().filter(db -> String.valueOf(db.getId()).equalsIgnoreCase(button.getId())).findFirst().orElse(null);
+
+            if (discordButton == null) {
+                return;
             }
+
+            discordButton.getActionConsumer().accept(new DiscordButtonAction(event.getUser(), button, message, textChannel));
+
         }
     }
 }

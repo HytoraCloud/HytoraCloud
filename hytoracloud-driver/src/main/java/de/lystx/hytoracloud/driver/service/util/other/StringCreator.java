@@ -21,6 +21,13 @@ public class StringCreator implements Iterable<String> {
         this.lines = new ArrayList<>();
     }
 
+    public StringCreator(String... args) {
+        this();
+        for (String arg : args) {
+            this.append(arg).append(" ");
+        }
+    }
+
     @SneakyThrows
     public StringCreator(File file) {
         this.lines = new ArrayList<>();
@@ -45,6 +52,18 @@ public class StringCreator implements Iterable<String> {
     }
 
     /**
+     * Appends a line without a new automatic line
+     *
+     * @param line the line to add
+     * @return current creator
+     */
+    public StringCreator singleAppend(String line) {
+
+        this.lines.add(line);
+        return this;
+    }
+
+    /**
      * Saves it to a File
      *
      * @param file the file to save
@@ -58,6 +77,15 @@ public class StringCreator implements Iterable<String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Turns this creator to an array
+     *
+     * @return array
+     */
+    public String[] toArray() {
+        return this.lines.toArray(new String[0]);
     }
 
     /**
@@ -79,6 +107,10 @@ public class StringCreator implements Iterable<String> {
 
     public String create() {
         return toString();
+    }
+
+    public List<String> getLines() {
+        return lines;
     }
 
     @NotNull

@@ -4,13 +4,15 @@ import com.google.gson.*;
 import io.thunder.packet.PacketBuffer;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 
 @Getter @Setter
-public class JsonBuilder {
+public class JsonBuilder implements Iterable<JsonElement> {
 
     /**
      * Gson constant to (de-)serialize Objects
@@ -20,7 +22,7 @@ public class JsonBuilder {
     /**
      * The file of this document
      */
-    private final File file;
+    private File file;
 
     /**
      * The JsonParser for this document
@@ -179,6 +181,27 @@ public class JsonBuilder {
         List<String> list = new LinkedList<>();
         for (Map.Entry<String, JsonElement> jsonElementEntry : this.jsonObject.entrySet()) {
             list.add(jsonElementEntry.getKey());
+        }
+        return list;
+    }
+    /**
+     * Loads the keys of this Document
+     *
+     * @return list of keys
+     */
+    public List<String> keysExclude(String... strings) {
+        List<String> list = new LinkedList<>();
+        for (Map.Entry<String, JsonElement> jsonElementEntry : this.jsonObject.entrySet()) {
+            boolean b = false;
+            for (String string : strings) {
+                if (jsonElementEntry.getKey().equalsIgnoreCase(string)) {
+                    b = true;
+                    break;
+                }
+            }
+            if (!b) {
+                list.add(jsonElementEntry.getKey());
+            }
         }
         return list;
     }
@@ -405,6 +428,7 @@ public class JsonBuilder {
      * @param file the file to save it to
      */
     public void save(File file) {
+        this.file = file;
         try (PrintWriter w = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), true)) {
             w.print(GSON.toJson(this.getJsonObject()));
             w.flush();
@@ -472,6 +496,33 @@ public class JsonBuilder {
      */
     public static <T> T fromClass(String input, Class<T> tClass) {
         return new JsonBuilder(input).getAs(tClass);
+    }
+
+    /**
+     * Iterates through the builder with a given class
+     *
+     * @param tClass the class
+     * @param consumer the consumer
+     * @param <T> the generic type
+     */
+    public <T> void forEach(Class<T> tClass, Consumer<T> consumer) {
+        List<T> tList = new ArrayList<>();
+
+        for (String key : this.keys()) {
+            tList.add(this.getObject(key, tClass));
+        }
+        tList.forEach(consumer);
+    }
+
+
+    @NotNull
+    @Override
+    public Iterator<JsonElement> iterator() {
+        List<JsonElement> objects = new ArrayList<>();
+        for (String key : keys()) {
+            objects.add(this.jsonObject.get(key));
+        }
+        return objects.iterator();
     }
 
 }

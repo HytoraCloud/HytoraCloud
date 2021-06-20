@@ -3,9 +3,8 @@ package net.hytora.discordbot;
 
 import de.lystx.hytoracloud.driver.elements.other.JsonBuilder;
 import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.OnlineStatus;
+import de.lystx.hytoracloud.driver.service.util.Utils;
+import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -14,15 +13,26 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.internal.interactions.ButtonImpl;
 import net.hytora.discordbot.commands.HelpCommand;
+import net.hytora.discordbot.commands.SuggestCommand;
 import net.hytora.discordbot.listener.*;
 import net.hytora.discordbot.manager.command.CommandCategory;
 import net.hytora.discordbot.manager.command.CommandManager;
+import net.hytora.discordbot.manager.conversation.ConversationManager;
 import net.hytora.discordbot.manager.logger.LogManager;
+import net.hytora.discordbot.manager.other.ReactionRolesManager;
+import net.hytora.discordbot.manager.suggestion.SuggestionManager;
+import net.hytora.discordbot.manager.ticket.TicketManager;
+import net.hytora.discordbot.util.MultiConsumer;
+import net.hytora.discordbot.util.button.DiscordButton;
+import net.hytora.discordbot.util.button.DiscordButtonAction;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.io.*;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Hytora {
 
@@ -40,6 +50,26 @@ public class Hytora {
      * The manager for commands
      */
     private CommandManager commandManager;
+
+    /**
+     * Manager for suggestions
+     */
+    private SuggestionManager suggestionManager;
+
+    /**
+     * Manager for tickets
+     */
+    private TicketManager ticketManager;
+
+    /**
+     * Manager for roles
+     */
+    private ReactionRolesManager reactionRolesManager;
+
+    /**
+     * For managing conversations
+     */
+    private final ConversationManager conversationManager;
 
     /**
      * The config where all values are stored
@@ -61,25 +91,34 @@ public class Hytora {
      */
     private TextChannel botManaging;
 
+    /**
+     * All {@link DiscordButton}s
+     */
+    private final List<DiscordButton> discordButtons;
+
     public Hytora() {
         long start = System.currentTimeMillis();
 
         hytora = this;
         this.logManager = new LogManager("logs/");
+        this.conversationManager = new ConversationManager();
+        this.discordButtons = new ArrayList<>();
 
-        this.logManager.log("\n  _    _       _                  \n" +
-                " | |  | |     | |                 \n" +
-                " | |__| |_   _| |_ ___  _ __ __ _ \n" +
-                " |  __  | | | | __/ _ \\| '__/ _` |\n" +
-                " | |  | | |_| | || (_) | | | (_| |\n" +
-                " |_|  |_|\\__, |\\__\\___/|_|  \\__,_|\n" +
-                "          __/ |                   \n" +
-                "         |___/                    \n");
-        this.logManager.log("§8");
-        this.logManager.log("INFO", "§7Loading §3HytoraBot §7by §bLystx§8...");
-
-        if (this.loadConfig() && this.loadJDA(new BotStopListener(), new CommandListener(), new JoinListener())) {
+        if (this.loadConfig() && this.loadJDA(new CommandListener(), new JoinListener(), new DiscordButtonListener(), new ConversationListener())) {
             Scheduler.getInstance().scheduleDelayedTask(() -> {
+                Utils.clearConsole();
+                this.logManager.log("\n  _    _       _                  \n" +
+                        " | |  | |     | |                 \n" +
+                        " | |__| |_   _| |_ ___  _ __ __ _ \n" +
+                        " |  __  | | | | __/ _ \\| '__/ _` |\n" +
+                        " | |  | | |_| | || (_) | | | (_| |\n" +
+                        " |_|  |_|\\__, |\\__\\___/|_|  \\__,_|\n" +
+                        "          __/ |                   \n" +
+                        "         |___/                    \n");
+                this.logManager.log("§8");
+                this.logManager.log("INFO", "§7Loading §3HytoraBot §7by §bLystx§8...");
+
+
                 if (this.loadGuild()) {
 
                     this.commandManager = new CommandManager(this.jsonConfig.getString("command"));
@@ -91,12 +130,28 @@ public class Hytora {
                     this.logManager.log("§8");
 
                     if (this.checkOtherValues()) {
+                        this.registerConversations();
                         this.manageDefaultRoles();
 
                         this.logManager.preset(this.botManaging, "Welcome", this.discord.getSelfUser(), message -> {
 
                         }, new Button[]{
-                                new ButtonImpl("stop", "Stop HytoraCloud", ButtonStyle.DANGER, false, null)
+                                new DiscordButton(0x00, "Stop DiscordBot", ButtonStyle.DANGER, new Consumer<DiscordButtonAction>() {
+                                    @Override
+                                    public void accept(DiscordButtonAction discordButtonAction) {
+                                        TextChannel textChannel = discordButtonAction.getTextChannel();
+                                        Message message = discordButtonAction.getMessage();
+                                        if (textChannel.getId().equalsIgnoreCase(Hytora.getHytora().getBotManaging().getId())) {
+                                            EmbedBuilder embedBuilder = Hytora.getHytora().getLogManager().embedBuilder(Color.DARK_GRAY,"Shutdown", discordButtonAction.getUser(), "The HytoraCloud Bot", "Is shutting down in 1 Second...");
+                                            message.editMessage(embedBuilder.build()
+                                            ).queue(message1 -> {
+                                                Scheduler.getInstance().scheduleDelayedTask(() -> {
+                                                    message1.delete().queue(unused -> Hytora.getHytora().shutdown());
+                                                }, 20L);
+                                            });
+                                        }
+                                    }
+                                }).submit()
                         }, "HytoraCloud DiscordBot", "Is now active and may be used!", "----------", "Click the stop-button", "to stop the bot at any time!");
 
                     } else {
@@ -112,7 +167,7 @@ public class Hytora {
                     }
                     this.shutdown();
                 }
-            }, 20L);
+            }, 60L);
             return;
         }
         this.logManager.log("ERROR", "§cCouldn't load the §econfig.json §cor the §ebot §ccouldn't log in properly!");
@@ -124,9 +179,63 @@ public class Hytora {
      */
     public void shutdown() {
         this.logManager.log("ERROR", "§cShutting down....");
+
+        if (this.suggestionManager != null) {
+            this.suggestionManager.save();
+        }
+
+        if (this.ticketManager != null) {
+            this.ticketManager.shutdown();
+        }
+
         this.logManager.save();
         this.discord.shutdown();
         System.exit(1);
+    }
+
+    /**
+     * Registers all triggers for a Conversation
+     */
+    private void registerConversations() {
+
+        //HEllo triggers
+        this.conversationManager.registerAnswer(
+                "Hello",
+                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
+        );
+        this.conversationManager.registerAnswer(
+                "Hey",
+                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
+        );
+        this.conversationManager.registerAnswer(
+                "Hallo",
+                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
+        );
+        this.conversationManager.registerAnswer(
+                "Hi",
+                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
+        );
+
+        //Other
+        this.conversationManager.registerAnswer(
+                "Whats the Time?",
+                0.50,
+                (s, user, message) -> s.replace("%time%", new SimpleDateFormat("hh:mm:ss").format(new Date())),
+                "Its currently %time%!", "Oh bro I got you!\nIt's currently %time%!");
+        this.conversationManager.registerAnswer(
+                "How are you?",
+                0.50,
+                (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                "Thanks %user%, I'm fine!",
+                "Whoa I'm not that fine today to be honest...",
+                "That's not important! How was your day?",
+                "Oh, could have been better!",
+                "Well, I'm not even awake long enough to say xD"
+        );
     }
 
     /**
@@ -134,8 +243,61 @@ public class Hytora {
      * and gives everyone the default role
      * if they don't have any
      */
+
     public void manageDefaultRoles() {
 
+        //Roles
+        JsonBuilder roles = this.jsonConfig.getJson("roles");
+        JsonBuilder defaultRole = roles.getJson("default");
+        JsonBuilder supportRole = roles.getJson("support");
+
+        this.createRole(defaultRole, df -> {
+
+            logManager.log("INFO", "§7Created §b" + df.getName() + "§7-Role§8!");
+            for (Member member : guild.getMembers()) {
+                Role memberRole = member.getRoles().stream().filter(role1 -> role1.getName().equalsIgnoreCase(df.getName())).findFirst().orElse(null);
+                if (memberRole == null) {
+                    guild.addRoleToMember(member, df).queue();
+                }
+            }
+
+        });
+        this.createRole(supportRole, sr -> {
+            for (Member member : guild.getMembers()) {
+                if (member.hasPermission(Permission.ADMINISTRATOR)) {
+                    guild.addRoleToMember(member, sr).queue();
+                }
+            }
+        });
+    }
+
+    /**
+     * Creates a new {@link Role} and accepts the consumer
+     *
+     * @param jsonBuilder the data for the role
+     * @param consumer the consumer
+     */
+    public void createRole(JsonBuilder jsonBuilder, Consumer<Role> consumer) {
+
+        String name = jsonBuilder.getString("name");
+        String color = jsonBuilder.getString("color");
+        boolean showOrder = jsonBuilder.getBoolean("showOrder");
+        boolean mentionable = jsonBuilder.getBoolean("mentionable");
+
+        Role role = guild.getRoles().stream().filter(role1 -> role1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+
+        if (role == null) {
+            try {
+                guild.createRole()
+                        .setName(name)
+                        .setColor((Color) Color.class.getDeclaredField(color).get(Color.WHITE))
+                        .setHoisted(showOrder)
+                        .setMentionable(mentionable)
+                        .queue(consumer);
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -143,6 +305,7 @@ public class Hytora {
      */
     public void registerCommands() {
         this.commandManager.registerCommand(new HelpCommand("help", "Shows this message", CommandCategory.GENERAL, "?", "hilfe"));
+        this.commandManager.registerCommand(new SuggestCommand("suggest", "Creates a suggestion", CommandCategory.OTHER));
     }
 
     /**
@@ -158,39 +321,25 @@ public class Hytora {
             String botManagingId = this.jsonConfig.getString("botManagingId");
             this.botManaging = this.guild.getTextChannelById(botManagingId);
 
-            //Roles
-            JsonBuilder roles = this.jsonConfig.getJson("roles");
-            JsonBuilder defaultRole = roles.getJson("default");
-            String name = defaultRole.getString("name");
-            String color = defaultRole.getString("color");
-            boolean showOrder = defaultRole.getBoolean("showOrder");
-            boolean mentionable = defaultRole.getBoolean("mentionable");
+            //Suggestions
+            JsonBuilder suggestions = this.jsonConfig.getJson("suggestions");
+            String commands = suggestions.getString("commands");
+            String suggestionsChannel = suggestions.getString("suggestions");
 
-            Role role = guild.getRoles().stream().filter(role1 -> role1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+            this.suggestionManager = new SuggestionManager(suggestionsChannel);
 
-            if (role == null) {
-                guild.createRole()
-                        .setName(name)
-                        .setColor((Color) Color.class.getDeclaredField(color).get(Color.WHITE))
-                        .setHoisted(showOrder)
-                        .setMentionable(mentionable)
-                        .queue(df -> {
-                            logManager.log("INFO", "§7Had to create §b" + df.getName() + "§7-Role§8!");
 
-                            for (Member member : guild.getMembers()) {
-                                Role memberRole = member.getRoles().stream().filter(role1 -> role1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-                                if (memberRole == null) {
-                                    guild.addRoleToMember(member, df).queue();
-                                }
-                            }
+            JsonBuilder tickets = this.jsonConfig.getJson("tickets");
+            String channel = tickets.getString("channel");
+            this.ticketManager = new TicketManager(channel);
 
-                        });
-            }
 
-            //
+            JsonBuilder reactionRoles = this.jsonConfig.getJson("reactionRoles");
+            this.reactionRolesManager = new ReactionRolesManager(reactionRoles.getString("channel"), reactionRoles);
 
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -269,6 +418,7 @@ public class Hytora {
     }
 
     public static void main(String[] args) {
+
         new Hytora();
     }
 
@@ -279,6 +429,10 @@ public class Hytora {
 
     public LogManager getLogManager() {
         return logManager;
+    }
+
+    public TicketManager getTicketManager() {
+        return ticketManager;
     }
 
     public CommandManager getCommandManager() {
@@ -295,6 +449,22 @@ public class Hytora {
 
     public Guild getGuild() {
         return guild;
+    }
+
+    public SuggestionManager getSuggestionManager() {
+        return suggestionManager;
+    }
+
+    public List<DiscordButton> getDiscordButtons() {
+        return discordButtons;
+    }
+
+    public ConversationManager getConversationManager() {
+        return conversationManager;
+    }
+
+    public ReactionRolesManager getReactionRolesManager() {
+        return reactionRolesManager;
     }
 
     public TextChannel getBotManaging() {

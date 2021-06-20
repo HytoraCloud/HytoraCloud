@@ -15,10 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -35,6 +32,46 @@ public class Utils {
     public static final String PASTE_SERVER_URL = "https://paste.labymod.net/";
     public static final String PASTE_SERVER_URL_RAW = "https://paste.labymod.net/raw/";
 
+
+
+    /**
+     * Gets the percent of match of two strings
+     *
+     * @param s1 the string to compare
+     * @param s2 the string to get compared
+     * @param ignoreCase if strings should be lowercased
+     * @return percent as double (1.0 = 100%, 0.94 = 94%)
+     */
+    public static double getPercentMatch(String s1, String s2, boolean ignoreCase) {
+
+        if (ignoreCase) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+        }
+
+        Set<String> nx = new HashSet<>(); //Set 1
+        Set<String> ny = new HashSet<>(); //Set 2
+
+        //String 1 match
+        for (int i = 0; i < s1.length() - 1; i++) {
+            char x1 = s1.charAt(i);
+            char x2 = s1.charAt(i + 1);
+            nx.add("" + x1 + x2);
+        }
+
+        //String 2 match
+        for (int j = 0; j < s2.length() - 1; j++) {
+            char y1 = s2.charAt(j);
+            char y2 = s2.charAt(j+1);
+            ny.add("" + y1 + y2);
+        }
+
+        //New set for the match
+        Set<String> intersection = new HashSet<>(nx);
+        intersection.retainAll(ny); //Removes all not containing elements
+
+        return (2 * intersection.size()) / (nx.size() + ny.size());
+    }
 
     public static void clearConsole() {
         try {

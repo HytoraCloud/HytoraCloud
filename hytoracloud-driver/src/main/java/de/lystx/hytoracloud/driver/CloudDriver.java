@@ -557,6 +557,19 @@ public class CloudDriver {
      * ======================================
      */
 
+
+    /**
+     * Gets the percent of match of two strings
+     *
+     * @param s1 the string to compare
+     * @param s2 the string to get compared
+     * @param ignoreCase if strings should be lowercased
+     * @return percent as double (1.0 = 100%, 0.94 = 94%)
+     */
+    public double getPercentMatch(String s1, String s2, boolean ignoreCase) {
+        return Utils.getPercentMatch(s1, s2, ignoreCase);
+    }
+
     /**
      * Returns the {@link NetworkConfig}
      *
