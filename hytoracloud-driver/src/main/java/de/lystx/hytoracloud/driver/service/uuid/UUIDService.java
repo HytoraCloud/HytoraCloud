@@ -12,8 +12,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * This class is used
@@ -147,15 +149,6 @@ public class UUIDService {
         return nameArray;
     }
 
-
-    public static void main(String[] args) {
-        for (int i = 0; i < 10; i++) {
-            for (NameChange lystx : UUIDService.getInstance().getNameChanges(UUIDService.getInstance().getUUID("Lystx"))) {
-                System.out.println(lystx.format());
-            }
-            System.out.println("----------------");
-        }
-    }
 
     /**
      * Loads Name from UUID

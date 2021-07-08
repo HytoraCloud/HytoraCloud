@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.module.serverselector.spigot.manager.sign;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.layout.SignLayOut;
 import de.lystx.hytoracloud.driver.service.util.minecraft.ServerPinger;
@@ -32,9 +33,13 @@ public class SignManager {
      * Starts the Sign Scheduler
      */
     public void run() {
-        if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
-            return;
+        try {
+            if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
+                return;
+            }
+            CloudDriver.getInstance().execute(() -> this.signUpdater.run());
+        } catch (NullPointerException e) {
+            Scheduler.getInstance().scheduleDelayedTask(this::run, 5L);
         }
-        CloudDriver.getInstance().execute(() -> this.signUpdater.run());
     }
 }

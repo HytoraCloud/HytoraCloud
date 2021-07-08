@@ -35,131 +35,149 @@ import io.thunder.packet.impl.response.Response;
 import io.thunder.packet.impl.response.ResponseStatus;
 import io.thunder.utils.objects.ThunderObject;
 import lombok.*;
+import net.hytora.networking.elements.component.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
-//TODO: DOCUMENTATION (AGAIN)
 @Getter @Setter
 public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObject, IPermissionUser, Identifiable {
 
-    public static Class<? extends CloudPlayer> TYPE_CLASS = CloudPlayer.class;
-
+    /**
+     * The Service the Player is on
+     */
     private String service;
+
+    /**
+     * The proxy the Player is on
+     */
     private String proxy;
 
+    /**
+     * The connection of the player
+     */
     private PlayerConnection connection;
 
+    /**
+     * The information of the player
+     */
     private PlayerInformation playerInformation;
-    private LabyModPlayer labyModPlayer;
 
     public CloudPlayer(PlayerConnection connection) {
         this.connection = connection;
-        this.setPlayerInformation(CloudDriver.getInstance().getPermissionPool().getPlayerInformation(connection.getUniqueId()));
+        this.setPlayerInformation(CloudDriver.getInstance().getPermissionPool().loadNonePacketPool().getPlayerInformation(connection.getUniqueId()));
     }
 
+    /**
+     * Gets the {@link Service} of this player
+     * by searching for a service with the string
+     *
+     * @return service or null
+     */
     public Service getService() {
         return CloudDriver.getInstance().getServiceManager().getService(this.service);
     }
 
-    
+    /**
+     * Sets the {@link Service} of this player
+     *
+     * @param service the service
+     */
     public void setService(Service service) {
         this.service = service == null ? "No Server" : service.getName();
     }
 
+    /**
+     * Gets the proxy ({@link Service}) of this player
+     * by searching for a service with the string
+     *
+     * @return proxy or null if not found
+     */
     public Service getProxy() {
         return CloudDriver.getInstance().getServiceManager().getService(this.proxy);
     }
 
-    
+    /**
+     * Sets the proxy ({@link Service}) of this player
+     *
+     * @param service the proxy
+     */
     public void setProxy(Service service) {
         this.proxy = service.getName();
     }
 
-    
-    public void setPlayerInformation() {
-        this.setPlayerInformation(CloudDriver.getInstance().getPermissionPool().getPlayerInformation(this.getUniqueId()));
-    }
-
+    /**
+     * Gets the name of this player
+     *
+     * @return name
+     */
+    @Override
     public String getName() {
         return this.connection.getName();
     }
 
+    /**
+     * Gets the uuid of this player
+     *
+     * @return uuid
+     */
+    @Override
     public UUID getUniqueId() {
         return this.connection.getUniqueId();
     }
 
-    
+
+    /**
+     * Sets the UUID for this {@link CloudCommandSender}
+     *
+     * @param uniqueId the uuid
+     */
+    @Override
     public void setUniqueId(UUID uniqueId) {
         throw new UnsupportedOperationException("Not available for CloudPlayer");
     }
 
-    
+    /**
+     * Sets the name for this {@link CloudCommandSender}
+     *
+     * @param name the name
+     */
+    @Override
     public void setName(String name) {
         throw new UnsupportedOperationException("Not available for CloudPlayer");
     }
 
+    /**
+     * Gets the IP Address of this player
+     *
+     * @return address as string
+     */
     public String getIpAddress() {
         return this.connection.getAddress();
     }
 
-    
-    public IResponse<MinecraftWorld> getWorld() {
-        PacketRequestPlayerWorld packetRequestPlayerWorld = new PacketRequestPlayerWorld(this.getUniqueId());
-        Response response = CloudDriver.getInstance().getResponse(packetRequestPlayerWorld);
-        return response.toIResponse(new MinecraftWorld(response.get(0).asString(), response.get(1).asUUID()));
-    }
-
-    
-    public IResponse<MinecraftLocation> getLocation() {
-        PacketRequestPlayerLocation playerLocation = new PacketRequestPlayerLocation(this.getUniqueId());
-        Response response = CloudDriver.getInstance().getResponse(playerLocation);
-        return response.toIResponse(new MinecraftLocation(response.get(0).asCustom(Double.class), response.get(1).asCustom(Double.class), response.get(2).asCustom(Double.class), response.get(3).asCustom(Float.class), response.get(4).asCustom(Float.class), response.get(5).asString()));
-    }
-
-    public NameChange[] getNameChanges() {
-        return UUIDService.getInstance().getNameChanges(this.getUniqueId());
-    }
-
-    public boolean hasPlayedBefore() {
-        return this.playerInformation.getFirstLogin() == 0L || this.playerInformation.getFirstLogin() == System.currentTimeMillis();
-    }
-
-    public PlayerInformation getPlayerInformation() {
-        return this.playerInformation == null ? CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(this.getUniqueId(), this.getName(), this.getIpAddress()) : this.playerInformation;
+    /**
+     * Loads the player's ping as {@link IResponse}
+     * this might take a while because of packet-transfer
+     *
+     * @return response with the ping
+     */
+    public int getPing() {
+        PacketRequestPing packetRequestPing = new PacketRequestPing(this.getUniqueId());
+        Component component = packetRequestPing.toReply(CloudDriver.getInstance().getConnection());
+        return Integer.parseInt(component.reply().getMessage());
     }
 
     /**
-     * Returns the ping of the player
-     * @return
+     * Loads the player's permissionGroup as {@link IResponse}
+     * this might take a while because of packet-transfer
+     *
+     * @return response with the permissionGroup
      */
-    public IResponse<Integer> getPing() {
-        Response response = CloudDriver.getInstance().getConnection().transferToResponse(new PacketRequestPing(this.getUniqueId()));
-        return response.toIResponse(response.get(0).asInt());
-    }
-
-    /**
-     * Returns a CloudPlayer Inventory to manage stuff
-     * @return
-     */
-    public CloudPlayerInventory getInventory() {
-        return CloudDriver.getInstance().getCloudInventories().getOrDefault(this.getUniqueId(), new CloudPlayerInventory(this));
-    }
-
-    /**
-     * Updates a player and all his data
-     */
-    public void update() {
-        if (this.playerInformation != null) {
-            this.playerInformation.update();
-        }
-        CloudDriver.getInstance().sendPacket(new PacketUpdatePlayer(this));
-    }
-
-    
     public IResponse<PermissionGroup> getPermissionGroup() {
         if (CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
             PacketRequestPermissionGroupGet groupGet = new PacketRequestPermissionGroupGet(this.getUniqueId());
@@ -170,61 +188,171 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
         }
     }
 
-    
+    /**
+     * Loads the player's property as {@link IResponse}
+     * this might take a while because of packet-transfer
+     *
+     * @return response with the property
+     */
+    public IResponse<JsonObject> getProperty(String name) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
+            Response response = CloudDriver.getInstance().getResponse(new PacketRequestGetProperty(this.getUniqueId(), name));
+            return response.toIResponse((JsonObject) new JsonParser().parse(response.getMessage()));
+        } else {
+            Response response = new Response(ResponseStatus.SUCCESS);
+
+            return response.toIResponse(CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name));
+        }
+    }
+
+
+    /**
+     * Loads all {@link NameChange}s of this player
+     * this might take a while because of web requests
+     *
+     * @return namechange array
+     */
+    public NameChange[] getNameChanges() {
+        return UUIDService.getInstance().getNameChanges(this.getUniqueId());
+    }
+
+    /**
+     * Checks if this player has ever played before
+     *
+     * @return boolean
+     */
+    public boolean hasPlayedBefore() {
+        return this.playerInformation.getFirstLogin() == 0L || this.playerInformation.getFirstLogin() == System.currentTimeMillis();
+    }
+
+    /**
+     * Gets the {@link PlayerInformation} of this player
+     *
+     * @return information or default if not set
+     */
+    public PlayerInformation getPlayerInformation() {
+        return this.playerInformation == null ? CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(this.getUniqueId(), this.getName(), this.getIpAddress()) : this.playerInformation;
+    }
+
+    /**
+     * Returns a CloudPlayer Inventory to manage stuff
+     *
+     * @return inventory if cached or new one
+     */
+    public CloudPlayerInventory getInventory() {
+        return CloudDriver.getInstance().getCloudInventories().getOrDefault(this.getUniqueId(), new CloudPlayerInventory(this));
+    }
+
+    /**
+     * Updates a player and all his data
+     */
+    @Override
+    public void update() {
+        CloudDriver.getInstance().sendPacket(new PacketUpdatePlayer(this));
+    }
+
+    /**
+     * Gets the {@link PermissionGroup} with the lowest ID (the highest rank)
+     *
+     * @return group
+     */
+    @Override
     public PermissionGroup getHighestPermissionGroup() {
         return CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(this.getUniqueId());
     }
 
-    
+    /**
+     * Adds a permission to this player
+     *
+     * @param permission the permission
+     */
+    @Override
     public void addPermission(String permission) {
         if (this.playerInformation != null) {
             this.playerInformation.getExclusivePermissions().add(permission);
         }
     }
 
-    
+    /**
+     * Removes a permission from a player
+     *
+     * @param permission the permission
+     */
+    @Override
     public void removePermission(String permission) {
         if (this.playerInformation != null) {
             this.playerInformation.getExclusivePermissions().remove(permission);
         }
     }
 
-    
+    /**
+     * Gets a list of all permissions
+     *
+     * @return list
+     */
+    @Override
     public List<String> getPermissions() {
         List<String> permissions = new ArrayList<>();
         CloudDriver.getInstance().getPermissionPool().updatePermissions(this.getUniqueId(), this.getIpAddress(), permissions::add);
         return permissions;
     }
 
-    
+    /**
+     * Gets a list of permissions only
+     * this player has been given
+     *
+     * @return list of permissions
+     */
+    @Override
     public List<String> getExclusivePermissions() {
         return this.playerInformation.getPermissions();
     }
 
-    
+    /**
+     * Gets all {@link PermissionGroup}s of this player
+     *
+     * @return list of groups
+     */
+    @Override
     public List<PermissionGroup> getAllPermissionGroups() {
         return CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups(this.getUniqueId());
     }
 
-    
+    /**
+     * Removes a {@link PermissionGroup} from this player
+     *
+     * @param permissionGroup the group to be removed
+     */
+    @Override
     public void removePermissionGroup(PermissionGroup permissionGroup) {
         CloudDriver.getInstance().getPermissionPool().removePermissionGroupFromUser(this.getUniqueId(), permissionGroup);
         CloudDriver.getInstance().getPermissionPool().update();
     }
 
-    
+    /**
+     * Adds a {@link PermissionGroup} to this player
+     *
+     * @param permissionGroup the group to add
+     * @param time the time (e.g. "1")
+     * @param unit the unit (e.g. "month")
+     */
+    @Override
     public void addPermissionGroup(PermissionGroup permissionGroup, int time, PermissionValidity unit) {
         CloudDriver.getInstance().getPermissionPool().addPermissionGroupToUser(this.getUniqueId(), permissionGroup, time, unit);
         CloudDriver.getInstance().getPermissionPool().update();
     }
 
+    /**
+     * Sends a message to this player
+     *
+     * @param message the message to send
+     */
+    @Override
     public void sendMessage(Object message) {
         if (CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
-            Object player;
-            if (CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType() == ServiceType.SPIGOT) {
-                player = Reflections.getBukkitPlayer(this.getName());
-            } else {
-                player = Reflections.getBungeePlayer(this.getName());
+            Object player = Reflections.getPlayer(this.getName());
+            if (player == null) {
+                return;
             }
             if (message == null) {
                 message = "null";
@@ -235,14 +363,31 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
         CloudDriver.getInstance().getConnection().sendPacket(new PacketSendMessage(this.getUniqueId(), message.toString()));
     }
 
+    /**
+     * Sends an action bar message to
+     * this player
+     *
+     * @param message the message to send
+     */
     public void sendActionbar(Object message) {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketSendActionbar(this.getUniqueId(), message.toString()));
     }
 
+    /**
+     * Sends a {@link CloudComponent} to this player
+     *
+     * @param cloudComponent the component to send
+     */
+    @Override
     public void sendComponent(CloudComponent cloudComponent) {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketSendComponent(this.getUniqueId(), cloudComponent));
     }
 
+    /**
+     * Opens a {@link CloudInventory} to this player
+     *
+     * @param cloudInventory the inventory to open
+     */
     public void openInventory(CloudInventory cloudInventory) {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketOpenInventory(this, cloudInventory));
     }
@@ -257,11 +402,23 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
         CloudDriver.getInstance().getConnection().sendPacket(new PacketPlaySound(this.getName(), sound.name(), v1, v2));
     }
 
+    /**
+     * Sends a title to this player
+     *
+     * @param title the title
+     * @param subtitle the subtitle
+     */
     public void sendTitle(String title, String subtitle) {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketSendTitle(this.getName(), title, subtitle));
     }
 
-    
+    /**
+     * Adds a property to this player
+     *
+     * @param name the name of the property
+     * @param jsonObject the data
+     * @return status
+     */
     public ResponseStatus addProperty(String name, JsonObject jsonObject) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             return CloudDriver.getInstance().getResponse(new PacketRequestAddProperty(this.getUniqueId(), name, jsonObject)).getStatus();
@@ -271,49 +428,79 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
         return ResponseStatus.SUCCESS;
     }
 
-    
-    public IResponse<JsonObject> getProperty(String name) {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            Response response = CloudDriver.getInstance().getResponse(new PacketRequestGetProperty(this.getUniqueId(), name));
-            return response.toIResponse((JsonObject) new JsonParser().parse(response.getMessage()));
-        } else {
-            Response response = new Response(ResponseStatus.SUCCESS);
-
-            return response.toIResponse(CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name));
-        }
-    }
-
+    /**
+     * Fallbacks this player
+     */
     public void fallback() {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketFallback(this.getName()));
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketFallback(this.getUniqueId()));
     }
 
+    /**
+     * Connects this player to a {@link Service}
+     *
+     * @param service the service to connect to
+     */
     public void connect(Service service) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketConnectServer(this.getName(), service.getName()));
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketConnectServer(this.getUniqueId(), service.getName()));
     }
 
+    /**
+     * Connects this player to a random service
+     * out of the given group
+     *
+     * @param serviceGroup the group
+     */
     public void connectRandom(ServiceGroup serviceGroup) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketConnectGroup(this.getName(), serviceGroup.getName()));
+
+        List<Service> services = CloudDriver.getInstance().getServiceManager().getServices(serviceGroup);
+        Service service = services.get(new Random().nextInt(services.size()));
+
+        this.connect(service);
     }
 
+    /**
+     * Kicks this player from the network
+     *
+     * @param reason the reason for the kick
+     */
     public void kick(String reason) {
         this.getConnection().disconnect(reason);
     }
 
+    /**
+     * Checks if a player has a permission
+     *
+     * @param permission the permission to check
+     * @return boolean
+     */
+    @Override
     public boolean hasPermission(String permission) {
         return CloudDriver.getInstance().getPermissionPool().hasPermission(this.getUniqueId(), permission);
     }
 
+    /**
+     * Loads the cached {@link PermissionGroup} of this player
+     *
+     * @return group
+     */
     @Nullable
-    
+    @Override
     public PermissionGroup getCachedPermissionGroup() {
         return CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(this.getUniqueId());
     }
 
+    /**
+     * Sends a message with prefix
+     *
+     * @param prefix the prefix
+     * @param message the message
+     */
+    @Override
     public void sendMessage(String prefix, String message) {
         throw new UnsupportedOperationException("Only works on CloudConsole!");
     }
 
-    
+    @Override
     public void write(PacketBuffer buf) {
 
         buf.writeThunderObject(getConnection()); //Name, UUID, iP
@@ -325,7 +512,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
     }
 
 
-
+    @Override
     public void read(PacketBuffer buf) {
 
         setConnection(buf.readThunderObject(PlayerConnection.class));
@@ -336,5 +523,27 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
 
         setProxy(proxy.equalsIgnoreCase("null") ? null : CloudDriver.getInstance().getServiceManager().getService(proxy));
         setService(service.equalsIgnoreCase("null") ? null : CloudDriver.getInstance().getServiceManager().getService(service));
+    }
+
+    /**
+     * Easier method to get a {@link CloudPlayer}
+     * by its name (cached)
+     *
+     * @param name the name of the player
+     * @return player or null if not cached
+     */
+    public static CloudPlayer fromName(String name) {
+        return CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(name);
+    }
+
+    /**
+     * Easier method to get a {@link CloudPlayer}
+     * by its uuid (cached)
+     *
+     * @param uniqueId the uuid of the player
+     * @return player or null if not cached
+     */
+    public static CloudPlayer fromUUID(UUID uniqueId) {
+        return CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(uniqueId);
     }
 }

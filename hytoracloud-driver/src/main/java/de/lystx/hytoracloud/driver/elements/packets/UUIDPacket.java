@@ -2,29 +2,27 @@ package de.lystx.hytoracloud.driver.elements.packets;
 
 import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.util.UUID;
 
 
-public class UUIDPacket extends Packet {
+@Getter @AllArgsConstructor @NoArgsConstructor
+public class UUIDPacket extends HytoraPacket {
 
     private UUID uuid;
 
-    public UUIDPacket(UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    public UUID getUuid() {
-        return uuid;
+    @Override
+    public void write(Component component) {
+        component.put("uuid", uuid);
     }
 
     @Override
-    public final void write(PacketBuffer buf) {
-        buf.writeUUID(uuid);
-    }
-
-    @Override
-    public final void read(PacketBuffer buf) {
-        uuid = buf.readUUID();
+    public void read(Component component) {
+        uuid = component.getUUID("uuid");
     }
 }

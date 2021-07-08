@@ -88,8 +88,8 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
         this.idService = new IDService();
         if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            NetworkConfig networkConfig = CloudDriver.getInstance().getInstance(ConfigService.class).getNetworkConfig();
-            this.portService = new PortService(networkConfig.getNetworkConfig().getProxyStartPort(), networkConfig.getNetworkConfig().getServerStartPort());
+            NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
+            this.portService = new PortService(networkConfig.getGlobalProxyConfig().getProxyStartPort(), networkConfig.getGlobalProxyConfig().getServerStartPort());
         } else {
             ReceiverInfo receiverInfo = CloudDriver.getInstance().getImplementedData().getObject("receiverInfo", ReceiverInfo.class);
             this.portService = new PortService(Integer.parseInt((receiverInfo.getValues().get("proxyStartPort") + "").split("\\.")[0]), Integer.parseInt((receiverInfo.getValues().get("serverStartPort") + "").split("\\.")[0]));

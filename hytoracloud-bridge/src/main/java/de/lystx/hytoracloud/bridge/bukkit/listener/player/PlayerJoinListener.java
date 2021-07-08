@@ -1,25 +1,16 @@
 package de.lystx.hytoracloud.bridge.bukkit.listener.player;
 
 import com.google.gson.JsonObject;
-import de.lystx.hytoracloud.bridge.bukkit.CloudServer;
-import de.lystx.hytoracloud.bridge.bukkit.events.player.CloudPlayerLabyModJoinEvent;
+import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
 import de.lystx.hytoracloud.bridge.bukkit.utils.CloudPermissibleBase;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestKey;
-import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestPing;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.service.player.featured.labymod.LabyModPlayer;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerConnection;
-import io.thunder.packet.impl.response.PacketRespond;
-import io.thunder.packet.impl.response.Response;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
-
-import java.util.function.Consumer;
 
 public class PlayerJoinListener implements Listener {
 
@@ -37,8 +28,8 @@ public class PlayerJoinListener implements Listener {
             return;
         }
         //Player has joined; server is not stopping
-        if (CloudServer.getInstance().getTaskId() != -1) {
-            CloudDriver.getInstance().getScheduler().cancelTask(CloudServer.getInstance().getTaskId()); //Cancelling stop ask
+        if (HytoraCloudBukkitBridge.getInstance().getTaskId() != -1) {
+            CloudDriver.getInstance().getScheduler().cancelTask(HytoraCloudBukkitBridge.getInstance().getTaskId()); //Cancelling stop ask
         }
 
         CloudDriver.getInstance().getThisService().update();
@@ -57,27 +48,4 @@ public class PlayerJoinListener implements Listener {
         CloudDriver.getInstance().updatePermissions(event.getPlayer(), new CloudPermissibleBase(event.getPlayer()));
 
     }
-
-    @EventHandler
-    public void handleLabyMod(CloudPlayerLabyModJoinEvent event) {
-        CloudPlayer cloudPlayer = event.getPlayer();
-        LabyModPlayer labyModPlayer = cloudPlayer.getLabyModPlayer();
-
-        if (CloudServer.getInstance().getLabyMod() != null && CloudDriver.getInstance().getNetworkConfig().getLabyModConfig().isEnabled()) {
-            if (!CloudDriver.getInstance().getNetworkConfig().getLabyModConfig().isVoiceChat()) {
-                labyModPlayer.disableVoicechat();
-            }
-
-            labyModPlayer.updateGamemode(CloudDriver.getInstance().getNetworkConfig().getLabyModConfig()
-                    .getServerSwitchMessage().replace("&", "§").replace("%service%", CloudDriver.getInstance().getThisService().getName())
-                    .replace("%group%", CloudDriver.getInstance().getThisService().getServiceGroup().getName())
-                    .replace("%online_players%", Bukkit.getOnlinePlayers().size() + "")
-                    .replace("%max_player%", Bukkit.getMaxPlayers() + " ")
-                    .replace("%id%", CloudDriver.getInstance().getThisService().getServiceID() + "")
-                    .replace("%receiver%", CloudDriver.getInstance().getThisService().getServiceGroup().getReceiver() + "")
-                    .replace("%max_players%", Bukkit.getMaxPlayers() + ""));
-
-        }
-    }
-
 }

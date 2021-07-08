@@ -173,6 +173,21 @@ public class JsonEntity implements Iterable<JsonElement> {
     }
 
     /**
+     * Loads a list of objects with a given class
+     *
+     * @param tClass the class you want the objects to be
+     * @param <T> generic type
+     * @return list of objects
+     */
+    public <T> List<T> keys(Class<T> tClass) {
+        List<T> list = new ArrayList<>();
+        for (String key : this.keys()) {
+            list.add(this.getObject(key, tClass));
+        }
+        return list;
+    }
+
+    /**
      * Loads the keys of this Document
      *
      * @return list of keys

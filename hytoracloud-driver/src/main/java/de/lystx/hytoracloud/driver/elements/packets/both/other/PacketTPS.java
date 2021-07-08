@@ -2,9 +2,9 @@ package de.lystx.hytoracloud.driver.elements.packets.both.other;
 
 import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
 
 import java.io.Serializable;
 
@@ -15,21 +15,26 @@ public class PacketTPS extends PacketCommunication implements Serializable {
     private Service service;
     private String tps;
 
-    @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
-
-        player = buf.readString();
-        service = Service.readFromBuf(buf);
-        tps = buf.readString();
-    }
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        buf.writeString(player);
-        service.writeToBuf(buf);
-        buf.writeString(tps);
+        player = component.getString("player");
+        service = (Service) component.getObject("service");
+        tps = component.getString("tps");
     }
+
+
+    @Override
+    public void write(Component component) {
+        super.write(component);
+
+        component.append(map -> {
+           map.put("player", player);
+           map.put("service", service);
+           map.put("tps", tps);
+        });
+    }
+
 }

@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.launcher.global;
 
-import de.lystx.hytoracloud.driver.service.permission.PermissionService;
+import de.lystx.hytoracloud.driver.elements.packets.both.PacketReload;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 //import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -119,7 +119,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         this.getInstance(CommandService.class).registerCommand(new RunCommand(this));
 
         this.getInstance(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
-        this.getInstance(CommandService.class).registerCommand(new DownloadCommand(this));
+        this.getInstance(CommandService.class).registerCommand(new DownloadCommand());
 
         this.getInstance(CommandService.class).registerCommand(new UpdateCommand(this));
         this.getInstance(CommandService.class).registerCommand(new LogCommand(this));
@@ -160,13 +160,16 @@ public class CloudProcess extends CloudDriver implements DriverParent {
             module.onReload();
         }
 
+        CloudDriver.getInstance().sendPacket(new PacketReload());
+        CloudDriver.getInstance().getInstance(ConfigService.class).reload();
+
         try {
             CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
                     CloudDriver.getInstance().getNetworkConfig(),
                     CloudDriver.getInstance().getServiceManager().getServiceMap()
             ));
+            CloudDriver.getInstance().getNetworkConfig().update();
             ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceGroups(this.getInstance(GroupService.class).getGroups());
-            this.getInstance(ConfigService.class).reload();
 
         } catch (NullPointerException e) {
             e.printStackTrace();

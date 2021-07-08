@@ -2,12 +2,11 @@ package de.lystx.hytoracloud.driver.elements.service;
 
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.packets.both.service.ServicePacket;
 import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.enums.ServiceState;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import io.thunder.packet.Packet;
+import de.lystx.hytoracloud.driver.service.util.minecraft.ServiceInfo;
 import io.thunder.packet.PacketBuffer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.util.minecraft.ServerPinger;
@@ -167,6 +166,7 @@ public class Service implements Serializable, Objectable<Service> {
      * to get all Data of it
      */
     private ServerPinger ping() {
+
         ServerPinger serverPinger = new ServerPinger();
         if (this.host == null) {
             return serverPinger;
@@ -181,6 +181,17 @@ public class Service implements Serializable, Objectable<Service> {
             }
         };
         return serverPinger;
+    }
+
+
+    /**
+     * Prepares a {@link ServiceInfo}
+     * to get values like motd and so on
+     *
+     * @return prepared info
+     */
+    public ServiceInfo prepare() {
+        return ServiceInfo.prepare(this.host, this.port);
     }
 
     @Override
@@ -233,16 +244,6 @@ public class Service implements Serializable, Objectable<Service> {
         service.setProperties(this.properties);
         service.setAuthenticated(this.authenticated);
         return service;
-    }
-
-    /**
-     * Sends a {@link Packet} to only this service
-     *
-     * @param packet the packet to send
-     */
-    public void sendPacket(Packet packet) {
-        ServicePacket servicePacket = new ServicePacket(this.name, packet);
-        CloudDriver.getInstance().sendPacket(servicePacket);
     }
 
 }

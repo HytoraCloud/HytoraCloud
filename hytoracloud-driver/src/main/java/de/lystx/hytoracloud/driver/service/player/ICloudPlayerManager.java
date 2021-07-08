@@ -1,5 +1,7 @@
 package de.lystx.hytoracloud.driver.service.player;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutPlayers;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
@@ -134,5 +136,12 @@ public interface ICloudPlayerManager extends Iterable<CloudPlayer> {
      * @return list of players on this service
      */
     List<CloudPlayer> getPlayersOnGroup(ServiceGroup serviceGroup);
+
+    /**
+     * Syncs the player manager all over the network
+     */
+    default void sync() {
+        CloudDriver.getInstance().sendPacket(new PacketOutPlayers(this));
+    }
 
 }

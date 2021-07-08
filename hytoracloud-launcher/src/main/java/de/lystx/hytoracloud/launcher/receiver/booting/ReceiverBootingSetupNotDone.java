@@ -50,7 +50,7 @@ public class ReceiverBootingSetupNotDone {
 
             receiver.getParent().getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
             Updater.download(spigot.get().getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading Spigot");
-            Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? ProxyVersion.WATERFALL.getUrl() : ProxyVersion.BUNGEECORD.getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get());
+            Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? ProxyVersion.WATERFALL.getUrl() : ProxyVersion.BUNGEECORD.getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"), "Downloading " + bungeeCord.get());
 
             receiver.getInstance(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(receiver.getInstance(FileService.class).getGlobalDirectory(), "server-icon.png"));
 

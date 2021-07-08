@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.service.command;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketCommand;
+import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommand;
 import de.lystx.hytoracloud.driver.service.command.base.CommandUsage;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;

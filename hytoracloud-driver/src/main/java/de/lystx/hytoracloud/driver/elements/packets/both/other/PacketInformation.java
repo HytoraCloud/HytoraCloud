@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver.elements.packets.both.other;
 
 import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
-import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
 
 import java.util.Map;
 
@@ -15,18 +15,21 @@ public class PacketInformation extends PacketCommunication {
 
 
     @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        key = buf.readString();
-        objectMap = buf.readObject();
+        key = component.getString("key");
+        objectMap = (Map<String, Object>) component.getObject("map");
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void write(Component component) {
+        super.write(component);
 
-        buf.writeString(key);
-        buf.writeObject(objectMap);
+        component.append(map -> {
+            map.put("key", key);
+            map.put("map", objectMap);
+        });
     }
+
 }

@@ -4,11 +4,13 @@ import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.util.UUID;
 
 @AllArgsConstructor @Getter
-public class PacketRequestPing extends Packet {
+public class PacketRequestPing extends HytoraPacket {
 
     private UUID uuid;
     private String key;
@@ -20,14 +22,13 @@ public class PacketRequestPing extends Packet {
 
 
     @Override
-    public void write(PacketBuffer packetBuffer) {
-        packetBuffer.nullSafe().writeUUID(uuid);
-        packetBuffer.nullSafe().writeString(key);
+    public void write(Component component) {
+        component.put("uuid", uuid).put("key", key);
     }
 
     @Override
-    public void read(PacketBuffer packetBuffer) {
-        uuid = packetBuffer.nullSafe().readUUID();
-        key = packetBuffer.nullSafe().readString();
+    public void read(Component component) {
+        uuid = component.getUUID("uuid");
+        key = component.getString("key");
     }
 }

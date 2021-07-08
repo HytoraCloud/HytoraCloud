@@ -8,9 +8,9 @@ import de.lystx.hytoracloud.driver.elements.other.ReceiverInfo;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketCallEvent;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInCopyTemplate;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInCreateTemplate;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInLogMessage;
+import de.lystx.hytoracloud.driver.elements.packets.both.PacketLogMessage;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStopServer;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketCommand;
+import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommand;
 import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestModules;
 import de.lystx.hytoracloud.driver.elements.packets.result.ResultPacketStatistics;
 import de.lystx.hytoracloud.driver.elements.service.Service;
@@ -44,30 +44,26 @@ import de.lystx.hytoracloud.driver.service.util.minecraft.TicksPerSecond;
 import de.lystx.hytoracloud.driver.service.util.reflection.Reflections;
 import de.lystx.hytoracloud.driver.service.util.utillity.CloudRunnable;
 import de.lystx.hytoracloud.driver.service.util.utillity.CloudMap;
-import de.lystx.hytoracloud.driver.service.util.utillity.Value;
 import de.lystx.hytoracloud.driver.service.config.impl.MessageConfig;
 import de.lystx.hytoracloud.driver.service.event.DefaultEventService;
 import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import io.thunder.Thunder;
-import io.thunder.connection.ErrorHandler;
-import io.thunder.connection.data.ThunderConnection;
-import io.thunder.packet.Packet;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.event.CloudEvent;
 import de.lystx.hytoracloud.driver.service.other.FileService;
 import de.lystx.hytoracloud.driver.service.lib.LibraryService;
-import io.thunder.packet.handler.PacketHandler;
-import io.thunder.packet.impl.response.IResponse;
-import io.thunder.packet.impl.response.Response;
-import io.thunder.packet.impl.response.ResponseStatus;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.hytora.networking.connection.HytoraConnection;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.URLClassLoader;
@@ -90,6 +86,12 @@ public class CloudDriver {
      */
     @Getter
     private DriverParent parent;
+
+    /**
+     * The proxy bridge instance
+     */
+    @Setter @Getter
+    private ProxyBridge proxyBridge;
 
     /**
      * Custom values to not create extra getters
@@ -122,7 +124,7 @@ public class CloudDriver {
      * Packets and Queries
      */
     @Getter
-    private ThunderConnection connection;
+    private HytoraConnection connection;
 
     /**
      * The PermissionPool
@@ -229,29 +231,6 @@ public class CloudDriver {
      */
     public CloudDriver(CloudType driverType) {
         instance = this;
-
-        Thunder.addHandler(new ErrorHandler() {
-            @Override
-            public void onError(Exception e) {
-                if (e.getClass().getSimpleName().equals("SocketException")) {
-                    return;
-                }
-                if (driverType.isInstance()) {
-                    parent.getConsole().sendMessage("§cERROR", "§7Thunder-Networking-Error");
-                    for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                        parent.getConsole().sendMessage("§cERROR", "§7" + stackTraceElement.toString());
-                    }
-                    parent.getConsole().sendMessage("§7");
-                    return;
-                }
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onPacketFailure(Packet packet, String s, Exception e) {
-                onError(e);
-            }
-        });
 
         this.serviceRegistry = new DefaultServiceRegistry();
         this.eventService = new DefaultEventService();
@@ -362,7 +341,7 @@ public class CloudDriver {
      * @param showUpInConsole > If false it will only be logged
      */
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
-        this.sendPacket(new PacketInLogMessage(prefix, message, showUpInConsole));
+        this.sendPacket(new PacketLogMessage(prefix, message, showUpInConsole));
     }
 
     /**
@@ -389,7 +368,7 @@ public class CloudDriver {
      */
     public void registerPacketHandler(PacketHandler... handler) {
         for (PacketHandler o : handler) {
-            connection.addPacketHandler(o);
+            connection.registerPacketHandler(o);
         }
     }
 
@@ -407,85 +386,47 @@ public class CloudDriver {
      * Without consumer to call back
      * @param packet the packet to send
      */
-    public void sendPacket(Packet packet) {
+    public void sendPacket(HytoraPacket packet) {
         this.sendPacket(packet,  null);
     }
-
     /**
      * Sends a packet with a consumer
      * @param packet the packet to send
      * @param consumer the consumer to accept the response
      */
-    public void sendPacket(Packet packet, Consumer<Response> consumer) {
+    public void sendPacket(HytoraPacket packet, Consumer<Component> consumer) {
         if (consumer == null) {
             this.connection.sendPacket(packet);
         } else {
-            this.connection.sendPacket(packet, consumer);
+
+            Component reply = packet.toReply(connection);
+            consumer.accept(reply);
         }
     }
 
     /**
-     * Sends a packet with a consumer
-     *
-     * @param packet the packet to send
-     * @param timeOut the timeOut for the response
-     * @param consumer the consumer to accept the response
-     */
-    public void sendPacket(Packet packet, Consumer<Response> consumer, int timeOut) {
-        this.connection.sendPacket(packet, consumer, timeOut);
-    }
-
-    /**
-     * Transfers a {@link Packet} to a {@link Response}
+     * Transfers a {@link HytoraPacket} to a {@link Component}
      * with default timeOut of 3000ms
      *
      * @param packet the packet
      * @return response
      */
-    public Response getResponse(Packet packet) {
+    public Component getResponse(HytoraPacket packet) {
         return this.getResponse(packet, 3000);
     }
 
     /**
-     * Transfers a {@link Packet} to a {@link Response}
+     * Transfers a {@link HytoraPacket} to a {@link Component}
      *
      * @param responsePacket the packet
      * @param timeOut the timeout
      * @return response
      */
-    public Response getResponse(Packet responsePacket, int timeOut) {
-        return this.connection.transferToResponse(responsePacket, timeOut);
+    public Component getResponse(HytoraPacket responsePacket, int timeOut) {
+
+        return responsePacket.toReply(connection);
     }
 
-
-    public <T extends Packet> T packetToPacket(T packet) {
-        Value<T> response = new Value<>();
-        this.connection.getPacketAdapter().addHandler(new PacketHandler() {
-            @Override
-            public void handle(Packet p) {
-                System.out.println("[" + p.getClass().getSimpleName() + "@" + p.getUniqueId() + "]");
-                if (p.getClass().getSimpleName().equalsIgnoreCase(packet.getClass().getSimpleName())) {
-                    if (packet.getUniqueId() == p.getUniqueId()) {
-                        connection.getPacketAdapter().removeHandler(this);
-                        response.setValue((T) p);
-                    }
-                }
-            }
-        });
-
-        this.sendPacket(packet); //Sending packet
-
-        while (response.get() == null) {
-            try {
-                Thread.sleep(0L, 500000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        return response.get();
-    }
 
     /*
      * ======================================
@@ -576,11 +517,13 @@ public class CloudDriver {
      * @return config
      */
     public NetworkConfig getNetworkConfig() {
+        NetworkConfig networkConfig;
         if (driverType == CloudType.BRIDGE || driverType == CloudType.RECEIVER) {
-            return implementedData.getObject("networkConfig", NetworkConfig.class);
+            networkConfig = implementedData.getObject("networkConfig", NetworkConfig.class);
         } else {
-            return getInstance(ConfigService.class).getNetworkConfig();
+            networkConfig = this.getInstance(ConfigService.class).getNetworkConfig();
         }
+        return networkConfig;
     }
 
     /**
@@ -589,10 +532,10 @@ public class CloudDriver {
      * @return string prefix
      */
     public String getCloudPrefix() {
-        if (getNetworkConfig() == null) {
+        if (this.getNetworkConfig() == null) {
             return "§8[§cNullCloud§8]";
         }
-        return getNetworkConfig().getMessageConfig().getPrefix().replace("&", "§");
+        return this.getNetworkConfig().getMessageConfig().getPrefix().replace("&", "§");
     }
 
     /**
@@ -605,7 +548,8 @@ public class CloudDriver {
 
     /**
      * Injects the CloudPermissibleBase to the Player
-     * @param player
+     *
+     * @param player the player
      */
     public void updatePermissions(Object player, Object cloudPermissible) {
         if (!CloudDriver.getInstance().getPermissionPool().isEnabled()) {
@@ -636,9 +580,13 @@ public class CloudDriver {
     @SneakyThrows
     public Statistics getStatistics() {
         if (this.driverType == CloudType.BRIDGE) {
-            return new Statistics(new VsonObject(connection.transferToResponse(new ResultPacketStatistics()).getMessage()));
+
+            ResultPacketStatistics resultPacketStatistics = new ResultPacketStatistics();
+            Component component = resultPacketStatistics.toReply(connection);
+
+            return new Statistics(new VsonObject(component.reply().getMessage()));
         } else {
-            return getInstance(StatsService.class).getStatistics();
+            return this.getInstance(StatsService.class).getStatistics();
         }
     }
 
@@ -667,14 +615,15 @@ public class CloudDriver {
      * Returns all the Modules
      * @return IResponse
      */
-    public IResponse<List<ModuleInfo>> getModules() {
+    public List<ModuleInfo> getModules() {
 
         if (driverType == CloudType.BRIDGE) {
-            Response response = connection.transferToResponse(new PacketRequestModules(), 5000);
-            return response.toIResponse(response.get(0).asList(ModuleInfo.class));
-        } else {
 
-            Response response = new Response(ResponseStatus.SUCCESS);
+            PacketRequestModules packetRequestModules = new PacketRequestModules();
+            Component component = packetRequestModules.toReply(connection);
+
+            return component.get("modules");
+        } else {
 
             List<ModuleInfo> list = new LinkedList<>();
 
@@ -684,7 +633,7 @@ public class CloudDriver {
                 }
             }
 
-            return response.toIResponse(list);
+            return list;
         }
     }
 
@@ -697,9 +646,10 @@ public class CloudDriver {
     @SneakyThrows
     public ModuleInfo getModule(String name) {
         if (this.driverType == CloudType.BRIDGE) {
-            IResponse<List<ModuleInfo>> iResponse = this.getModules();
 
-            return iResponse.raw().get(0).asList(ModuleInfo.class)
+            List<ModuleInfo> modules = this.getModules();
+
+            return modules
                     .stream()
                     .filter(
                             moduleInfo ->
@@ -801,13 +751,13 @@ public class CloudDriver {
      * @return boolean
      */
     public boolean isFallback(CloudPlayer player) {
-        Value<Boolean> booleanValue = new Value<>(false);
-        this.getFallbacks(player).forEach(fallback -> {
+        List<Fallback> fallbacks = this.getFallbacks(player);
+        for (Fallback fallback : fallbacks) {
             if (player.getService().getServiceGroup().getName().equalsIgnoreCase(fallback.getGroupName())) {
-                booleanValue.setValue(true);
+                return true;
             }
-        });
-        return booleanValue.get();
+        }
+        return false;
     }
 
 
@@ -858,11 +808,11 @@ public class CloudDriver {
     public List<Fallback> getFallbacks(CloudPlayer player) {
         List<Fallback> list = new LinkedList<>();
         list.add(CloudDriver.getInstance().getNetworkConfig().getFallbackConfig().getDefaultFallback());
-        CloudDriver.getInstance().getNetworkConfig().getFallbackConfig().getFallbacks().forEach(fallback -> {
+        for (Fallback fallback : CloudDriver.getInstance().getNetworkConfig().getFallbackConfig().getFallbacks()) {
             if (CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), fallback.getPermission()) || fallback.getPermission().trim().isEmpty() || fallback.getPermission() == null) {
                 list.add(fallback);
             }
-        });
+        }
         return list;
     }
 
@@ -874,7 +824,11 @@ public class CloudDriver {
 
     public void shutdownDriver() {
         CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getThisService()));
-        this.connection.disconnect();
+        try {
+            this.connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

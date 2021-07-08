@@ -24,7 +24,7 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
             id = 1,
             question = "What's the ip of this CloudSystem? ",
             message = {
-                    "§f[§9INFO§f] §cIf you do not use §eMultiRoot §cthen just type §elocalhost§c!",
+                    "INFO%% §cIf you do not use §eMultiRoot §cthen just type §elocalhost§c!",
             },
             changeAnswers = {
                     "localhost->0",
@@ -53,8 +53,8 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
             id = 4,
             question = "What's the name of the first Admin?",
             message = {
-                    "§f[§9INFO§f] §cBe careful!",
-                    "§f[§9INFO§f] §cThis player is the first one to receive all rights!"
+                    "INFO%% §cBe careful!",
+                    "INFO%% §cThis player is the first one to receive all rights!"
             }
     )
     private String firstAdmin;
@@ -63,8 +63,8 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
             id = 5,
             question = "Do you want the cloud to update it's self?",
             message = {
-                    "§f[§9INFO§f] §cSadly the AutoUpdater is not supported at the moment!",
-                    "§f[§9INFO§f] §cJust enter §efalse §cor else there will be errors!"
+                    "INFO%% §cSadly the AutoUpdater is not supported at the moment!",
+                    "INFO%% §cJust enter §efalse §cor else there will be errors!"
             },
             onlyAnswers = {
                     "true",
@@ -95,8 +95,8 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
             id = 7,
             question = "What Datbase do you want to use? (MYSQL, MONGODB, FILES)",
             message = {
-                    "§f[§9INFO§f] §cIf you enter an §eOnline-Database §clike MongoDB or MySQL you will have to enter your data in the next step!",
-                    "§f[§9INFO§f] §cIf you enter §eFiles §cyou don't need to enter any data of course!",
+                    "INFO%% §cIf you enter an §eOnline-Database §clike MongoDB or MySQL you will have to enter your data in the next step!",
+                    "INFO%% §cIf you enter §eFiles §cyou don't need to enter any data of course!",
             },
             onlyAnswers = {
                     "MONGODB",
@@ -108,10 +108,11 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
 
     @Setup(
             id = 8,
-            question = "What Proxy Software do you want to use ? (WATERFALL, BUNGEECORD)",
+            question = "What Proxy Software do you want to use ? (WATERFALL, BUNGEECORD, VELOCITY)",
             onlyAnswers = {
                     "BUNGEECORD",
-                    "WATERFALL"
+                    "WATERFALL",
+                    "VELOCITY"
             }
     )
     private String bungeeCordType;
@@ -120,8 +121,8 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
             id = 9,
             question = "What Spigot version do you prefer ? (1.8.8, 1.9, 1.10, 1.11 etc...)",
             message = {
-                    "§f[§9INFO§f] §cI don't know why but after entering the version you have to hit §eenter §cagain to confirm it!",
-                    "§f[§9INFO§f] §cIm still trying to figure out the error!",
+                    "INFO%% §cI don't know why but after entering the version you have to hit §eenter §cagain to confirm it!",
+                    "INFO%% §cIm still trying to figure out the error!",
             }
     )
     private String spigotVersion;

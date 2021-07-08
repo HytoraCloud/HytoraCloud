@@ -29,20 +29,13 @@ public class TicketManager extends ListenerAdapter {
    private final List<Ticket> tickets;
 
     /**
-     * The file for the {@link JsonEntity}
-     */
-    private final File file;
-
-    /**
-     * The stored {@link Suggestion}s
-     */
-    private final JsonEntity jsonEntity;
-
-    /**
      * The ticket channel
      */
     private final TextChannel channel;
 
+    /**
+     * The ticket category
+     */
     private final Category category;
 
     public TicketManager(String channelId) {
@@ -51,20 +44,6 @@ public class TicketManager extends ListenerAdapter {
         this.channel = Hytora.getHytora().getGuild().getTextChannelById(channelId);
         this.category = channel.getParent();
 
-        File directory = new File("tickets/"); directory.mkdirs();
-        this.file = new File(directory, "pending.json");
-
-        try {
-            this.file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        this.jsonEntity = new JsonEntity(this.file);
-        this.jsonEntity.save();
-
-        //Load saved tickets
-        this.jsonEntity.forEach(Ticket.class, this.tickets::add);
         this.checkCreator();
         Hytora.getHytora().getLogManager().log("TICKETS", "§7Loaded §b" + this.tickets.size() + " §7Opened §3Tickets§8!");
     }
@@ -84,35 +63,13 @@ public class TicketManager extends ListenerAdapter {
                 Hytora.getHytora().getDiscord().getSelfUser(),
                 message -> {},
                 new Button[]{
-                        new DiscordButton(0x099, "Open Ticket", ButtonStyle.SUCCESS, new Consumer<DiscordButtonAction>() {
-                            @Override
-                            public void accept(DiscordButtonAction a) {
-                                Ticket ticket = new Ticket(a.getUser().getId(), tickets.size() + 1, false, null);
-                                openTicket(ticket);
-                            }
-                        }).submit()
+                        new DiscordButton(0x099, "Open Ticket", ButtonStyle.SUCCESS, a -> openTicket(new Ticket(a.getUser().getId(), tickets.size() + 1, false, null))).submit()
                 },
                 "Click here to open a new Ticket"
         );
     }
 
-    /**
-     * Saves all {@link Ticket}s
-     */
-    public void save() {
-        this.jsonEntity.clear();
-        for (Ticket ticket : this.tickets) {
-            this.jsonEntity.append(ticket.getId() + "", ticket);
-        }
-        this.jsonEntity.save(this.file);
-    }
 
-    /**
-     * Shuts down the ticketManager
-     */
-    public void shutdown() {
-        this.save();
-    }
 
     /**
      * Opens a new {@link Ticket}
@@ -195,6 +152,5 @@ public class TicketManager extends ListenerAdapter {
         ticket = this.tickets.stream().filter(t -> t.getId() == id).findFirst().orElse(ticket);
 
         this.tickets.remove(ticket);
-        this.save();
     }
 }

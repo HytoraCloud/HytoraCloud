@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.bukkit.handler;
 
-import de.lystx.hytoracloud.bridge.bukkit.CloudServer;
+import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
 import de.lystx.hytoracloud.bridge.bukkit.events.player.CloudServerPlayerRankUpdateEvent;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerPermissionGroupAddCloudEvent;
@@ -22,11 +22,11 @@ public class PacketHandlerBukkitEvent implements PacketHandler {
         switch (packetCallEvent.getCloudEvent().getClass().getSimpleName()) {
             case "CloudPlayerPermissionGroupAddEvent":
                 CloudPlayerPermissionGroupAddCloudEvent event = (CloudPlayerPermissionGroupAddCloudEvent) packetCallEvent.getCloudEvent();
-                CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerPlayerRankUpdateEvent(CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(event.getName()), event.getPermissionGroup(), true));
+                HytoraCloudBukkitBridge.getInstance().getServer().getPluginManager().callEvent(new CloudServerPlayerRankUpdateEvent(CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(event.getName()), event.getPermissionGroup(), true));
                 break;
             case "CloudPlayerPermissionGroupRemoveEvent":
                 CloudPlayerPermissionGroupRemoveCloudEvent playerPermissionGroupRemoveEvent = (CloudPlayerPermissionGroupRemoveCloudEvent)packetCallEvent.getCloudEvent();
-                CloudServer.getInstance().getServer().getPluginManager().callEvent(new CloudServerPlayerRankUpdateEvent(CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(playerPermissionGroupRemoveEvent.getPlayerName()), playerPermissionGroupRemoveEvent.getPermissionGroup(), false));
+                HytoraCloudBukkitBridge.getInstance().getServer().getPluginManager().callEvent(new CloudServerPlayerRankUpdateEvent(CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(playerPermissionGroupRemoveEvent.getPlayerName()), playerPermissionGroupRemoveEvent.getPermissionGroup(), false));
                 break;
             default:
         }

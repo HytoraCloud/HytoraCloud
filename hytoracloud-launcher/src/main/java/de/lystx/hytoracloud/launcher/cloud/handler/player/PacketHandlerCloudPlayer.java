@@ -1,21 +1,12 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.player;
 
-import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestKey;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerChangeServerCloudEvent;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketCallEvent;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketUpdatePlayer;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInPlayerExecuteCommand;
 import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestPing;
 import de.lystx.hytoracloud.driver.service.player.ICloudPlayerManager;
 import io.thunder.packet.Packet;
 import io.thunder.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-
-import de.lystx.hytoracloud.driver.service.permission.PermissionService;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 
 
@@ -23,8 +14,6 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import io.thunder.packet.impl.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-
-import java.util.UUID;
 
 @AllArgsConstructor
 public class PacketHandlerCloudPlayer implements PacketHandler {
@@ -35,60 +24,36 @@ public class PacketHandlerCloudPlayer implements PacketHandler {
     @SneakyThrows
     @Override
     public void handle(Packet packet) {
-        ICloudPlayerManager iCloudPlayerManager = CloudDriver.getInstance().getCloudPlayerManager();
-        if (packet instanceof PacketCallEvent) {
-            PacketCallEvent packetCallEvent = (PacketCallEvent)packet;
-            if (packetCallEvent.getCloudEvent() instanceof CloudPlayerChangeServerCloudEvent) {
-                CloudPlayerChangeServerCloudEvent serverEvent = (CloudPlayerChangeServerCloudEvent)packetCallEvent.getCloudEvent();
-                try {
-                    CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(serverEvent.getCloudPlayer().getName());
-                    if (cloudPlayer != null) {
-                        cloudPlayer.setService(CloudDriver.getInstance().getServiceManager().getService(serverEvent.getNewServer()));
-                        cloudPlayer.update();
-                    }
-                } catch (NullPointerException e) {
-                    //IGNORING
-                }
-            }
-        }
-        if (packet instanceof PacketRequestKey && ((PacketRequestKey) packet).getKey().startsWith("playerInformation::")) {
+        ICloudPlayerManager playerManager = CloudDriver.getInstance().getCloudPlayerManager();
 
-            PacketRequestKey packetRequestKey = (PacketRequestKey)packet;
-            String key = packetRequestKey.getKey();
-            UUID uniqueId = UUID.fromString(key.split("::")[1]);
-            PlayerInformation playerInformation = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(uniqueId);
 
-            packet.respond(ResponseStatus.SUCCESS, playerInformation);
-        }
         if (packet instanceof PacketUpdatePlayer) {
-            PacketUpdatePlayer packetUpdatePlayer = (PacketUpdatePlayer)packet;
-            CloudPlayer cloudPlayer = packetUpdatePlayer.getCloudPlayer();
-            PlayerInformation playerInformation = cloudPlayer.getPlayerInformation();
 
-            System.out.println("{INCOMING} " + cloudPlayer.getName() + "@" + cloudPlayer.getUniqueId() + " [" + playerInformation.getAllPermissionGroups().size() + "]");
-            try {
-                PermissionPool permissionPool = CloudDriver.getInstance().getPermissionPool();
-                permissionPool.updatePlayer(playerInformation);
-                CloudDriver.getInstance().setPermissionPool(permissionPool);
-                CloudDriver.getInstance().getInstance(PermissionService.class).save();
+            PacketUpdatePlayer p = (PacketUpdatePlayer)packet;
+            CloudPlayer cloudPlayer = p.getCloudPlayer();
 
-                CloudDriver.getInstance().getCloudPlayerManager().update(cloudPlayer);
-                CloudDriver.getInstance().reload();
+            CloudPlayer cachedPlayer = playerManager.getCachedPlayer(cloudPlayer.getUniqueId());
 
-            } catch (NullPointerException e) {
-                e.printStackTrace();
+            if (cachedPlayer == null) {
+                //Player is not registered so we register...
+
+                playerManager.registerPlayer(cloudPlayer);
+
+
+            } else {
+                //Player already online so updating...
+
+                playerManager.update(cloudPlayer);
             }
-        }
 
-        if (packet instanceof PacketInPlayerExecuteCommand) {
-
-            this.cloudSystem.getInstance(StatsService.class).getStatistics().add("executedCommands");
+            playerManager.sync();
 
         }
+
         if (packet instanceof PacketRequestPing) {
 
             PacketRequestPing packetOutPingRequest = (PacketRequestPing)packet;
-            CloudPlayer cloudPlayer = iCloudPlayerManager.getCachedPlayer(packetOutPingRequest.getUuid());
+            CloudPlayer cloudPlayer = playerManager.getCachedPlayer(packetOutPingRequest.getUuid());
 
 
             int ping = CloudDriver.getInstance().getConnection().transferToResponse(new PacketRequestPing(cloudPlayer.getUniqueId())).get(0).asInt();

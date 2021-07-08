@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.module.serverselector.spigot;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.elements.interfaces.BooleanRequest;
 import de.lystx.hytoracloud.module.serverselector.spigot.handler.PacketHandlerBukkitSignSystem;
 import de.lystx.hytoracloud.module.serverselector.spigot.handler.PacketHandlerManageNPCs;
 import de.lystx.hytoracloud.module.serverselector.spigot.handler.PacketHandlerManageSigns;
@@ -41,21 +42,24 @@ public class SpigotSelector extends JavaPlugin {
 
         PluginManager pm = Bukkit.getPluginManager();
 
-        if (!CloudDriver.getInstance().getBukkit().isNewVersion()) {
-            this.npcManager = new NPCManager();
-            this.skinFetcher = new NPC.SkinFetcher();
-            pm.registerEvents(new NPCListener(), this);
-        }
+        CloudDriver.getInstance().executeIf(() -> {
+            if (!CloudDriver.getInstance().getBukkit().isNewVersion()) {
+                this.npcManager = new NPCManager();
+                this.skinFetcher = new NPC.SkinFetcher();
+                pm.registerEvents(new NPCListener(), this);
+            }
 
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerBukkitSignSystem());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerManageSigns());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerManageNPCs());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerUpdate());
+            CloudDriver.getInstance().registerPacketHandler(new PacketHandlerBukkitSignSystem());
+            CloudDriver.getInstance().registerPacketHandler(new PacketHandlerManageSigns());
+            CloudDriver.getInstance().registerPacketHandler(new PacketHandlerManageNPCs());
+            CloudDriver.getInstance().registerPacketHandler(new PacketHandlerUpdate());
 
-        pm.registerEvents(new PlayerSignListener(), this);
-        pm.registerEvents(new PlayerJoinListener(), this);
-        pm.registerEvents(new PlayerQuitListener(), this);
-        System.out.println("[ServerSelector] ServerSelector-Module-Bukkit loaded up and started!");
+            pm.registerEvents(new PlayerSignListener(), this);
+            pm.registerEvents(new PlayerJoinListener(), this);
+            pm.registerEvents(new PlayerQuitListener(), this);
+            System.out.println("[ServerSelector] ServerSelector-Module-Bukkit loaded up and started!");
+        }, () -> CloudDriver.getInstance().getBukkit() != null);
+
     }
 
     @Override

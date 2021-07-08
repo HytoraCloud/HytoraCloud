@@ -55,7 +55,7 @@ public class PlayerConnection implements Serializable, ThunderObject {
      * @param reason the reason for the disconnect
      */
     public void disconnect(String reason) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketKickPlayer(this.name, reason));
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketKickPlayer(this.uniqueId, reason));
     }
 
     @Override

@@ -44,7 +44,7 @@ public class CloudBootingSetupNotDone {
         cloudSystem.getInstance(CommandService.class).setActive(false);
         CloudSetup cloudSetup = new CloudSetup();
         Value<SpigotVersion> spigot = new Value<>();
-        Value<String> bungeeCord = new Value<>();
+        Value<ProxyVersion> proxy = new Value<>();
 
         cloudSetup.start(cloudSystem.getParent().getConsole(), setup -> {
             if (setup.isCancelled()) {
@@ -68,7 +68,7 @@ public class CloudBootingSetupNotDone {
             document.append("autoUpdater", setup.isAutoUpdater());
             document.save();
             spigot.setValue(SpigotVersion.byKey(setup.getSpigotVersion()));
-            bungeeCord.setValue(setup.getBungeeCordType());
+            proxy.setValue(ProxyVersion.byKey(setup.getBungeeCordType()));
 
             ProxyConfig config = ProxyConfig.defaultConfig();
             config.setMaxPlayers(setup.getMaxPlayers());
@@ -146,8 +146,18 @@ public class CloudBootingSetupNotDone {
             cloudSystem.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
                 Action action = new Action();
 
-                Updater.download(spigot.get().getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading " + spigot.get().getJarName());
-                Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? ProxyVersion.WATERFALL.getUrl() : ProxyVersion.BUNGEECORD.getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"), "Downloading " + bungeeCord.get().toUpperCase());
+                File spigotFile = new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar");
+                File proxyFile = new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar");
+
+                if (!spigotFile.exists()) {
+                    Updater.download(spigot.get().getUrl(), spigotFile, "Downloading " + spigot.get().getJarName());
+                }
+
+
+                if (!proxyFile.exists()) {
+                    Updater.download(proxy.get().getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"), "Downloading " + proxy.get().getKey().toUpperCase());
+                }
+
 
                 cloudSystem.getInstance(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(cloudSystem.getInstance(FileService.class).getGlobalDirectory(), "server-icon.png"));
 

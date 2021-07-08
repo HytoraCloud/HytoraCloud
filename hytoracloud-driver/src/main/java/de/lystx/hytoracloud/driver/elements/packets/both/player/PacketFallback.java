@@ -1,28 +1,31 @@
 package de.lystx.hytoracloud.driver.elements.packets.both.player;
 
 import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
-import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Getter  @AllArgsConstructor
 public class PacketFallback extends PacketCommunication implements Serializable {
 
-    private String name;
+    private UUID uuid;
+
 
     @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        name = buf.readString();
+        uuid = component.getUUID("uuid");
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void write(Component component) {
+        super.write(component);
 
-        buf.writeString(name);
+        component.append(map -> map.put("uuid", uuid));
     }
+
 }

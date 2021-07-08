@@ -9,30 +9,56 @@ import de.lystx.hytoracloud.driver.service.config.impl.labymod.LabyModConfig;
 import de.lystx.hytoracloud.driver.service.config.impl.proxy.GlobalProxyConfig;
 import io.thunder.utils.objects.ThunderObject;
 import io.vson.elements.object.Objectable;
-import io.vson.elements.object.VsonObject;
-import io.vson.enums.VsonSettings;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 @Getter @Setter @AllArgsConstructor
-public class NetworkConfig implements Serializable, ThunderObject {
+public class NetworkConfig implements Serializable, ThunderObject, Objectable<NetworkConfig> {
 
+    /**
+     * The host of the cloud
+     */
     private String host;
+
+    /**
+     * The port of the cloud
+     */
     private Integer port;
+
+    /**
+     * If the cloud is set up
+     */
     private boolean setupDone;
+
+    /**
+     * If auto updater is enabled
+     */
     private boolean autoUpdater;
 
-    private GlobalProxyConfig networkConfig;
+    /**
+     * The GlobalProxyConfig
+     */
+    private GlobalProxyConfig globalProxyConfig;
+
+    /**
+     * The LabyMod config
+     */
     private LabyModConfig labyModConfig;
+
+    /**
+     * The message config
+     */
     private MessageConfig messageConfig;
+
+    /**
+     * The fallback config
+     */
     private FallbackConfig fallbackConfig;
 
 
@@ -42,7 +68,7 @@ public class NetworkConfig implements Serializable, ThunderObject {
      * @return default config
      */
     public static NetworkConfig defaultConfig() {
-        return new NetworkConfig("0",
+        return new NetworkConfig("localhost",
                 1401,
                 false,
                 false,
@@ -84,12 +110,12 @@ public class NetworkConfig implements Serializable, ThunderObject {
     @SneakyThrows @Override
     public void write(PacketBuffer buf) {
 
-        buf.writeString(host);
-        buf.writeInt(port);
+        buf.writeString(host == null ? "host" : host);
+        buf.writeInt(port == -1 ? 0 : port);
         buf.writeBoolean(setupDone);
         buf.writeBoolean(autoUpdater);
 
-        buf.writeThunderObject(networkConfig);
+        buf.writeThunderObject(globalProxyConfig);
         buf.writeThunderObject(labyModConfig);
         buf.writeThunderObject(messageConfig);
         buf.writeThunderObject(fallbackConfig);
@@ -102,13 +128,17 @@ public class NetworkConfig implements Serializable, ThunderObject {
         setupDone = buf.readBoolean();
         autoUpdater = buf.readBoolean();
 
-        networkConfig = buf.readThunderObject(GlobalProxyConfig.class);
+        globalProxyConfig = buf.readThunderObject(GlobalProxyConfig.class);
         labyModConfig = buf.readThunderObject(LabyModConfig.class);
         messageConfig = buf.readThunderObject(MessageConfig.class);
         fallbackConfig = buf.readThunderObject(FallbackConfig.class);
     }
 
 
+    /**
+     * Updates this {@link NetworkConfig}
+     * to sync it all over the network
+     */
     public void update() {
         CloudDriver.getInstance().sendPacket(new PacketUpdateNetworkConfig(this));
     }

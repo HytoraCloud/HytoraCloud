@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketCommand;
+import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommand;
 import io.thunder.packet.Packet;
 import io.thunder.packet.handler.PacketHandler;
 

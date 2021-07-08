@@ -1,5 +1,8 @@
 package de.lystx.hytoracloud.driver.service.setup;
 
+import de.lystx.hytoracloud.driver.elements.service.ServiceType;
+import de.lystx.hytoracloud.driver.enums.CloudType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

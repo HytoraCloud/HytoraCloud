@@ -9,28 +9,29 @@ import io.vson.elements.object.VsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.Serializable;
 import java.util.List;
 
 @AllArgsConstructor @Getter
-public class PacketReceiverLoginResult extends Packet implements Serializable {
+public class PacketReceiverLoginResult extends HytoraPacket implements Serializable {
 
     private ReceiverInfo receiverInfo;
     private Decision decision;
     private List<ServiceGroup> serviceGroups;
 
-    @Override @SneakyThrows
-    public void read(PacketBuffer buf) {
-        receiverInfo = ReceiverInfo.fromBuf(buf);
-        decision = buf.readEnum(Decision.class);
-        serviceGroups = new VsonObject(buf.readString()).getAs(List.class);
+    @Override
+    public void write(Component component) {
+        component.put("r", receiverInfo).put("d", decision.name()).put("s", serviceGroups);
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        receiverInfo.toBuf(buf);
-        buf.writeEnum(decision);
-        buf.writeString(new VsonObject().append(serviceGroups).toString());
+    public void read(Component component) {
+
+        receiverInfo = component.get("r");
+        decision = Decision.valueOf(component.getString("d"));
+        serviceGroups = component.get("s");
     }
 }

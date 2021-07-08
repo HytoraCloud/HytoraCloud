@@ -21,22 +21,22 @@ public class MaintenanceCommand implements TabCompletable {
         NetworkConfig config = CloudSystem.getInstance().getInstance(ConfigService.class).getNetworkConfig();
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("switch")) {
-                GlobalProxyConfig globalProxyConfig = config.getNetworkConfig();
-                if (!config.getNetworkConfig().isMaintenance()) {
+                GlobalProxyConfig globalProxyConfig = config.getGlobalProxyConfig();
+                if (!config.getGlobalProxyConfig().isMaintenance()) {
                     globalProxyConfig.setMaintenance(true);
                     sender.sendMessage("INFO", "§9The network is now in §amaintenance§9!");
                 } else {
                     globalProxyConfig.setMaintenance(false);
                     sender.sendMessage("INFO", "§9The network is no longer in §cmaintenance§9!");
                 }
-                config.setNetworkConfig(globalProxyConfig);
+                config.setGlobalProxyConfig(globalProxyConfig);
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getInstance(ConfigService.class).save();
                 CloudSystem.getInstance().reload();
                 CloudSystem.getInstance().getInstance(StatsService.class).getStatistics().add("maintenanceSwitched");
             } else if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("INFO", "§bWhitelisted Players§7:");
-                for (String whitelistedPlayer : config.getNetworkConfig().getWhitelistedPlayers()) {
+                for (String whitelistedPlayer : config.getGlobalProxyConfig().getWhitelistedPlayers()) {
                     sender.sendMessage("INFO", "§9" + whitelistedPlayer);
                 }
             } else {
@@ -46,7 +46,7 @@ public class MaintenanceCommand implements TabCompletable {
             String identifier = args[0];
             String user = args[1].trim();
 
-            GlobalProxyConfig globalProxyConfig = config.getNetworkConfig();
+            GlobalProxyConfig globalProxyConfig = config.getGlobalProxyConfig();
             List<String> whitelist = globalProxyConfig.getWhitelistedPlayers();
             boolean contains = whitelist.toString().toLowerCase().contains(user.toLowerCase());
             if (identifier.equalsIgnoreCase("add")) {
@@ -56,7 +56,7 @@ public class MaintenanceCommand implements TabCompletable {
                 }
                 whitelist.add(user);
                 globalProxyConfig.setWhitelistedPlayers(whitelist);
-                config.setNetworkConfig(globalProxyConfig);
+                config.setGlobalProxyConfig(globalProxyConfig);
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getInstance(ConfigService.class).save();
                 CloudSystem.getInstance().reload();
@@ -68,7 +68,7 @@ public class MaintenanceCommand implements TabCompletable {
                 }
                 whitelist.remove(user);
                 globalProxyConfig.setWhitelistedPlayers(whitelist);
-                config.setNetworkConfig(globalProxyConfig);
+                config.setGlobalProxyConfig(globalProxyConfig);
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getInstance(ConfigService.class).save();
                 CloudSystem.getInstance().reload();
@@ -97,7 +97,7 @@ public class MaintenanceCommand implements TabCompletable {
             list.add("remove");
             list.add("switch");
         } else if (args.length == 3 && args[1].equalsIgnoreCase("remove")) {
-            list.addAll(cloudDriver.getInstance(ConfigService.class).getNetworkConfig().getNetworkConfig().getWhitelistedPlayers());
+            list.addAll(cloudDriver.getInstance(ConfigService.class).getNetworkConfig().getGlobalProxyConfig().getWhitelistedPlayers());
         }
         return list;
     }

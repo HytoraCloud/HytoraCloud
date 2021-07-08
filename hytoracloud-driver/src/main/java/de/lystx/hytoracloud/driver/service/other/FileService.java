@@ -68,8 +68,6 @@ public class FileService implements ICloudService {
     private File modulesDirectory;
     private File statsFile;
     private File versionsDirectory;
-    private File spigotVersionsDirectory;
-    private File oldSpigotVersionsDirectory;
 
 
     private VsonObject tempData;
@@ -108,8 +106,6 @@ public class FileService implements ICloudService {
         this.globalPluginsDirectory = new File(this.pluginsDirectory, "global/");
         this.spigotPluginsDirectory = new File(this.pluginsDirectory, "spigot/");
         this.versionsDirectory = new File(this.globalDirectory, "versions/");
-        this.spigotVersionsDirectory = new File(this.versionsDirectory, "downloads/");
-        this.oldSpigotVersionsDirectory = new File(this.versionsDirectory, "old/");
         this.logsDirectory = new File(this.globalDirectory, "logs/");
         this.modulesDirectory = new File(this.globalDirectory, "modules/");
 
@@ -158,9 +154,7 @@ public class FileService implements ICloudService {
         this.bungeeCordPluginsDirectory.mkdirs();
         this.spigotPluginsDirectory.mkdirs();
         this.versionsDirectory.mkdirs();
-        this.spigotVersionsDirectory.mkdirs();
         this.globalPluginsDirectory.mkdirs();
-        this.oldSpigotVersionsDirectory.mkdirs();
         this.logsDirectory.mkdirs();
         if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             this.modulesDirectory.mkdirs();

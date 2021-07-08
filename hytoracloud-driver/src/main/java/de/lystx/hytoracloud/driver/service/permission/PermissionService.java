@@ -36,12 +36,7 @@ public class PermissionService implements ICloudService {
     public PermissionService() {
 
         this.file = CloudDriver.getInstance().getInstance(FileService.class).getPermissionsFile();
-        CloudDriver.getInstance().executeIf(this::reload, new BooleanRequest() {
-            @Override
-            public boolean isAccepted() {
-                return CloudDriver.getInstance().getDatabaseManager() != null;
-            }
-        });
+        CloudDriver.getInstance().executeIf(this::reload, () -> CloudDriver.getInstance().getDatabaseManager() != null);
     }
 
     /**
@@ -58,6 +53,9 @@ public class PermissionService implements ICloudService {
         CloudDriver.getInstance().getPermissionPool().setCachedCloudPlayers(CloudDriver.getInstance().getDatabaseManager().getDatabase().loadEntries());
         if (!loaded) {
             loaded = true;
+            if (!CloudDriver.getInstance().getNetworkConfig().isSetupDone()) {
+                return;
+            }
             CloudDriver.getInstance().getParent().getConsole().sendMessage("DATABASE", "§7Loaded §b" + CloudDriver.getInstance().getPermissionPool().getCachedCloudPlayers().size() + " PlayerEntries §ffrom Database §h[§7Type: §b" + CloudDriver.getInstance().getDatabaseManager().getDatabase().getType().name() + "§h]!");
         }
     }

@@ -11,8 +11,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.hytora.discordbot.commands.HelpCommand;
-import net.hytora.discordbot.commands.SuggestCommand;
+import net.hytora.discordbot.commands.*;
 import net.hytora.discordbot.listener.*;
 import net.hytora.discordbot.manager.command.CommandCategory;
 import net.hytora.discordbot.manager.command.CommandManager;
@@ -182,12 +181,10 @@ public class Hytora {
             this.suggestionManager.save();
         }
 
-        if (this.ticketManager != null) {
-            this.ticketManager.shutdown();
-        }
-
         this.logManager.save();
-        this.discord.shutdown();
+        if (this.discord != null) {
+            this.discord.shutdown();
+        }
         System.exit(1);
     }
 
@@ -303,7 +300,10 @@ public class Hytora {
      */
     public void registerCommands() {
         this.commandManager.registerCommand(new HelpCommand("help", "Shows this message", CommandCategory.GENERAL, "?", "hilfe"));
+        this.commandManager.registerCommand(new EmbedCommand("embed", "Creates an Embed", CommandCategory.ADMINISTRATION, "em", "bc"));
         this.commandManager.registerCommand(new SuggestCommand("suggest", "Creates a suggestion", CommandCategory.OTHER));
+        this.commandManager.registerCommand(new StopCommand("stop", "Stops the bot", CommandCategory.GENERAL));
+        this.commandManager.registerCommand(new MemeCommand("meme", "Shows you a meme", CommandCategory.FUN));
     }
 
     /**
@@ -353,6 +353,7 @@ public class Hytora {
             this.jsonConfig = new JsonEntity(reader);
             return !this.jsonConfig.isEmpty();
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -389,9 +390,9 @@ public class Hytora {
             }
 
             this.discord = api.build(); //Building
-
             return true; //everything went well
         } catch (LoginException e) {
+            e.printStackTrace();
             return false;
         }
     }

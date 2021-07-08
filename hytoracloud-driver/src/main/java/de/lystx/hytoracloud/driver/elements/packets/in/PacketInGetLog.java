@@ -4,6 +4,8 @@ import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -15,20 +17,23 @@ import java.io.Serializable;
  * and return the link of it
  */
 @Getter @AllArgsConstructor
-public class PacketInGetLog extends Packet implements Serializable {
+public class PacketInGetLog extends HytoraPacket implements Serializable {
 
     private String service;
     private String player;
 
     @Override
-    public void read(PacketBuffer buf) {
-        service = buf.readString();
-        player = buf.readString();
+    public void write(Component component) {
+        component.append(map -> {
+            map.put("s", service);
+            map.put("p", player);
+        });
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        buf.writeString(service);
-        buf.writeString(player);
+    public void read(Component component) {
+
+        service = component.getString("s");
+        player = component.getString("p");
     }
 }

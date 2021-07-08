@@ -28,7 +28,8 @@ public class PlayerChatListener implements Listener {
             }
             CloudDriver.getInstance().execute(() -> CloudDriver.getInstance().getInstance(CommandService.class).execute(cloudPlayer, true, event.getMessage()));
         }
-        CloudDriver.getInstance().sendPacket(new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
+        //TODO: CHECK SEND COMMAND
+       // CloudDriver.getInstance().sendPacket(new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 
 

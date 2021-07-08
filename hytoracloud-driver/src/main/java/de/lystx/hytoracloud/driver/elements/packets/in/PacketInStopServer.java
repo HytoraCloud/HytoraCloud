@@ -5,23 +5,24 @@ import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.Serializable;
 
 
 @AllArgsConstructor @Getter
-public class PacketInStopServer extends Packet implements Serializable {
+public class PacketInStopServer extends HytoraPacket implements Serializable {
 
     private Service service;
 
     @Override
-    public void read(PacketBuffer buf) {
-        service = Service.readFromBuf(buf);
+    public void write(Component component) {
+        component.put("s", service);
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        service.writeToBuf(buf);
+    public void read(Component component) {
+        service = (Service) component.getObject("s");
     }
-
 }

@@ -1,9 +1,13 @@
 package de.lystx.hytoracloud.driver.service.console.progressbar;
 
 
+import de.lystx.hytoracloud.driver.enums.Color;
+
 public enum ProgressBarStyle {
 
     COLORFUL_UNICODE_BLOCK("\r", "\u001b[33m│", "│\u001b[0m", '█', ' ', " ▏▎▍▌▋▊▉"),
+
+    COLOR("\r", Color.YELLOW + "│", "│" + Color.RESET, '█', ' ', " ▏▎▍▌▋▊▉"),
 
     UNICODE_BLOCK("\r", "│", "│", '█', ' ', " ▏▎▍▌▋▊▉"),
 

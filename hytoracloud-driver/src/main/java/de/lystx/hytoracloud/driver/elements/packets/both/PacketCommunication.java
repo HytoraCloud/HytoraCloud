@@ -4,6 +4,8 @@ import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
 import lombok.Getter;
 import lombok.Setter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.Serializable;
 
@@ -15,7 +17,7 @@ import java.io.Serializable;
  * Network...
  */
 @Getter @Setter
-public abstract class PacketCommunication extends Packet implements Serializable {
+public abstract class PacketCommunication extends HytoraPacket implements Serializable {
 
     private boolean sendBack;
 
@@ -34,12 +36,12 @@ public abstract class PacketCommunication extends Packet implements Serializable
     }
 
     @Override
-    public void read(PacketBuffer buf) {
-        sendBack = buf.readBoolean();
+    public void read(Component component) {
+        sendBack = component.getBoolean("b");
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        buf.writeBoolean(sendBack);
+    public void write(Component component) {
+        component.append(map -> map.put("b", sendBack));
     }
 }

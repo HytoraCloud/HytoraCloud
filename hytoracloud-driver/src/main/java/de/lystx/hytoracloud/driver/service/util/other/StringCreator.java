@@ -117,4 +117,8 @@ public class StringCreator implements Iterable<String> {
     public Iterator<String> iterator() {
         return this.lines.iterator();
     }
+
+    public void clear() {
+        this.lines.clear();
+    }
 }

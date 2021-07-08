@@ -2,6 +2,7 @@ package net.hytora.discordbot.manager.command;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.*;
+import net.hytora.discordbot.Hytora;
 
 public abstract class CommandHandler {
 
@@ -37,5 +38,9 @@ public abstract class CommandHandler {
 
     public CommandCategory getCategory() {
         return category;
+    }
+
+    protected String getPrefix() {
+        return Hytora.getHytora().getCommandManager().getPrefix();
     }
 }

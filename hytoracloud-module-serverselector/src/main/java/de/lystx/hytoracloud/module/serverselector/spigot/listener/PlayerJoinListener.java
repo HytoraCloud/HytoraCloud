@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.listener;
 
-import de.lystx.hytoracloud.bridge.bukkit.CloudServer;
+import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
@@ -41,7 +41,7 @@ public class PlayerJoinListener implements Listener {
                     System.out.println("[CloudAPI] Couldn't update Nametag for " + player.getName() + "! His PermissionGroup couldn't be found!");
                     return;
                 }
-                CloudServer.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), player.getName());
+                HytoraCloudBukkitBridge.getInstance().getNametagManager().setNametag(group.getPrefix(), group.getSuffix(), group.getId(), player.getName());
             }
         }
     }

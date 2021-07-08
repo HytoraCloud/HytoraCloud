@@ -80,7 +80,6 @@ public class Ticket {
                         Hytora.getHytora().getTicketManager().claimTicket(Ticket.this, a.getUser());
                     }
                 }).submit()
-
                 ).queue();
         this.getChannel().sendMessage(role.getAsMention()).queue(message1 -> message1.delete().queue());
     }

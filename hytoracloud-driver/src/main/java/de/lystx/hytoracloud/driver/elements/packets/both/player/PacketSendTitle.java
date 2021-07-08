@@ -4,6 +4,7 @@ import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
 
 @Getter @AllArgsConstructor
 public class PacketSendTitle extends PacketCommunication {
@@ -14,20 +15,23 @@ public class PacketSendTitle extends PacketCommunication {
 
 
     @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        name = buf.readString();
-        title = buf.readString();
-        subtitle = buf.readString();
+        name = component.getString("name");
+        title = component.getString("title");
+        subtitle = component.getString("subtitle");
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void write(Component component) {
+        super.write(component);
 
-        buf.writeString(name);
-        buf.writeString(title);
-        buf.writeString(subtitle);
+        component.append(map -> {
+            map.put("name", name);
+            map.put("title", title);
+            map.put("subtitle", subtitle);
+        });
     }
+
 }

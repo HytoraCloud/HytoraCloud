@@ -76,11 +76,11 @@ public class ServiceStarter {
      * @return boolean to work with
      */
     public boolean checkForSpigot() {
-        if (!new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "spigot.jar").exists() || !new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar").exists()) {
+        if (!new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "spigot.jar").exists() || !new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "proxy.jar").exists()) {
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("ERROR", "§cCouldn't start Service §e" + service.getName() + " §cbecause either §espigot.jar §cor §ebungeeCord.jar §cwas found!");
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Downloading §7default §9BungeeCord §7and default §eSpigot-1.8.8§h...");
 
-            CloudDriver.getInstance().getInstance(FileService.class).download(ProxyVersion.BUNGEECORD.getUrl(), new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "bungeeCord.jar"));
+            CloudDriver.getInstance().getInstance(FileService.class).download(ProxyVersion.BUNGEECORD.getUrl(), new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"));
             CloudDriver.getInstance().getInstance(FileService.class).download(SpigotVersion.V1_8_8.getUrl(), new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"));
             return false;
         }
@@ -174,7 +174,7 @@ public class ServiceStarter {
                     "servers:\n" +
                     "  Lobby-1:\n" +
                     "    motd: '" + "MOTD" + "'\n" +
-                    "    address: '127.0.0.1:" + CloudDriver.getInstance().getNetworkConfig().getNetworkConfig().getServerStartPort() + "'\n" +
+                    "    address: '127.0.0.1:" + CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().getServerStartPort() + "'\n" +
                     "    restricted: false\n" +
                     "listeners:\n" +
                     "  - query_port: 25577\n" +
@@ -191,7 +191,7 @@ public class ServiceStarter {
                     "    tab_size: 60\n" +
                     "    ping_passthrough: false\n" +
                     "    force_default_server: false\n" +
-                    "    proxy_protocol: " + CloudDriver.getInstance().getNetworkConfig().getNetworkConfig().isProxyProtocol() + "\n" +
+                    "    proxy_protocol: " + CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().isProxyProtocol() + "\n" +
                     "ip_forward: true\n" +
                     "network_compression_threshold: 256\n" +
                     "groups:\n" +
@@ -286,7 +286,7 @@ public class ServiceStarter {
      * @return string file name
      */
     public String getJarFile() {
-        return this.serviceGroup.getServiceType() == ServiceType.PROXY ? "bungeeCord.jar" : "spigot.jar";
+        return this.serviceGroup.getServiceType() == ServiceType.PROXY ? "proxy.jar" : "spigot.jar";
     }
 
     /**

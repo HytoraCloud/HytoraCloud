@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.driver.enums.ServiceState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface IServiceManager {
 
@@ -136,6 +137,7 @@ public interface IServiceManager {
      * @return service or null if not found
      */
     Service getService(String name);
+
 
     /**
      * Gets a {@link Service} as proxy by its port

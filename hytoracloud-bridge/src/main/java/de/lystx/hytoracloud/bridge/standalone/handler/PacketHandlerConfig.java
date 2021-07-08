@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.standalone.handler;
 
-import de.lystx.hytoracloud.bridge.standalone.manager.DefaultServiceManager;
+import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgeServiceManager;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketUpdateNetworkConfig;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutGlobalInfo;
 import io.thunder.packet.Packet;
@@ -18,7 +18,7 @@ public class PacketHandlerConfig implements PacketHandler {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo packetOutGlobalInfo = ((PacketOutGlobalInfo)packet);
             CloudDriver.getInstance().getImplementedData().put("networkConfig", packetOutGlobalInfo.getNetworkConfig());
-            ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceMap(packetOutGlobalInfo.getServices());
+            ((CloudBridgeServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceMap(packetOutGlobalInfo.getServices());
 
         } else if (packet instanceof PacketUpdateNetworkConfig) {
             PacketUpdateNetworkConfig packetUpdateNetworkConfig = (PacketUpdateNetworkConfig)packet;

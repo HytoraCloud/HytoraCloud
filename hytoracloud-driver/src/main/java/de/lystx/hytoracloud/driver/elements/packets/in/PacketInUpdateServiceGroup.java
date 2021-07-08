@@ -5,6 +5,7 @@ import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
 
 import java.io.Serializable;
 
@@ -15,16 +16,16 @@ public class PacketInUpdateServiceGroup extends PacketCommunication implements S
 
 
     @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        serviceGroup = ServiceGroup.readFromBuf(buf);
+        serviceGroup = (ServiceGroup) component.getObject("g");
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void write(Component component) {
+        super.write(component);
 
-        serviceGroup.writeToBuf(buf);
+        component.put("g", serviceGroup);
     }
 }

@@ -31,7 +31,6 @@ public class MinecraftWorld {
      */
     public List<CloudPlayer> getPlayers() {
         List<CloudPlayer> onlinePlayers = CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers();
-        onlinePlayers.removeIf(cloudPlayer -> !cloudPlayer.getWorld().get().getName().equalsIgnoreCase(this.name));
         return onlinePlayers;
     }
 }

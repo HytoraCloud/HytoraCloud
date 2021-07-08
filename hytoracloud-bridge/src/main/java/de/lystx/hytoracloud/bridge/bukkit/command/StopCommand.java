@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.bukkit.command;
 
-import de.lystx.hytoracloud.bridge.bukkit.CloudServer;
+import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
@@ -16,6 +16,6 @@ public class StopCommand {
             return;
         }
         player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7Stopping §c" + CloudDriver.getInstance().getThisService().getName() + "§8...");
-        CloudServer.getInstance().shutdown();
+        HytoraCloudBukkitBridge.getInstance().shutdown();
     }
 }

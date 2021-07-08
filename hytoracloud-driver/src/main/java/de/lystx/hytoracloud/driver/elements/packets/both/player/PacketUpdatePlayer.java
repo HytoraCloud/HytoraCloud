@@ -1,30 +1,31 @@
 package de.lystx.hytoracloud.driver.elements.packets.both.player;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
+import net.hytora.networking.elements.component.Component;
 
-@Getter @AllArgsConstructor
+
+@Getter @AllArgsConstructor @Setter
 public class PacketUpdatePlayer extends PacketCommunication {
 
     private CloudPlayer cloudPlayer;
 
 
     @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        cloudPlayer = JsonEntity.fromClass(buf.readString(), CloudPlayer.class);
+        cloudPlayer = (CloudPlayer) component.getObject("p");
     }
-
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void write(Component component) {
+        super.write(component);
 
-        JsonEntity.toBuffer(buf, cloudPlayer);
+        component.append(map -> map.put("p", cloudPlayer));
     }
+
 }

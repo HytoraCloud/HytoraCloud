@@ -7,6 +7,7 @@ import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.hytora.networking.elements.component.Component;
 
 import java.io.Serializable;
 
@@ -16,16 +17,17 @@ public class PacketRegisterService extends PacketCommunication implements Serial
     private Service service;
 
     @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        service = Service.readFromBuf(buf);
+        service = (Service) component.getObject("s");
     }
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void write(Component component) {
+        super.write(component);
 
-        service.writeToBuf(buf);
+        component.append(map -> map.put("s", service));
     }
+
 }

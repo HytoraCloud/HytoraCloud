@@ -1,6 +1,9 @@
 package de.lystx.hytoracloud.driver.service.util.reflection;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.ProxyBridge;
+import de.lystx.hytoracloud.driver.elements.service.ServiceType;
+import de.lystx.hytoracloud.driver.enums.ProxyVersion;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
@@ -48,6 +51,45 @@ public class Reflections {
         final Method getPlayer = bukkitClass.getDeclaredMethod("getPlayer", String.class);
         getPlayer.setAccessible(true);
         return getPlayer.invoke(bukkitClass, name);
+    }
+
+
+    public static Object getPlayer(String name) {
+        if (CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType() == ServiceType.SPIGOT) {
+            return getBukkitPlayer(name);
+        } else {
+            ProxyBridge proxyBridge = CloudDriver.getInstance().getProxyBridge();
+            ProxyVersion version = proxyBridge.getVersion();
+
+            if (version.equals(ProxyVersion.BUNGEECORD) || version.equals(ProxyVersion.WATERFALL)) {
+                return getBungeePlayer(name);
+            } else if (version.equals(ProxyVersion.VELOCITY)) {
+                return getVelocityPlayer(name);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a Player Object from velocity
+     * with the name of the player
+     * via Reflections
+     * @param name the name of the player
+     * @return  player object
+     */
+    @SneakyThrows
+    public static Object getVelocityPlayer(String name) {
+        final Class<?> bridgeClass = Class.forName("de.lystx.hytoracloud.bridge.velocity.HytoraCloudVelocityBridge");
+        final Method getInstance = bridgeClass.getDeclaredMethod("getInstance"); getInstance.setAccessible(true);
+
+        final Object instance = getInstance.invoke(bridgeClass);
+
+        Method getServer = instance.getClass().getDeclaredMethod("getServer"); getServer.setAccessible(true);
+
+        Object server = getServer.invoke(instance);
+
+        final Method getPlayer = server.getClass().getDeclaredMethod("getPlayer", String.class); getPlayer.setAccessible(true);
+        return getPlayer.invoke(server, name);
     }
 
     /**

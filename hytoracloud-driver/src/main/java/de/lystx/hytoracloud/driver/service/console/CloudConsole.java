@@ -74,7 +74,15 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     }
 
     public String getPrefix() {
-        return "§h[§7" + Utils.getSimpleDateFormat().format(new Date()) + " §7| §bConsole§h] §f» §7 ";
+        return getPrefix("Console");
+    }
+
+    public String getPrefix(String s) {
+        return "§h[§7" + Utils.getSimpleDateFormat().format(new Date()) + " §7| §b" + s + "§h] §f» §7";
+    }
+
+    public String prefix(String s) {
+        return ConsoleColor.formatColorString(getPrefix(s));
     }
 
     @Override

@@ -214,18 +214,19 @@ public class SuggestionManager extends ListenerAdapter {
                 if (userByTag == null) {
                     return;
                 }
+                User user = event.getUser();
 
                 if (button.getId() != null && button.getId().startsWith("vote_up")) {
-                    if (!suggestion.getUpVotes().contains(userByTag.getId())) {
-                        suggestion.getUpVotes().add(userByTag.getId());
+                    if (!suggestion.getUpVotes().contains(user.getId())) {
+                        suggestion.getUpVotes().add(user.getId());
                     } else {
-                        suggestion.getUpVotes().remove(userByTag.getId());
+                        suggestion.getUpVotes().remove(user.getId());
                     }
                 } else {
-                    if (!suggestion.getDownVotes().contains(userByTag.getId())) {
-                        suggestion.getDownVotes().add(userByTag.getId());
+                    if (!suggestion.getDownVotes().contains(user.getId())) {
+                        suggestion.getDownVotes().add(user.getId());
                     } else {
-                        suggestion.getDownVotes().remove(userByTag.getId());
+                        suggestion.getDownVotes().remove(user.getId());
                     }
                 }
 

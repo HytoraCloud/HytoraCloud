@@ -5,6 +5,7 @@ import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
 
 import java.util.UUID;
 
@@ -16,19 +17,21 @@ public class PacketSendComponent extends PacketCommunication {
 
 
     @Override
-    public void read(PacketBuffer buf) {
-        super.read(buf);
+    public void read(Component component) {
+        super.read(component);
 
-        buf.nullSafe().writeUUID(uuid);
-        buf.writeThunderObject(cloudComponent);
+        uuid = component.getUUID("uuid");
+        cloudComponent = (CloudComponent) component.getObject("c");
     }
-
 
     @Override
-    public void write(PacketBuffer buf) {
-        super.write(buf);
+    public void write(Component component) {
+        super.write(component);
 
-        uuid = buf.nullSafe().readUUID();
-        cloudComponent = buf.readThunderObject(CloudComponent.class);
+        component.append(map -> {
+           map.put("uuid", uuid);
+           map.put("c", cloudComponent);
+        });
     }
+
 }
