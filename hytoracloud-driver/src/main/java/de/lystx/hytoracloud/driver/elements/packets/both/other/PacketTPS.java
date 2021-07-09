@@ -20,9 +20,9 @@ public class PacketTPS extends PacketCommunication implements Serializable {
     public void read(Component component) {
         super.read(component);
 
-        player = component.getString("player");
-        service = (Service) component.getObject("service");
-        tps = component.getString("tps");
+        player = component.get("player");
+        service = (Service) component.get("service");
+        tps = component.get("tps");
     }
 
 

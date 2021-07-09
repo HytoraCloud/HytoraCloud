@@ -2,14 +2,12 @@ package de.lystx.hytoracloud.bridge.standalone.manager;
 
 import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.packets.result.ResultPacketCloudPlayer;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.service.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
 import io.thunder.packet.Packet;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import io.thunder.packet.impl.response.Response;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -114,11 +112,11 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     }
 
     public CloudPlayer getPlayer(String name) {
-        return CloudDriver.getInstance().getResponse(new ResultPacketCloudPlayer(name)).get(0).asCustom(CloudPlayer.class);
+        return null;
     }
 
     public CloudPlayer getPlayer(UUID uniqueId) {
-        return CloudDriver.getInstance().getResponse(new ResultPacketCloudPlayer(uniqueId)).get(0).asCustom(CloudPlayer.class);
+        return null;
     }
 
 
@@ -140,12 +138,7 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
      * @param name
      */
     public void getAsync(String name, Consumer<CloudPlayer> consumer) {
-        try {
-            Response response = CloudDriver.getInstance().getResponse(new ResultPacketCloudPlayer(name));
-            consumer.accept(response.get(0).asCustom(CloudPlayer.class));
-        } catch (NullPointerException e) {
-            consumer.accept(null);
-        }
+
     }
 
     /**
@@ -156,12 +149,7 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
      * @param uuid
      */
     public void getAsync(UUID uuid, Consumer<CloudPlayer> consumer) {
-        try {
-            Response response = CloudDriver.getInstance().getResponse(new ResultPacketCloudPlayer(uuid));
-            consumer.accept(response.get(0).asCustom(CloudPlayer.class));
-        } catch (NullPointerException e) {
-            consumer.accept(null);
-        }
+
     }
 
     @NotNull

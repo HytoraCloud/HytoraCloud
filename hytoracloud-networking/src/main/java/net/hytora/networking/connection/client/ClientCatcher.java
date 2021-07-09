@@ -1,9 +1,8 @@
 package net.hytora.networking.connection.client;
 
 
-import net.hytora.networking.elements.component.ReplyComponent;
+import net.hytora.networking.elements.component.RepliableComponent;
 import net.hytora.networking.elements.other.TimedHashMap;
-import net.hytora.networking.elements.component.ClientComponent;
 import net.hytora.networking.elements.component.Component;
 
 import lombok.Getter;
@@ -18,7 +17,7 @@ public class ClientCatcher {
     /**
      * All the message events and their handlers
      */
-    private final Map<String, Set<Consumer<ReplyComponent>>> channelHandlers;
+    private final Map<String, Set<Consumer<RepliableComponent>>> channelHandlers;
 
     /**
      * All the login handlers
@@ -65,8 +64,8 @@ public class ClientCatcher {
      * @param channel the channel
      * @param consumer the consumer
      */
-    public void registerChannelHandler(String channel, Consumer<ReplyComponent> consumer) {
-        Set<Consumer<ReplyComponent>> candidate = channelHandlers.get(channel);
+    public void registerChannelHandler(String channel, Consumer<RepliableComponent> consumer) {
+        Set<Consumer<RepliableComponent>> candidate = channelHandlers.get(channel);
         if (candidate != null) {
             candidate.add(consumer);
         } else {
@@ -103,10 +102,10 @@ public class ClientCatcher {
      * @param hytoraComponent the component
      */
     public void handleComponent(HytoraClient client, Component hytoraComponent) {
-        Set<Consumer<ReplyComponent>> candidates = channelHandlers.get(hytoraComponent.getChannel());
+        Set<Consumer<RepliableComponent>> candidates = channelHandlers.get(hytoraComponent.getChannel());
         if (candidates != null) {
-            for (Consumer<ReplyComponent> consumer : candidates) {
-                consumer.accept(new ClientComponent(client, hytoraComponent));
+            for (Consumer<RepliableComponent> consumer : candidates) {
+                consumer.accept(new RepliableComponent(client, hytoraComponent));
             }
         }
     }
@@ -117,10 +116,10 @@ public class ClientCatcher {
      * @param hytoraReply the reply as component
      */
     public void handleReply(Component hytoraReply) {
-        BiConsumer<Component, Boolean> candidate = replyHandlers.get(hytoraReply.getIdRequest());
+        BiConsumer<Component, Boolean> candidate = replyHandlers.get(hytoraReply.getRequestID());
         if (candidate != null) {
             candidate.accept(hytoraReply, true);
-            replyHandlers.remove(hytoraReply.getIdRequest());
+            replyHandlers.remove(hytoraReply.getRequestID());
         }
     }
 }

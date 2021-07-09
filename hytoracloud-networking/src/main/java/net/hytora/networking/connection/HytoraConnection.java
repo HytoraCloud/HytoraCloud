@@ -1,33 +1,19 @@
 package net.hytora.networking.connection;
 
 import net.hytora.networking.connection.server.HytoraServer;
+import net.hytora.networking.elements.other.ComponentSender;
 import net.hytora.networking.elements.packet.PacketManager;
-import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.other.UserManager;
 
 import java.io.Closeable;
+import java.net.InetSocketAddress;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public interface HytoraConnection extends Closeable {
-
-    /**
-     * Sends a {@link Component} to the other
-     * connection end (Server -> client | Client -> Server)
-     *
-     * @param consumer the consumer
-     */
-    void sendComponent(Consumer<Component> consumer);
-
-    /**
-     * Sends a {@link Component} raw without consumer
-     *
-     * @param component the component
-     */
-    void sendComponent(Component component);
+public interface HytoraConnection extends ComponentSender, Closeable {
 
     /**
      * Sends a {@link Component} to the server
@@ -65,28 +51,6 @@ public interface HytoraConnection extends Closeable {
      */
     Future<HytoraConnection> createConnection();
 
-    /**
-     * Sends a {@link HytoraPacket} to the other
-     * connection end (Server -> client | Client -> Server)
-     *
-     * @param packet the packet to send
-     */
-    default void sendPacket(HytoraPacket packet) {
-        this.sendComponent(component -> {
-            component.setChannel("_packets");
-            component.append(map -> {
-                map.put("_class", packet.getClass().getName());
-                map.put("_uuid", packet.getPacketUUID());
-                map.put("_ms", System.currentTimeMillis());
-            });
-
-            if (this instanceof HytoraServer) {
-                component.setRecipient("all");
-            }
-
-            packet.write(component);
-        });
-    }
 
     /**
      * The {@link PacketManager} to manage
@@ -95,6 +59,13 @@ public interface HytoraConnection extends Closeable {
      * @return manager
      */
     PacketManager getPacketManager();
+
+    /**
+     * The address the connection
+     * belongs to or is connected to
+     * @return address
+     */
+    InetSocketAddress remoteAddress();
 
     /**
      * The {@link UserManager} to manage
@@ -121,4 +92,11 @@ public interface HytoraConnection extends Closeable {
     default void unregisterPacketHandler(PacketHandler packetHandler) {
         this.getPacketManager().getPacketHandlers().remove(packetHandler);
     }
+
+    /**
+     * If connection is still connected
+     *
+     * @return boolean
+     */
+    boolean isConnected();
 }

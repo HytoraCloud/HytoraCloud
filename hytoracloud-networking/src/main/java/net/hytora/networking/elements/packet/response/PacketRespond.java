@@ -35,8 +35,8 @@ public class PacketRespond extends HytoraPacket {
 
     @Override
     public void read(Component component) {
-        message = component.getString("message");
-        status = ResponseStatus.valueOf(component.getString("status"));
-        hytoraComponent = (Component) component.getObject("component");
+        message = component.get("message");
+        status = ResponseStatus.valueOf(component.get("status"));
+        hytoraComponent = (Component) component.get("component");
     }
 }

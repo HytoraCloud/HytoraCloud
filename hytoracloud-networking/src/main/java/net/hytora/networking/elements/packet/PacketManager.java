@@ -51,10 +51,10 @@ public class PacketManager {
 
         if (component.has("_class")) {
 
-            String aClass = component.getString("_class");
+            String aClass = component.get("_class");
             Class<? extends HytoraPacket> packetClass = (Class<? extends HytoraPacket>) Class.forName(aClass);
-            long ms = component.getLong("_ms");
-            UUID uniqueId = (UUID) component.getObject("_uuid");
+            long ms = component.get("_ms");
+            UUID uniqueId = component.get("_uuid");
 
             //Removing unnecessary values the people dont need
             component.remove("_class");

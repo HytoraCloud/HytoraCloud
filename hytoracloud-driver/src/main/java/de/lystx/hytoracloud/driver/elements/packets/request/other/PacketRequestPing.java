@@ -28,7 +28,7 @@ public class PacketRequestPing extends HytoraPacket {
 
     @Override
     public void read(Component component) {
-        uuid = component.getUUID("uuid");
-        key = component.getString("key");
+        uuid = component.get("uuid");
+        key = component.get("key");
     }
 }

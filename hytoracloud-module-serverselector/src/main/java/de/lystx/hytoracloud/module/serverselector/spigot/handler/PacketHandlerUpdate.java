@@ -4,14 +4,14 @@ import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketServiceUp
 
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 public class PacketHandlerUpdate implements PacketHandler {
 
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketServiceUpdate) {
             PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;
             Service service = packetServiceUpdate.getService();

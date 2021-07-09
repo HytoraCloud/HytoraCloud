@@ -9,8 +9,10 @@ import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutRegisterServer;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStartedServer;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStopServer;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
+
 
 public class PacketHandlerNetwork implements PacketHandler {
 
@@ -58,7 +60,7 @@ public class PacketHandlerNetwork implements PacketHandler {
     }
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketCallEvent) {
             this.handleEvent((PacketCallEvent) packet);
         }

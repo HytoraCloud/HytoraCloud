@@ -3,14 +3,15 @@ package net.hytora.networking.connection.server;
 import lombok.SneakyThrows;
 import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.connection.HytoraConnectionBridge;
-import net.hytora.networking.elements.component.ReplyComponent;
-import net.hytora.networking.elements.component.ServerComponent;
+import net.hytora.networking.elements.component.RepliableComponent;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.other.UserManager;
 import net.hytora.networking.elements.component.Component;
 
 import lombok.Getter;
 
+import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -126,6 +127,11 @@ public class HytoraServer implements HytoraConnection {
         return future;
     }
 
+    @Override
+    public InetSocketAddress remoteAddress() {
+        return new InetSocketAddress(this.port);
+    }
+
     /**
      * Sends an object to one client instance or all
      *
@@ -134,21 +140,26 @@ public class HytoraServer implements HytoraConnection {
     @SneakyThrows
     public void sendComponent(Component component) {
 
-        if (component.getRecipient().equalsIgnoreCase("ALL")) {
+        if (component.getReceiver().equalsIgnoreCase("ALL")) {
             for (HytoraConnectionBridge user : this.userManager.getConnectedUsers()) {
                 synchronized (user.getSyncOut()) {
                     user.getObjectOutputStream().writeObject(component);
                     user.getObjectOutputStream().flush();
                 }
             }
-        } else if (!component.getRecipient().equalsIgnoreCase("SERVER")) {
-            for (HytoraConnectionBridge user : this.userManager.getUsers(component.getRecipient())) {
+        } else if (!component.getReceiver().equalsIgnoreCase("SERVER")) {
+            for (HytoraConnectionBridge user : this.userManager.getUsers(component.getReceiver())) {
                 synchronized (user.getSyncOut()) {
                     user.getObjectOutputStream().writeObject(component);
                     user.getObjectOutputStream().flush();
                 }
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return "HytoraServer@" + port;
     }
 
     /**
@@ -161,10 +172,14 @@ public class HytoraServer implements HytoraConnection {
      * @param delay the timeout delay
      * @param replyConsumer the callback for the reply
      */
+    @SneakyThrows
     public void sendComponent(Component hytoraComponent, int delay, BiConsumer<Component, Boolean> replyConsumer) {
 
-        hytoraComponent.setIdRequest(random.nextLong());
-        this.catcher.registerReplyHandler(hytoraComponent.getIdRequest(), delay, replyConsumer);
+        Field requestID = hytoraComponent.getClass().getDeclaredField("requestID");
+        requestID.setAccessible(true);
+        requestID.set(hytoraComponent, this.random.nextLong());
+
+        this.catcher.registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
 
         this.sendComponent(hytoraComponent);
     }
@@ -182,7 +197,7 @@ public class HytoraServer implements HytoraConnection {
     public void sendComponent(Consumer<Component> componentConsumer, int delay, BiConsumer<Component, Boolean> replyConsumer) {
 
         Component hytoraComponent = new Component();
-        hytoraComponent.setRecipient("ALL");
+        hytoraComponent.setReceiver("ALL");
         componentConsumer.accept(hytoraComponent);
 
         this.sendComponent(hytoraComponent, delay, replyConsumer);
@@ -200,7 +215,7 @@ public class HytoraServer implements HytoraConnection {
     public void sendComponent(Consumer<Component> consumer)  {
 
         Component hytoraComponent = new Component();
-        hytoraComponent.setRecipient("ALL");
+        hytoraComponent.setReceiver("ALL");
         consumer.accept(hytoraComponent);
 
         this.sendComponent(hytoraComponent);
@@ -212,7 +227,7 @@ public class HytoraServer implements HytoraConnection {
      * @param channel the name of the channel
      * @param consumer the consumer
      */
-    public void registerChannelHandler(String channel, Consumer<ReplyComponent> consumer) {
+    public void registerChannelHandler(String channel, Consumer<RepliableComponent> consumer) {
         this.catcher.registerChannelHandler(channel, consumer);
     }
 
@@ -247,7 +262,10 @@ public class HytoraServer implements HytoraConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
+    @Override
+    public boolean isConnected() {
+        return opened;
+    }
 }

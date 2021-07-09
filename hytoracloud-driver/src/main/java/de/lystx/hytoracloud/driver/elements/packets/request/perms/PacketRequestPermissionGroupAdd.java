@@ -5,12 +5,14 @@ import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.util.UUID;
 
 
 @AllArgsConstructor @Getter
-public class PacketRequestPermissionGroupAdd extends Packet {
+public class PacketRequestPermissionGroupAdd extends HytoraPacket {
 
     private UUID playerUUID;
     private String group;
@@ -18,18 +20,18 @@ public class PacketRequestPermissionGroupAdd extends Packet {
     private PermissionValidity validality;
 
     @Override
-    public void write(PacketBuffer buf) {
-        buf.writeUUID(playerUUID);
-        buf.writeString(group);
-        buf.writeInt(i);
-        buf.writeEnum(validality);
+    public void write(Component component) {
+        component.put("uuid", playerUUID);
+        component.put("group", group);
+        component.put("i", i);
+        component.put("valid", validality);
     }
 
     @Override
-    public void read(PacketBuffer buf) {
-        playerUUID = buf.readUUID();
-        group = buf.readString();
-        i = buf.readInt();
-        validality = buf.readEnum(PermissionValidity.class);
+    public void read(Component component) {
+        playerUUID = component.get("uuid");
+        group = component.get("group");
+        i = component.get("i");
+        validality = component.get("valid");
     }
 }

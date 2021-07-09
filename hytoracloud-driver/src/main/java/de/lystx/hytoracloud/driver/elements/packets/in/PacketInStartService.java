@@ -26,7 +26,7 @@ public class PacketInStartService extends HytoraPacket implements Serializable {
 
     @Override
     public void read(Component component) {
-        service = (Service) component.getObject("s");
-        properties = (JsonObject) new JsonParser().parse(component.getString("json"));
+        service = (Service) component.get("s");
+        properties = (JsonObject) new JsonParser().parse((String) component.get("json"));
     }
 }

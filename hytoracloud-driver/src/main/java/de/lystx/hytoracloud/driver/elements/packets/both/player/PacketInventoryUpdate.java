@@ -20,8 +20,8 @@ public class PacketInventoryUpdate extends PacketCommunication implements Serial
     public void read(Component component) {
         super.read(component);
 
-        cloudPlayer = (CloudPlayer) component.getObject("cloudPlayer");
-        playerInventory = (CloudPlayerInventory) component.getObject("inv");
+        cloudPlayer = (CloudPlayer) component.get("cloudPlayer");
+        playerInventory = (CloudPlayerInventory) component.get("inv");
     }
 
     @Override

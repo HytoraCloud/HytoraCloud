@@ -6,27 +6,29 @@ import io.thunder.packet.Packet;
 import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.util.UUID;
 
 @AllArgsConstructor @Getter
-public class PacketRequestAddProperty extends Packet {
+public class PacketRequestAddProperty extends HytoraPacket {
 
     private UUID playerUUID;
     private String name;
     private JsonObject property;
 
     @Override
-    public void write(PacketBuffer buf) {
-        buf.writeUUID(playerUUID);
-        buf.writeString(name);
-        buf.writeString(property.toString());
+    public void write(Component component) {
+        component.put("uuid", playerUUID);
+        component.put("name", name);
+        component.put("property", property.toString());
     }
 
     @Override
-    public void read(PacketBuffer buf) {
-        playerUUID = buf.readUUID();
-        name = buf.readString();
-        property = (JsonObject) new JsonParser().parse(buf.readString());
+    public void read(Component component) {
+        playerUUID = component.get("uuid");
+        name = component.get("name");
+        property = (JsonObject) new JsonParser().parse((String) component.get("property"));
     }
 }

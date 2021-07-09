@@ -1,3 +1,5 @@
+package packets;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,7 @@ public class ExamplePacket extends HytoraPacket {
 
     @Override
     public void read(Component component) {
-        name = component.getString("name");
-        age = component.getInteger("age");
+        name = component.get("name");
+        age = component.get("age");
     }
 }

@@ -4,8 +4,6 @@ import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.PacketHandlerCopyTemplate;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.PacketHandlerCreateTemplate;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.PacketHandlerGroupUpdate;
-//import de.lystx.cloudsystem.cloud.handler.managing.*;
-//import de.lystx.cloudsystem.cloud.handler.other.*;
 import de.lystx.hytoracloud.launcher.cloud.handler.managing.PacketHandlerConfig;
 import de.lystx.hytoracloud.launcher.cloud.handler.managing.PacketHandlerMessage;
 import de.lystx.hytoracloud.launcher.cloud.handler.managing.PacketHandlerPermissionPool;
@@ -63,7 +61,7 @@ public class CloudBootingSetupDone {
 
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerRegister());
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerStopServer(cloudSystem));
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerCloudPlayer(cloudSystem));
+        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerCloudPlayer());
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerStart(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerReload(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerShutdown(cloudSystem));

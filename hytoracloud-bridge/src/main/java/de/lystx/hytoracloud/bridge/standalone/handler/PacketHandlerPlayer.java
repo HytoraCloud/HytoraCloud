@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.bridge.standalone.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketUpdatePlayer;
-import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutPlayers;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
+
 
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import lombok.SneakyThrows;
@@ -16,7 +16,7 @@ import java.util.List;
 public class PacketHandlerPlayer implements PacketHandler {
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
 
         if (packet instanceof PacketOutPlayers) {
 

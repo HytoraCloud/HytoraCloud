@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.launcher.receiver.handler;
 import de.lystx.hytoracloud.driver.elements.packets.receiver.PacketReceiverLoginResult;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
 
@@ -16,8 +16,9 @@ public class ReceiverPacketHandlerLogin implements PacketHandler {
 
     private final Receiver receiver;
 
+
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketReceiverLoginResult) {
             PacketReceiverLoginResult packetReceiverLoginResult = (PacketReceiverLoginResult)packet;
             if (packetReceiverLoginResult.getReceiverInfo().getName().equalsIgnoreCase(this.receiver.getInstance(ConfigService.class).getReceiverInfo().getName())) {

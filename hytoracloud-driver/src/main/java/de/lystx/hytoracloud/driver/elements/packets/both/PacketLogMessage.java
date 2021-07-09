@@ -28,9 +28,9 @@ public class PacketLogMessage extends PacketCommunication implements Serializabl
     public void read(Component component) {
         super.read(component);
 
-        prefix = component.getString("p");
-        message = component.getString("m");
-        showUpInConsole = component.getBoolean("s");
+        prefix = component.get("p");
+        message = component.get("m");
+        showUpInConsole = component.get("s");
     }
 
     @Override

@@ -13,12 +13,12 @@ import de.lystx.hytoracloud.driver.service.database.IDatabase;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.service.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.service.player.impl.*;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
 import lombok.Setter;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -43,7 +43,7 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
         this.onlinePlayers = new LinkedList<>();
         this.database = this.getDriver().getDatabaseManager().getDatabase();
 
-        CloudDriver.getInstance().executeIf(() -> CloudDriver.getInstance().getConnection().addPacketHandler(DefaultCloudPlayerManager.this), () -> CloudDriver.getInstance().getConnection() != null);
+        CloudDriver.getInstance().executeIf(() -> CloudDriver.getInstance().getConnection().registerPacketHandler(DefaultCloudPlayerManager.this), () -> CloudDriver.getInstance().getConnection() != null);
         if (this.getDriver().getParent().getWebServer() == null) {
             return;
         }
@@ -217,7 +217,8 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
     }
 
     @Override
-    public void handle(Packet packet) {if (packet instanceof PacketUnregisterPlayer) {
+    public void handle(HytoraPacket packet) {
+        if (packet instanceof PacketUnregisterPlayer) {
 
             PacketUnregisterPlayer player = (PacketUnregisterPlayer)packet;
             CloudPlayer cloudPlayer = this.getCachedPlayer(player.getName());

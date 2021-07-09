@@ -36,6 +36,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
 
@@ -342,8 +343,10 @@ public class HytoraCloudBungeeCordBridge extends Plugin {
     }
 
     public void shutdown() {
-        if (CloudDriver.getInstance().getConnection().isConnected()) {
-            CloudDriver.getInstance().getConnection().disconnect();
+        try {
+            CloudDriver.getInstance().getConnection().close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

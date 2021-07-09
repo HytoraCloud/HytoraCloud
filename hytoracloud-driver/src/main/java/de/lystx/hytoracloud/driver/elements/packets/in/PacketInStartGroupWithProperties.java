@@ -26,7 +26,7 @@ public class PacketInStartGroupWithProperties extends HytoraPacket implements Se
 
     @Override
     public void read(Component component) {
-        serviceGroup = (ServiceGroup) component.getObject("group");
-        properties = (JsonObject) new JsonParser().parse(component.getString("json"));
+        serviceGroup = (ServiceGroup) component.get("group");
+        properties = (JsonObject) new JsonParser().parse((String) component.get("json"));
     }
 }

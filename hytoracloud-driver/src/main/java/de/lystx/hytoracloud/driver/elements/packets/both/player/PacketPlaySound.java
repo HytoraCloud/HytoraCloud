@@ -19,10 +19,10 @@ public class PacketPlaySound extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        name = component.getString("name");
-        sound = component.getString("sound");
-        v1 = Float.parseFloat(component.getString("v1"));
-        v2 = Float.parseFloat(component.getString("v2"));
+        name = component.get("name");
+        sound = component.get("sound");
+        v1 = Float.parseFloat(component.get("v1"));
+        v2 = Float.parseFloat(component.get("v2"));
     }
 
     @Override

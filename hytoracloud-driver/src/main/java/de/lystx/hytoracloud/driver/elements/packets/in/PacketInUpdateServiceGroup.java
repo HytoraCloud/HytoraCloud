@@ -19,7 +19,7 @@ public class PacketInUpdateServiceGroup extends PacketCommunication implements S
     public void read(Component component) {
         super.read(component);
 
-        serviceGroup = (ServiceGroup) component.getObject("g");
+        serviceGroup = (ServiceGroup) component.get("g");
     }
 
     @Override

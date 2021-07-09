@@ -17,7 +17,7 @@ public class PacketUnregisterPlayer extends PacketCommunication implements Seria
     public void read(Component component) {
         super.read(component);
 
-        name = component.getString("name");
+        name = component.get("name");
     }
 
     @Override

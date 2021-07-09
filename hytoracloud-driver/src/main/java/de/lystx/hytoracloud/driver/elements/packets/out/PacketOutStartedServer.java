@@ -23,6 +23,6 @@ public class PacketOutStartedServer extends HytoraPacket implements Serializable
 
     @Override
     public void read(Component component) {
-        service = component.getString("s");
+        service = component.get("s");
     }
 }

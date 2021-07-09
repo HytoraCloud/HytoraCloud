@@ -5,9 +5,10 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 
-import io.thunder.packet.Packet;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 public class ProxyHandlerConfig implements PacketHandler {
 
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         ProxyBridge proxyBridge = CloudBridge.getInstance().getProxyBridge();
 
         if (packet instanceof PacketOutGlobalInfo) {

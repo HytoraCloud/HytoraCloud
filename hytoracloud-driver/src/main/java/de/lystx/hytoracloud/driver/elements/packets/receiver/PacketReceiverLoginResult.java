@@ -31,7 +31,7 @@ public class PacketReceiverLoginResult extends HytoraPacket implements Serializa
     public void read(Component component) {
 
         receiverInfo = component.get("r");
-        decision = Decision.valueOf(component.getString("d"));
+        decision = Decision.valueOf(component.get("d"));
         serviceGroups = component.get("s");
     }
 }

@@ -45,7 +45,7 @@ public class ServiceCommand {
                         player.sendMessage("  §8» §bID §8┃ §7" + CloudDriver.getInstance().getThisService().getServiceID());
                         player.sendMessage("  §8» §bUUID §8┃ §7" + CloudDriver.getInstance().getThisService().getUniqueId());
                         player.sendMessage("  §8» §bPort §8┃ §7" + CloudDriver.getInstance().getThisService().getPort());
-                        player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudDriver.getInstance().getConnection().getChannel().remoteAddress().toString());
+                        player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudDriver.getInstance().getConnection().remoteAddress().toString());
                         player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudDriver.getInstance().getHost());
                         player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getThisService().getServiceGroup().getTemplate().getName());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");

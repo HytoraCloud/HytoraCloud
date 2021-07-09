@@ -18,9 +18,9 @@ public class PacketSendTitle extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        name = component.getString("name");
-        title = component.getString("title");
-        subtitle = component.getString("subtitle");
+        name = component.get("name");
+        title = component.get("title");
+        subtitle = component.get("subtitle");
     }
 
     @Override

@@ -18,8 +18,8 @@ public class PacketConnectServer extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        uuid = component.getUUID("uuid");
-        server = component.getString("server");
+        uuid = component.get("uuid");
+        server = component.get("server");
     }
 
     @Override

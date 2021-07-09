@@ -4,9 +4,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
-import io.thunder.packet.handler.PacketHandler;
-
-import io.thunder.packet.Packet;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.NPC;
 import org.bukkit.Bukkit;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class PacketHandlerManageNPCs implements PacketHandler {
 
     
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInformation) {
             PacketInformation information = (PacketInformation) packet;
 

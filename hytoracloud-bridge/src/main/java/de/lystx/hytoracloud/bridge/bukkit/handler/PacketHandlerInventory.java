@@ -4,13 +4,13 @@ import de.lystx.hytoracloud.bridge.bukkit.utils.Item;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketOpenInventory;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketInventoryUpdate;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudInventory;
 import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudItem;
 import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 public class PacketHandlerInventory implements PacketHandler {
 
     
-    public void handle(Packet rawPacket) {
+    public void handle(HytoraPacket rawPacket) {
         if (rawPacket instanceof PacketOpenInventory) {
             PacketOpenInventory packet = (PacketOpenInventory)rawPacket;
             CloudInventory inventory = packet.getCloudInventory();

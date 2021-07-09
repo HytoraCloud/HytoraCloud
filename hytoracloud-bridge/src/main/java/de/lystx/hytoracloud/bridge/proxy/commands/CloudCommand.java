@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketTPS;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInGetLog;
+import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.service.other.Updater;
 import de.lystx.hytoracloud.driver.elements.packets.result.ResultPacketTPS;
@@ -11,7 +12,6 @@ import de.lystx.hytoracloud.driver.elements.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.elements.packets.result.ResultPacketStartService;
 import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
 import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
@@ -39,7 +39,7 @@ public class CloudCommand implements TabCompletable {
                     } else if (args[0].equalsIgnoreCase("tps")) {
 
 
-                        CloudDriver.getInstance().sendPacket(new ResultPacketTPS(), response -> player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§6TPS§8: §b" + response.getMessage()));
+                        CloudDriver.getInstance().sendPacket(new ResultPacketTPS(), response -> player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§6TPS§8: §b" + response.reply().getMessage()));
 
 
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
@@ -70,8 +70,7 @@ public class CloudCommand implements TabCompletable {
 
                         player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7Trying to start a new service of group §a" + group.getName() + "§8...");
 
-
-                        CloudDriver.getInstance().sendPacket(new ResultPacketStartService(groupname));
+                        CloudDriver.getInstance().sendPacket(new PacketInStartGroup(CloudDriver.getInstance().getServiceManager().getServiceGroup(groupname)));
 
                     } else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
                         boolean add = args[0].equalsIgnoreCase("add");

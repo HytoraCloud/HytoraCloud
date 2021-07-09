@@ -32,7 +32,7 @@ public interface IPermissionUser extends Identifiable {
      *
      * @return response containing permissionGroup
      */
-    IResponse<PermissionGroup> getPermissionGroup();
+    PermissionGroup getPermissionGroup();
 
     /**
      * Gets the {@link PermissionGroup} with the lowest ID (the highest ranked group)

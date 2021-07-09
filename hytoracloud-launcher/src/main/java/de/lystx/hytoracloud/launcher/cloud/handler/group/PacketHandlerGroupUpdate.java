@@ -2,23 +2,20 @@ package de.lystx.hytoracloud.launcher.cloud.handler.group;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import io.thunder.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import io.thunder.packet.Packet;
 import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
+import lombok.AllArgsConstructor;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
+@AllArgsConstructor
 public class PacketHandlerGroupUpdate implements PacketHandler {
 
     private final CloudSystem cloudSystem;
 
-    public PacketHandlerGroupUpdate(CloudSystem cloudSystem) {
-        this.cloudSystem = cloudSystem;
-    }
-
-    
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInUpdateServiceGroup) {
             PacketInUpdateServiceGroup packetInUpdateServiceGroup = (PacketInUpdateServiceGroup)packet;
             ServiceGroup group = packetInUpdateServiceGroup.getServiceGroup();

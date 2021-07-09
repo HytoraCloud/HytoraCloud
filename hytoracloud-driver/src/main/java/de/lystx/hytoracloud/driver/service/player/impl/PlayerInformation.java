@@ -20,7 +20,7 @@ import java.util.*;
 
 //TODO: DOCUMENTATION (AGAIN)
 @Getter @Setter @AllArgsConstructor
-public class PlayerInformation implements ThunderObject, IPermissionUser, Objectable<PlayerInformation> {
+public class PlayerInformation implements IPermissionUser, Objectable<PlayerInformation> {
 
     private UUID uniqueId;
     private String name;
@@ -115,7 +115,7 @@ public class PlayerInformation implements ThunderObject, IPermissionUser, Object
     }
 
     @Override
-    public IResponse<PermissionGroup> getPermissionGroup() {
+    public PermissionGroup getPermissionGroup() {
         throw new UnsupportedOperationException("Not available for OfflinePlayer");
     }
 
@@ -148,81 +148,5 @@ public class PlayerInformation implements ThunderObject, IPermissionUser, Object
     public void addPermissionGroup(PermissionGroup permissionGroup, int time, PermissionValidity unit) {
         CloudDriver.getInstance().getPermissionPool().addPermissionGroupToUser(this.getUniqueId(), permissionGroup, time, unit);
     }
-    public void write(PacketBuffer buf) {
 
-        if (getPermissionEntries() == null) {
-            setPermissionEntries(new ArrayList<>());
-        }
-
-        if (getPermissions() == null) {
-            setPermissions(new ArrayList<>());
-        }
-
-        if (getProperties() == null) {
-            setProperties(new HashMap<>());
-        }
-
-        buf.nullSafe().writeUUID(getUniqueId());
-        buf.nullSafe().writeString(getName());
-
-        buf.nullSafe().writeInt(getPermissionEntries().size());
-        for (PermissionEntry permissionEntry : getPermissionEntries()) {
-            buf.nullSafe().writeString(permissionEntry.getPermissionGroup());
-            buf.nullSafe().writeString(permissionEntry.getValidTime());
-        }
-
-        buf.nullSafe().writeInt(getPermissions().size());
-        for (String permission : getPermissions()) {
-            buf.nullSafe().writeString(permission);
-        }
-
-        buf.nullSafe().writeString(getIpAddress());
-
-        buf.nullSafe().writeBoolean(isNotifyServerStart());
-        buf.nullSafe().writeBoolean(isDefault());
-        buf.nullSafe().writeLong(getFirstLogin());
-        buf.nullSafe().writeLong(getLastLogin());
-
-        buf.nullSafe().writeInt(getProperties().keySet().size());
-        for (String s : getProperties().keySet()) {
-            buf.nullSafe().writeString(s);
-            buf.nullSafe().writeString(getProperties().get(s).toString());
-        }
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-
-        setUniqueId(buf.nullSafe().readUUID());
-        setName(buf.nullSafe().readString());
-
-        int size = buf.nullSafe().readInt();
-        setPermissionEntries(new ArrayList<>(size));
-        for (int i = 0; i < size; i++) {
-            String group = buf.nullSafe().readString();
-            String time = buf.nullSafe().readString();
-            getPermissionEntries().add(new PermissionEntry(group, time));
-        }
-
-        size = buf.nullSafe().readInt();
-        setPermissions(new ArrayList<>());
-        for (int i = 0; i < size; i++) {
-            getPermissions().add(buf.nullSafe().readString());
-        }
-        setIpAddress(buf.nullSafe().readString());
-        setNotifyServerStart(buf.nullSafe().readBoolean());
-        setDefault(buf.nullSafe().readBoolean());
-        setFirstLogin(buf.nullSafe().readLong());
-        setLastLogin(buf.nullSafe().readLong());
-
-        size = buf.nullSafe().readInt();
-        setProperties(new HashMap<>(size));
-
-        for (int i = 0; i < size; i++) {
-            String s = buf.nullSafe().readString();
-            JsonObject object = (JsonObject) new JsonParser().parse(buf.nullSafe().readString());
-            getProperties().put(s, object);
-        }
-
-    }
 }

@@ -5,12 +5,10 @@ import net.hytora.networking.elements.component.Component;
 public class EmptyPacket extends HytoraPacket {
 
     @Override
-    public void write(Component component) {
-
+    public final void write(Component component) {
     }
 
     @Override
-    public void read(Component component) {
-
+    public final void read(Component component) {
     }
 }

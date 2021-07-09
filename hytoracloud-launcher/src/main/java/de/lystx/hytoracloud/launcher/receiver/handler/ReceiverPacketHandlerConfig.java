@@ -2,13 +2,13 @@ package de.lystx.hytoracloud.launcher.receiver.handler;
 
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
 import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
 
 import lombok.AllArgsConstructor;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 @AllArgsConstructor
 public class ReceiverPacketHandlerConfig implements PacketHandler {
@@ -17,7 +17,7 @@ public class ReceiverPacketHandlerConfig implements PacketHandler {
 
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo packetOutGlobalInfo = (PacketOutGlobalInfo)packet;
             NetworkConfig networkConfig = packetOutGlobalInfo.getNetworkConfig();

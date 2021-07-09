@@ -11,6 +11,8 @@ import de.lystx.hytoracloud.launcher.receiver.booting.ReceiverBootingSetupDone;
 import de.lystx.hytoracloud.launcher.receiver.booting.ReceiverBootingSetupNotDone;
 import lombok.Getter;
 import lombok.Setter;
+import net.hytora.networking.connection.client.HytoraClient;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 
 @Getter @Setter
@@ -19,7 +21,7 @@ public class Receiver extends CloudProcess {
     @Getter
     private static Receiver instance;
 
-    private final ThunderClient cloudClient;
+    private HytoraClient cloudClient;
 
     /**
      * Boots up the Receiver
@@ -27,8 +29,6 @@ public class Receiver extends CloudProcess {
     public Receiver() {
         super(CloudType.RECEIVER);
         instance = this;
-
-        this.cloudClient = Thunder.createClient();
 
         if (this.getInstance(ConfigService.class).getReceiverInfo().isEstablished()) {
             new ReceiverBootingSetupDone(this);
@@ -49,7 +49,7 @@ public class Receiver extends CloudProcess {
     }
 
     @Override
-    public void sendPacket(Packet packet) {
+    public void sendPacket(HytoraPacket packet) {
         this.cloudClient.sendPacket(packet);
     }
 

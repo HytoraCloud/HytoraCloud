@@ -18,8 +18,8 @@ public class PacketInformation extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        key = component.getString("key");
-        objectMap = (Map<String, Object>) component.getObject("map");
+        key = component.get("key");
+        objectMap = (Map<String, Object>) component.get("map");
     }
 
     @Override

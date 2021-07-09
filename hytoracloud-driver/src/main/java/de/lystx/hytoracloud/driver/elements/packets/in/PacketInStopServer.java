@@ -23,6 +23,6 @@ public class PacketInStopServer extends HytoraPacket implements Serializable {
 
     @Override
     public void read(Component component) {
-        service = (Service) component.getObject("s");
+        service = (Service) component.get("s");
     }
 }

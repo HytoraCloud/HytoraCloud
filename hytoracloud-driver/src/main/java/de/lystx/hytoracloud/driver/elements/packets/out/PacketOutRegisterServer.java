@@ -32,7 +32,7 @@ public class PacketOutRegisterServer extends HytoraPacket implements Serializabl
 
     @Override
     public void read(Component component) {
-        service = (Service) component.getObject("s");
-        action = component.getString("a");
+        service = (Service) component.get("s");
+        action = component.get("a");
     }
 }

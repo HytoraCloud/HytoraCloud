@@ -26,7 +26,7 @@ public class PacketUpdateNetworkConfig extends PacketCommunication implements Se
     public void read(Component component) {
         super.read(component);
 
-        networkConfig = (NetworkConfig) component.getObject("n");
+        networkConfig = (NetworkConfig) component.get("n");
     }
 
     @Override

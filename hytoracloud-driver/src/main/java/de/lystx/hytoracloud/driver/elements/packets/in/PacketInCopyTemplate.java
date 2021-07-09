@@ -29,8 +29,8 @@ public class PacketInCopyTemplate extends HytoraPacket implements Serializable {
     @Override
     public void read(Component component) {
 
-        service = (Service) component.getObject("s");
-        template = component.getString("t");
-        specificDirectory = component.getString("sD");
+        service = (Service) component.get("s");
+        template = component.get("t");
+        specificDirectory = component.get("sD");
     }
 }

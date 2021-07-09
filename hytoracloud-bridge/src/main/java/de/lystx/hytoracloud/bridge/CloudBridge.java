@@ -43,10 +43,14 @@ import io.thunder.utils.objects.ThunderOption;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.hytora.networking.connection.client.HytoraClient;
+import net.hytora.networking.elements.other.HytoraLogin;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudBridge {
@@ -55,7 +59,7 @@ public class CloudBridge {
     private static CloudBridge instance;
 
     private final CloudDriver cloudDriver;
-    private final ThunderClient cloudClient;
+    private final HytoraClient cloudClient;
 
     private ProxyBridge proxyBridge;
 
@@ -63,7 +67,9 @@ public class CloudBridge {
         instance = this;
 
         this.cloudDriver = new CloudDriver(CloudType.BRIDGE);
-        this.cloudClient = Thunder.createClient();
+
+        InetSocketAddress host = CloudDriver.getInstance().getHost();
+        this.cloudClient = new HytoraClient(host.getAddress().getHostAddress(), host.getPort());
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.cloudClient);
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "driverType", CloudType.BRIDGE);
@@ -133,27 +139,6 @@ public class CloudBridge {
         CloudDriver.getInstance().registerCommand(new ListCommand());
         CloudDriver.getInstance().registerCommand(new NetworkCommand());
 
-
-        Thunder.addHandler(new ErrorHandler() {
-            @Override
-            public void onError(Exception e) {
-                if (e.getClass().getSimpleName().equals("SocketException")) {
-                    return;
-                }
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onPacketFailure(Packet packet, String s, Exception e) {
-                if (s.equalsIgnoreCase("de.lystx.hytoracloud.module.serverselector.packets.PacketOutServerSelector")) {
-                    return;
-                }
-                System.out.println("[CloudAPI] A §ePacket §fcould §cnot §fbe decoded (§b" + s + "§f)");
-                if (e != null) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     /**
@@ -164,65 +149,35 @@ public class CloudBridge {
      * the serviec will stop
      */
     private void bootstrap() {
-        this.cloudClient.option(ThunderOption.IGNORE_HANDSHAKE_IF_FAILED, true);
-        this.cloudClient.addSessionListener(new ThunderListener() {
 
-            @Override
-            public void handleConnect(ThunderSession thunderSession) {
-                System.out.println("§8");
-                System.out.println("[CloudAPI] §eThunderSession §fis now active (§cNot Handshaked yet§f)!");
-                System.out.println("§8");
-
-                cloudClient.sendPacket(new PacketRegisterService(CloudDriver.getInstance().getThisService()));
-            }
+        if (this.cloudClient.isConnected()) {
+            return;
+        }
+        this.cloudClient.loginHandler(new Consumer<HytoraClient>() {
 
             @SneakyThrows
             @Override
-            public void handleHandshake(PacketHandshake packetHandshake) {
+            public void accept(HytoraClient hytoraClient) {
                 System.out.println("§8");
-                System.out.println("[CloudAPI] Received Handshake with CloudSystem (§aConnected§f)");
+                System.out.println("[CloudAPI] §eCloudSession §fis now active ");
                 System.out.println("§8");
+
+                cloudClient.sendPacket(new PacketRegisterService(CloudDriver.getInstance().getThisService()));
+
 
                 Service thisService = CloudDriver.getInstance().getThisService();
                 thisService.setAuthenticated(true);
                 thisService.setHost(InetAddress.getLocalHost().getHostAddress());
                 thisService.update();
-
             }
+        }).login(new HytoraLogin(CloudDriver.getInstance().getThisService().getName())).createConnection();
 
-            @Override
-            public void handlePacketSend(Packet packet) {
-                System.out.println("[Out] " + packet.getClass().getName());
-            }
-
-            @Override
-            public void handlePacketReceive(Packet packet) {
-                System.out.println("[In] " + packet.getClass().getName());
-            }
-
-            @Override
-            public void handleDisconnect(ThunderSession thunderSession) {
-                System.out.println("§8");
-                System.out.println("[CloudAPI] ThunderSession was marked as §4inactive§f! Report this on the §9Discord §aplease§f!");
-                System.out.println("§8");
-            }
-        });
-
-        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
-        if (this.cloudClient.isConnected()) {
-            return;
-        }
-        int port = jsonEntity.getInteger("port");
-        String host = jsonEntity.getString("host");
-        System.out.println("[CloudAPI] Connecting to CloudSystem [" + host + ":" + port + "]");
-        this.cloudClient.connect(host, port).perform();
 
     }
 
     public static void load() {
         instance = new CloudBridge();
     }
-
 
     private int pings;
     private int tabInit;

@@ -33,7 +33,7 @@ public class PacketInGetLog extends HytoraPacket implements Serializable {
     @Override
     public void read(Component component) {
 
-        service = component.getString("s");
-        player = component.getString("p");
+        service = component.get("s");
+        player = component.get("p");
     }
 }

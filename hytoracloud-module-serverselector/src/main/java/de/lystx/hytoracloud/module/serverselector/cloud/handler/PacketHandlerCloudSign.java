@@ -4,9 +4,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.SignService;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
-import io.thunder.packet.handler.PacketHandler;
-
-import io.thunder.packet.Packet;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 import lombok.AllArgsConstructor;
 
 import java.util.Map;
@@ -17,7 +16,7 @@ public class PacketHandlerCloudSign implements PacketHandler {
     private final CloudDriver cloudDriver;
 
     
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInformation) {
             PacketInformation packetInformation = (PacketInformation)packet;
             Map<String, Object> map = packetInformation.getObjectMap();

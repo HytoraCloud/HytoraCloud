@@ -4,14 +4,14 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketTPS;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.service.util.reflection.Reflections;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.service.util.minecraft.NetworkInfo;
 
 public class PacketHandlerTPS implements PacketHandler {
 
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketTPS) {
             PacketTPS packetTPS = (PacketTPS)packet;
             Service service = packetTPS.getService();

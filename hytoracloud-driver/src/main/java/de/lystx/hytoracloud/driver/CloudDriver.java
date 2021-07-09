@@ -613,7 +613,7 @@ public class CloudDriver {
 
     /**
      * Returns all the Modules
-     * @return IResponse
+     * @return list of module infos
      */
     public List<ModuleInfo> getModules() {
 

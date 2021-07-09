@@ -17,7 +17,7 @@ public class PacketUpdatePermissionPool extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        permissionPool = (PermissionPool) component.getObject("pool");
+        permissionPool = (PermissionPool) component.get("pool");
     }
 
     @Override

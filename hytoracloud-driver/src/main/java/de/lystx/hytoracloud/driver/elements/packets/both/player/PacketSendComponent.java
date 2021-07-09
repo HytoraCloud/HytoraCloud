@@ -20,8 +20,8 @@ public class PacketSendComponent extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        uuid = component.getUUID("uuid");
-        cloudComponent = (CloudComponent) component.getObject("c");
+        uuid = component.get("uuid");
+        cloudComponent = (CloudComponent) component.get("c");
     }
 
     @Override

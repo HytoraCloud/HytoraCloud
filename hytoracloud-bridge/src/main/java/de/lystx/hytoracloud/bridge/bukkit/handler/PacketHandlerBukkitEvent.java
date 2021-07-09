@@ -6,14 +6,14 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerPermissionGroupAddCloudEvent;
 import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerPermissionGroupRemoveCloudEvent;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketCallEvent;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 public class PacketHandlerBukkitEvent implements PacketHandler {
 
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (!(packet instanceof PacketCallEvent)) {
             return;
         }

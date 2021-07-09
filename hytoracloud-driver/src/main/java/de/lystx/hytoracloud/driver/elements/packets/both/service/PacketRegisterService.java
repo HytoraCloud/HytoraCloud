@@ -20,7 +20,7 @@ public class PacketRegisterService extends PacketCommunication implements Serial
     public void read(Component component) {
         super.read(component);
 
-        service = (Service) component.getObject("s");
+        service = (Service) component.get("s");
     }
 
     @Override

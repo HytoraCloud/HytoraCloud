@@ -8,8 +8,8 @@ import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutRegisterServer;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 
 import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
@@ -25,7 +25,7 @@ public class ReceiverPacketHandlerServer implements PacketHandler {
 
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketServiceUpdate) {
 
             PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;

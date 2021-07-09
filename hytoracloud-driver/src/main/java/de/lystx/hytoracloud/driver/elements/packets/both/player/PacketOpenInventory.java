@@ -21,8 +21,8 @@ public class PacketOpenInventory extends PacketCommunication implements Serializ
     public void read(Component component) {
         super.read(component);
 
-        cloudPlayer = (CloudPlayer) component.getObject("cloudPlayer");
-        cloudInventory = (CloudInventory) component.getObject("inv");
+        cloudPlayer = (CloudPlayer) component.get("cloudPlayer");
+        cloudInventory = (CloudInventory) component.get("inv");
     }
 
     @Override

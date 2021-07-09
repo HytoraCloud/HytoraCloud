@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.bridge.bukkit.handler;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketPlaySound;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketSendActionbar;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketSendTitle;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatMessageType;
@@ -21,7 +21,7 @@ public class PacketHandlerBukkitCloudPlayerHandler implements PacketHandler {
 
     
     @SneakyThrows
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketPlaySound) {
             PacketPlaySound packetPlaySound = (PacketPlaySound)packet;
             Player player = Bukkit.getPlayer(packetPlaySound.getName());

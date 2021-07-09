@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.launcher.cloud.handler.receiver;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.elements.packets.receiver.PacketReceiverLogin;
 import de.lystx.hytoracloud.driver.elements.packets.receiver.PacketReceiverShutdown;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ public class PacketHandlerReceiver implements PacketHandler {
     private final CloudSystem cloudSystem;
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketReceiverShutdown) {
             PacketReceiverShutdown packetReceiverShutdown = (PacketReceiverShutdown)packet;
             cloudSystem.getReceiverManager().unregisterReceiver(packetReceiverShutdown.getReceiverInfo());

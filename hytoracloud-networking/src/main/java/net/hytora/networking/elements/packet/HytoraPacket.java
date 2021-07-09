@@ -174,5 +174,8 @@ public abstract class HytoraPacket {
         this.reply(new PacketRespond(message, status, null));
     }
 
+    public void reply(ResponseStatus status, Object message) {
+        this.reply(status, message.toString());
+    }
 
 }

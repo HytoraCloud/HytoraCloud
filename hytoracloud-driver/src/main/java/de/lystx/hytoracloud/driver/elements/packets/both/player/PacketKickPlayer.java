@@ -20,8 +20,8 @@ public class PacketKickPlayer extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        uuid = component.getUUID("uuid");
-        reason = component.getString("reason");
+        uuid = component.get("uuid");
+        reason = component.get("reason");
     }
 
     @Override

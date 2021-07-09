@@ -17,7 +17,7 @@ public class PacketCallEvent extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        cloudEvent = JsonEntity.fromClass(component.getString("event"), CloudEvent.class);
+        cloudEvent = JsonEntity.fromClass(component.get("event"), CloudEvent.class);
     }
 
 

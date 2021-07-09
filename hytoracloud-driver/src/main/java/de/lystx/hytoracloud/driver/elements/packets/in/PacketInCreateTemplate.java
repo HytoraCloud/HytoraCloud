@@ -26,7 +26,7 @@ public class PacketInCreateTemplate extends HytoraPacket implements Serializable
     @Override
     public void read(Component component) {
 
-        serviceGroup = (ServiceGroup) component.getObject("g");
-        template = component.getString("t");
+        serviceGroup = (ServiceGroup) component.get("g");
+        template = component.get("t");
     }
 }

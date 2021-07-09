@@ -11,13 +11,15 @@ import io.vson.enums.FileFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter @AllArgsConstructor
-public class PacketOutServerSelector extends Packet implements Serializable {
+public class PacketOutServerSelector extends HytoraPacket implements Serializable {
 
     private List<CloudSign> cloudSigns;
     private VsonObject signLayOut;
@@ -27,77 +29,21 @@ public class PacketOutServerSelector extends Packet implements Serializable {
     private JsonEntity npcs;
 
 
-    @Override @SneakyThrows
-    public void read(PacketBuffer buf) {
-
-
-        int size = buf.readInt();
-
-        this.cloudSigns = new ArrayList<>(size);
-
-        for (int i = 0; i < size; i++) {
-            this.cloudSigns.add(CloudSign.readFromBuf(buf));
-        }
-
-        this.signLayOut = new VsonObject(buf.readString());
-        this.npcs = new JsonEntity(buf.readString());
-
-
-        int inventoryRows = buf.readInt();
-        String title = buf.readString();
-        boolean corners = buf.readBoolean();
-        String message = buf.readString();
-        String itemName = buf.readString();
-
-        int loreSize = buf.readInt();
-        List<String> lore = new ArrayList<>(loreSize);
-
-        for (int i = 0; i < loreSize; i++) {
-            lore.add(buf.readString());
-        }
-
-        String itemType = buf.readString();
-
-        int itemSize = buf.readInt();
-        List<SerializableDocument> items = new ArrayList<>(itemSize);
-        for (int i = 0; i < itemSize; i++) {
-            items.add(SerializableDocument.fromDocument(new JsonEntity(buf.readString())));
-        }
-
-        this.npcConfig = new NPCConfig(inventoryRows, title, corners, message, itemName, lore, itemType, items);
-    }
-
     @Override
-    public void write(PacketBuffer buf) {
+    public void write(Component component) {
 
-
-        buf.writeInt(cloudSigns.size());
-        for (CloudSign cloudSign : cloudSigns) {
-            cloudSign.writeToBuf(buf);
-        }
-
-        buf.writeString(signLayOut.toString(FileFormat.RAW_JSON));
-        buf.writeString(npcs.toString());
-
-        buf.writeInt(npcConfig.getInventoryRows());
-        buf.writeString(npcConfig.getInventoryTitle());
-        buf.writeBoolean(npcConfig.isCorners());
-        buf.writeString(npcConfig.getConnectingMessage());
-        buf.writeString(npcConfig.getItemName());
-
-        buf.writeInt(npcConfig.getLore().size());
-        for (String s : npcConfig.getLore()) {
-            buf.writeString(s);
-        }
-
-        buf.writeString(npcConfig.getItemType());
-
-        buf.writeInt(npcConfig.getItems().size());
-        for (SerializableDocument item : npcConfig.getItems()) {
-            buf.writeString(item.toString());
-        }
+        component.put("signs", cloudSigns);
+        component.put("layout", signLayOut.toString(FileFormat.RAW_JSON));
+        component.put("config", npcConfig);
+        component.put("npcs", npcs.toString());
     }
 
+    @Override @SneakyThrows
+    public void read(Component component) {
 
-
+        cloudSigns = component.get("signs");
+        signLayOut = new VsonObject((String) component.get("layout"));
+        component = component.get("config");
+        npcs = new JsonEntity((String) component.get("npcs"));
+    }
 }

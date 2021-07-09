@@ -2,9 +2,8 @@ package net.hytora.networking.connection.client;
 
 import lombok.SneakyThrows;
 import net.hytora.networking.connection.HytoraConnection;
-import net.hytora.networking.elements.component.ReplyComponent;
+import net.hytora.networking.elements.component.RepliableComponent;
 import net.hytora.networking.elements.other.HytoraLogin;
-import net.hytora.networking.elements.component.ClientComponent;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.component.Component;
 
@@ -14,6 +13,8 @@ import lombok.Getter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Random;
 import java.util.concurrent.*;
@@ -252,6 +253,11 @@ public class HytoraClient implements HytoraConnection {
         return future;
     }
 
+    @Override
+    public InetSocketAddress remoteAddress() {
+        return new InetSocketAddress(this.host, this.port);
+    }
+
     /**
      * This waits for the login to be accepted
      * it sends the username of this client and the credentials
@@ -291,11 +297,10 @@ public class HytoraClient implements HytoraConnection {
      * Sends a {@link Component} and receives a reply
      * if given else it will just time out and set an empty reply
      *
-     * @param consumer the consumer
+     * @param component the component
      * @return reply or empty reply
      */
-    public Component sendComponentToReply(Consumer<Component> consumer) {
-
+    public Component sendComponentToReply(Component component) {
         if (this.available != 0) {
             return new Component();
         }
@@ -303,8 +308,7 @@ public class HytoraClient implements HytoraConnection {
         int timeOut = 3000;
         Component[] hytoraReply = {null};
 
-        this.sendComponent(consumer, 0, (reply, aBoolean) -> hytoraReply[0] = reply);
-
+        this.sendComponent(component, 0, (reply, aBoolean) -> hytoraReply[0] = reply);
 
         int count = 0;
         while (hytoraReply[0] == null && count++ < timeOut) {
@@ -322,6 +326,20 @@ public class HytoraClient implements HytoraConnection {
     }
 
     /**
+     * Sends a {@link Component} and receives a reply
+     * if given else it will just time out and set an empty reply
+     *
+     * @param consumer the consumer
+     * @return reply or empty reply
+     */
+    public Component sendComponentToReply(Consumer<Component> consumer) {
+        Component component = new Component();
+        consumer.accept(component);
+
+        return this.sendComponentToReply(component);
+    }
+
+    /**
      * Sends a component to the server
      *
      * @param component the component
@@ -335,6 +353,11 @@ public class HytoraClient implements HytoraConnection {
             this.objectOutputStream.writeObject(component);
             this.objectOutputStream.flush();
         }
+    }
+
+    @Override
+    public String getName() {
+        return "HytoraClient@" + host + ":" + port;
     }
 
     /**
@@ -418,15 +441,20 @@ public class HytoraClient implements HytoraConnection {
      * @param delay the timeout delay
      * @param replyConsumer the callback for the reply
      */
+    @SneakyThrows
     public void sendComponent(Component hytoraComponent, int delay, BiConsumer<Component, Boolean> replyConsumer) {
         if (this.available != 0) {
             return;
         }
 
         try {
-            hytoraComponent.setIdRequest(random.nextLong());
 
-            this.catcher.registerReplyHandler(hytoraComponent.getIdRequest(), delay, replyConsumer);
+            Field requestID = hytoraComponent.getClass().getDeclaredField("requestID");
+            requestID.setAccessible(true);
+            requestID.set(hytoraComponent, this.random.nextLong());
+
+
+            this.catcher.registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
 
             synchronized (this.objectOutgoing) {
                 this.objectOutputStream.writeObject(hytoraComponent);
@@ -446,7 +474,7 @@ public class HytoraClient implements HytoraConnection {
      * @param channel the channel to listen for
      * @param consumer the consumer
      */
-    public void registerChannelHandler(String channel, Consumer<ReplyComponent> consumer) {
+    public void registerChannelHandler(String channel, Consumer<RepliableComponent> consumer) {
         this.catcher.registerChannelHandler(channel, consumer);
     }
 
@@ -469,5 +497,7 @@ public class HytoraClient implements HytoraConnection {
             }
         }
     }
+
+
 
 }

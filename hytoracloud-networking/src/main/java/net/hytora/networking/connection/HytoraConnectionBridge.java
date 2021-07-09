@@ -3,13 +3,16 @@ package net.hytora.networking.connection;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import net.hytora.networking.connection.server.HytoraServer;
 import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.other.ComponentSender;
 
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +23,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 @Setter @Getter
-public class HytoraConnectionBridge{
+public class HytoraConnectionBridge implements ComponentSender {
 
     /**
      * The incoming objects
@@ -114,7 +117,7 @@ public class HytoraConnectionBridge{
                                 hytoraComponent.setSender(this.name); //Setting sender to this
 
                                //Checking for forwarding or receiver
-                                if (hytoraComponent.getRecipient().equalsIgnoreCase("SERVER")) { // to the server
+                                if (hytoraComponent.getReceiver().equalsIgnoreCase("SERVER")) { // to the server
 
                                     if (hytoraComponent.isReply()) {
                                         this.server.getCatcher().handleReply(hytoraComponent);
@@ -126,7 +129,7 @@ public class HytoraConnectionBridge{
                                     if (hytoraComponent.isReply()) {
                                         this.server.getCatcher().handleReply(hytoraComponent);
                                     } else {
-                                        if ((!hytoraComponent.getRecipient().equalsIgnoreCase("ALL"))) {
+                                        if ((!hytoraComponent.getReceiver().equalsIgnoreCase("ALL"))) {
                                             this.server.sendComponent(hytoraComponent);
                                         }
                                     }
@@ -220,13 +223,17 @@ public class HytoraConnectionBridge{
      * @param delay the timeout delay
      * @param replyConsumer the callback for the reply
      */
+    @SneakyThrows
     public void sendComponent(Component hytoraComponent, int delay, BiConsumer<Component, Boolean> replyConsumer) {
         if (!this.verified) {
             return;
         }
 
-        hytoraComponent.setIdRequest(this.server.getRandom().nextLong());
-        this.server.getCatcher().registerReplyHandler(hytoraComponent.getIdRequest(), delay, replyConsumer);
+        Field requestID = hytoraComponent.getClass().getDeclaredField("requestID");
+        requestID.setAccessible(true);
+        requestID.set(hytoraComponent, this.server.getRandom().nextLong());
+
+        this.server.getCatcher().registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
 
         try {
             synchronized (this.syncOut) {
@@ -249,6 +256,7 @@ public class HytoraConnectionBridge{
      * @param delay the timeout delay
      * @param replyConsumer the callback for the reply
      */
+    @SneakyThrows
     public void sendComponent(Consumer<Component> componentConsumer, int delay, BiConsumer<Component, Boolean> replyConsumer) {
         if (!this.verified) {
             return;
@@ -257,8 +265,11 @@ public class HytoraConnectionBridge{
         Component hytoraComponent = new Component();
         componentConsumer.accept(hytoraComponent);
 
-        hytoraComponent.setIdRequest(this.server.getRandom().nextLong());
-        this.server.getCatcher().registerReplyHandler(hytoraComponent.getIdRequest(), delay, replyConsumer);
+
+        Field requestID = hytoraComponent.getClass().getDeclaredField("requestID");
+        requestID.setAccessible(true);
+        requestID.set(hytoraComponent, this.server.getRandom().nextLong());
+        this.server.getCatcher().registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
 
         try {
             synchronized (this.syncOut) {
@@ -319,10 +330,13 @@ public class HytoraConnectionBridge{
      *
      * @param content the content to reply
      */
+    @SneakyThrows
     public void reply(Object content) {
         Component hytoraReply = new Component();
-        hytoraReply.setContent(content);
-        hytoraReply.setReply(true);
+        hytoraReply.setMessage(content);
+        Field reply = hytoraReply.getClass().getDeclaredField("reply");
+        reply.setAccessible(true);
+        reply.set(hytoraReply, true);
         this.sendReply(hytoraReply);
     }
 
@@ -331,10 +345,14 @@ public class HytoraConnectionBridge{
      *
      * @param consumer the consumer to handle
      */
+    @SneakyThrows
     public void reply(Consumer<Component> consumer) {
         Component hytoraReply = new Component();
         consumer.accept(hytoraReply);
-        hytoraReply.setReply(true);
+
+        Field reply = hytoraReply.getClass().getDeclaredField("reply");
+        reply.setAccessible(true);
+        reply.set(hytoraReply, true);
         this.sendReply(hytoraReply);
 
     }

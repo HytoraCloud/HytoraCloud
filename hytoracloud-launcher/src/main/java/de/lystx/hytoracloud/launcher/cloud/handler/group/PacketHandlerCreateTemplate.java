@@ -2,23 +2,20 @@ package de.lystx.hytoracloud.launcher.cloud.handler.group;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import io.thunder.packet.handler.PacketHandler;
+import lombok.AllArgsConstructor;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInCopyTemplate;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import io.thunder.packet.Packet;
 import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
 
+@AllArgsConstructor
 public class PacketHandlerCreateTemplate implements PacketHandler {
 
     private final CloudSystem cloudSystem;
-
-    public PacketHandlerCreateTemplate(CloudSystem cloudSystem) {
-        this.cloudSystem = cloudSystem;
-    }
-
     
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInCopyTemplate) {
             PacketInCopyTemplate packetInCopyTemplate = (PacketInCopyTemplate)packet;
             Service service = packetInCopyTemplate.getService();

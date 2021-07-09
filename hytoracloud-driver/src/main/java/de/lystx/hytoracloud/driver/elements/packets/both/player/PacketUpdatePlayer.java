@@ -18,7 +18,7 @@ public class PacketUpdatePlayer extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        cloudPlayer = (CloudPlayer) component.getObject("p");
+        cloudPlayer = (CloudPlayer) component.get("p");
     }
 
     @Override

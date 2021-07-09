@@ -5,8 +5,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStartedServer;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ public class PacketHandlerReceiverServer implements PacketHandler {
     private final CloudSystem cloudSystem;
 
     
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet.getClass().getSimpleName().startsWith("PacketIn") && (packet.getClass().getSuperclass() != null && !packet.getClass().getSuperclass().equals(PacketCommunication.class))) {
             this.cloudSystem.sendPacket(packet);
         }

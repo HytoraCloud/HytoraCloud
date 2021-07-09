@@ -6,8 +6,8 @@ import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketServiceUp
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.elements.service.Service;
 import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ import java.io.File;
 public class PacketHandlerBukkitServerUpdate implements PacketHandler {
 
     
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInUpdateServiceGroup) {
             PacketInUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketInUpdateServiceGroup) packet;
             ServiceGroup group = CloudDriver.getInstance().getThisService().getServiceGroup();

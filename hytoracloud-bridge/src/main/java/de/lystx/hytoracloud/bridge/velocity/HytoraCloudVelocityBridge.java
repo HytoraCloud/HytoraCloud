@@ -24,6 +24,8 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
+import java.io.IOException;
+
 @Plugin(
         id = "hytora_proxy_bridge",
         name = "CloudBridge",
@@ -167,8 +169,10 @@ public class HytoraCloudVelocityBridge {
     }
 
     public void shutdown() {
-        if (CloudDriver.getInstance().getConnection().isConnected()) {
-            CloudDriver.getInstance().getConnection().disconnect();
+        try {
+            CloudDriver.getInstance().getConnection().close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

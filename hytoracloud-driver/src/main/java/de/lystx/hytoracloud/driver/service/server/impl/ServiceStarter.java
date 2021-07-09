@@ -115,7 +115,7 @@ public class ServiceStarter {
                 FileUtils.copyFile(file, new File(this.pluginsDirectory, file.getName()));
             }
         }
-        for (ModuleInfo module : CloudDriver.getInstance().getModules().get()) {
+        for (ModuleInfo module : CloudDriver.getInstance().getModules()) {
             switch (module.getCopyType()) {
                 case COPY_ALL:
                     FileUtils.copyFile(module.getFile(), new File(this.pluginsDirectory, module.getFile().getName()));

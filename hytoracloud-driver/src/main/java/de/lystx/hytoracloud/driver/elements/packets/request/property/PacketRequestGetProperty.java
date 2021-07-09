@@ -1,29 +1,27 @@
 package de.lystx.hytoracloud.driver.elements.packets.request.property;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.thunder.packet.Packet;
-import io.thunder.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.util.UUID;
 
 @AllArgsConstructor @Getter
-public class PacketRequestGetProperty extends Packet {
+public class PacketRequestGetProperty extends HytoraPacket {
 
     private UUID playerUUID;
     private String name;
 
     @Override
-    public void write(PacketBuffer buf) {
-        buf.writeUUID(playerUUID);
-        buf.writeString(name);
+    public void write(Component component) {
+        component.put("uuid", playerUUID);
+        component.put("name", name);
     }
 
     @Override
-    public void read(PacketBuffer buf) {
-        playerUUID = buf.readUUID();
-        name = buf.readString();
+    public void read(Component component) {
+        playerUUID = component.get("uuid");
+        name = component.get("name");
     }
 }

@@ -18,7 +18,7 @@ public class PacketFallback extends PacketCommunication implements Serializable 
     public void read(Component component) {
         super.read(component);
 
-        uuid = component.getUUID("uuid");
+        uuid = component.get("uuid");
     }
 
     @Override

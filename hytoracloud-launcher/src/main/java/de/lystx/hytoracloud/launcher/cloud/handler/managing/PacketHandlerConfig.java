@@ -1,24 +1,23 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.managing;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import io.thunder.packet.handler.PacketHandler;
 import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
 
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketUpdateNetworkConfig;
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
 import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
-import io.thunder.packet.Packet;
+import lombok.AllArgsConstructor;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
+@AllArgsConstructor
 public class PacketHandlerConfig implements PacketHandler {
 
     private final CloudSystem cloudSystem;
 
-    public PacketHandlerConfig(CloudSystem cloudSystem) {
-        this.cloudSystem = cloudSystem;
-    }
 
-    
-    public void handle(Packet packet) {
+    @Override
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketUpdateNetworkConfig) {
 
             PacketUpdateNetworkConfig packetUpdateNetworkConfig = (PacketUpdateNetworkConfig)packet;

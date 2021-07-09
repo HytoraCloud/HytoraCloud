@@ -6,18 +6,16 @@ import de.lystx.hytoracloud.driver.ProxyBridge;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutRegisterServer;
 import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStartedServer;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 
-import java.net.InetSocketAddress;
 
 public class ProxyHandlerRegister implements PacketHandler {
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         ProxyBridge proxyBridge = CloudBridge.getInstance().getProxyBridge();
 
         if (packet instanceof PacketOutRegisterServer) {

@@ -6,8 +6,8 @@ import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
 
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.service.util.utillity.CloudMap;
@@ -71,7 +71,7 @@ public class PacketHandlerManageSigns implements PacketHandler {
     }
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInformation) {
             this.handleInformation((PacketInformation) packet);
         }

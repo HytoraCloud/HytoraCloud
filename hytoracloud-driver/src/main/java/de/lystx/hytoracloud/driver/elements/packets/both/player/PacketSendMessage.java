@@ -18,8 +18,8 @@ public class PacketSendMessage extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        uuid = component.getUUID("uuid");
-        message = component.getString("message");
+        uuid = component.get("uuid");
+        message = component.get("message");
     }
 
     @Override

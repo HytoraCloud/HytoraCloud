@@ -16,7 +16,7 @@ public class PacketServiceUpdate extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        service = (Service) component.getObject("s");
+        service = (Service) component.get("s");
     }
 
     @Override

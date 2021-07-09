@@ -23,7 +23,7 @@ public class PacketChannelMessage extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        channelMessage = (ChannelMessage) component.getObject("message");
+        channelMessage = (ChannelMessage) component.get("message");
     }
 
 }

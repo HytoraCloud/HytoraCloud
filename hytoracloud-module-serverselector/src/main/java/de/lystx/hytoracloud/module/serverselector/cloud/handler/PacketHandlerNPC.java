@@ -4,13 +4,14 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCService;
-import io.thunder.packet.handler.PacketHandler;
 
-import io.thunder.packet.Packet;
-import io.vson.elements.object.VsonObject;
+import io.thunder.utils.vson.elements.object.VsonObject;
+import net.hytora.networking.elements.packet.HytoraPacket;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class PacketHandlerNPC implements PacketHandler {
 
     
     @SneakyThrows
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInformation) {
             PacketInformation information = (PacketInformation)packet;
             if (information.getKey().equalsIgnoreCase("PacketInCreateNPC")) {

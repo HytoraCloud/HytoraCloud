@@ -28,6 +28,7 @@ import org.bukkit.event.*;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.*;
 
 @Getter @Setter
@@ -64,8 +65,10 @@ public class HytoraCloudBukkitBridge extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (CloudDriver.getInstance().getConnection().isConnected()) {
-            CloudDriver.getInstance().getConnection().disconnect();
+        try {
+            CloudDriver.getInstance().getConnection().close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LABYMOD");
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");

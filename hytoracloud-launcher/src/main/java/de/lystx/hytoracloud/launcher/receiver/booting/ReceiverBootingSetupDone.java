@@ -15,6 +15,8 @@ import io.thunder.connection.extra.ThunderListener;
 import io.thunder.packet.Packet;
 import io.thunder.packet.impl.PacketHandshake;
 import lombok.Getter;
+import net.hytora.networking.connection.client.HytoraClient;
+import net.hytora.networking.elements.other.HytoraLogin;
 
 @Getter
 public class ReceiverBootingSetupDone {
@@ -53,40 +55,13 @@ public class ReceiverBootingSetupDone {
         new Thread(() -> {
             try {
 
-                receiver.getCloudClient().addSessionListener(new ThunderListener() {
 
-                    @Override
-                    public void handleConnect(ThunderSession thunderSession) {
+                HytoraClient hytoraClient = new HytoraClient(info.getIpAddress(), info.getPort());
 
-                        receiver.getCloudClient().addPacketHandler(new ReceiverPacketHandlerLogin(receiver));
-                        receiver.getCloudClient().addPacketHandler(new ReceiverPacketHandlerShutdown(receiver));
-                        receiver.getCloudClient().addPacketHandler(new ReceiverPacketHandlerConfig(receiver));
-                        receiver.getCloudClient().addPacketHandler(new ReceiverPacketHandlerServer(receiver));
-                        receiver.getCloudClient().sendPacket(new PacketReceiverLogin(receiver.getInstance(ConfigService.class).getReceiverInfo(), receiver.getAuthManager().getKey()));
-                    }
+                hytoraClient.login(new HytoraLogin(info.getName())).createConnection();
 
-                    @Override
-                    public void handleHandshake(PacketHandshake packetHandshake) {
+                receiver.setCloudClient(hytoraClient);
 
-                    }
-
-                    @Override
-                    public void handlePacketSend(Packet packet) {
-
-                    }
-
-                    @Override
-                    public void handlePacketReceive(Packet packet) {
-
-                    }
-
-                    @Override
-                    public void handleDisconnect(ThunderSession thunderSession) {
-
-                    }
-                });
-
-                receiver.getCloudClient().connect(info.getIpAddress(), info.getPort()).perform();
             } catch (Exception e) {
                 receiver.getParent().getConsole().getLogger().sendMessage("ERROR", "§cNo connection to CloudSystem §ccould be build up! §h[§b" + info.getIpAddress() + "§7:" + "§b" + info.getPort() + "§7/§bTried: " + tries + "x§h]");
                 this.connect();

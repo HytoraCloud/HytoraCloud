@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.service.util.Utils;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketInGetLog;
 import de.lystx.hytoracloud.driver.elements.service.Service;
@@ -29,7 +29,7 @@ public class PacketHandlerLog implements PacketHandler {
     private final CloudSystem cloudSystem;
 
 
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInGetLog) {
             PacketInGetLog packetInGetLog = (PacketInGetLog)packet;
             Service service = CloudDriver.getInstance().getServiceManager().getService(packetInGetLog.getService());

@@ -25,17 +25,12 @@ import de.lystx.hytoracloud.driver.service.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.service.player.IPermissionUser;
 import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudInventory;
 import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudPlayerInventory;
-import de.lystx.hytoracloud.driver.service.player.featured.labymod.LabyModPlayer;
 import de.lystx.hytoracloud.driver.service.util.reflection.Reflections;
 import de.lystx.hytoracloud.driver.service.uuid.NameChange;
 import de.lystx.hytoracloud.driver.service.uuid.UUIDService;
-import io.thunder.packet.PacketBuffer;
-import io.thunder.packet.impl.response.IResponse;
-import io.thunder.packet.impl.response.Response;
-import io.thunder.packet.impl.response.ResponseStatus;
-import io.thunder.utils.objects.ThunderObject;
 import lombok.*;
 import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -45,7 +40,7 @@ import java.util.Random;
 import java.util.UUID;
 
 @Getter @Setter
-public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObject, IPermissionUser, Identifiable {
+public class CloudPlayer implements Serializable, CloudCommandSender , IPermissionUser, Identifiable {
 
     /**
      * The Service the Player is on
@@ -161,7 +156,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
     }
 
     /**
-     * Loads the player's ping as {@link IResponse}
+     * Loads the player's ping as {@link Integer}
      * this might take a while because of packet-transfer
      *
      * @return response with the ping
@@ -173,35 +168,35 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
     }
 
     /**
-     * Loads the player's permissionGroup as {@link IResponse}
+     * Loads the player's permissionGroup as {@link PermissionGroup}
      * this might take a while because of packet-transfer
      *
      * @return response with the permissionGroup
      */
-    public IResponse<PermissionGroup> getPermissionGroup() {
+    public PermissionGroup getPermissionGroup() {
         if (CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
             PacketRequestPermissionGroupGet groupGet = new PacketRequestPermissionGroupGet(this.getUniqueId());
-            Response response = CloudDriver.getInstance().getResponse(groupGet);
-            return response.toIResponse(response.get(0).asCustom(PermissionGroup.class));
+
+            Component component = groupGet.toReply(CloudDriver.getInstance().getConnection());
+
+            return component.get("group");
         } else {
-            return new Response(ResponseStatus.SUCCESS).toIResponse(CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(this.getUniqueId()));
+            return CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(this.getUniqueId());
         }
     }
 
     /**
-     * Loads the player's property as {@link IResponse}
+     * Loads the player's property as {@link JsonObject}
      * this might take a while because of packet-transfer
      *
      * @return response with the property
      */
-    public IResponse<JsonObject> getProperty(String name) {
+    public JsonObject getProperty(String name) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            Response response = CloudDriver.getInstance().getResponse(new PacketRequestGetProperty(this.getUniqueId(), name));
-            return response.toIResponse((JsonObject) new JsonParser().parse(response.getMessage()));
+            Component response = CloudDriver.getInstance().getResponse(new PacketRequestGetProperty(this.getUniqueId(), name));
+            return (JsonObject) new JsonParser().parse(response.reply().getMessage());
         } else {
-            Response response = new Response(ResponseStatus.SUCCESS);
-
-            return response.toIResponse(CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name));
+            return CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name);
         }
     }
 
@@ -421,7 +416,7 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
      */
     public ResponseStatus addProperty(String name, JsonObject jsonObject) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            return CloudDriver.getInstance().getResponse(new PacketRequestAddProperty(this.getUniqueId(), name, jsonObject)).getStatus();
+            return CloudDriver.getInstance().getResponse(new PacketRequestAddProperty(this.getUniqueId(), name, jsonObject)).reply().getStatus();
         }
         playerInformation.addProperty(name, jsonObject);
         playerInformation.update();
@@ -498,31 +493,6 @@ public class CloudPlayer implements Serializable, CloudCommandSender, ThunderObj
     @Override
     public void sendMessage(String prefix, String message) {
         throw new UnsupportedOperationException("Only works on CloudConsole!");
-    }
-
-    @Override
-    public void write(PacketBuffer buf) {
-
-        buf.writeThunderObject(getConnection()); //Name, UUID, iP
-        buf.nullSafe().writeThunderObject(getPlayerInformation());
-
-        buf.writeString(this.getProxy() != null ? this.getProxy().getName() : "null");
-        buf.writeString(this.getService() != null ? this.getService().getName() : "null");
-        //TODO: LABYMODPLAYER SERIALIZE IN BUF
-    }
-
-
-    @Override
-    public void read(PacketBuffer buf) {
-
-        setConnection(buf.readThunderObject(PlayerConnection.class));
-        setPlayerInformation(buf.nullSafe().readThunderObject(PlayerInformation.class));
-
-        String proxy = buf.readString();
-        String service = buf.readString();
-
-        setProxy(proxy.equalsIgnoreCase("null") ? null : CloudDriver.getInstance().getServiceManager().getService(proxy));
-        setService(service.equalsIgnoreCase("null") ? null : CloudDriver.getInstance().getServiceManager().getService(service));
     }
 
     /**

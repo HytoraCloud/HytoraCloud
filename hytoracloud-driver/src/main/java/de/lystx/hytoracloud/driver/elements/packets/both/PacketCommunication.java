@@ -37,7 +37,7 @@ public abstract class PacketCommunication extends HytoraPacket implements Serial
 
     @Override
     public void read(Component component) {
-        sendBack = component.getBoolean("b");
+        sendBack = component.get("b");
     }
 
     @Override

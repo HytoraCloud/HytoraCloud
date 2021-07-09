@@ -9,19 +9,14 @@ import de.lystx.hytoracloud.driver.elements.packets.request.perms.PacketRequestP
 import de.lystx.hytoracloud.driver.elements.packets.request.perms.PacketRequestPermissionGroupGet;
 import de.lystx.hytoracloud.driver.elements.packets.request.property.PacketRequestAddProperty;
 import de.lystx.hytoracloud.driver.elements.packets.request.property.PacketRequestGetProperty;
-import de.lystx.hytoracloud.driver.service.module.Module;
-import de.lystx.hytoracloud.driver.service.module.ModuleInfo;
-import de.lystx.hytoracloud.driver.service.module.ModuleService;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
-import io.thunder.packet.Packet;
-import io.thunder.packet.handler.PacketHandler;
-import io.thunder.packet.impl.response.ResponseStatus;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.handler.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -30,7 +25,7 @@ public class PacketHandlerRequest implements PacketHandler {
 
     private final CloudSystem cloudSystem;
 
-    public void handle(Packet packet) {
+    public void handle(HytoraPacket packet) {
         if (packet instanceof PacketRequestPermissionGroupAdd) {
 
             PacketRequestPermissionGroupAdd packetRequestPermissionGroupAdd = (PacketRequestPermissionGroupAdd) packet;
@@ -41,75 +36,61 @@ public class PacketHandlerRequest implements PacketHandler {
             PermissionGroup permissionGroup = permissionPool.getPermissionGroupByName(packetRequestPermissionGroupAdd.getGroup());
 
             if (permissionGroup == null) {
-                packet.respond(ResponseStatus.FAILED, "The PermissionGroup " + packetRequestPermissionGroupAdd.getGroup() + " does not exist!");
+                packet.reply(ResponseStatus.FAILED, "The PermissionGroup " + packetRequestPermissionGroupAdd.getGroup() + " does not exist!");
                 return;
             }
 
             permissionPool.addPermissionGroupToUser(playerUUID, permissionGroup, packetRequestPermissionGroupAdd.getI(), packetRequestPermissionGroupAdd.getValidality());
             permissionPool.update();
 
-            packet.respond(ResponseStatus.SUCCESS, permissionGroup);
+            packet.reply(component -> component.put("group", permissionGroup));
         } else if (packet instanceof PacketRequestPermissionGroupGet) {
 
             PacketRequestPermissionGroupGet packetRequestPermissionGroupGet = (PacketRequestPermissionGroupGet)packet;
 
-            UUID playerUUID = packetRequestPermissionGroupGet.getPlayerUUID();
+            UUID playerUUID = packetRequestPermissionGroupGet.getUuid();
 
             PlayerInformation playerInformation = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(playerUUID);
 
             if (playerInformation == null) {
-                packet.respond(ResponseStatus.FAILED);
+                packet.reply(ResponseStatus.FAILED);
                 return;
             }
-            packet.respond(ResponseStatus.SUCCESS, playerInformation.getHighestPermissionGroup());
+            packet.reply(component -> component.put("group", playerInformation.getHighestPermissionGroup()));
 
         } else if (packet instanceof PacketRequestAddProperty) {
             try {
                 PacketRequestAddProperty packetRequestAddProperty = (PacketRequestAddProperty)packet;
-                PlayerInformation offlinePlayer = CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(packetRequestAddProperty.getUniqueId());
+                PlayerInformation offlinePlayer = CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(packetRequestAddProperty.getPlayerUUID());
 
                 offlinePlayer.addProperty(packetRequestAddProperty.getName(), packetRequestAddProperty.getProperty());
                 offlinePlayer.update();
-                packet.respond(ResponseStatus.SUCCESS);
+                packet.reply(ResponseStatus.SUCCESS);
             } catch (Exception e) {
-                packet.respond(ResponseStatus.FAILED);
+                packet.reply(ResponseStatus.FAILED);
             }
 
         } else if (packet instanceof PacketRequestGetProperty) {
             try {
                 PacketRequestGetProperty packetRequestGetProperty = (PacketRequestGetProperty)packet;
-                PlayerInformation offlinePlayer = CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(packetRequestGetProperty.getUniqueId());
+                PlayerInformation offlinePlayer = CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(packetRequestGetProperty.getPlayerUUID());
 
-                packet.respond(ResponseStatus.SUCCESS, offlinePlayer.getProperty(packetRequestGetProperty.getName()).toString());
+                packet.reply(ResponseStatus.SUCCESS, offlinePlayer.getProperty(packetRequestGetProperty.getName()).toString());
             } catch (Exception e) {
-                packet.respond(ResponseStatus.FAILED);
+                packet.reply(ResponseStatus.FAILED);
             }
-
-        } else if (packet instanceof PacketRequestModules) {
-
-            PacketRequestModules packetRequestModules = (PacketRequestModules)packet;
-
-            List<ModuleInfo> list = new LinkedList<>();
-            for (Module module : CloudDriver.getInstance().getInstance(ModuleService.class).getModules()) {
-                list.add(module.getInfo());
-            }
-            packetRequestModules.setModuleInfos(list);
-            CloudDriver.getInstance().sendPacket(packetRequestModules);
-            
-            //packet.respond(ResponseStatus.SUCCESS, list);
-
 
         } else if (packet instanceof PacketRequestPermissionGroup) {
 
             PacketRequestPermissionGroup packetRequestPermissionGroup = (PacketRequestPermissionGroup)packet;
-            UUID name = packetRequestPermissionGroup.getName();
+            UUID name = packetRequestPermissionGroup.getUuid();
 
             PermissionGroup permissionGroup = CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(name);
 
             if (permissionGroup != null) {
-                packet.respond(ResponseStatus.SUCCESS, permissionGroup);
+                packet.reply(component -> component.put("group", permissionGroup));
             } else {
-                packet.respond(ResponseStatus.FAILED);
+                packet.reply(ResponseStatus.FAILED);
             }
 
         }

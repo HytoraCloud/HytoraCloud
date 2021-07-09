@@ -23,6 +23,6 @@ public class UUIDPacket extends HytoraPacket {
 
     @Override
     public void read(Component component) {
-        uuid = component.getUUID("uuid");
+        uuid = component.get("uuid");
     }
 }

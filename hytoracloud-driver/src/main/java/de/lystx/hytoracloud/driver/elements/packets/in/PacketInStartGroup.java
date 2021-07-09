@@ -22,6 +22,6 @@ public class PacketInStartGroup extends HytoraPacket implements Serializable {
 
     @Override
     public void read(Component component) {
-        serviceGroup = (ServiceGroup) component.getObject("s");
+        serviceGroup = (ServiceGroup) component.get("s");
     }
 }

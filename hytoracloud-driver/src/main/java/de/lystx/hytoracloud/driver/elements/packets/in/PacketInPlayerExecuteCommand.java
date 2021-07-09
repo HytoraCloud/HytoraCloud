@@ -29,7 +29,7 @@ public class PacketInPlayerExecuteCommand extends HytoraPacket implements Serial
 
     @Override
     public void read(Component component) {
-        player = component.getString("p");
-        command = component.getString("c");
+        player = component.get("p");
+        command = component.get("c");
     }
 }

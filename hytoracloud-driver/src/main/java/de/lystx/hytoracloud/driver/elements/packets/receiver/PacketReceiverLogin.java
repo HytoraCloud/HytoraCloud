@@ -26,7 +26,7 @@ public class PacketReceiverLogin extends HytoraPacket implements Serializable {
     @Override
     public void read(Component component) {
 
-        receiverInfo = (ReceiverInfo) component.getObject("r");
-        key = component.getString("k");
+        receiverInfo = (ReceiverInfo) component.get("r");
+        key = component.get("k");
     }
 }

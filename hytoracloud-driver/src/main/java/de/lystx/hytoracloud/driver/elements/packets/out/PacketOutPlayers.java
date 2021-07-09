@@ -30,6 +30,6 @@ public class PacketOutPlayers extends HytoraPacket {
 
     @Override
     public void read(Component component) {
-        cloudPlayers = (List<CloudPlayer>) component.getObject("ps");
+        cloudPlayers = (List<CloudPlayer>) component.get("ps");
     }
 }

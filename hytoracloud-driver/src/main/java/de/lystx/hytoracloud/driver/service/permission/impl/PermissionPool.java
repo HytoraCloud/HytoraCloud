@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Getter @Setter
-public class PermissionPool implements Serializable, ThunderObject {
+public class PermissionPool implements Serializable {
 
     /**
      * All cached {@link PermissionGroup}s
@@ -627,41 +627,4 @@ public class PermissionPool implements Serializable, ThunderObject {
     }
 
 
-    @Override
-    public void write(PacketBuffer buf) {
-        buf.writeBoolean(enabled);
-
-        buf.writeInt(cachedPermissionGroups.size());
-        for (PermissionGroup cachedPermissionGroup : cachedPermissionGroups) {
-            if (cachedPermissionGroup == null) {
-                continue;
-            }
-            buf.writeThunderObject(cachedPermissionGroup);
-        }
-
-        buf.writeInt(cachedCloudPlayers.size());
-        for (PlayerInformation cachedCloudPlayer : cachedCloudPlayers) {
-            if (cachedCloudPlayer == null) {
-                continue;
-            }
-            buf.writeThunderObject(cachedCloudPlayer);
-        }
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        enabled = buf.readBoolean();
-
-        int size = buf.readInt();
-        cachedPermissionGroups = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            cachedPermissionGroups.add(buf.readThunderObject(PermissionGroup.class));
-        }
-
-        size = buf.readInt();
-        cachedCloudPlayers = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            cachedCloudPlayers.add(buf.readThunderObject(PlayerInformation.class));
-        }
-    }
 }

@@ -8,49 +8,27 @@ import io.thunder.packet.PacketBuffer;
 import io.thunder.packet.impl.JsonPacket;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.Serializable;
 import java.util.*;
 
 @Getter @AllArgsConstructor
-public class PacketOutGlobalInfo extends Packet implements Serializable {
+public class PacketOutGlobalInfo extends HytoraPacket implements Serializable {
 
     private NetworkConfig networkConfig;
     private Map<ServiceGroup, List<Service>> services;
 
     @Override
-    public void write(PacketBuffer buf) {
-        buf.writeThunderObject(networkConfig);
-
-        buf.writeInt(services.size());
-        for (ServiceGroup serviceGroup : services.keySet()) {
-            serviceGroup.writeToBuf(buf);
-            List<Service> services = this.services.get(serviceGroup);
-            buf.writeInt(services.size());
-            for (Service service : services) {
-                service.writeToBuf(buf);
-            }
-        }
-
+    public void write(Component component) {
+        component.put("config", networkConfig);
+        component.put("services", services);
     }
 
     @Override
-    public void read(PacketBuffer buf) {
-
-        networkConfig = buf.readThunderObject(NetworkConfig.class);
-
-        int size = buf.readInt();
-
-        this.services = new HashMap<>(size);
-
-        for (int i = 0; i < size; i++) {
-            ServiceGroup serviceGroup = ServiceGroup.readFromBuf(buf);
-            int size2 = buf.readInt();
-            List<Service> services = new ArrayList<>(size2);
-            for (int i1 = 0; i1 < size2; i1++) {
-                services.add(Service.readFromBuf(buf));
-            }
-            this.services.put(serviceGroup, services);
-        }
+    public void read(Component component) {
+        networkConfig = component.get("config");
+        services = component.get("services");
     }
 }
