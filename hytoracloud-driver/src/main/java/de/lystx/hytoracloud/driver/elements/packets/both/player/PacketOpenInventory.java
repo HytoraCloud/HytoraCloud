@@ -4,7 +4,7 @@ import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudInventory;
 import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import io.thunder.packet.PacketBuffer;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;

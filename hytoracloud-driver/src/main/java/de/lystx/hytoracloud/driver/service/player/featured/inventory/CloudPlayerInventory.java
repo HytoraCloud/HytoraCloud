@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.driver.service.player.featured.inventory;
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketInventoryUpdate;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import io.thunder.packet.PacketBuffer;
-import io.thunder.utils.objects.ThunderObject;
+
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter @Setter
-public class CloudPlayerInventory implements Serializable, ThunderObject {
+public class CloudPlayerInventory implements Serializable {
 
     private CloudItem helmet, chestplate, leggings, boots;
     private Map<Integer, CloudItem> slots;
@@ -61,34 +61,4 @@ public class CloudPlayerInventory implements Serializable, ThunderObject {
         }
     }
 
-    @Override
-    public void write(PacketBuffer buf) {
-
-        buf.writeThunderObject(helmet);
-        buf.writeThunderObject(chestplate);
-        buf.writeThunderObject(leggings);
-        buf.writeThunderObject(boots);
-
-        buf.writeInt(slots.size());
-        for (Integer integer : slots.keySet()) {
-            buf.writeInt(integer);
-            buf.writeThunderObject(slots.get(integer));
-        }
-
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-
-        helmet = buf.readThunderObject(CloudItem.class);
-        chestplate = buf.readThunderObject(CloudItem.class);
-        leggings = buf.readThunderObject(CloudItem.class);
-        boots = buf.readThunderObject(CloudItem.class);
-
-        int size = buf.readInt();
-        slots = new HashMap<>(size);
-        for (int i = 0; i < size; i++) {
-            slots.put(buf.readInt(), buf.readThunderObject(CloudItem.class));
-        }
-    }
 }

@@ -2,15 +2,16 @@ package de.lystx.hytoracloud.driver.elements.service;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.other.FileService;
-import io.thunder.packet.PacketBuffer;
-import io.thunder.utils.objects.ThunderObject;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.File;
+import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class Template implements ThunderObject {
+public class Template implements Serializable {
 
     /**
      * The name of the template (e.g. "Lobby")
@@ -26,17 +27,6 @@ public class Template implements ThunderObject {
         this(name, CloudDriver.getInstance().getInstance(FileService.class).getTemplatesDirectory() + "/" + group + "/" + name + "/");
     }
 
-    @Override
-    public void write(PacketBuffer buf) {
-        buf.writeString(name);
-        buf.writeString(directory);
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        name = buf.readString();
-        directory = buf.readString();
-    }
 
     public File getDirectory() {
         return new File(directory);

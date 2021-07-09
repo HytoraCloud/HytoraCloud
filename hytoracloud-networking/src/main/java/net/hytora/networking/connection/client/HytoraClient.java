@@ -4,6 +4,8 @@ import lombok.SneakyThrows;
 import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.elements.component.RepliableComponent;
 import net.hytora.networking.elements.other.HytoraLogin;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.PacketHandshake;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.component.Component;
 
@@ -105,6 +107,11 @@ public class HytoraClient implements HytoraConnection {
     private Consumer<HytoraClient> loginConsumer;
 
     /**
+     * The client listener
+     */
+    private ClientListener clientListener;
+
+    /**
      * Creates a new client with given options and login
      *
      * @param host the host to connect to
@@ -121,7 +128,25 @@ public class HytoraClient implements HytoraConnection {
         this.userManager = new UserManager();
         this.packetManager = new PacketManager(this);
         this.random = new Random();
+        this.clientListener = null;
 
+        this.registerPacketHandler(packet -> {
+            if (this.clientListener != null) {
+                this.clientListener.packetIn(packet);
+            }
+            if (packet instanceof PacketHandshake) {
+                if (this.clientListener != null) {
+                    this.clientListener.onHandshake((PacketHandshake) packet);
+                }
+            }
+        });
+
+        this.loginHandler(hytoraClient -> {
+
+            if (this.clientListener != null) {
+                this.clientListener.onConnect(new InetSocketAddress(this.host, this.port));
+            }
+        });
     }
 
     /**
@@ -133,6 +158,34 @@ public class HytoraClient implements HytoraConnection {
     public HytoraClient options(HytoraClientOptions options) {
         this.options = options;
         return this;
+    }
+
+    /**
+     * Sets the listener for this client
+     *
+     * @param listener the listener
+     * @return current client
+     */
+    public HytoraClient listener(ClientListener listener) {
+        this.clientListener = listener;
+        return this;
+    }
+
+    @Override
+    public void sendPacket(HytoraPacket packet) {
+        HytoraConnection.super.sendPacket(packet);
+
+        if (this.clientListener != null) {
+            this.clientListener.packetOut(packet);
+        }
+    }
+
+    @Override
+    public void sendPacket(HytoraPacket packet, String receiver) {
+        HytoraConnection.super.sendPacket(packet, receiver);
+        if (this.clientListener != null) {
+            this.clientListener.packetOut(packet);
+        }
     }
 
     /**
@@ -236,6 +289,9 @@ public class HytoraClient implements HytoraConnection {
                     //Retrying with the given retry delay
                     this.available = -2;
                     TimeUnit.MILLISECONDS.sleep(this.options.getRetryDelay());
+                }
+                if (this.clientListener != null) {
+                    this.clientListener.onDisconnect();
                 }
             } catch (Exception e) {
                 if (this.options.isDebug()) {

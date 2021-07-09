@@ -3,7 +3,6 @@ package de.lystx.hytoracloud.driver.service.player;
 import de.lystx.hytoracloud.driver.elements.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.service.permission.impl.PermissionValidity;
-import io.thunder.packet.impl.response.IResponse;
 
 import javax.annotation.Nullable;
 import java.util.List;

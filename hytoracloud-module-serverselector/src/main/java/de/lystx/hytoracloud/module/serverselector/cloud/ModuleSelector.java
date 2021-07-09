@@ -26,8 +26,8 @@ public class ModuleSelector extends Module {
         CloudDriver.getInstance().getServiceRegistry().registerService(new SignService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new NPCService());
 
-        CloudDriver.getInstance().getConnection().addPacketHandler(new PacketHandlerNPC(CloudDriver.getInstance()));
-        CloudDriver.getInstance().getConnection().addPacketHandler(new PacketHandlerCloudSign(CloudDriver.getInstance()));
+        CloudDriver.getInstance().getConnection().registerPacketHandler(new PacketHandlerNPC(CloudDriver.getInstance()));
+        CloudDriver.getInstance().getConnection().registerPacketHandler(new PacketHandlerCloudSign(CloudDriver.getInstance()));
     }
 
     @Override

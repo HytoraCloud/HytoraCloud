@@ -258,24 +258,16 @@ public class ServiceStarter {
             FileUtils.copyFile( new File(version, getJarFile()), jar);
         }
         File cloud = new File(serverLocation + "/CLOUD/"); cloud.mkdirs();
-        File file = new File(cloud, "connection.json");
         File hytoraCloud = new File(cloud, "cloud.json");
-        if (!file.exists()) {
-            file.createNewFile();
-        }
         if (!hytoraCloud.exists()) {
             hytoraCloud.createNewFile();
         }
 
-        JsonEntity jsonEntity = new JsonEntity(file);
-
-        jsonEntity.append(service);
-        jsonEntity.save();
-
-        jsonEntity = new JsonEntity(hytoraCloud);
+        JsonEntity jsonEntity = new JsonEntity(hytoraCloud);
         jsonEntity.append("@logType", CloudDriver.getInstance().getHost().getClass().getName());
         jsonEntity.append("host", CloudDriver.getInstance().getHost().getAddress().getHostAddress());
         jsonEntity.append("port", CloudDriver.getInstance().getHost().getPort());
+        jsonEntity.append("server", service.getName());
         jsonEntity.save();
     }
 

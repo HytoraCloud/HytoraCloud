@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.driver.elements.packets.request.property;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.thunder.packet.Packet;
-import io.thunder.packet.PacketBuffer;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;

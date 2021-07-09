@@ -30,20 +30,44 @@ public interface ComponentSender {
      * @param packet the packet to send
      */
     default void sendPacket(HytoraPacket packet) {
-        this.sendComponent(component -> {
-            component.setChannel("_packets");
-            component.append(map -> {
-                map.put("_class", packet.getClass().getName());
-                map.put("_uuid", packet.getPacketUUID());
-                map.put("_ms", System.currentTimeMillis());
-            });
+        Component component = this.packetToComponent(packet);
+        this.sendComponent(component);
+    }
 
-            if (this instanceof HytoraServer) {
-                component.setReceiver("all");
-            }
+    /**
+     * Sends a {@link HytoraPacket} to a given receiver
+     *
+     * @param packet the packet
+     * @param receiver the receiver
+     */
+    default void sendPacket(HytoraPacket packet, String receiver) {
+        Component component = this.packetToComponent(packet);
+        component.setReceiver(receiver);
+        this.sendComponent(component);
+    }
 
-            packet.write(component);
+    /**
+     * Transforms a packet into a component
+     *
+     * @param packet the packet
+     * @return component
+     */
+    default Component packetToComponent(HytoraPacket packet) {
+        Component component = new Component();
+        component.setChannel("_packets");
+        component.append(map -> {
+            map.put("_class", packet.getClass().getName());
+            map.put("_uuid", packet.getPacketUUID());
+            map.put("_ms", System.currentTimeMillis());
         });
+
+        if (this instanceof HytoraServer) {
+            component.setReceiver("all");
+        }
+
+        packet.write(component);
+
+        return component;
     }
 
     /**

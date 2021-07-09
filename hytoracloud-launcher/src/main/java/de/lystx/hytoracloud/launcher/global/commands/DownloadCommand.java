@@ -1,29 +1,16 @@
 package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.enums.Color;
 import de.lystx.hytoracloud.driver.enums.ProxyVersion;
 import de.lystx.hytoracloud.driver.enums.SpigotVersion;
 import de.lystx.hytoracloud.driver.service.console.CloudConsole;
-import de.lystx.hytoracloud.driver.service.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.service.other.Updater;
-import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.util.other.Action;
 import de.lystx.hytoracloud.launcher.global.impl.setup.VersionDownload;
-import io.thunder.utils.objects.ThunderTimer;
-import lombok.AllArgsConstructor;
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 public class DownloadCommand {
 

@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.service.config.impl.fallback;
 
-import io.thunder.packet.PacketBuffer;
-import io.thunder.utils.objects.ThunderObject;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter @AllArgsConstructor
-public class FallbackConfig implements ThunderObject {
+public class FallbackConfig implements Serializable {
 
     /**
      * The default fallback
@@ -34,22 +34,4 @@ public class FallbackConfig implements ThunderObject {
         return this.fallbacks.stream().filter(fallback -> fallback.getGroupName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
     }
 
-    @Override
-    public void write(PacketBuffer buf) {
-        buf.writeThunderObject(defaultFallback);
-        buf.writeInt(fallbacks.size());
-        for (Fallback fallback : fallbacks) {
-            buf.writeThunderObject(fallback);
-        }
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        defaultFallback = buf.readThunderObject(Fallback.class);
-        int size = buf.readInt();
-        fallbacks = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            fallbacks.add(buf.readThunderObject(Fallback.class));
-        }
-    }
 }

@@ -459,7 +459,8 @@ public class CloudDriver {
      * @return service
      */
     public Service getThisService() {
-        return new JsonEntity(new File("./CLOUD/connection.json")).getAs(Service.class);
+        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+        return this.serviceManager.getService(jsonEntity.getString("server"));
     }
 
     /**

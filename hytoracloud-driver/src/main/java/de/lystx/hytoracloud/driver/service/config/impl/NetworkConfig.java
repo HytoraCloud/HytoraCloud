@@ -2,12 +2,12 @@ package de.lystx.hytoracloud.driver.service.config.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.elements.packets.in.PacketUpdateNetworkConfig;
-import io.thunder.packet.PacketBuffer;
+
 import de.lystx.hytoracloud.driver.service.config.impl.fallback.Fallback;
 import de.lystx.hytoracloud.driver.service.config.impl.fallback.FallbackConfig;
 import de.lystx.hytoracloud.driver.service.config.impl.labymod.LabyModConfig;
 import de.lystx.hytoracloud.driver.service.config.impl.proxy.GlobalProxyConfig;
-import io.thunder.utils.objects.ThunderObject;
+
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 @Getter @Setter @AllArgsConstructor
-public class NetworkConfig implements Serializable, ThunderObject, Objectable<NetworkConfig> {
+public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
 
     /**
      * The host of the cloud
@@ -105,35 +105,6 @@ public class NetworkConfig implements Serializable, ThunderObject, Objectable<Ne
                 )
         );
     }
-
-
-    @SneakyThrows @Override
-    public void write(PacketBuffer buf) {
-
-        buf.writeString(host == null ? "host" : host);
-        buf.writeInt(port == -1 ? 0 : port);
-        buf.writeBoolean(setupDone);
-        buf.writeBoolean(autoUpdater);
-
-        buf.writeThunderObject(globalProxyConfig);
-        buf.writeThunderObject(labyModConfig);
-        buf.writeThunderObject(messageConfig);
-        buf.writeThunderObject(fallbackConfig);
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        host = buf.readString();
-        port = buf.readInt();
-        setupDone = buf.readBoolean();
-        autoUpdater = buf.readBoolean();
-
-        globalProxyConfig = buf.readThunderObject(GlobalProxyConfig.class);
-        labyModConfig = buf.readThunderObject(LabyModConfig.class);
-        messageConfig = buf.readThunderObject(MessageConfig.class);
-        fallbackConfig = buf.readThunderObject(FallbackConfig.class);
-    }
-
 
     /**
      * Updates this {@link NetworkConfig}

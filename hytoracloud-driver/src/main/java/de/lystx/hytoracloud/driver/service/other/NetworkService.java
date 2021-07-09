@@ -3,13 +3,10 @@ package de.lystx.hytoracloud.driver.service.other;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
 import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.service.util.Utils;
-import io.thunder.Thunder;
-import io.thunder.connection.base.ThunderServer;
-import io.thunder.utils.objects.ThunderOption;
 import lombok.Getter;
+import net.hytora.networking.connection.server.HytoraServer;
 
 @Getter
 @ICloudServiceInfo(
@@ -22,21 +19,20 @@ import lombok.Getter;
 )
 public class NetworkService implements ICloudService {
 
-    private final ThunderServer thunderServer;
+    private final HytoraServer hytoraServer;
 
     public NetworkService() {
-        this.thunderServer = Thunder.createServer();
 
-        this.thunderServer.option(ThunderOption.IGNORE_HANDSHAKE_IF_FAILED, true);
+        this.hytoraServer = new HytoraServer(CloudDriver.getInstance().getNetworkConfig().getPort());
 
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.thunderServer);
-        this.thunderServer.start(CloudDriver.getInstance().getInstance(ConfigService.class).getNetworkConfig().getPort()).perform();
+        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.hytoraServer);
+        this.hytoraServer.createConnection();
     }
 
     /**
      * Stops server
      */
     public void shutdown() {
-        this.thunderServer.disconnect();
+        this.hytoraServer.close();
     }
 }

@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.elements.other;
 
-import io.thunder.packet.PacketBuffer;
+
 import io.vson.elements.object.VsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,18 +25,4 @@ public class ReceiverInfo implements Serializable {
     private final boolean established;
     private final Map<String, Object> values;
 
-
-    @SneakyThrows
-    public static ReceiverInfo fromBuf(PacketBuffer buf) {
-        return new ReceiverInfo(buf.readString(), buf.readString(), buf.readInt(), buf.readBoolean(), VsonObject.encode(new VsonObject(buf.readString())));
-    }
-    
-    public void toBuf(PacketBuffer buf) {
-
-        buf.writeString(getName());
-        buf.writeString(getIpAddress());
-        buf.writeInt(getPort());
-        buf.writeBoolean(isEstablished());
-        buf.writeString(VsonObject.encode(getValues()).toString());
-    }
 }

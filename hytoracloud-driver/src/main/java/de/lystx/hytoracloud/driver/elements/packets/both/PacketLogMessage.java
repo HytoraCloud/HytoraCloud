@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.elements.packets.both;
 
 import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
-import io.thunder.packet.PacketBuffer;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;

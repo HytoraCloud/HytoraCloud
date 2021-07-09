@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.elements.other;
 
 import com.google.gson.*;
-import io.thunder.packet.PacketBuffer;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -488,18 +488,6 @@ public class JsonEntity implements Iterable<JsonElement> {
      */
     public static String toString(Object src) {
         return GSON.toJson(src);
-    }
-    /**
-     * Formats an Object directly
-     * into a formatted JsonString and writes it to a buffer
-     *
-     * @param src the object to transform
-     * @return string as json
-     */
-    public static String toBuffer(PacketBuffer buf, Object src) {
-        String string = toString(src);
-        buf.writeString(string);
-        return string;
     }
 
     /**

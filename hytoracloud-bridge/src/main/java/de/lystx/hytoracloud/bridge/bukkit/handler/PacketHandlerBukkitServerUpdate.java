@@ -35,15 +35,6 @@ public class PacketHandlerBukkitServerUpdate implements PacketHandler {
                 CloudDriver.getInstance().getBukkit().setMaxPlayers(newGroup.getMaxPlayers());
                 CloudDriver.getInstance().getBukkit().update();
             }
-        } else if (packet instanceof PacketServiceUpdate) {
-            PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;
-            Service service = packetServiceUpdate.getService();
-            if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getThisService().getName())) {
-                JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/connection.json"));
-                jsonEntity.clear();
-                jsonEntity.append(service);
-                jsonEntity.save();
-            }
         }
     }
 }

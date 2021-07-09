@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.enums.ServiceState;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.service.util.minecraft.ServiceInfo;
-import io.thunder.packet.PacketBuffer;
+
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.service.util.minecraft.ServerPinger;
 import io.vson.elements.object.Objectable;
@@ -146,11 +146,6 @@ public class Service implements Serializable, Objectable<Service> {
      * and syncs it all over the cloud
      */
     public void update() {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/connection.json"));
-            jsonEntity.append(this);
-            jsonEntity.save();
-        }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketServiceUpdate(this));
     }
 
@@ -197,36 +192,6 @@ public class Service implements Serializable, Objectable<Service> {
     @Override
     public String toString() {
         return name;
-    }
-
-    @SneakyThrows
-    public void writeToBuf(PacketBuffer buf) {
-        buf.writeString(name);
-        buf.writeUUID(uniqueId);
-        buf.writeInt(serviceID);
-        buf.writeInt(port);
-        buf.writeString(host);
-        buf.writeEnum(serviceState);
-        buf.writeString(properties.toString());
-        serviceGroup.writeToBuf(buf);
-        buf.writeBoolean(authenticated);
-
-    }
-
-    public static Service readFromBuf(PacketBuffer buf) {
-
-        String name = buf.readString();
-        UUID uniqueId = buf.readUUID();
-        int id = buf.readInt();
-        int port = buf.readInt();
-        String host = buf.readString();
-        ServiceState state = buf.readEnum(ServiceState.class);
-        JsonObject properties = new JsonEntity(buf.readString()).build();
-        ServiceGroup serviceGroup = ServiceGroup.readFromBuf(buf);
-        boolean authenticated = buf.readBoolean();
-
-        return new Service(name, uniqueId, id, port, host, state, properties, serviceGroup, authenticated);
-
     }
 
     /**

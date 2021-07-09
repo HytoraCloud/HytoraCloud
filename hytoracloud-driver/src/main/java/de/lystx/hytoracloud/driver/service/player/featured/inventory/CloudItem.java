@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.service.player.featured.inventory;
 
-import io.thunder.packet.PacketBuffer;
-import io.thunder.utils.objects.ThunderObject;
+
+
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-public class CloudItem implements Serializable, ThunderObject {
+public class CloudItem implements Serializable {
 
 
     private List<String> lore;
@@ -181,35 +181,4 @@ public class CloudItem implements Serializable, ThunderObject {
         return this;
     }
 
-    @Override
-    public void write(PacketBuffer buf) {
-        buf.nullSafe().writeInt(lore.size());
-        for (String s : lore) {
-            buf.nullSafe().writeString(s);
-        }
-        buf.nullSafe().writeShort(id);
-        buf.nullSafe().writeString(material);
-        buf.nullSafe().writeString(displayName);
-        buf.nullSafe().writeInt(amount);
-        buf.nullSafe().writeBoolean(unbreakable);
-        buf.nullSafe().writeBoolean(glow);
-        buf.nullSafe().writeString(skullOwner);
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        int size = buf.nullSafe().readInt();
-        lore = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            lore.add(buf.nullSafe().readString());
-        }
-
-        id = buf.nullSafe().readShort();
-        material = buf.nullSafe().readString();
-        displayName = buf.nullSafe().readString();
-        amount = buf.nullSafe().readInt();
-        unbreakable = buf.nullSafe().readBoolean();
-        glow = buf.nullSafe().readBoolean();
-        skullOwner = buf.nullSafe().readString();
-    }
 }

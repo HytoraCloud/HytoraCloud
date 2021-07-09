@@ -78,7 +78,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
     @Override
     public void startService(ServiceGroup serviceGroup, Service service, JsonObject properties) {
         service.setServiceGroup(serviceGroup);
-        this.cloudBridge.getCloudClient().sendPacket(new PacketInStartService(service, properties));
+        this.cloudBridge.getClient().sendPacket(new PacketInStartService(service, properties));
     }
 
     @Override
@@ -92,12 +92,12 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param serviceGroup
      */
     public void startService(ServiceGroup serviceGroup) {
-        this.cloudBridge.getCloudClient().sendPacket(new PacketInStartGroup(serviceGroup));
+        this.cloudBridge.getClient().sendPacket(new PacketInStartGroup(serviceGroup));
     }
 
     @Override
     public void startService(ServiceGroup serviceGroup, JsonObject properties) {
-        this.cloudBridge.getCloudClient().sendPacket(new PacketInStartGroupWithProperties(serviceGroup, properties));
+        this.cloudBridge.getClient().sendPacket(new PacketInStartGroupWithProperties(serviceGroup, properties));
     }
 
 
@@ -246,7 +246,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param service
      */
     public void stopService(Service service) {
-        this.cloudBridge.getCloudClient().sendPacket(new PacketInStopServer(service));
+        this.cloudBridge.getClient().sendPacket(new PacketInStopServer(service));
     }
 
     @Override

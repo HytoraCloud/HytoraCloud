@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.driver.service.permission.impl;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import io.thunder.packet.PacketBuffer;
-import io.thunder.utils.objects.ThunderObject;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Getter @Setter @AllArgsConstructor
-public class PermissionGroup implements Serializable, ThunderObject {
+public class PermissionGroup implements Serializable {
 
     /**
      * The name of the group (e.g. "Admin")
@@ -137,67 +137,4 @@ public class PermissionGroup implements Serializable, ThunderObject {
         CloudDriver.getInstance().getPermissionPool().update();
     }
 
-
-    @Override
-    public void write(PacketBuffer buf) {
-
-        buf.writeString(name); //Writes the name
-        buf.writeInt(id); //writes the id
-        buf.writeString(prefix); //writes the prefix
-        buf.writeString(suffix); //writes the suffix
-        buf.writeString(display); //writes the display
-        buf.writeString(chatFormat); //writes the chatFormat
-
-        //Writes the permissions
-        buf.writeInt(permissions.size()); //the size of the list
-        for (String permission : permissions) {
-            //the permissions
-            buf.writeString(permission);
-        }
-
-        //Writes the inheritances
-        buf.writeInt(inheritances.size()); //size of the inheritance list
-        for (String inheritance : inheritances) {
-            //the inheritances
-            buf.writeString(inheritance);
-        }
-
-        //writes the properties
-        buf.writeString(properties.toString());
-
-        buf.writeInt(properties.size());
-        properties.forEach((s, json) -> {
-            buf.writeString(s);
-            buf.writeString(json.toString());
-        });
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        name = buf.readString(); //the name
-        id = buf.readInt(); //the id
-        prefix = buf.readString(); //the prefix
-        suffix = buf.readString(); //the suffix
-        display = buf.readString(); //the display
-        chatFormat = buf.readString(); //the chatFormat
-
-        int permsSize = buf.readInt(); //the size of the permissions
-        permissions = new ArrayList<>(permsSize); //the permissionsList
-        for (int i1 = 0; i1 < permsSize; i1++) {
-            permissions.add(buf.readString());
-        }
-
-        int inSize = buf.readInt(); //the size of the inheritances
-        inheritances = new ArrayList<>(inSize); //the inheritance list
-        for (int i1 = 0; i1 < inSize; i1++) {
-            inheritances.add(buf.readString());
-        }
-
-        int propSize = buf.readInt();
-        properties = new HashMap<>(propSize);
-        for (int i = 0; i < propSize; i++) {
-            properties.put(buf.readString(), (JsonObject) new JsonParser().parse(buf.readString()));
-        }
-
-    }
 }

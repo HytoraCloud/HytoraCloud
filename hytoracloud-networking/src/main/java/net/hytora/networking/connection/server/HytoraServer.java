@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.connection.HytoraConnectionBridge;
 import net.hytora.networking.elements.component.RepliableComponent;
+import net.hytora.networking.elements.packet.PacketHandshake;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.other.UserManager;
 import net.hytora.networking.elements.component.Component;
@@ -88,6 +89,7 @@ public class HytoraServer implements HytoraConnection {
         this.packetManager = new PacketManager(this);
         this.random = new Random();
 
+        this.registerLoginHandler(hytoraConnectionBridge -> hytoraConnectionBridge.sendPacket(new PacketHandshake(), hytoraConnectionBridge.getName()));
     }
 
     /**

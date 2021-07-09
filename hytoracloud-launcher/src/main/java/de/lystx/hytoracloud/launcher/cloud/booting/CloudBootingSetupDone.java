@@ -56,7 +56,7 @@ public class CloudBootingSetupDone {
         CloudDriver.getInstance().getServiceRegistry().registerService(new BackupService());
 
 
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", CloudDriver.getInstance().getInstance(NetworkService.class).getThunderServer());
+        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", CloudDriver.getInstance().getInstance(NetworkService.class).getHytoraServer());
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "serviceManager", new DefaultServiceManager(CloudDriver.getInstance().getInstance(GroupService.class).getGroups()));
 
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerRegister());

@@ -4,19 +4,18 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.bukkit.command.ServiceCommand;
 import de.lystx.hytoracloud.bridge.bukkit.command.StopCommand;
 import de.lystx.hytoracloud.bridge.bukkit.events.other.BukkitEventEvent;
-//import de.lystx.bridge.bukkit.handler.*;
 import de.lystx.hytoracloud.bridge.bukkit.listener.cloud.CloudListener;
-//import de.lystx.bridge.bukkit.listener.player.*;
 import de.lystx.hytoracloud.bridge.bukkit.manager.DefaultBukkit;
 import de.lystx.hytoracloud.bridge.bukkit.manager.nametag.NametagManager;
 import de.lystx.hytoracloud.bridge.bukkit.handler.*;
 import de.lystx.hytoracloud.bridge.bukkit.listener.player.PlayerChatListener;
 import de.lystx.hytoracloud.bridge.bukkit.listener.player.PlayerJoinListener;
 import de.lystx.hytoracloud.bridge.bukkit.listener.player.PlayerQuitListener;
+import de.lystx.hytoracloud.driver.elements.service.ServiceType;
 import de.lystx.hytoracloud.driver.service.command.base.Command;
-import io.thunder.Thunder;
-import io.thunder.connection.ErrorHandler;
-import io.thunder.packet.Packet;
+
+
+
 
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -50,6 +49,8 @@ public class HytoraCloudBukkitBridge extends JavaPlugin {
         }
         CloudDriver.getInstance().execute(() -> {
             instance = this;
+
+            Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "bukkit", new DefaultBukkit());
 
             CloudDriver.getInstance().getBukkit().setVersion(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
 

@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.elements.packets.in.PacketInUpdateServiceGrou
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import io.thunder.packet.PacketBuffer;
+
 import de.lystx.hytoracloud.driver.CloudDriver;
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
@@ -173,43 +173,4 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
         return this.name;
     }
 
-    @SneakyThrows
-    public void writeToBuf(PacketBuffer buf) {
-        buf.writeUUID(uniqueId);
-        buf.writeString(name);
-        buf.writeThunderObject(template);
-        buf.writeEnum(serviceType);
-        buf.writeString(receiver);
-        buf.writeInt(maxServer);
-        buf.writeInt(minServer);
-        buf.writeInt(maxRam);
-        buf.writeInt(minRam);
-        buf.writeInt(maxPlayers);
-        buf.writeInt(newServerPercent);
-        buf.writeBoolean(maintenance);
-        buf.writeBoolean(lobby);
-        buf.writeBoolean(dynamic);
-        buf.writeString(properties.toString());
-
-    }
-
-    public static ServiceGroup readFromBuf(PacketBuffer buf) {
-        return new ServiceGroup(
-                buf.readUUID(),
-                buf.readString(),
-                buf.readThunderObject(Template.class),
-                buf.readEnum(ServiceType.class),
-                buf.readString(),
-                buf.readInt(),
-                buf.readInt(),
-                buf.readInt(),
-                buf.readInt(),
-                buf.readInt(),
-                buf.readInt(),
-                buf.readBoolean(),
-                buf.readBoolean(),
-                buf.readBoolean(),
-                SerializableDocument.fromDocument(new JsonEntity(buf.readString()))
-        );
-    }
 }

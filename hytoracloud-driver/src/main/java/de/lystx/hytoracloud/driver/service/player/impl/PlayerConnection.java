@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.driver.service.player.impl;
 
 import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketKickPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import io.thunder.packet.PacketBuffer;
-import io.thunder.utils.objects.ThunderObject;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
  * and send packets
  */
 @Getter @AllArgsConstructor
-public class PlayerConnection implements Serializable, ThunderObject {
+public class PlayerConnection implements Serializable {
 
     /**
      * The UUId of this connection
@@ -58,24 +58,4 @@ public class PlayerConnection implements Serializable, ThunderObject {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketKickPlayer(this.uniqueId, reason));
     }
 
-    @Override
-    public void write(PacketBuffer buf) {
-
-        buf.writeString(name);
-        buf.writeUUID(uniqueId);
-        buf.writeString(address);
-        buf.writeInt(protocolVersion);
-        buf.writeBoolean(online);
-        buf.writeBoolean(legacyMode);
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        name = buf.readString();
-        uniqueId = buf.readUUID();
-        address = buf.readString();
-        protocolVersion = buf.readInt();
-        online = buf.readBoolean();
-        legacyMode = buf.readBoolean();
-    }
 }

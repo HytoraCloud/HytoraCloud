@@ -1,8 +1,6 @@
 package de.lystx.hytoracloud.bridge;
 
 
-import de.lystx.hytoracloud.bridge.bukkit.manager.DefaultBukkit;
-//import de.lystx.bridge.standalone.handler.*;
 import de.lystx.hytoracloud.bridge.proxy.handler.ProxyHandlerConfig;
 import de.lystx.hytoracloud.bridge.proxy.commands.*;
 import de.lystx.hytoracloud.bridge.proxy.handler.ProxyHandlerCloudPlayer;
@@ -18,7 +16,6 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
 import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
 import de.lystx.hytoracloud.driver.enums.CloudType;
 import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketRegisterService;
 import de.lystx.hytoracloud.driver.service.config.ConfigService;
@@ -29,28 +26,24 @@ import de.lystx.hytoracloud.driver.service.module.ModuleService;
 import de.lystx.hytoracloud.driver.service.permission.PermissionService;
 import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
 import de.lystx.hytoracloud.driver.service.util.Utils;
-import io.thunder.Thunder;
-import io.thunder.connection.ErrorHandler;
-import io.thunder.connection.base.ThunderClient;
-import io.thunder.connection.base.ThunderSession;
-import io.thunder.connection.extra.ThunderListener;
-import io.thunder.packet.Packet;
+
 
 
 import de.lystx.hytoracloud.driver.service.player.featured.labymod.LabyModAddon;
-import io.thunder.packet.impl.PacketHandshake;
-import io.thunder.utils.objects.ThunderOption;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.hytora.networking.connection.client.ClientListener;
 import net.hytora.networking.connection.client.HytoraClient;
+import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.other.HytoraLogin;
+import net.hytora.networking.elements.packet.HytoraPacket;
+import net.hytora.networking.elements.packet.PacketHandshake;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudBridge {
@@ -59,7 +52,7 @@ public class CloudBridge {
     private static CloudBridge instance;
 
     private final CloudDriver cloudDriver;
-    private final HytoraClient cloudClient;
+    private final HytoraClient client;
 
     private ProxyBridge proxyBridge;
 
@@ -68,10 +61,10 @@ public class CloudBridge {
 
         this.cloudDriver = new CloudDriver(CloudType.BRIDGE);
 
-        InetSocketAddress host = CloudDriver.getInstance().getHost();
-        this.cloudClient = new HytoraClient(host.getAddress().getHostAddress(), host.getPort());
+        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+        this.client = new HytoraClient(jsonEntity.getString("host"), jsonEntity.getInteger("port"));
 
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.cloudClient);
+        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.client);
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "driverType", CloudType.BRIDGE);
 
         CloudDriver.getInstance().execute(LabyModAddon::load);
@@ -88,10 +81,6 @@ public class CloudBridge {
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "serviceManager", new CloudBridgeServiceManager(this));
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "databaseManager", new CloudBridgeDatabaseService());
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "channelMessenger", new CloudBridgeChannelMessenger());
-
-        if (CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType() == ServiceType.SPIGOT) {
-            Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "bukkit", new DefaultBukkit());
-        }
 
         CloudDriver.getInstance().registerPacketHandler(
                 new PacketHandlerConfig(),
@@ -150,27 +139,52 @@ public class CloudBridge {
      */
     private void bootstrap() {
 
-        if (this.cloudClient.isConnected()) {
-            return;
-        }
-        this.cloudClient.loginHandler(new Consumer<HytoraClient>() {
+        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+
+        System.out.println("[CloudBridge] Trying to connect to Cloud@" + jsonEntity.getString("host") + ":" + jsonEntity.getInteger("port") + " via user '" + jsonEntity.getString("server") + "' ...");
+        this.client.listener(new ClientListener() {
+
+            @Override
+            public void onConnect(InetSocketAddress socketAddress) {
+                System.out.println("§8");
+                System.out.println("[CloudAPI] §eCloudSession §fis now active (Not handshaked yet)");
+                System.out.println("§8");
+
+                Component server = CloudDriver.getInstance().getResponse(new PacketRegisterService(jsonEntity.getString("server")));
+
+                Service service = server.get("service");
+
+                System.out.println("WORKED FOR " + service.getName());
+            }
 
             @SneakyThrows
             @Override
-            public void accept(HytoraClient hytoraClient) {
+            public void onHandshake(PacketHandshake packetHandshake) {
                 System.out.println("§8");
-                System.out.println("[CloudAPI] §eCloudSession §fis now active ");
+                System.out.println("[CloudAPI] §eCloudSession has shaken hands with CloudInstance");
                 System.out.println("§8");
-
-                cloudClient.sendPacket(new PacketRegisterService(CloudDriver.getInstance().getThisService()));
-
 
                 Service thisService = CloudDriver.getInstance().getThisService();
                 thisService.setAuthenticated(true);
                 thisService.setHost(InetAddress.getLocalHost().getHostAddress());
                 thisService.update();
             }
-        }).login(new HytoraLogin(CloudDriver.getInstance().getThisService().getName())).createConnection();
+
+            @Override
+            public void onDisconnect() {
+
+            }
+
+            @Override
+            public void packetIn(HytoraPacket packet) {
+
+            }
+
+            @Override
+            public void packetOut(HytoraPacket packet) {
+
+            }
+        }).login(new HytoraLogin(jsonEntity.getString("server"))).createConnection();
 
 
     }

@@ -63,6 +63,9 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
     private List<Service> globalServices;
     private final Map<String, Action> actions;
 
+
+    private final List<Service> unverifiedServices;
+
     private final List<Service> cloudServers;
     private final List<Service> cloudProxies;
     private final List<Service> lobbies;
@@ -80,6 +83,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         this.actions = new HashMap<>();
         this.serviceMap = new HashMap<>();
         this.globalServices = new LinkedList<>();
+        this.unverifiedServices = new LinkedList<>();
 
         this.startUp = false;
         this.cloudServers = new LinkedList<>();
@@ -110,14 +114,6 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         List<Service> list = this.getServiceMap(this.getServiceGroup(group.getName()));
         this.serviceMap.put(this.getServiceGroup(group.getName()), list);
 
-        for (Service service : this.getServiceMap(this.getServiceGroup(group.getName()))) {
-            service.setServiceGroup(newGroup);
-            CloudScreen screen = this.getDriver().getInstance(CloudScreenService.class).getMap().get(service.getName());
-
-            JsonEntity jsonEntity = new JsonEntity(new File(screen.getServerDir(), "CLOUD/connection.json"));
-            jsonEntity.append(service);
-            jsonEntity.save();
-        }
     }
 
     /**
@@ -278,35 +274,44 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * Registers service after packetHandler handled
      * @param service
      */
-    public void registerService(Service service) {
+    public Service registerService(String service) {
         if (!this.running) {
-            return;
+            return null;
+        }
+
+
+        Service safeService = this.unverifiedServices.stream().filter(s -> s.getName().equalsIgnoreCase(service)).findFirst().orElse(null);
+
+        if (safeService == null) {
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("ERROR", "§cTried to register §e" + service + " §calthough it hasn't been started properly!");
+            return null;
         }
 
         //Calling handlers
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerRegister(service);
+            networkHandler.onServerRegister(safeService);
         }
 
-        List<Service> list = this.getServiceMap(service.getServiceGroup());
-        Service contains = list.stream().filter(service1 -> service1.getName().equalsIgnoreCase(service.getName())).findFirst().orElse(null);
+        List<Service> list = this.getServiceMap(safeService.getServiceGroup());
+        Service contains = list.stream().filter(service1 -> service1.getName().equalsIgnoreCase(safeService.getName())).findFirst().orElse(null);
 
-        Action action = this.actions.getOrDefault(service.getName(), new Action());
+        Action action = this.actions.getOrDefault(safeService.getName(), new Action());
         if (contains == null) {
-            list.add(service);
-            this.serviceMap.put(this.getServiceGroup(service.getServiceGroup().getName()), list);
+            list.add(safeService);
+            this.serviceMap.put(this.getServiceGroup(safeService.getServiceGroup().getName()), list);
 
             //Sending it was registered
-            this.getDriver().sendPacket(new PacketOutRegisterServer(service).setAction(action.getMS()));
-            this.actions.remove(service.getName());
+            this.getDriver().sendPacket(new PacketOutRegisterServer(safeService).setAction(action.getMS()));
+            this.actions.remove(safeService.getName());
         }
 
         //If in screen not sending message!
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
-            return;
+            return safeService;
         }
-        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Service §b" + service.getName() + " §7has connected §h[§b" + service.getServiceGroup().getReceiver() + "@" + service.getHost() + "§h] §7in §b" + action.getMS() + "s§f!");
+        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Service §b" + safeService.getName() + " §7has connected §h[§b" + safeService.getServiceGroup().getReceiver() + "@" + safeService.getHost() + "§h] §7in §b" + action.getMS() + "s§f!");
 
+        return safeService;
     }
 
     /**
@@ -360,6 +365,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
 
         CloudDriver.getInstance().getInstance(StatsService.class).getStatistics().add("startedServices");
+        this.unverifiedServices.add(service);
 
         if (service.getPort() <= 0) {
             int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();

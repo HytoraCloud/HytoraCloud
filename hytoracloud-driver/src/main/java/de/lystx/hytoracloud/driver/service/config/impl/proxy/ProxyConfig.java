@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.service.config.impl.proxy;
 
-import io.thunder.packet.PacketBuffer;
-import io.thunder.utils.objects.ThunderObject;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Getter @Setter @AllArgsConstructor @ToString
-public class ProxyConfig implements ThunderObject {
+public class ProxyConfig implements Serializable {
 
     private boolean enabled;
     private boolean onlineMode;
@@ -61,52 +61,4 @@ public class ProxyConfig implements ThunderObject {
         );
     }
 
-    @Override
-    public void write(PacketBuffer buf) {
-        buf.writeBoolean(enabled);
-        buf.writeBoolean(onlineMode);
-        buf.writeInt(maxPlayers);
-        buf.writeLong(tabListDelay);
-
-        buf.writeInt(tabList.size());
-        for (TabList list : tabList) {
-            buf.writeThunderObject(list);
-        }
-
-        buf.writeInt(motdNormal.size());
-        for (Motd motd : motdNormal) {
-            buf.writeThunderObject(motd);
-        }
-
-        buf.writeInt(motdMaintenance.size());
-        for (Motd motd : motdMaintenance) {
-            buf.writeThunderObject(motd);
-        }
-    }
-
-    @Override
-    public void read(PacketBuffer buf) {
-        enabled = buf.readBoolean();
-        onlineMode = buf.readBoolean();
-        maxPlayers = buf.readInt();
-        tabListDelay = buf.readLong();
-
-        int size = buf.readInt();
-        tabList = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            tabList.add(buf.readThunderObject(TabList.class));
-        }
-
-        size = buf.readInt();
-        motdNormal = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            motdNormal.add(buf.readThunderObject(Motd.class));
-        }
-
-        size = buf.readInt();
-        motdMaintenance = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            motdMaintenance.add(buf.readThunderObject(Motd.class));
-        }
-    }
 }
