@@ -7,15 +7,10 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.permission.PermissionSubject;
 import com.velocitypowered.api.proxy.Player;
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.bridge.velocity.HytoraCloudVelocityBridge;
 import de.lystx.hytoracloud.bridge.velocity.elements.PlayerPermissionProvider;
-import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
-import io.vson.enums.FileFormat;
 import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,10 +23,15 @@ public class PlayerLoginListener {
         DisconnectEvent.LoginStatus loginStatus = event.getLoginStatus();
         Player player = event.getPlayer();
 
+
+
         CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
 
         if (cloudPlayer == null) {
             return;
+
+
+
         }
 
         CloudBridge.getInstance().getProxyBridge().playerQuit(cloudPlayer);
@@ -62,11 +62,10 @@ public class PlayerLoginListener {
         );
 
 
-        EventResult eventResult = CloudBridge.getInstance().getProxyBridge().playerLogin(playerConnection);
+        EventResult login = CloudBridge.getInstance().getProxyBridge().playerLogin(playerConnection);
 
-
-        if (eventResult.isCancelled()) {
-            event.setResult(ResultedEvent.ComponentResult.denied(Component.text(eventResult.getComponent())));
+        if (login.isCancelled()) {
+            event.setResult(ResultedEvent.ComponentResult.denied(Component.text(login.getComponent())));
         } else {
             event.setResult(ResultedEvent.ComponentResult.allowed());
         }

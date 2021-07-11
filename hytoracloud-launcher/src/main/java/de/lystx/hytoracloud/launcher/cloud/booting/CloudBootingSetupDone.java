@@ -77,7 +77,6 @@ public class CloudBootingSetupDone {
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerLog(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerEvent(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerRequest(cloudSystem));
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerChannelMessage());
 
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerReceiver(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerReceiverServer(cloudSystem));

@@ -10,18 +10,18 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.proxy.handler.*;
 import de.lystx.hytoracloud.bridge.velocity.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.velocity.listener.player.*;
-import de.lystx.hytoracloud.bridge.velocity.listener.server.ProxyPingListener;
-import de.lystx.hytoracloud.bridge.velocity.listener.server.TablistListener;
+import de.lystx.hytoracloud.bridge.velocity.listener.other.ProxyPingListener;
+import de.lystx.hytoracloud.bridge.velocity.listener.other.TablistListener;
+import de.lystx.hytoracloud.bridge.velocity.listener.server.ServerConnectListener;
+import de.lystx.hytoracloud.bridge.velocity.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.Service;
 import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 
 
@@ -45,16 +45,16 @@ import java.util.*;
 )
 
 @Getter
-public class HytoraCloudVelocityBridge {
+public class VelocityBridge {
 
     private final ProxyServer server;
     private final Logger logger;
 
     @Getter
-    private static HytoraCloudVelocityBridge instance;
+    private static VelocityBridge instance;
 
     @Inject
-    public HytoraCloudVelocityBridge(ProxyServer server, Logger logger) {
+    public VelocityBridge(ProxyServer server, Logger logger) {
         instance = this;
         this.server = server;
         this.logger = logger;
@@ -64,42 +64,8 @@ public class HytoraCloudVelocityBridge {
         CloudDriver.getInstance().execute(() -> {
             instance = this;
 
-            this.bootstrap();
-
 
             CloudBridge.getInstance().setProxyBridge(new ProxyBridge() {
-                @Override
-                public String formatTabList(CloudPlayer cloudPlayer, String input) {
-                    try {
-                        Service service;
-                        PermissionGroup permissionGroup;
-                        if (cloudPlayer == null || cloudPlayer.getPermissionGroup() == null) {
-                            permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
-                        } else {
-                            permissionGroup = cloudPlayer.getCachedPermissionGroup();
-                        }
-                        if (cloudPlayer == null || cloudPlayer.getService() == null) {
-                            service = CloudDriver.getInstance().getThisService();
-                        } else {
-                            service = CloudDriver.getInstance().getServiceManager().getService(cloudPlayer.getService().getName());
-                        }
-                        return input
-                                .replace("&", "§")
-                                .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getProxyConfig().getMaxPlayers()))
-                                .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size()))
-                                .replace("%id%", service.getServiceID() + "")
-                                .replace("%group%", service.getServiceGroup().getName() + "")
-                                .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
-                                .replace("%receiver%", CloudDriver.getInstance().getThisService().getServiceGroup().getReceiver())
-                                .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
-                                .replace("%proxy%", CloudDriver.getInstance().getServiceManager().getProxy(server.getBoundAddress().getPort()).getName())
-                                .replace("%server%", service.getName());
-
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
 
                 @Override
                 public void updateTabList() {
@@ -119,25 +85,6 @@ public class HytoraCloudVelocityBridge {
                                 Component.text(Objects.requireNonNull(formatTabList(cloudPlayer, tabList.getFooter())))
                         );
                     }
-                }
-
-                @Override
-                public boolean onServerKick(CloudPlayer cloudPlayer, Service kickedFromService) {
-                    try {
-                        Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
-                        cloudPlayer.connect(fallback);
-                        return true;
-                    } catch (NullPointerException e) {
-                        return false;
-                    }
-                }
-
-                @Override
-                public void onServerConnect(CloudPlayer cloudPlayer, Service service) {
-
-                    DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, service);
-
-                    CloudDriver.getInstance().callEvent(serverChange);
                 }
 
                 @Override
@@ -170,12 +117,12 @@ public class HytoraCloudVelocityBridge {
                 @Override
                 public void connectPlayer(UUID uniqueId, String server) {
 
-                    Player player = HytoraCloudVelocityBridge.getInstance().getServer().getPlayer(uniqueId).orElse(null);
+                    Player player = VelocityBridge.getInstance().getServer().getPlayer(uniqueId).orElse(null);
                     if (player == null) {
                         return;
                     }
 
-                    RegisteredServer registeredServer = HytoraCloudVelocityBridge.getInstance().getServer().getServer(server).orElse(null);
+                    RegisteredServer registeredServer = VelocityBridge.getInstance().getServer().getServer(server).orElse(null);
                     if (registeredServer == null) {
                         return;
                     }
@@ -190,7 +137,12 @@ public class HytoraCloudVelocityBridge {
                     if (player == null) {
                         return;
                     }
-                    //TODO: FALLBACK
+
+                    CloudPlayer cloudPlayer = CloudPlayer.dummy(player.getUsername(), player.getUniqueId());
+                    Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+
+                    server.getServer(fallback.getName()).ifPresent(registeredServer -> player.createConnectionRequest(registeredServer).connect());
+
                 }
 
                 @Override
@@ -249,9 +201,17 @@ public class HytoraCloudVelocityBridge {
                 @Override
                 public void registerService(Service service) {
 
-                    ServerInfo serverInfo = new ServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()));
+                    //Proxy's do not need to be registered
+                    if (service.getServiceGroup().getServiceType().isProxy()) {
+                        return;
+                    }
 
-                    server.registerServer(serverInfo);
+                    //Server not already registered
+                    if (server.getServer(service.getName()).orElse(null) == null) {
+                        ServerInfo serverInfo = new ServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()));
+                        server.registerServer(serverInfo);
+                    }
+
                 }
 
                 @Override
@@ -276,6 +236,10 @@ public class HytoraCloudVelocityBridge {
                     return ProxyVersion.VELOCITY;
                 }
             });
+
+
+            this.bootstrap();
+
 
         });
     }
@@ -315,17 +279,6 @@ public class HytoraCloudVelocityBridge {
 
     public void bootstrap() {
 
-        CloudDriver.getInstance()
-                //Registers all the PacketHandlers
-                .registerPacketHandler(
-                        new ProxyHandlerRegister(),
-                        new ProxyHandlerUnregister(),
-                        new ProxyHandlerConfig(),
-                        new ProxyHandlerCloudPlayer(),
-                        new ProxyHandlerShutdown());
-
-        CloudDriver.getInstance().registerNetworkHandler(new CloudListener()); //Registers the NetworkHandler
-
         //Registers all Listeners
         this.server.getEventManager().register(this, new CommandListener());
         this.server.getEventManager().register(this, new ProxyPingListener());
@@ -338,7 +291,7 @@ public class HytoraCloudVelocityBridge {
 
         if (CloudDriver.getInstance().getProxyConfig() == null) {
             CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getThisService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
-            System.out.println("[CloudAPI] Couldn't find ProxyConfig!");
+            System.out.println("[CloudBridge] Couldn't find ProxyConfig!");
         }
 
     }

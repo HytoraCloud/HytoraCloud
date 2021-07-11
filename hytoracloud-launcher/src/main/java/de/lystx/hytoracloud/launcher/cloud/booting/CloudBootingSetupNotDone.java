@@ -58,9 +58,7 @@ public class CloudBootingSetupNotDone {
                 System.exit(0);
                 return;
             }
-            VsonObject document = cloudSystem.getInstance(ConfigService.class).getVsonObject();
-            document.getVsonSettings().add(VsonSettings.CREATE_FILE_IF_NOT_EXIST);
-            document.getVsonSettings().add(VsonSettings.OVERRITE_VALUES);
+            JsonEntity document = cloudSystem.getInstance(ConfigService.class).getJsonEntity();
             document.append("setupDone", true);
             document.append("host", setup.getHostname());
             document.append("port", setup.getPort());

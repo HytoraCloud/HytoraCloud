@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.bridge.velocity.listener.server;
+package de.lystx.hytoracloud.bridge.velocity.listener.other;
 
 
 import com.velocitypowered.api.event.Subscribe;

@@ -73,7 +73,7 @@ public class ReceiverPacketHandlerServer implements PacketHandler {
 
             PacketOutRegisterServer packetOutRegisterServer = (PacketOutRegisterServer)packet;
             Service service = packetOutRegisterServer.getService();
-            this.receiver.getParent().getConsole().getLogger().sendMessage("NETWORK", "§aChannel §7[§a" + service.getName() + "@" + service.getUniqueId() + "§7] §aconnected §7[§2" + packetOutRegisterServer.getAction() + "s) §7]");
+            this.receiver.getParent().getConsole().getLogger().sendMessage("NETWORK", "§aChannel §7[§a" + service.getName() + "@" + service.getUniqueId() + "§7] §aconnected §7[§2s) §7]");
 
         } else if (packet instanceof PacketInStartGroup) {
 

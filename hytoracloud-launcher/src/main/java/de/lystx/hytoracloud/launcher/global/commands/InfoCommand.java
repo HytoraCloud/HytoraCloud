@@ -79,9 +79,13 @@ public class InfoCommand implements TabCompletable {
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
                     for (ServiceGroup serviceGroup : instance.getGroups()) {
+
+
+                        int max = serviceGroup.getServices().size() * serviceGroup.getMaxPlayers();
+
                         sender.sendMessage("§h> §b" + serviceGroup.getName() + " §h[" + serviceGroup.getUniqueId() + "§h] §h:");
                         sender.sendMessage("  §8> §bType: " + serviceGroup.getServiceType() + " §7| §eReceiver: " + serviceGroup.getReceiver());
-                        sender.sendMessage("  §8> §bPlayers: " +  serviceGroup.getOnlinePlayers().size() + "/" + serviceGroup.getMaxPlayers() + " §7| §eTemplate: " + serviceGroup.getTemplate().getName());
+                        sender.sendMessage("  §8> §bPlayers: " +  serviceGroup.getOnlinePlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getTemplate().getName());
                         sender.sendMessage("  §8> §bMinRAM: " +  serviceGroup.getMinRam() + " §7| §eMaxRAM: " + serviceGroup.getMaxRam());
                         sender.sendMessage("  §8> §bMinServer: " +  serviceGroup.getMinServer() + " §7| §eMaxServer: " + serviceGroup.getMaxServer());
                         sender.sendMessage("  §8> §bNew-Server-At: " +  serviceGroup.getNewServerPercent() + "% §7| §eProperties: " + serviceGroup.getProperties().keySet().size());

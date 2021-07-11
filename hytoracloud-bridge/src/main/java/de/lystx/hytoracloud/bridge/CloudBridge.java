@@ -7,13 +7,14 @@ import de.lystx.hytoracloud.bridge.proxy.handler.ProxyHandlerCloudPlayer;
 import de.lystx.hytoracloud.bridge.proxy.handler.ProxyHandlerRegister;
 import de.lystx.hytoracloud.bridge.proxy.handler.ProxyHandlerShutdown;
 import de.lystx.hytoracloud.bridge.proxy.handler.ProxyHandlerUnregister;
-import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgeChannelMessenger;
 import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgeDatabaseService;
 import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgeServiceManager;
 import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgePlayerManager;
 import de.lystx.hytoracloud.bridge.standalone.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.service.Service;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
@@ -38,6 +39,7 @@ import net.hytora.networking.connection.client.HytoraClient;
 import net.hytora.networking.connection.client.HytoraClientOptions;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.component.ComponentSender;
+import net.hytora.networking.elements.component.RepliableComponent;
 import net.hytora.networking.elements.other.HytoraLogin;
 import net.hytora.networking.elements.packet.HytoraPacket;
 
@@ -83,7 +85,6 @@ public class CloudBridge {
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "cloudPlayerManager", new CloudBridgePlayerManager());
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "serviceManager", new CloudBridgeServiceManager(this));
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "databaseManager", new CloudBridgeDatabaseService());
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "channelMessenger", new CloudBridgeChannelMessenger());
 
         CloudDriver.getInstance().registerPacketHandler(
                 new PacketHandlerConfig(),
@@ -92,8 +93,7 @@ public class CloudBridge {
                 new PacketHandlerCommunication(),
                 new PacketHandlerPlayer(),
                 new PacketHandlerPermissionPool(),
-                new PacketHandlerCallEvent(),
-                new PacketHandlerChannelMessage()
+                new PacketHandlerCallEvent()
         );
         this.bootstrap();
 
@@ -131,6 +131,28 @@ public class CloudBridge {
         CloudDriver.getInstance().registerCommand(new ListCommand());
         CloudDriver.getInstance().registerCommand(new NetworkCommand());
 
+
+        CloudDriver.getInstance().getConnection().registerChannelHandler("cloud::main", new Consumer<RepliableComponent>() {
+            @Override
+            public void accept(RepliableComponent repliableComponent) {
+
+                Component component = repliableComponent.getComponent();
+                ComponentSender sender = repliableComponent.getSender();
+
+                if (component.has("key") && component.get("key").equals("chat_event")) {
+
+                    String player = component.get("player");
+                    String message = component.get("message");
+
+                    CloudPlayer cloudPlayer = CloudPlayer.fromName(player);
+
+                    DriverEventPlayerChat playerChat = new DriverEventPlayerChat(cloudPlayer, message);
+
+                    CloudDriver.getInstance().callEvent(playerChat);
+
+                }
+            }
+        });
     }
 
     /**

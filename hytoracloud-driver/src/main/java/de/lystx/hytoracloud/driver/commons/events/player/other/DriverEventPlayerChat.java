@@ -5,13 +5,10 @@ import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.io.Serializable;
-
 @AllArgsConstructor @Getter
-public class DriverEventPlayerJoin extends CloudEvent implements Serializable {
+public class DriverEventPlayerChat extends CloudEvent {
 
-    /**
-     * The joined player
-     */
     private final CloudPlayer player;
+
+    private final String message;
 }

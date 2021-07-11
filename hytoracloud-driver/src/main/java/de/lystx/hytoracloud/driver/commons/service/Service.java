@@ -151,7 +151,7 @@ public class Service implements Serializable, Objectable<Service> {
     public String getTPS() {
         PacketRequestTPS packetRequestTPS = new PacketRequestTPS(this.name);
 
-        Component component = packetRequestTPS.toReply(CloudDriver.getInstance().getConnection(), 1000);
+        Component component = packetRequestTPS.toReply(CloudDriver.getInstance().getConnection(), 3000);
         String message = component.reply().getMessage();
 
         return message.equalsIgnoreCase("The request timed out") ? "§c???" : message;

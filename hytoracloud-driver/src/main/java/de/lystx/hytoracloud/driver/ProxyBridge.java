@@ -2,18 +2,19 @@ package de.lystx.hytoracloud.driver;
 
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.service.Service;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public interface ProxyBridge {
 
@@ -69,6 +70,9 @@ public interface ProxyBridge {
         if (player == null) {
             return;
         }
+
+        player.modifyInformation(playerInformation -> playerInformation.setLastLogin(new Date().getTime()));
+
         CloudDriver.getInstance().sendPacket(new PacketUnregisterPlayer(player.getName()));
     }
 
@@ -95,7 +99,37 @@ public interface ProxyBridge {
      * @param input the header or footer
      * @return formatted string
      */
-   String formatTabList(CloudPlayer cloudPlayer, String input);
+    default String formatTabList(CloudPlayer cloudPlayer, String input) {
+        try {
+            Service service;
+            PermissionGroup permissionGroup;
+            if (cloudPlayer == null || cloudPlayer.getPermissionGroup() == null) {
+                permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
+            } else {
+                permissionGroup = cloudPlayer.getCachedPermissionGroup();
+            }
+            if (cloudPlayer == null || cloudPlayer.getService() == null) {
+                service = CloudDriver.getInstance().getThisService();
+            } else {
+                service = CloudDriver.getInstance().getServiceManager().getService(cloudPlayer.getService().getName());
+            }
+            return input
+                    .replace("&", "§")
+                    .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getProxyConfig().getMaxPlayers()))
+                    .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size()))
+                    .replace("%id%", service.getServiceID() + "")
+                    .replace("%group%", service.getServiceGroup().getName() + "")
+                    .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
+                    .replace("%receiver%", CloudDriver.getInstance().getThisService().getServiceGroup().getReceiver())
+                    .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
+                    .replace("%proxy%", CloudDriver.getInstance().getThisService().getName())
+                    .replace("%server%", service.getName());
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * Updates the {@link TabList} for all players
@@ -109,7 +143,15 @@ public interface ProxyBridge {
      * @param kickedFromService the service
      * @return boolean if cancel
      */
-   boolean onServerKick(CloudPlayer cloudPlayer, Service kickedFromService);
+    default boolean onServerKick(CloudPlayer cloudPlayer, Service kickedFromService) {
+        try {
+            Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+            cloudPlayer.connect(fallback);
+            return true;
+        } catch (NullPointerException e) {
+            return false;
+        }
+    }
 
     /**
      * Called when a player connected on a service
@@ -117,7 +159,14 @@ public interface ProxyBridge {
      * @param cloudPlayer the player
      * @param service the service
      */
-   void onServerConnect(CloudPlayer cloudPlayer, Service service);
+    default void onServerConnect(CloudPlayer cloudPlayer, Service service) {
+
+        cloudPlayer.setService(service);
+        cloudPlayer.update();
+
+        DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, service);
+        CloudDriver.getInstance().callEvent(serverChange);
+    }
 
     /**
      * Gets the current {@link NetworkHandler}

@@ -2,6 +2,7 @@ package net.hytora.networking.connection;
 
 import net.hytora.networking.connection.server.HytoraServer;
 import net.hytora.networking.elements.component.ComponentSender;
+import net.hytora.networking.elements.component.RepliableComponent;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import net.hytora.networking.elements.component.Component;
@@ -26,6 +27,14 @@ public interface HytoraConnection extends ComponentSender, Closeable {
      * @param replyConsumer the callback for the reply
      */
     void sendComponent(Consumer<Component> componentConsumer, int delay, BiConsumer<Component, Boolean> replyConsumer);
+
+    /**
+     * Registers a channel handler to receive components
+     *
+     * @param channel the channel to listen for
+     * @param consumer the consumer
+     */
+    void registerChannelHandler(String channel, Consumer<RepliableComponent> consumer);
 
     /**
      * Sends a {@link Component} to the server

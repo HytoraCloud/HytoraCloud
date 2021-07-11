@@ -1,6 +1,6 @@
 author: Lystx
 name: CloudBridge
-main: de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge
+main: de.lystx.hytoracloud.bridge.bukkit.BukkitBridge
 version: 1.7.3
 description: ServerAPI for HytoraCloud
 load: STARTUP

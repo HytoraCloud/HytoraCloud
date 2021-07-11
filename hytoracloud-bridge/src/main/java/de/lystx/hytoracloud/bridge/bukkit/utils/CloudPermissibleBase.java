@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.bukkit.utils;
 
-import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
+import de.lystx.hytoracloud.bridge.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -102,7 +102,7 @@ public class CloudPermissibleBase extends PermissibleBase {
                                                         this,
                                                         s,
                                                         new PermissionAttachment(
-                                                                HytoraCloudBukkitBridge
+                                                                BukkitBridge
                                                                         .getInstance(),
                                                                 this
                                                         ), true)));

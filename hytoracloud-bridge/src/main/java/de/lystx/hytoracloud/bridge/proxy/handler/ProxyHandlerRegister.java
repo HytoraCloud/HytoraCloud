@@ -1,11 +1,8 @@
 package de.lystx.hytoracloud.bridge.proxy.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStartedServer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
@@ -17,12 +14,10 @@ public class ProxyHandlerRegister implements PacketHandler {
         ProxyBridge proxyBridge = CloudBridge.getInstance().getProxyBridge();
 
         if (packet instanceof PacketOutRegisterServer) {
-            proxyBridge.registerService(((PacketOutRegisterServer) packet).getService());
+            PacketOutRegisterServer packetOutRegisterServer = (PacketOutRegisterServer)packet;
+
+            proxyBridge.registerService(packetOutRegisterServer.getService());
         }
 
-        if (packet instanceof PacketOutStartedServer) {
-            Service service = CloudDriver.getInstance().getServiceManager().getService(((PacketOutStartedServer) packet).getService());
-            proxyBridge.registerService(service);
-        }
     }
 }

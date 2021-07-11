@@ -5,7 +5,6 @@ import de.lystx.hytoracloud.launcher.cloud.booting.CloudBootingSetupNotDone;
 import de.lystx.hytoracloud.launcher.cloud.commands.*;
 import de.lystx.hytoracloud.launcher.cloud.handler.ReceiverManager;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
-import de.lystx.hytoracloud.launcher.global.impl.DefaultChannelMessenger;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
@@ -45,7 +44,6 @@ public class CloudSystem extends CloudProcess {
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "databaseManager", new DefaultDatabaseService());
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "cloudPlayerManager", new DefaultCloudPlayerManager());
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "channelMessenger", new DefaultChannelMessenger());
 
 
         this.getInstance(CommandService.class).registerCommand(new EditCommand());

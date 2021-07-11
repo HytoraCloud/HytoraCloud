@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudPlayer implements Serializable, CloudCommandSender , IPermissionUser, Identifiable {
@@ -242,6 +243,22 @@ public class CloudPlayer implements Serializable, CloudCommandSender , IPermissi
     public void update() {
         PacketUpdatePlayer packetUpdatePlayer = new PacketUpdatePlayer(this);
         CloudDriver.getInstance().sendPacket(packetUpdatePlayer);
+    }
+
+    /**
+     * Modifies the information of a player
+     *
+     * @param consumer the consumer to handle
+     */
+    public void modifyInformation(Consumer<PlayerInformation> consumer) {
+
+        PlayerInformation information = this.playerInformation;
+
+        consumer.accept(information);
+
+        this.playerInformation = information;
+
+        this.update();
     }
 
     /**
@@ -513,5 +530,16 @@ public class CloudPlayer implements Serializable, CloudCommandSender , IPermissi
      */
     public static CloudPlayer fromUUID(UUID uniqueId) {
         return CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(uniqueId);
+    }
+
+    /**
+     * Creates a dummy {@link CloudPlayer} just to test stuff
+     *
+     * @param name the name
+     * @param uniqueId the uuid
+     * @return dummy player
+     */
+    public static CloudPlayer dummy(String name, UUID uniqueId) {
+        return new CloudPlayer(new PlayerConnection(uniqueId, name, "", -1, true, true));
     }
 }

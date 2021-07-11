@@ -1,10 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.receiver;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStartedServer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
@@ -24,10 +21,5 @@ public class PacketHandlerReceiverServer implements PacketHandler {
         }
     }
 
-    
-    public void handle(PacketOutStartedServer packet) {
-        Service service = CloudDriver.getInstance().getServiceManager().getService(packet.getService());
-        this.cloudSystem.getParent().getConsole().getLogger().sendMessage("NETWORK", "§7The service §b" + service.getName() + " §7is §equeued §7| §b" + service.getServiceGroup().getReceiver() + " §7| §bID " + service.getServiceID() + " §7| §bPort " + service.getPort() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7| §bType " + service.getServiceGroup().getServiceType().name() );
-    }
 
 }

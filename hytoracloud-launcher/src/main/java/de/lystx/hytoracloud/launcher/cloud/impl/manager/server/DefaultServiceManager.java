@@ -8,7 +8,6 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStart;
 import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStop;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStartedServer;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
 import de.lystx.hytoracloud.driver.commons.service.Service;
 import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
@@ -296,10 +295,10 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             this.cachedServices.put(this.getServiceGroup(safeService.getServiceGroup().getName()), list);
 
             //Sending it was registered
-            this.getDriver().sendPacket(new PacketOutRegisterServer(safeService).setAction(action.getMS()));
             this.actions.remove(safeService.getName());
         }
 
+        this.getDriver().sendPacket(new PacketOutRegisterServer(safeService));
         //If in screen not sending message!
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return safeService;
@@ -393,7 +392,6 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
                 serviceStarter.start(new Consumer<Service>() {
                     @Override
                     public void accept(Service service) {
-                        CloudDriver.getInstance().sendPacket(new PacketOutStartedServer(service.getName()));
                         notifyStart(service);
                         CloudDriver.getInstance().callEvent(new DriverEventServiceStart(service));
 

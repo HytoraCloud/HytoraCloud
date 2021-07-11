@@ -30,16 +30,4 @@ public class ServerConnectListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onFinish(ServerConnectedEvent event) {
-
-        ProxiedPlayer player = event.getPlayer();
-        CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
-
-        Service service = CloudDriver.getInstance().getServiceManager().getService(event.getServer().getInfo().getName());
-
-        cloudPlayer.setService(service);
-        cloudPlayer.update();
-    }
-
 }

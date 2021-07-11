@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.velocity.listener.cloud;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.lystx.hytoracloud.bridge.velocity.HytoraCloudVelocityBridge;
+import de.lystx.hytoracloud.bridge.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.Service;
@@ -13,7 +13,7 @@ public class CloudListener implements NetworkHandler {
 
     public void notify(int state, String servername) {
 
-        ProxyServer server = HytoraCloudVelocityBridge.getInstance().getServer();
+        ProxyServer server = VelocityBridge.getInstance().getServer();
 
         for (Player player : server.getAllPlayers()) {
             if (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.notify")) {

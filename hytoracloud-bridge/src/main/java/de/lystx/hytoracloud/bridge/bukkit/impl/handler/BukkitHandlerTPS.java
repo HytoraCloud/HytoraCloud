@@ -14,6 +14,7 @@ public class BukkitHandlerTPS implements PacketHandler {
     public void handle(HytoraPacket packet) {
 
        if (packet instanceof PacketRequestTPS) {
+           System.out.println("SENDING TPS");
             PacketRequestTPS packetRequestTPS = (PacketRequestTPS)packet;
 
             if (packetRequestTPS.getServer().equalsIgnoreCase(CloudDriver.getInstance().getThisService().getName())) {

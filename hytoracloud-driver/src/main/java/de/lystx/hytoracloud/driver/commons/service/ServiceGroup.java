@@ -139,7 +139,12 @@ public class ServiceGroup implements Serializable, Objectable<ServiceGroup> {
      * @return List with CloudPlayers on this Group
      */
     public List<CloudPlayer> getOnlinePlayers() {
-        return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()).find(cloudPlayer -> cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(this.getName())).findAll());
+        return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()).find(cloudPlayer -> {
+            if (cloudPlayer.getService() == null) {
+                return false;
+            }
+            return cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(this.getName());
+        }).findAll());
     }
 
     /**

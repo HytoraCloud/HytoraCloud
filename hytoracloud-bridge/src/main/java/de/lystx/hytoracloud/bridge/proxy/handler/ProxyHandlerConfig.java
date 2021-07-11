@@ -25,6 +25,8 @@ public class ProxyHandlerConfig implements PacketHandler {
             //Setting network config
             CloudDriver.getInstance().getImplementedData().put("networkConfig", info.getNetworkConfig());
 
+            CloudDriver.getInstance().getServiceManager().setCachedServices(info.getServices());
+
             //New config is maintenance -> switching
             if (info.getNetworkConfig().getGlobalProxyConfig().isMaintenance()) {
                 boolean to = info.getNetworkConfig().getGlobalProxyConfig().isMaintenance();
@@ -62,18 +64,24 @@ public class ProxyHandlerConfig implements PacketHandler {
             //Registering all services from the info
             for (List<Service> value : info.getServices().values()) {
                 for (Service service : value) {
+                    if (service == null) {
+                        continue;
+                    }
                     proxyBridge.registerService(service);
                 }
             }
 
-            //Removing all non existent services
-            for (String serverInfo : CloudBridge.getInstance().getProxyBridge().getAllServices()) {
-                Service service = CloudDriver.getInstance().getServiceManager().getService(serverInfo);
-                if (service == null) {
-                    proxyBridge.removeServer(serverInfo);
-                }
+            CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
 
-            }
+                //Removing all non existent services
+                for (String serverInfo : CloudBridge.getInstance().getProxyBridge().getAllServices()) {
+                    Service service = CloudDriver.getInstance().getServiceManager().getService(serverInfo);
+                    if (service == null) {
+                        proxyBridge.removeServer(serverInfo);
+                    }
+                }
+            }, 20L);
+
 
         }
     }

@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.bridge.velocity.listener.server;
+package de.lystx.hytoracloud.bridge.velocity.listener.other;
 
 
 import com.velocitypowered.api.event.Subscribe;
@@ -77,10 +77,10 @@ public class ProxyPingListener {
             builder.description(Component.text(this.replace(motd.getFirstLine(), port) + "\n" + this.replace(motd.getSecondLine(), port)));
 
             event.setPing(builder.build());
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             this.nullPointers++;
             if (nullPointers == 5) {
-                System.out.println("[CloudProxy] Couldn't get ProxyPing information for " + this.nullPointers + " times!");
+                System.out.println("[CloudBridge] Couldn't get ProxyPing information for " + this.nullPointers + " times!");
                 e.printStackTrace();
                 this.nullPointers = 0;
             }
@@ -93,7 +93,7 @@ public class ProxyPingListener {
         return (string
                 .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getProxyConfig().getMaxPlayers()))
                 .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size()))
-                .replace("%proxy%", service == null ? "no_proxy_available" : service.getName())
+                .replace("%proxy%", service == null ? "NO-PROXY-FOUND" : service.getName())
                 .replace("%maintenance%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().isMaintenance()))).replace("&", "§");
     }
 }

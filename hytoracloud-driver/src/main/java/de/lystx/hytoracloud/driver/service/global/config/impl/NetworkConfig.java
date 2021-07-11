@@ -60,7 +60,6 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
      */
     private FallbackConfig fallbackConfig;
 
-
     /**
      * Create default Config for everything
      *

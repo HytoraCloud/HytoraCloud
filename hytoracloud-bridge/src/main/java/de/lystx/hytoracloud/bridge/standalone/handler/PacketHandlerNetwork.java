@@ -1,22 +1,28 @@
 package de.lystx.hytoracloud.bridge.standalone.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStart;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStartedServer;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
 import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.managing.event.handler.Event;
+import de.lystx.hytoracloud.driver.service.managing.event.handler.EventListener;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 
-public class PacketHandlerNetwork implements PacketHandler {
+public class PacketHandlerNetwork implements PacketHandler, EventListener {
 
 
+    public PacketHandlerNetwork() {
+        CloudDriver.getInstance().getEventService().registerEvent(this);
+    }
 
-    public void handleStart(PacketOutStartedServer packet) {
-        Service service = CloudDriver.getInstance().getServiceManager().getService(packet.getService());
+    @Event
+    public void handle(DriverEventServiceStart event) {
+        Service service = event.getService();
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
             networkHandler.onServerQueue(service);
         }
@@ -54,9 +60,6 @@ public class PacketHandlerNetwork implements PacketHandler {
         }
         if (packet instanceof PacketOutRegisterServer) {
             this.handleRegister((PacketOutRegisterServer) packet);
-        }
-        if (packet instanceof PacketOutStartedServer) {
-            this.handleStart((PacketOutStartedServer) packet);
         }
     }
 }

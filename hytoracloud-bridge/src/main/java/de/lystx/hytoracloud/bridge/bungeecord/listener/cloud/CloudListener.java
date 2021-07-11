@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.bridge.bungeecord.listener.network;
+package de.lystx.hytoracloud.bridge.bungeecord.listener.cloud;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;

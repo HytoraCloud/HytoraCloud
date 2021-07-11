@@ -18,6 +18,8 @@ import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -143,6 +145,23 @@ public class ServiceStarter {
      */
     public void createProperties() throws Exception {
 
+
+        String jarFile = getJarFile();
+        File file = new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), jarFile);
+
+        ClassLoader classLoader = new URLClassLoader(new URL[]{file.toURL().toURI().toURL()});
+
+
+        boolean bungeecord;
+
+
+        try {
+            classLoader.loadClass(ProxyVersion.BUNGEECORD.getCheckClass());
+            bungeecord = true;
+        } catch (ClassNotFoundException e) {
+            bungeecord = false;
+        }
+
         service.setProperties((this.properties == null ? new PropertyObject() : this.properties));
         if (service.getServiceGroup().getServiceType().isProxy()) {
             File serverIcon = new File(global, "server-icon.png");
@@ -152,52 +171,153 @@ public class ServiceStarter {
 
 
             ProxyConfig config = service.getServiceGroup().getProperties().has("proxyConfig") ? service.getServiceGroup().getProperties().get("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
-            FileWriter writer = new FileWriter(serverLocation + "/config.yml");
 
+            FileWriter writer;
+            if (!bungeecord) {
 
-            writer.write("player_limit: " + config.getMaxPlayers() + "\n" +
-                    "permissions:\n" +
-                    "  default: []\n" +
-                    "  admin:\n" +
-                    "    - bungeecord.command.alert\n" +
-                    "    - bungeecord.command.end\n" +
-                    "    - bungeecord.command.ip\n" +
-                    "    - bungeecord.command.reload\n" +
-                    "    - bungeecord.command.send\n" +
-                    "    - bungeecord.command.server\n" +
-                    "    - bungeecord.command.list\n" +
-                    "timeout: 30000\n" +
-                    "log_commands: false\n" +
-                    "online_mode: " + config.isOnlineMode() + "\n" +
-                    "disabled_commands:\n" +
-                    "  - disabledcommandhere\n" +
-                    "servers:\n" +
-                    "  Lobby-1:\n" +
-                    "    motd: '" + "MOTD" + "'\n" +
-                    "    address: '127.0.0.1:" + CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().getServerStartPort() + "'\n" +
-                    "    restricted: false\n" +
-                    "listeners:\n" +
-                    "  - query_port: 25577\n" +
-                    "    motd: \"&bHytoraCloud &7Default Motd &7by Lystx\"\n" +
-                    "    priorities:\n" +
-                    "      - Lobby-1\n" +
-                    "    bind_local_address: true\n" +
-                    "    tab_list: GLOBAL_PING\n" +
-                    "    query_enabled: false\n" +
-                    "    host: 0.0.0.0:" + service.getPort() + "\n" +
-                    "    forced_hosts:\n" +
-                    "      pvp.md-5.net: pvp\n" +
-                    "    max_players: 0\n" +
-                    "    tab_size: 60\n" +
-                    "    ping_passthrough: false\n" +
-                    "    force_default_server: false\n" +
-                    "    proxy_protocol: " + CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().isProxyProtocol() + "\n" +
-                    "ip_forward: true\n" +
-                    "network_compression_threshold: 256\n" +
-                    "groups:\n" +
-                    "connection_throttle: -1\n" +
-                    "stats: 13be5ac9-5731-4502-9ccc-c4a80163f14a\n" +
-                    "prevent_proxy_connections: false");
+                String p = CloudDriver.getInstance().getCloudPrefix();
+
+                writer = new FileWriter(serverLocation + "/velocity.toml");
+
+                writer.write("# Config version. Do not change this\n" +
+                        "config-version = \"1.0\"\n" +
+                        "\n" +
+                        "# What port should the proxy be bound to? By default, we'll bind to all addresses on port 25577.\n" +
+                        "bind = \"0.0.0.0:" + service.getPort() + "\"\n" +
+                        "\n" +
+                        "# What should be the MOTD? This gets displayed when the player adds your server to\n" +
+                        "# their server list. Legacy color codes and JSON are accepted.\n" +
+                        "motd = \"&3A Velocity Server\"\n" +
+                        "\n" +
+                        "# What should we display for the maximum number of players? (Velocity does not support a cap\n" +
+                        "# on the number of players online.)\n" +
+                        "show-max-players = " + config.getMaxPlayers() + "\n" +
+                        "\n" +
+                        "# Should we authenticate players with Mojang? By default, this is on.\n" +
+                        "online-mode = " + config.isOnlineMode() + "\n" +
+                        "\n" +
+                        "# Should we forward IP addresses and other data to backend servers?\n" +
+                        "# Available options:\n" +
+                        "# - \"none\":   No forwarding will be done. All players will appear to be connecting from the\n" +
+                        "#             proxy and will have offline-mode UUIDs.\n" +
+                        "# - \"legacy\": Forward player IPs and UUIDs in a BungeeCord-compatible format. Use this if\n" +
+                        "#             you run servers using Minecraft 1.12 or lower.\n" +
+                        "# - \"modern\": Forward player IPs and UUIDs as part of the login process using Velocity's\n" +
+                        "#             native forwarding. Only applicable for Minecraft 1.13 or higher.\n" +
+                        "player-info-forwarding-mode = \"NONE\"\n" +
+                        "\n" +
+                        "# If you are using modern IP forwarding, configure an unique secret here.\n" +
+                        "forwarding-secret = \"5L7eb15i6yie\"\n" +
+                        "\n" +
+                        "# Announce whether or not your server supports Forge. If you run a modded server, we\n" +
+                        "# suggest turning this on.\n" +
+                        "announce-forge = false\n" +
+                        "\n" +
+                        "[servers]\n" +
+                        "\n" +
+                        "# In what order we should try servers when a player logs in or is kicked from aserver.\n" +
+                        "try = []\n" +
+                        "\n" +
+                        "[forced-hosts]\n" +
+                        "# Configure your forced hosts here.\n" +
+                        "\n" +
+                        "[advanced]\n" +
+                        "# How large a Minecraft packet has to be before we compress it. Setting this to zero will\n" +
+                        "# compress all packets, and setting it to -1 will disable compression entirely.\n" +
+                        "compression-threshold = 256\n" +
+                        "\n" +
+                        "# How much compression should be done (from 0-9). The default is -1, which uses the\n" +
+                        "# default level of 6.\n" +
+                        "compression-level = -1\n" +
+                        "\n" +
+                        "# How fast (in milliseconds) are clients allowed to connect after the last connection? By\n" +
+                        "# default, this is three seconds. Disable this by setting this to 0.\n" +
+                        "login-ratelimit = 3000\n" +
+                        "\n" +
+                        "# Specify a custom timeout for connection timeouts here. The default is five seconds.\n" +
+                        "connection-timeout = 5000\n" +
+                        "\n" +
+                        "# Specify a read timeout for connections here. The default is 30 seconds.\n" +
+                        "read-timeout = 30000\n" +
+                        "\n" +
+                        "# Enables compatibility with HAProxy.\n" +
+                        "proxy-protocol = false\n" +
+                        "\n" +
+                        "[query]\n" +
+                        "# Whether to enable responding to GameSpy 4 query responses or not.\n" +
+                        "enabled = false\n" +
+                        "\n" +
+                        "# If query is enabled, on what port should the query protocol listen on?\n" +
+                        "port = 25577\n" +
+                        "\n" +
+                        "# This is the map name that is reported to the query services.\n" +
+                        "map = \"Velocity\"\n" +
+                        "\n" +
+                        "# Whether plugins should be shown in query response by default or not\n" +
+                        "show-plugins = false\n" +
+                        "\n" +
+                        "[metrics]\n" +
+                        "# Whether metrics will be reported to bStats (https://bstats.org).\n" +
+                        "# bStats collects some basic information, like how many people use Velocity and their\n" +
+                        "# player count. We recommend keeping bStats enabled, but if you're not comfortable with\n" +
+                        "# this, you can turn this setting off. There is no performance penalty associated with\n" +
+                        "# having metrics enabled, and data sent to bStats can't identify your server.\n" +
+                        "enabled = false\n" +
+                        "\n" +
+                        "# A unique, anonymous ID to identify this proxy with.\n" +
+                        "id = \"9cc04bee-691b-450b-94dc-5f5de5b6847b\"\n" +
+                        "\n" +
+                        "log-failure = false");
+
+            } else {
+
+                writer = new FileWriter(serverLocation + "/config.yml");
+
+                writer.write("player_limit: " + config.getMaxPlayers() + "\n" +
+                        "permissions:\n" +
+                        "  default: []\n" +
+                        "  admin:\n" +
+                        "    - bungeecord.command.alert\n" +
+                        "    - bungeecord.command.end\n" +
+                        "    - bungeecord.command.ip\n" +
+                        "    - bungeecord.command.reload\n" +
+                        "    - bungeecord.command.send\n" +
+                        "    - bungeecord.command.server\n" +
+                        "    - bungeecord.command.list\n" +
+                        "timeout: 30000\n" +
+                        "log_commands: false\n" +
+                        "online_mode: " + config.isOnlineMode() + "\n" +
+                        "disabled_commands:\n" +
+                        "  - disabledcommandhere\n" +
+                        "log_pings: false\n" +
+                        "servers:\n" +
+                        "  Lobby-1:\n" +
+                        "    motd: '" + "MOTD" + "'\n" +
+                        "    address: '127.0.0.1:" + CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().getServerStartPort() + "'\n" +
+                        "    restricted: false\n" +
+                        "listeners:\n" +
+                        "  - query_port: 25577\n" +
+                        "    motd: \"&bHytoraCloud &7Default Motd &7by Lystx\"\n" +
+                        "    priorities:\n" +
+                        "      - Lobby-1\n" +
+                        "    bind_local_address: true\n" +
+                        "    tab_list: GLOBAL_PING\n" +
+                        "    query_enabled: false\n" +
+                        "    host: 0.0.0.0:" + service.getPort() + "\n" +
+                        "    forced_hosts:\n" +
+                        "      pvp.md-5.net: pvp\n" +
+                        "    max_players: 0\n" +
+                        "    tab_size: 60\n" +
+                        "    ping_passthrough: false\n" +
+                        "    force_default_server: false\n" +
+                        "    proxy_protocol: " + CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().isProxyProtocol() + "\n" +
+                        "ip_forward: true\n" +
+                        "network_compression_threshold: 256\n" +
+                        "groups:\n" +
+                        "connection_throttle: -1\n" +
+                        "stats: 13be5ac9-5731-4502-9ccc-c4a80163f14a\n" +
+                        "prevent_proxy_connections: false");
+            }
             writer.flush();
             writer.close();
         } else {

@@ -27,7 +27,6 @@ import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.service.global.config.stats.Statistics;
 import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
 import de.lystx.hytoracloud.driver.service.managing.database.IDatabaseManager;
-import de.lystx.hytoracloud.driver.service.global.messenger.IChannelMessenger;
 import de.lystx.hytoracloud.driver.service.cloud.module.Module;
 import de.lystx.hytoracloud.driver.service.cloud.module.ModuleInfo;
 import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
@@ -174,13 +173,6 @@ public class CloudDriver {
      */
     @Getter
     private IServiceManager serviceManager;
-
-
-    /**
-     * To manage all channelMessages
-     */
-    @Getter
-    private IChannelMessenger channelMessenger;
 
     /**
      * Manages the cloudServices

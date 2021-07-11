@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class DriverEventPlayerServerChange extends CloudEvent implements Serializable {
 
-    private final CloudPlayer cloudPlayer;
+    private final CloudPlayer player;
     private final Service service;
 
 }

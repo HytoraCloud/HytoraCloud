@@ -13,5 +13,5 @@ public class DriverEventPlayerQuit extends CloudEvent implements Serializable {
     /**
      * The joined player
      */
-    private final CloudPlayer cloudPlayer;
+    private final CloudPlayer player;
 }

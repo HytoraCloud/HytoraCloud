@@ -51,7 +51,7 @@ public class ScreenCommand implements TabCompletable {
                         this.screenPrinter.create(screen);
                         try {
                             for (String cachedLine : screen.getCachedLines()) {
-                                sender.sendMessage("§9[§b" + screen.getScreenName() + "§9]§f " + cachedLine);
+                                sender.sendMessage(screen.getScreenName(), cachedLine);
                             }
                         } catch (ConcurrentModificationException ignored) {
                         }

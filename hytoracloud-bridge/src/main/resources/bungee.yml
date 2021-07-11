@@ -1,6 +1,6 @@
 author: Lystx
 name: CloudBridge
-main: de.lystx.hytoracloud.bridge.bungeecord.HytoraCloudBungeeCordBridge
+main: de.lystx.hytoracloud.bridge.bungeecord.BungeeBridge
 version: 1.7.3
 load: STARTUP
 description: ServerAPI for HytoraCloud

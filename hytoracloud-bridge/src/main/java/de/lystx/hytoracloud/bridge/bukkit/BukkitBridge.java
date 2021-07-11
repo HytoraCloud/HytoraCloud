@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.util.*;
 
 @Getter @Setter
-public class HytoraCloudBukkitBridge extends JavaPlugin {
+public class BukkitBridge extends JavaPlugin {
 
     @Getter
-    private static HytoraCloudBukkitBridge instance;
+    private static BukkitBridge instance;
 
     private NametagManager nametagManager;
 
@@ -84,7 +84,7 @@ public class HytoraCloudBukkitBridge extends JavaPlugin {
     }
 
     /**
-     * This will boot up the {@link HytoraCloudBukkitBridge}
+     * This will boot up the {@link BukkitBridge}
      * It will first register all PacketHandlers
      * Then a CloudListener for all specific CloudEvents
      * will be registered in
@@ -159,7 +159,7 @@ public class HytoraCloudBukkitBridge extends JavaPlugin {
                 if (cloudPlayer != null) {
                     player.sendMessage(msg);
                     if (CloudDriver.getInstance().getServiceManager().getLobbies().size() == 1) {
-                        Bukkit.getScheduler().runTask(HytoraCloudBukkitBridge.getInstance(), () -> player.kickPlayer(msg));
+                        Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> player.kickPlayer(msg));
                     } else {
                         cloudPlayer.fallback();
                     }

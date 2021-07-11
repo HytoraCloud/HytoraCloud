@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.bukkit.impl.listener;
 
-import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
+import de.lystx.hytoracloud.bridge.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +14,7 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        HytoraCloudBukkitBridge.getInstance().startStopTimer();
+        BukkitBridge.getInstance().startStopTimer();
         CloudDriver.getInstance().getThisService().update();
     }
 

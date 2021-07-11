@@ -2,22 +2,19 @@ package de.lystx.hytoracloud.bridge.bungeecord;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.ProxyBridge;
-import de.lystx.hytoracloud.bridge.bungeecord.listener.network.CloudListener;
+import de.lystx.hytoracloud.bridge.bungeecord.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.other.TablistListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.player.CommandListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.player.PlayerListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.server.ServerKickListener;
-import de.lystx.hytoracloud.bridge.bungeecord.manager.HubManager;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponentAction;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.Service;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 
 
@@ -40,12 +37,11 @@ import java.net.InetSocketAddress;
 import java.util.*;
 
 @Getter
-public class HytoraCloudBungeeCordBridge extends Plugin {
+public class BungeeBridge extends Plugin {
 
     @Getter
-    private static HytoraCloudBungeeCordBridge instance;
+    private static BungeeBridge instance;
 
-    private HubManager hubManager;
     private Action action;
 
     @Override
@@ -56,46 +52,11 @@ public class HytoraCloudBungeeCordBridge extends Plugin {
             instance = this;
 
             this.action = new Action();
-            this.hubManager = new HubManager();
 
             ProxyServer.getInstance().getPluginManager().registerListener(this, new ProxyPingListener());
             ProxyServer.getInstance().getPluginManager().registerListener(this, new TablistListener());
 
-
             CloudBridge.getInstance().setProxyBridge(new ProxyBridge() {
-
-                @Override
-                public String formatTabList(CloudPlayer cloudPlayer, String input) {
-                    try {
-                        Service service;
-                        PermissionGroup permissionGroup;
-                        if (cloudPlayer == null || cloudPlayer.getPermissionGroup() == null) {
-                            permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
-                        } else {
-                            permissionGroup = cloudPlayer.getCachedPermissionGroup();
-                        }
-                        if (cloudPlayer == null || cloudPlayer.getService() == null) {
-                            service = CloudDriver.getInstance().getThisService();
-                        } else {
-                            service = CloudDriver.getInstance().getServiceManager().getService(cloudPlayer.getService().getName());
-                        }
-                        return input
-                                .replace("&", "§")
-                                .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getProxyConfig().getMaxPlayers()))
-                                .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size()))
-                                .replace("%id%", service.getServiceID() + "")
-                                .replace("%group%", service.getServiceGroup().getName() + "")
-                                .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
-                                .replace("%receiver%", CloudDriver.getInstance().getThisService().getServiceGroup().getReceiver())
-                                .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
-                                .replace("%proxy%", CloudDriver.getInstance().getServiceManager().getProxy(getProxyPort()).getName())
-                                .replace("%server%", service.getName());
-
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
 
                 @Override
                 public void updateTabList() {
@@ -117,23 +78,6 @@ public class HytoraCloudBungeeCordBridge extends Plugin {
                     }
                 }
 
-                @Override
-                public boolean onServerKick(CloudPlayer cloudPlayer, Service kickedFromService) {
-                    try {
-                        Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
-                        cloudPlayer.connect(fallback);
-                        return true;
-                    } catch (NullPointerException e) {
-                        return false;
-                    }
-                }
-
-                @Override
-                public void onServerConnect(CloudPlayer cloudPlayer, Service service) {
-                    DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, service);
-
-                    CloudDriver.getInstance().callEvent(serverChange);
-                }
 
                 @Override
                 public NetworkHandler getNetworkHandler() {
@@ -182,7 +126,20 @@ public class HytoraCloudBungeeCordBridge extends Plugin {
                         return;
                     }
 
-                    HytoraCloudBungeeCordBridge.getInstance().getHubManager().sendPlayerToFallback(player);
+                    CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
+
+                    if (cloudPlayer == null) {
+                        return;
+                    }
+                    Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+
+                    ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(fallback.getName());
+
+                    if (serverInfo == null) {
+                        return;
+                    }
+
+                    player.connect(serverInfo);
                 }
 
                 @Override
@@ -230,14 +187,14 @@ public class HytoraCloudBungeeCordBridge extends Plugin {
 
                 @Override
                 public void registerService(Service service) {
-                    if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
-                        ServerInfo info = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(CloudDriver.getInstance().getHost().getAddress().getHostName(), service.getPort()), "CloudService", false);
-                        ProxyServer.getInstance().getServers().put(service.getName(), info);
-                    }
+                    System.out.println("[Register] Registering '" + service.getName() + "'");
+                    ServerInfo info = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()), "CloudService", false);
+                    ProxyServer.getInstance().getServers().put(service.getName(), info);
                 }
 
                 @Override
                 public void removeServer(String server) {
+                    System.out.println("[Register] Removing '" + server + "'");
                     ProxyServer.getInstance().getServers().remove(server);
                 }
 

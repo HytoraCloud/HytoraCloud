@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.bukkit.impl.listener;
 
-import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
+import de.lystx.hytoracloud.bridge.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.bukkit.utils.CloudPermissibleBase;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
@@ -28,8 +28,8 @@ public class PlayerJoinListener implements Listener {
             return;
         }
         //Player has joined; server is not stopping
-        if (HytoraCloudBukkitBridge.getInstance().getTaskId() != -1) {
-            CloudDriver.getInstance().getScheduler().cancelTask(HytoraCloudBukkitBridge.getInstance().getTaskId()); //Cancelling stop ask
+        if (BukkitBridge.getInstance().getTaskId() != -1) {
+            CloudDriver.getInstance().getScheduler().cancelTask(BukkitBridge.getInstance().getTaskId()); //Cancelling stop ask
         }
 
         CloudDriver.getInstance().getThisService().update();

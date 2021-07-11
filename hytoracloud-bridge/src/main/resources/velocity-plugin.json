@@ -7,5 +7,5 @@
   "authors": [
     "Lystx"
   ],
-  "main": "de.lystx.hytoracloud.bridge.velocity.HytoraCloudVelocityBridge"
+  "main": "de.lystx.hytoracloud.bridge.velocity.VelocityBridge"
 }
