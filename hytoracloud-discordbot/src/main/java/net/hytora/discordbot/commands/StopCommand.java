@@ -1,24 +1,14 @@
 package net.hytora.discordbot.commands;
 
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import net.dv8tion.jda.api.EmbedBuilder;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.hytora.discordbot.Hytora;
 import net.hytora.discordbot.manager.command.CommandCategory;
 import net.hytora.discordbot.manager.command.CommandHandler;
-import net.hytora.discordbot.manager.suggestion.Suggestion;
-import net.hytora.discordbot.util.button.DiscordButton;
-import net.hytora.discordbot.util.button.DiscordButtonAction;
-
-import java.awt.*;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 public class StopCommand extends CommandHandler {
 

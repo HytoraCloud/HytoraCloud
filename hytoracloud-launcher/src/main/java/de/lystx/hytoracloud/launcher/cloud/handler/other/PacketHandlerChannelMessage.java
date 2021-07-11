@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketChannelMessage;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.service.messenger.ChannelMessage;
-import de.lystx.hytoracloud.driver.service.messenger.ChannelMessageListener;
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketChannelMessage;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.service.global.messenger.ChannelMessage;
+import de.lystx.hytoracloud.driver.service.global.messenger.ChannelMessageListener;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 

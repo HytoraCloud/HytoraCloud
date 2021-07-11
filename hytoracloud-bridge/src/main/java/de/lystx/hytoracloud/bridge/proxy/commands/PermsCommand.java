@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.bridge.proxy.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
-import de.lystx.hytoracloud.driver.service.util.utillity.Value;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.utils.utillity.Value;
 
 import java.util.Date;
 import java.util.UUID;

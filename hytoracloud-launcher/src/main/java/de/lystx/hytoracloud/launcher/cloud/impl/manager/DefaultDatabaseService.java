@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.database.DatabaseType;
-import de.lystx.hytoracloud.driver.service.database.IDatabase;
-import de.lystx.hytoracloud.driver.service.database.IDatabaseManager;
-import de.lystx.hytoracloud.driver.service.database.impl.DefaultDatabaseFiles;
-import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.managing.database.DatabaseType;
+import de.lystx.hytoracloud.driver.service.managing.database.IDatabase;
+import de.lystx.hytoracloud.driver.service.managing.database.IDatabaseManager;
+import de.lystx.hytoracloud.driver.service.managing.database.impl.DefaultDatabaseFiles;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.service.other.FileService;
 import lombok.Getter;
 

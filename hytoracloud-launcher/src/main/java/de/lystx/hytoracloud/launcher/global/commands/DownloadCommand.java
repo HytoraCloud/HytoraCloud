@@ -1,13 +1,13 @@
 package de.lystx.hytoracloud.launcher.global.commands;
 
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.enums.ProxyVersion;
-import de.lystx.hytoracloud.driver.enums.SpigotVersion;
-import de.lystx.hytoracloud.driver.service.console.CloudConsole;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
+import de.lystx.hytoracloud.driver.service.cloud.console.CloudConsole;
 import de.lystx.hytoracloud.driver.service.other.Updater;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.service.other.FileService;
 import de.lystx.hytoracloud.launcher.global.impl.setup.VersionDownload;
 import java.io.File;

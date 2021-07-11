@@ -1,19 +1,14 @@
 package net.hytora.discordbot.listener;
 
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.hytora.discordbot.Hytora;
 import net.hytora.discordbot.util.button.DiscordButton;
 import net.hytora.discordbot.util.button.DiscordButtonAction;
 import org.jetbrains.annotations.NotNull;
-
-import java.awt.*;
 
 public class DiscordButtonListener extends ListenerAdapter {
 

@@ -5,7 +5,7 @@ import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.lystx.hytoracloud.bridge.velocity.HytoraCloudVelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
 import net.kyori.adventure.text.Component;
 
 public class ServerConnectListener {

@@ -1,42 +1,37 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
-import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.other.ReceiverInfo;
-import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.elements.events.other.CloudServiceStartEvent;
-import de.lystx.hytoracloud.driver.elements.events.other.CloudServiceStopEvent;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStartedServer;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStopServer;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.enums.ServiceState;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStart;
+import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStop;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStartedServer;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
-import de.lystx.hytoracloud.driver.service.server.IServiceManager;
-import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
-import de.lystx.hytoracloud.driver.service.server.impl.ServiceStarter;
-import de.lystx.hytoracloud.driver.service.server.impl.ServiceStopper;
-import de.lystx.hytoracloud.driver.service.util.Utils;
-import de.lystx.hytoracloud.driver.service.util.other.Action;
-import de.lystx.hytoracloud.driver.service.util.utillity.Value;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.service.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.ServiceStarter;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.ServiceStopper;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.utillity.Action;
+import de.lystx.hytoracloud.driver.utils.utillity.Value;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -59,7 +54,7 @@ import java.util.function.Consumer;
 )
 public class DefaultServiceManager implements ICloudService, IServiceManager, NetworkHandler {
 
-    private final Map<ServiceGroup, List<Service>> serviceMap;
+    private Map<ServiceGroup, List<Service>> cachedServices;
     private List<Service> globalServices;
     private final Map<String, Action> actions;
 
@@ -81,7 +76,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
     public DefaultServiceManager(List<ServiceGroup> serviceGroups) {
         this.serviceGroups = serviceGroups;
         this.actions = new HashMap<>();
-        this.serviceMap = new HashMap<>();
+        this.cachedServices = new HashMap<>();
         this.globalServices = new LinkedList<>();
         this.unverifiedServices = new LinkedList<>();
 
@@ -111,8 +106,8 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param newGroup
      */
     public void updateGroup(ServiceGroup group, ServiceGroup newGroup) {
-        List<Service> list = this.getServiceMap(this.getServiceGroup(group.getName()));
-        this.serviceMap.put(this.getServiceGroup(group.getName()), list);
+        List<Service> list = this.getCachedServices(this.getServiceGroup(group.getName()));
+        this.cachedServices.put(this.getServiceGroup(group.getName()), list);
 
     }
 
@@ -125,10 +120,10 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (!this.running) {
             return;
         }
-        List<Service> list = this.getServiceMap(service.getServiceGroup());
+        List<Service> list = this.getCachedServices(service.getServiceGroup());
         if (!list.contains(service)) {
             list.add(service);
-            this.serviceMap.put(this.getServiceGroup(service.getServiceGroup().getName()), list);
+            this.cachedServices.put(this.getServiceGroup(service.getServiceGroup().getName()), list);
         }
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
@@ -147,11 +142,11 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (!this.running) {
             return;
         }
-        List<Service> services = this.serviceMap.get(service.getServiceGroup());
+        List<Service> services = this.cachedServices.get(service.getServiceGroup());
         Service remove = this.getService(service.getName());
         if (services == null) services = new LinkedList<>();
         services.remove(remove);
-        this.serviceMap.put(this.getServiceGroup(service.getServiceGroup().getName()), services);
+        this.cachedServices.put(this.getServiceGroup(service.getServiceGroup().getName()), services);
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
@@ -172,7 +167,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             networkHandler.onServerUpdate(service);
         }
 
-        List<Service> services = this.getServiceMap(service.getServiceGroup());
+        List<Service> services = this.getCachedServices(service.getServiceGroup());
 
         services.set(services.indexOf(this.getService(service.getName())), service.deepCopy());
 
@@ -180,7 +175,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (serviceGroup == null) {
             serviceGroup = service.getServiceGroup();
         }
-        this.serviceMap.put(serviceGroup, services);
+        this.cachedServices.put(serviceGroup, services);
     }
 
     /**
@@ -292,13 +287,13 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             networkHandler.onServerRegister(safeService);
         }
 
-        List<Service> list = this.getServiceMap(safeService.getServiceGroup());
+        List<Service> list = this.getCachedServices(safeService.getServiceGroup());
         Service contains = list.stream().filter(service1 -> service1.getName().equalsIgnoreCase(safeService.getName())).findFirst().orElse(null);
 
         Action action = this.actions.getOrDefault(safeService.getName(), new Action());
         if (contains == null) {
             list.add(safeService);
-            this.serviceMap.put(this.getServiceGroup(safeService.getServiceGroup().getName()), list);
+            this.cachedServices.put(this.getServiceGroup(safeService.getServiceGroup().getName()), list);
 
             //Sending it was registered
             this.getDriver().sendPacket(new PacketOutRegisterServer(safeService).setAction(action.getMS()));
@@ -326,8 +321,8 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             return;
         }
         this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-            if (this.getServiceMap(serviceGroup).size() < serviceGroup.getMinServer()) {
-                for (int i = this.getServiceMap(serviceGroup).size(); i < serviceGroup.getMinServer(); i++) {
+            if (this.getCachedServices(serviceGroup).size() < serviceGroup.getMinServer()) {
+                for (int i = this.getCachedServices(serviceGroup).size(); i < serviceGroup.getMinServer(); i++) {
                     int id = idService.getFreeID(serviceGroup.getName());
                     int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
                     Service service = new Service(serviceGroup, id, port);
@@ -343,7 +338,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param service
      * @param properties
      */
-    public void startService(ServiceGroup serviceGroup, Service service, JsonObject properties) {
+    public void startService(ServiceGroup serviceGroup, Service service, PropertyObject properties) {
         if (!this.running) {
             return;
         }
@@ -355,8 +350,8 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
                 return;
             }
         }
-        if (serviceGroup.getMaxServer() != -1 && this.getServiceMap(serviceGroup).size() >= serviceGroup.getMaxServer()) {
-            this.getDriver().getParent().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getServiceMap(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
+        if (serviceGroup.getMaxServer() != -1 && this.getCachedServices(serviceGroup).size() >= serviceGroup.getMaxServer()) {
+            this.getDriver().getParent().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getCachedServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
             return;
         }
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
@@ -372,17 +367,17 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
             int id = this.idService.getFreeID(serviceGroup.getName());
             service = new Service(serviceGroup, id, port);
         }
-        service.setProperties((properties == null ? new JsonObject() : properties));
+        service.setProperties((properties == null ? new PropertyObject() : properties));
         this.globalServices.add(service);
-        List<Service> services = this.getServiceMap(serviceGroup);
+        List<Service> services = this.getCachedServices(serviceGroup);
         services.add(service);
 
 
         ServiceGroup serviceGroup1 = this.getServiceGroup(serviceGroup.getName());
         if (serviceGroup1 == null) {
-            this.serviceMap.put(serviceGroup, services);
+            this.cachedServices.put(serviceGroup, services);
         } else {
-            this.serviceMap.put(serviceGroup1, services);
+            this.cachedServices.put(serviceGroup1, services);
         }
 
         this.actions.put(service.getName(), new Action());
@@ -400,7 +395,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
                     public void accept(Service service) {
                         CloudDriver.getInstance().sendPacket(new PacketOutStartedServer(service.getName()));
                         notifyStart(service);
-                        CloudDriver.getInstance().callEvent(new CloudServiceStartEvent(service));
+                        CloudDriver.getInstance().callEvent(new DriverEventServiceStart(service));
 
                         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
                             networkHandler.onServerStart(service);
@@ -436,7 +431,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (!this.running) {
             return;
         }
-        this.startService(serviceGroup, (JsonObject) null);
+        this.startService(serviceGroup, (PropertyObject) null);
     }
 
     /**
@@ -445,7 +440,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param properties
      * @return
      */
-    public void startService(ServiceGroup serviceGroup, JsonObject properties) {
+    public void startService(ServiceGroup serviceGroup, PropertyObject properties) {
         if (!this.running) {
             return;
         }
@@ -487,15 +482,15 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
                 //Ignoring Ubuntu Error
             }
 
-            List<Service> services = this.serviceMap.get(this.getServiceGroup(service.getServiceGroup().getName()));
+            List<Service> services = this.cachedServices.get(this.getServiceGroup(service.getServiceGroup().getName()));
             Service remove = this.getService(service.getName());
             if (services == null) services = new LinkedList<>();
             services.remove(remove);
-            this.serviceMap.put(this.getServiceGroup(service.getServiceGroup().getName()), services);
+            this.cachedServices.put(this.getServiceGroup(service.getServiceGroup().getName()), services);
 
 
             ServiceStopper serviceStopper = new ServiceStopper(service);
-            if (!CloudDriver.getInstance().callEvent(new CloudServiceStopEvent(service))) {
+            if (!CloudDriver.getInstance().callEvent(new DriverEventServiceStop(service))) {
                 serviceStopper.stop(new Consumer<Service>() {
                     @Override
                     public void accept(Service service) {
@@ -552,14 +547,14 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      */
     public void stopServices() {
         List<String> already = new LinkedList<>();
-        for (ServiceGroup serviceGroup : new LinkedList<>(this.serviceMap.keySet())) {
+        for (ServiceGroup serviceGroup : new LinkedList<>(this.cachedServices.keySet())) {
             if (this.getDriver().getInstance(GroupService.class) != null && this.getDriver().getInstance(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
                 continue;
             }
             if (!already.contains(serviceGroup.getName())) {
                 already.add(serviceGroup.getName());
                 if (this.getDriver().getParent().getScreenPrinter().getScreen() == null && !this.getDriver().getParent().getScreenPrinter().isInScreen()) {
-                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Stopping services of the group §3" + serviceGroup.getName() + " §h[§7Services: §3" + this.serviceMap.get(serviceGroup).size() + "§h]");
+                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Stopping services of the group §3" + serviceGroup.getName() + " §h[§7Services: §3" + this.cachedServices.get(serviceGroup).size() + "§h]");
                 }
             }
         }
@@ -602,9 +597,9 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         if (!this.isRightReceiver(serviceGroup)) {
             return;
         }
-        Value<Integer> count = new Value<>(this.getServiceMap(serviceGroup).size());
+        Value<Integer> count = new Value<>(this.getCachedServices(serviceGroup).size());
         try {
-            for (Service service : new LinkedList<>(this.getServiceMap(serviceGroup))) {
+            for (Service service : new LinkedList<>(this.getCachedServices(serviceGroup))) {
                 this.stopService(service, false);
                 count.setValue(count.get() - 1);
 
@@ -622,8 +617,8 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param serviceGroup
      * @return
      */
-    public List<Service> getServiceMap(ServiceGroup serviceGroup) {
-        List<Service> list = this.serviceMap.get(this.getServiceGroup(serviceGroup.getName()));
+    public List<Service> getCachedServices(ServiceGroup serviceGroup) {
+        List<Service> list = this.cachedServices.get(this.getServiceGroup(serviceGroup.getName()));
         if (list == null) list = new LinkedList<>();
 
         return list;
@@ -636,7 +631,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      */
     public Service getService(String name) {
         try {
-            for (List<Service> value : new LinkedList<>(this.serviceMap.values())) {
+            for (List<Service> value : new LinkedList<>(this.cachedServices.values())) {
                 for (Service service : value) {
                     if (service.getName().equalsIgnoreCase(name)) {
                         return service;
@@ -651,7 +646,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
     public List<Service> getAllServices() {
         List<Service> list = new LinkedList<>();
-        for (List<Service> value : new LinkedList<>(this.serviceMap.values())) {
+        for (List<Service> value : new LinkedList<>(this.cachedServices.values())) {
             list.addAll(value);
         }
         return list;
@@ -663,7 +658,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @return
      */
     public ServiceGroup getServiceGroup(String name) {
-        return this.serviceMap.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return this.cachedServices.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     /**

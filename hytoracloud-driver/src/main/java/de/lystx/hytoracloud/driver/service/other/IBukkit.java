@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.service.other;
 
-import de.lystx.hytoracloud.driver.enums.ServiceState;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 
 public interface IBukkit {
 

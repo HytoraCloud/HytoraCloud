@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver;
 
-import de.lystx.hytoracloud.driver.service.console.CloudConsole;
-import de.lystx.hytoracloud.driver.service.util.other.AuthManager;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenPrinter;
-import de.lystx.hytoracloud.driver.service.webserver.WebServer;
+import de.lystx.hytoracloud.driver.service.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.utils.utillity.AuthManager;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenPrinter;
+import de.lystx.hytoracloud.driver.service.cloud.webserver.WebServer;
 
 public interface DriverParent {
 
@@ -24,7 +24,7 @@ public interface DriverParent {
     /**
      * Returns the KeyManager
      *
-     * @return authmanager
+     * @return authManager
      */
     AuthManager getAuthManager();
 

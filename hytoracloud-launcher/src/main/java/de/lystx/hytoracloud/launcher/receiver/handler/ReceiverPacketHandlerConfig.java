@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.launcher.receiver.handler;
 
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
 
 import lombok.AllArgsConstructor;
 import net.hytora.networking.elements.packet.HytoraPacket;

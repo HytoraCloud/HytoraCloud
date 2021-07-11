@@ -3,16 +3,16 @@ package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.service.other.Updater;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.service.util.minecraft.NetworkInfo;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
 import lombok.AllArgsConstructor;
 
 import java.text.DecimalFormat;

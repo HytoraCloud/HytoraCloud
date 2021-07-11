@@ -1,6 +1,6 @@
 package net.hytora.discordbot.manager.suggestion;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;

@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.module.Module;
-import de.lystx.hytoracloud.driver.service.module.ModuleService;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.cloud.module.Module;
+import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 
 public class ModulesCommand {
 

@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.elements.packets.both.PacketReload;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutUpdateTabList;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
 
 
 import lombok.AllArgsConstructor;

@@ -1,16 +1,15 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestModules;
-import de.lystx.hytoracloud.driver.elements.packets.request.perms.PacketRequestPermissionGroup;
-import de.lystx.hytoracloud.driver.elements.packets.request.perms.PacketRequestPermissionGroupAdd;
-import de.lystx.hytoracloud.driver.elements.packets.request.perms.PacketRequestPermissionGroupGet;
-import de.lystx.hytoracloud.driver.elements.packets.request.property.PacketRequestAddProperty;
-import de.lystx.hytoracloud.driver.elements.packets.request.property.PacketRequestGetProperty;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroup;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroupAdd;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroupGet;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.property.PacketRequestAddProperty;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.property.PacketRequestGetProperty;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import lombok.AllArgsConstructor;

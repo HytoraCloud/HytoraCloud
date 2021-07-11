@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.launcher.cloud.handler.player;
 
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 

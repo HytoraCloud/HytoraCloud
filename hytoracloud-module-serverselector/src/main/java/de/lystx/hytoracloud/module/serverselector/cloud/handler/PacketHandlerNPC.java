@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.module.serverselector.cloud.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCService;
 
 import io.vson.elements.object.VsonObject;

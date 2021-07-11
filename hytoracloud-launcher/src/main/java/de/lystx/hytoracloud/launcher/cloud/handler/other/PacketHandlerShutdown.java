@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketShutdown;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.packet.HytoraPacket;

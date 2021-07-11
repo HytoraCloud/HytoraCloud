@@ -1,17 +1,17 @@
 package de.lystx.hytoracloud.bridge.standalone.manager;
 
-import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStartGroup;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStartGroupWithProperties;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStartService;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStopServer;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.enums.ServiceState;
-import de.lystx.hytoracloud.driver.service.server.IServiceManager;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartService;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.service.cloud.server.IServiceManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,11 +21,11 @@ import java.util.*;
 public class CloudBridgeServiceManager implements IServiceManager {
 
     private final CloudBridge cloudBridge;
-    private Map<ServiceGroup, List<Service>> serviceMap;
+    private Map<ServiceGroup, List<Service>> cachedServices;
 
     public CloudBridgeServiceManager(CloudBridge cloudBridge) {
         this.cloudBridge = cloudBridge;
-        this.serviceMap = new HashMap<>();
+        this.cachedServices = new HashMap<>();
     }
 
     /**
@@ -34,7 +34,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @return
      */
     public ServiceGroup getServiceGroup(String groupName) {
-        return this.serviceMap.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
+        return this.cachedServices.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
     }
 
     /**
@@ -48,23 +48,23 @@ public class CloudBridgeServiceManager implements IServiceManager {
 
     @Override
     public void notifyStop(Service service) {
-        throw new UnsupportedOperationException("Not Available for CloudAPI!");
+        throw new UnsupportedOperationException("Not Available for CloudBridge!");
     }
 
 
     @Override
     public void updateGroup(ServiceGroup group, ServiceGroup newGroup) {
         ServiceGroup serviceGroup = this.getServiceGroup(group.getName());
-        List<Service> services = this.serviceMap.get(serviceGroup);
-        this.serviceMap.remove(serviceGroup);
-        this.serviceMap.put(group, services);
+        List<Service> services = this.cachedServices.get(serviceGroup);
+        this.cachedServices.remove(serviceGroup);
+        this.cachedServices.put(group, services);
     }
 
     @Override
     public void updateService(Service service) {
         Service safeGet = this.getService(service.getName());
         ServiceGroup serviceGroup = this.getServiceGroup(safeGet.getServiceGroup().getName());
-        List<Service> services = this.serviceMap.get(serviceGroup);
+        List<Service> services = this.cachedServices.get(serviceGroup);
         services.set(services.indexOf(safeGet), service);
     }
 
@@ -76,7 +76,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
     @Override
-    public void startService(ServiceGroup serviceGroup, Service service, JsonObject properties) {
+    public void startService(ServiceGroup serviceGroup, Service service, PropertyObject properties) {
         service.setServiceGroup(serviceGroup);
         this.cloudBridge.getClient().sendPacket(new PacketInStartService(service, properties));
     }
@@ -96,7 +96,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
     @Override
-    public void startService(ServiceGroup serviceGroup, JsonObject properties) {
+    public void startService(ServiceGroup serviceGroup, PropertyObject properties) {
         this.cloudBridge.getClient().sendPacket(new PacketInStartGroupWithProperties(serviceGroup, properties));
     }
 
@@ -108,7 +108,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param serviceGroup
      * @param properties
      */
-    public void startService(String serviceGroup, JsonObject properties) {
+    public void startService(String serviceGroup, PropertyObject properties) {
         CloudDriver.getInstance().sendPacket(new PacketInStartGroupWithProperties(this.getServiceGroup(serviceGroup), properties));
 
     }
@@ -127,8 +127,8 @@ public class CloudBridgeServiceManager implements IServiceManager {
      */
     public List<Service> getAllServices() {
         List<Service> list = new LinkedList<>();
-        if (this.serviceMap != null) {
-            this.serviceMap.values().forEach(list::addAll);
+        if (this.cachedServices != null) {
+            this.cachedServices.values().forEach(list::addAll);
         }
         return list;
     }
@@ -187,10 +187,10 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param serviceGroup
      * @return
      */
-    public List<Service> getServiceMap(ServiceGroup serviceGroup) {
+    public List<Service> getCachedServices(ServiceGroup serviceGroup) {
 
         try {
-            List<Service> services = new LinkedList<>(this.serviceMap.get(this.getServiceGroup(serviceGroup.getName())));
+            List<Service> services = new LinkedList<>(this.cachedServices.get(this.getServiceGroup(serviceGroup.getName())));
             services.sort(Comparator.comparingInt(Service::getServiceID));
             return services;
         } catch (NullPointerException e) {
@@ -204,7 +204,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @return
      */
     public Service getService(String name) {
-        for (List<Service> value : this.serviceMap.values()) {
+        for (List<Service> value : this.cachedServices.values()) {
             for (Service service : value) {
                 if (service.getName().equalsIgnoreCase(name)) {
                     return service;
@@ -219,7 +219,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param group
      */
     public void stopServices(ServiceGroup group) {
-        this.serviceMap.get(this.getServiceGroup(group.getName())).forEach(this::stopService);
+        this.cachedServices.get(this.getServiceGroup(group.getName())).forEach(this::stopService);
     }
 
     @Override
@@ -238,7 +238,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @return
      */
     public List<ServiceGroup> getServiceGroups() {
-        return new LinkedList<>(this.serviceMap == null ? new ArrayList<>() : this.serviceMap.keySet());
+        return new LinkedList<>(this.cachedServices == null ? new ArrayList<>() : this.cachedServices.keySet());
     }
 
     /**

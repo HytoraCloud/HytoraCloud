@@ -18,14 +18,14 @@ import de.lystx.hytoracloud.launcher.cloud.handler.services.PacketHandlerStart;
 import de.lystx.hytoracloud.launcher.cloud.handler.services.PacketHandlerStopServer;
 import de.lystx.hytoracloud.driver.service.other.Updater;
 import de.lystx.hytoracloud.driver.service.other.BackupService;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.module.ModuleService;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
 import de.lystx.hytoracloud.driver.service.other.NetworkService;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
-import de.lystx.hytoracloud.driver.service.util.Utils;
-import de.lystx.hytoracloud.driver.service.util.minecraft.NetworkInfo;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
 
 public class CloudBootingSetupDone {
 
@@ -75,7 +75,6 @@ public class CloudBootingSetupDone {
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerCommand(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerCreateTemplate(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerLog(cloudSystem));
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerTPS(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerEvent(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerRequest(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerChannelMessage());

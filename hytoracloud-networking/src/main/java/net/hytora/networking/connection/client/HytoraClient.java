@@ -5,7 +5,6 @@ import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.elements.component.RepliableComponent;
 import net.hytora.networking.elements.other.HytoraLogin;
 import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.PacketHandshake;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.component.Component;
 
@@ -15,6 +14,7 @@ import lombok.Getter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -29,12 +29,7 @@ public class HytoraClient implements HytoraConnection {
     /**
      * Enabled until close is called
      */
-    private boolean connected = true;
-
-    /**
-     * If client is available
-     */
-    private int available = -2;
+    private boolean available;
 
     /**
      * The login for this client
@@ -87,11 +82,6 @@ public class HytoraClient implements HytoraConnection {
     private HytoraClientOptions options;
 
     /**
-     * The userManager to handle users
-     */
-    private final UserManager userManager;
-
-    /**
      * The host to connect to
      */
     private final String host;
@@ -121,22 +111,26 @@ public class HytoraClient implements HytoraConnection {
 
         this.host = host;
         this.port = port;
+        this.available = true;
+        this.clientListener = null;
 
         this.hytoraLogin = new HytoraLogin("No-Name-Client");
         this.catcher = new ClientCatcher();
         this.options = new HytoraClientOptions();
-        this.userManager = new UserManager();
         this.packetManager = new PacketManager(this);
         this.random = new Random();
-        this.clientListener = null;
 
         this.registerPacketHandler(packet -> {
             if (this.clientListener != null) {
                 this.clientListener.packetIn(packet);
             }
-            if (packet instanceof PacketHandshake) {
-                if (this.clientListener != null) {
-                    this.clientListener.onHandshake((PacketHandshake) packet);
+        });
+
+        this.registerChannelHandler("hytora_internal", repliableComponent -> {
+            Component component = repliableComponent.getComponent();
+            if (component.has("handshake")) {
+                if (clientListener != null) {
+                    clientListener.onHandshake();
                 }
             }
         });
@@ -183,6 +177,7 @@ public class HytoraClient implements HytoraConnection {
     @Override
     public void sendPacket(HytoraPacket packet, String receiver) {
         HytoraConnection.super.sendPacket(packet, receiver);
+
         if (this.clientListener != null) {
             this.clientListener.packetOut(packet);
         }
@@ -225,38 +220,39 @@ public class HytoraClient implements HytoraConnection {
             int loopedAmount = 0;
 
             try {
-                while (this.connected) {
+                while (this.available) {
                     try (Socket socket = new Socket(this.host, this.port);
                          ObjectOutputStream sender = new ObjectOutputStream(socket.getOutputStream());
-                         ObjectInputStream receiver = new ObjectInputStream(socket.getInputStream())) {
+                         ObjectInputStream receiver = new ObjectInputStream(socket.getInputStream())
+                    ) {
 
                         this.socket = socket;
                         this.objectOutputStream = sender;
                         this.objectInputStream = receiver;
 
-                        this.available = -2;
 
                         if (this.loginToServer()) {
-                            if (this.loginConsumer != null) {
-                                this.loginConsumer.accept(this);
-                                this.loginConsumer = null;
-                            }
-                            future.complete(this);
 
-                            while (this.connected) {
+                            future.complete(null);
+
+                            while (this.available) {
                                 try {
                                     Object incomingObject;
                                     synchronized (this.objectIncoming) {
                                         incomingObject = this.objectInputStream.readObject();
                                     }
 
+                                    if (this.clientListener != null) {
+                                        this.clientListener.onReceive(this, incomingObject);
+                                    }
+
                                     //Only the components matter
                                     if (incomingObject instanceof Component) {
-                                        Component hytoraComponent = (Component) incomingObject;
-                                        if (hytoraComponent.isReply()) {
-                                            this.catcher.handleReply(hytoraComponent);
+                                        Component component = (Component) incomingObject;
+                                        if (component.isReply()) {
+                                            this.catcher.handleReply(component);
                                         } else {
-                                            this.catcher.handleComponent(this, hytoraComponent);
+                                            this.catcher.handleComponent(this, component);
                                         }
                                     }
                                 } catch (ClassNotFoundException e) {
@@ -273,21 +269,13 @@ public class HytoraClient implements HytoraConnection {
                         }
                     }
 
-                    if (this.available == 0) {
-                        this.catcher.handleLogin("ERROR", "Disconnected");
-                    } else if (this.available == 2) {
-                        this.connected = false;
-                        //Error so connection is disconnected
-                    }
-
                     if (loopedAmount++ == this.options.getMaxRetry()) {
-                        this.connected = false;
-                        //Maximum retrys over connected false
+                        this.available = false;
                         break;
                     }
 
                     //Retrying with the given retry delay
-                    this.available = -2;
+                    this.available = false;
                     TimeUnit.MILLISECONDS.sleep(this.options.getRetryDelay());
                 }
                 if (this.clientListener != null) {
@@ -312,6 +300,11 @@ public class HytoraClient implements HytoraConnection {
     @Override
     public InetSocketAddress remoteAddress() {
         return new InetSocketAddress(this.host, this.port);
+    }
+
+    @Override
+    public UserManager getUserManager() {
+        return new UserManager(this);
     }
 
     /**
@@ -340,11 +333,17 @@ public class HytoraClient implements HytoraConnection {
 
         if (response.equalsIgnoreCase("OK")) {
             this.catcher.handleLogin(response, " Connected and logged in as '" + this.hytoraLogin.getName() + "'");
-            this.available = 0;
+
+            //Login successful handling consumer
+            if (this.loginConsumer != null) {
+                this.loginConsumer.accept(this);
+                this.loginConsumer = null;
+            }
+            this.available = true;
             return true;
         } else {
             this.catcher.handleLogin(response, " Invalid credential for user '" + this.hytoraLogin.getName() + "'");
-            this.available = 2;
+            this.available = false;
             return false;
         }
     }
@@ -357,7 +356,7 @@ public class HytoraClient implements HytoraConnection {
      * @return reply or empty reply
      */
     public Component sendComponentToReply(Component component) {
-        if (this.available != 0) {
+        if (!this.available) {
             return new Component();
         }
 
@@ -402,18 +401,30 @@ public class HytoraClient implements HytoraConnection {
      */
     @Override @SneakyThrows
     public void sendComponent(Component component) {
-        if (this.available != 0) {
+        this.sendObject(component);
+    }
+
+
+    /**
+     * Sends an object which is {@link Serializable}
+     *
+     * @param object the object
+     */
+    @Override @SneakyThrows
+    public void sendObject(Serializable object) {
+
+        if (!this.available) {
             return;
         }
         synchronized (this.objectOutgoing) {
-            this.objectOutputStream.writeObject(component);
+            this.objectOutputStream.writeObject(object);
             this.objectOutputStream.flush();
         }
     }
 
     @Override
     public String getName() {
-        return "HytoraClient@" + host + ":" + port;
+        return this.hytoraLogin == null ? "HytoraClient@" + host + ":" + port : this.hytoraLogin.getName();
     }
 
     /**
@@ -423,46 +434,12 @@ public class HytoraClient implements HytoraConnection {
      * @param consumer The Message request consumer.
      */
     public void sendComponent(Consumer<Component> consumer) {
-        if (this.available != 0) {
-            return;
-        }
 
         Component component = new Component();
         consumer.accept(component);
 
-        try {
-            synchronized (this.objectOutgoing) {
-                this.objectOutputStream.writeObject(component);
-                this.objectOutputStream.flush();
-            }
-        } catch (IOException e) {
-            if (this.options.isDebug()) {
-                e.printStackTrace();
-            }
-        }
-    }
+        this.sendComponent(component);
 
-    /**
-     * Sends a reply to the server
-     * to respond to a given component
-     *
-     * @param reply the reply
-     */
-    public void reply(Component reply) {
-        if (this.available != 0) {
-            return;
-        }
-
-        try {
-            synchronized (this.objectOutgoing) {
-                this.objectOutputStream.writeObject(reply);
-                this.objectOutputStream.flush();
-            }
-        } catch (IOException e) {
-            if (this.options.isDebug()) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -476,10 +453,6 @@ public class HytoraClient implements HytoraConnection {
      * @param replyConsumer the callback for the reply
      */
     public void sendComponent(Consumer<Component> componentConsumer, int delay, BiConsumer<Component, Boolean> replyConsumer) {
-        if (this.available != 0) {
-            return;
-        }
-
         Component hytoraComponent = new Component();
         componentConsumer.accept(hytoraComponent);
 
@@ -499,29 +472,16 @@ public class HytoraClient implements HytoraConnection {
      */
     @SneakyThrows
     public void sendComponent(Component hytoraComponent, int delay, BiConsumer<Component, Boolean> replyConsumer) {
-        if (this.available != 0) {
-            return;
-        }
 
-        try {
-
-            Field requestID = hytoraComponent.getClass().getDeclaredField("requestID");
-            requestID.setAccessible(true);
-            requestID.set(hytoraComponent, this.random.nextLong());
+        Field requestID = hytoraComponent.getClass().getDeclaredField("requestID");
+        requestID.setAccessible(true);
+        requestID.set(hytoraComponent, this.random.nextLong());
 
 
-            this.catcher.registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
+        this.catcher.registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
 
-            synchronized (this.objectOutgoing) {
-                this.objectOutputStream.writeObject(hytoraComponent);
-                this.objectOutputStream.flush();
-            }
+        this.sendComponent(hytoraComponent);
 
-        } catch (IOException e) {
-            if (this.options.isDebug()) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -543,10 +503,9 @@ public class HytoraClient implements HytoraConnection {
     @Override
     public void close() {
         try {
-            this.connected = false;
+            this.available = false;
             this.socket.close();
             this.catcher.shutdown();
-            this.userManager.shutdown();
         } catch (IOException e) {
             if (this.options.isDebug()) {
                 e.printStackTrace();

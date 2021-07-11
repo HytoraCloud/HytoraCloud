@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.module.serverselector.packets;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCConfig;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 
@@ -15,7 +14,6 @@ import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter @AllArgsConstructor
@@ -23,7 +21,6 @@ public class PacketOutServerSelector extends HytoraPacket implements Serializabl
 
     private List<CloudSign> cloudSigns;
     private VsonObject signLayOut;
-
 
     private NPCConfig npcConfig;
     private JsonEntity npcs;
@@ -34,7 +31,7 @@ public class PacketOutServerSelector extends HytoraPacket implements Serializabl
 
         component.put("signs", cloudSigns);
         component.put("layout", signLayOut.toString(FileFormat.RAW_JSON));
-        component.put("config", npcConfig);
+        component.put("config", JsonEntity.toString(npcConfig));
         component.put("npcs", npcs.toString());
     }
 
@@ -43,7 +40,7 @@ public class PacketOutServerSelector extends HytoraPacket implements Serializabl
 
         cloudSigns = component.get("signs");
         signLayOut = new VsonObject((String) component.get("layout"));
-        component = component.get("config");
+        npcConfig = JsonEntity.fromClass(component.get("config"), NPCConfig.class);
         npcs = new JsonEntity((String) component.get("npcs"));
     }
 }

@@ -14,36 +14,39 @@ import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgePlayerManager;
 import de.lystx.hytoracloud.bridge.standalone.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketRegisterService;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.Motd;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.module.ModuleService;
-import de.lystx.hytoracloud.driver.service.permission.PermissionService;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterService;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.service.managing.permission.PermissionService;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.utils.Utils;
 
 
 
-import de.lystx.hytoracloud.driver.service.player.featured.labymod.LabyModAddon;
+import de.lystx.hytoracloud.driver.service.managing.player.featured.labymod.LabyModAddon;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import net.hytora.networking.connection.client.ClientListener;
 import net.hytora.networking.connection.client.HytoraClient;
+import net.hytora.networking.connection.client.HytoraClientOptions;
 import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.component.ComponentSender;
 import net.hytora.networking.elements.other.HytoraLogin;
 import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.PacketHandshake;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudBridge {
@@ -61,7 +64,7 @@ public class CloudBridge {
 
         this.cloudDriver = new CloudDriver(CloudType.BRIDGE);
 
-        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
         this.client = new HytoraClient(jsonEntity.getString("host"), jsonEntity.getInteger("port"));
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.client);
@@ -139,35 +142,65 @@ public class CloudBridge {
      */
     private void bootstrap() {
 
-        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
 
         System.out.println("[CloudBridge] Trying to connect to Cloud@" + jsonEntity.getString("host") + ":" + jsonEntity.getInteger("port") + " via user '" + jsonEntity.getString("server") + "' ...");
         this.client.listener(new ClientListener() {
 
             @Override
             public void onConnect(InetSocketAddress socketAddress) {
-                System.out.println("§8");
-                System.out.println("[CloudAPI] §eCloudSession §fis now active (Not handshaked yet)");
-                System.out.println("§8");
 
-                Component server = CloudDriver.getInstance().getResponse(new PacketRegisterService(jsonEntity.getString("server")));
 
-                Service service = server.get("service");
+                System.out.println("\n" +
+                        "   _____ _                 _ ____       _     _            \n" +
+                        "  / ____| |               | |  _ \\     (_)   | |           \n" +
+                        " | |    | | ___  _   _  __| | |_) |_ __ _  __| | __ _  ___ \n" +
+                        " | |    | |/ _ \\| | | |/ _` |  _ <| '__| |/ _` |/ _` |/ _ \\\n" +
+                        " | |____| | (_) | |_| | (_| | |_) | |  | | (_| | (_| |  __/\n" +
+                        "  \\_____|_|\\___/ \\__,_|\\__,_|____/|_|  |_|\\__,_|\\__, |\\___|\n" +
+                        "                                                 __/ |     \n" +
+                        "                                                |___/      ");
+                System.out.println("-------------------------");
+                System.out.println("[CloudBridge] Bridge has connected to cloud at [" + socketAddress.toString() + "]");
+                System.out.println("[CloudBridge] But this Service has not received a Handshake-Component yet!");
 
-                System.out.println("WORKED FOR " + service.getName());
+                PacketRegisterService packetRegisterService = new PacketRegisterService(jsonEntity.getString("server"));
+
+                packetRegisterService.toReply(client, new Consumer<Component>() {
+
+                    @SneakyThrows
+                    @Override
+                    public void accept(Component component) {
+
+                        Component.Reply reply = component.reply();
+                        Service service = JsonEntity.fromClass(reply.getMessage(), Service.class);
+
+                        System.out.println("[CloudBridge] Received Reply from Cloud for '" + service.getName() + "'");
+                    }
+                });
+
             }
 
             @SneakyThrows
             @Override
-            public void onHandshake(PacketHandshake packetHandshake) {
-                System.out.println("§8");
-                System.out.println("[CloudAPI] §eCloudSession has shaken hands with CloudInstance");
-                System.out.println("§8");
+            public void onHandshake() {
+                System.out.println("[CloudBridge] This Service is now registered and has Hands shaken with the CloudSystem");
 
-                Service thisService = CloudDriver.getInstance().getThisService();
-                thisService.setAuthenticated(true);
-                thisService.setHost(InetAddress.getLocalHost().getHostAddress());
-                thisService.update();
+
+                CloudDriver.getInstance().executeIf(() -> {
+
+                    Service service = CloudDriver.getInstance().getThisService();
+                    System.out.println("[CloudBridge] Verifying Service '" + service.getName() + "' that it is fully set up!");
+                    try {
+                        service.setAuthenticated(true);
+                        service.setHost(InetAddress.getLocalHost().getHostAddress());
+                        service.update();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                }, () -> CloudDriver.getInstance().getThisService() != null);
+
+
             }
 
             @Override
@@ -176,15 +209,19 @@ public class CloudBridge {
             }
 
             @Override
-            public void packetIn(HytoraPacket packet) {
+            public void onReceive(ComponentSender sender, Object object) {
 
+            }
+
+            @Override
+            public void packetIn(HytoraPacket packet) {
             }
 
             @Override
             public void packetOut(HytoraPacket packet) {
 
             }
-        }).login(new HytoraLogin(jsonEntity.getString("server"))).createConnection();
+        }).login(new HytoraLogin(jsonEntity.getString("server"))).options(new HytoraClientOptions().setDebug(true)).createConnection();
 
 
     }

@@ -1,17 +1,17 @@
 package de.lystx.hytoracloud.bridge.bungeecord.listener.player;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.elements.events.EventResult;
+import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerChangeServerCloudEvent;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.bridge.bungeecord.HytoraCloudBungeeCordBridge;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -63,7 +63,25 @@ public class PlayerListener implements Listener {
         String message = event.getMessage();
         String player = ((ProxiedPlayer)event.getSender()).getName();
 
-        CloudDriver.getInstance().getChannelMessenger().sendProxyChannelMessage("hytoraCloud::player", "chatMessage", new JsonEntity().append("player", player).append("message", message));
+        //TODO: CHAT EVENT SEND COMPONENT
+    }
+
+    @EventHandler
+    public void onConnected(ServerConnectedEvent event) {
+
+        ProxiedPlayer player = event.getPlayer();
+        Server server = event.getServer();
+
+
+        CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
+        Service service = CloudDriver.getInstance().getServiceManager().getService(server.getInfo().getName());
+
+
+        if (cloudPlayer == null || service == null) {
+            return;
+        }
+
+        CloudBridge.getInstance().getProxyBridge().onServerConnect(cloudPlayer, service);
     }
 
     @EventHandler
@@ -77,14 +95,6 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 event.setTarget(serverInfo);
-            } else {
-                try {
-                    ServerInfo info = player.getServer().getInfo();
-                    CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
-                    CloudDriver.getInstance().callEvent(new CloudPlayerChangeServerCloudEvent(cloudPlayer, info.getName()));
-                } catch (NullPointerException e) {
-                    // Ingoring
-                }
             }
             if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
                 ServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(event.getTarget().getName().split("-")[0]);

@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.module.serverselector.spigot;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.interfaces.BooleanRequest;
 import de.lystx.hytoracloud.module.serverselector.spigot.handler.PacketHandlerBukkitSignSystem;
 import de.lystx.hytoracloud.module.serverselector.spigot.handler.PacketHandlerManageNPCs;
 import de.lystx.hytoracloud.module.serverselector.spigot.handler.PacketHandlerManageSigns;

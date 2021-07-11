@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

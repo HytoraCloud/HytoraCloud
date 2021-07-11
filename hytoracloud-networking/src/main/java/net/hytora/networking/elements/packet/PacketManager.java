@@ -82,7 +82,7 @@ public class PacketManager {
             hytoraPacket.setConnection(this.connection);
             hytoraPacket.read(component);
 
-            for (PacketHandler packetHandler : packetHandlers) {
+            for (PacketHandler packetHandler : new ArrayList<>(this.packetHandlers)) {
                 hytoraPacket.handle(connection);
                 packetHandler.handle(hytoraPacket);
             }

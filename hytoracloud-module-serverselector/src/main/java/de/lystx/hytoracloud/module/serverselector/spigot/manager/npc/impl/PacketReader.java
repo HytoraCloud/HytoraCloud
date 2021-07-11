@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl;
 
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
-import de.lystx.hytoracloud.driver.service.util.utillity.CloudMap;
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import de.lystx.hytoracloud.module.serverselector.spigot.event.CloudServerNPCInteractEvent;
 import de.lystx.hytoracloud.driver.CloudDriver;

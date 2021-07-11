@@ -3,11 +3,10 @@ package de.lystx.hytoracloud.bridge.proxy.handler;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.elements.service.Service;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.commons.service.Service;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 
 import java.util.List;
@@ -34,6 +33,10 @@ public class ProxyHandlerConfig implements PacketHandler {
                     return;
                 }
                 //maintenance is now switched on -> kicking all players if not permission
+
+                if (proxyBridge == null) {
+                    return;
+                }
 
                 for (String name : proxyBridge.getPlayerInfos().keySet()) {
                     UUID uniqueId = proxyBridge.getPlayerInfos().get(name);

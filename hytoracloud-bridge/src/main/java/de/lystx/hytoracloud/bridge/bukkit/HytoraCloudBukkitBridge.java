@@ -1,30 +1,26 @@
 package de.lystx.hytoracloud.bridge.bukkit;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.bridge.bukkit.command.ServiceCommand;
-import de.lystx.hytoracloud.bridge.bukkit.command.StopCommand;
-import de.lystx.hytoracloud.bridge.bukkit.events.other.BukkitEventEvent;
-import de.lystx.hytoracloud.bridge.bukkit.listener.cloud.CloudListener;
-import de.lystx.hytoracloud.bridge.bukkit.manager.DefaultBukkit;
-import de.lystx.hytoracloud.bridge.bukkit.manager.nametag.NametagManager;
-import de.lystx.hytoracloud.bridge.bukkit.handler.*;
-import de.lystx.hytoracloud.bridge.bukkit.listener.player.PlayerChatListener;
-import de.lystx.hytoracloud.bridge.bukkit.listener.player.PlayerJoinListener;
-import de.lystx.hytoracloud.bridge.bukkit.listener.player.PlayerQuitListener;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
+import de.lystx.hytoracloud.bridge.bukkit.impl.command.ServiceCommand;
+import de.lystx.hytoracloud.bridge.bukkit.impl.command.StopCommand;
+import de.lystx.hytoracloud.bridge.bukkit.utils.DefaultBukkit;
+import de.lystx.hytoracloud.bridge.bukkit.utils.NametagManager;
+import de.lystx.hytoracloud.bridge.bukkit.impl.handler.*;
+import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerChatListener;
+import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerJoinListener;
+import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerQuitListener;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
 
 
 
 
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.*;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -44,7 +40,7 @@ public class HytoraCloudBukkitBridge extends JavaPlugin {
     public void onEnable() {
         CloudBridge.load();
 
-        if (CloudDriver.getInstance().getConnection() == null || !CloudDriver.getInstance().getConnection().isConnected()) {
+        if (CloudDriver.getInstance().getConnection() == null || !CloudDriver.getInstance().getConnection().isAvailable()) {
             CloudBridge.load();
         }
         CloudDriver.getInstance().execute(() -> {
@@ -96,20 +92,15 @@ public class HytoraCloudBukkitBridge extends JavaPlugin {
      * And last it manages the Bukkit stuff like
      * registering {@link Listener}s, {@link org.bukkit.command.Command}s and
      * CloudCommands with the {@link Command} Annotation
-     * (+ it registers the listeners to fire the {@link BukkitEventEvent} )
+     * (+ it registers the listeners to fire the  )
      */
     public void bootstrap() {
         // Registering PacketHandlers
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerInventory());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerBukkitStop());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerBukkitServerUpdate());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerBukkitCloudPlayerHandler());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerTPS());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerBukkitEvent());
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerBukkitRequest());
-
-        // Connecting to cloud and managing cloud stuff
-        CloudDriver.getInstance().registerNetworkHandler(new CloudListener());
+        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerInventory());
+        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerShutdown());
+        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerGroupUpdate());
+        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerCloudPlayer());
+        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerTPS());
 
         //Start checking for players or stop server
         this.startStopTimer();
@@ -123,28 +114,6 @@ public class HytoraCloudBukkitBridge extends JavaPlugin {
         CloudDriver.getInstance().registerCommand(new ServiceCommand());
         CloudDriver.getInstance().registerCommand(new StopCommand());
 
-        //Checking for fired events
-        for (EventPriority value : EventPriority.values()) {
-            this.registerListener(value, true);
-            this.registerListener(value, false);
-        }
-    }
-
-    /**
-     * Registers Handler for {@link BukkitEventEvent}
-     *
-     * @param eventPriority the priority for the event
-     * @param ignore if it should ignore
-     */
-    public void registerListener(EventPriority eventPriority, boolean ignore) {
-        for (HandlerList handler : HandlerList.getHandlerLists()) {
-            handler.register(new RegisteredListener(new Listener(){}, (listener, event) -> {
-                if (event.getClass().getSimpleName().equalsIgnoreCase(BukkitEventEvent.class.getSimpleName())) {
-                    return;
-                }
-                Bukkit.getPluginManager().callEvent(new BukkitEventEvent(event));
-            }, eventPriority, this, ignore));
-        }
     }
 
     /*

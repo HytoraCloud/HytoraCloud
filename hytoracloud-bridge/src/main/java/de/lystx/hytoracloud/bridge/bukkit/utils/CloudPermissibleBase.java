@@ -15,8 +15,19 @@ import java.util.*;
 @Getter
 public class CloudPermissibleBase extends PermissibleBase {
 
+    /**
+     * The player for this base
+     */
     private final Player player;
+
+    /**
+     * The failed tries
+     */
     private int tries;
+
+    /**
+     * The cached perms
+     */
     private Map<String, PermissionAttachmentInfo> perms;
 
     public CloudPermissibleBase(Player player) {
@@ -99,7 +110,7 @@ public class CloudPermissibleBase extends PermissibleBase {
             tries += 1;
             CloudDriver.getInstance().getScheduler().scheduleDelayedTask(this::recalculatePermissions, 5L);
             if (tries >= 5) {
-                System.out.println("[CloudAPI] Something went wrong while recalculating permissions of a player!");
+                System.out.println("[CloudBridge] Something went wrong while recalculating permissions of a player!");
                 tries = 0;
             }
         }

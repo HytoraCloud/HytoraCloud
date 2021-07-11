@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.bridge.standalone.manager;
 
-import de.lystx.hytoracloud.driver.service.database.DatabaseType;
-import de.lystx.hytoracloud.driver.service.database.IDatabase;
-import de.lystx.hytoracloud.driver.service.database.IDatabaseManager;
+import de.lystx.hytoracloud.driver.service.managing.database.DatabaseType;
+import de.lystx.hytoracloud.driver.service.managing.database.IDatabase;
+import de.lystx.hytoracloud.driver.service.managing.database.IDatabaseManager;
 import lombok.Getter;
 
 @Getter

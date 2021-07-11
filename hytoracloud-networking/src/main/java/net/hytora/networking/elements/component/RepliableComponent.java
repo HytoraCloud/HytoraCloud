@@ -3,8 +3,8 @@ package net.hytora.networking.elements.component;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.hytora.networking.elements.other.ComponentSender;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
@@ -28,7 +28,7 @@ public class RepliableComponent {
      */
 
     @SneakyThrows
-    public void reply(Object content) {
+    public void reply(Serializable content) {
         if (this.component.getRequestID() != 0) {
             Component component = new Component();
 

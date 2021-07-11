@@ -3,13 +3,13 @@ package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenPrinter;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreen;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenPrinter;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
 import lombok.AllArgsConstructor;
 
 import java.util.ConcurrentModificationException;

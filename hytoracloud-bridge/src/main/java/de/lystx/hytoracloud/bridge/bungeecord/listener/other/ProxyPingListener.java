@@ -1,20 +1,18 @@
 package de.lystx.hytoracloud.bridge.bungeecord.listener.other;
 
 
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.events.network.CloudNetworkPingEvent;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.Motd;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.commons.events.network.DriverEventNetworkPing;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -55,7 +53,7 @@ public class ProxyPingListener implements Listener {
                         event.getConnection().isLegacy()
                 );
 
-                CloudDriver.getInstance().callEvent(new CloudNetworkPingEvent(playerConnection));
+                CloudDriver.getInstance().callEvent(new DriverEventNetworkPing(playerConnection));
                 CloudDriver.getInstance().getNetworkHandlers().forEach(networkHandler -> networkHandler.onNetworkPing(playerConnection));
 
             }

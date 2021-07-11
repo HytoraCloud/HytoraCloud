@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.driver.service.other;
 
-import de.lystx.hytoracloud.driver.service.console.CloudConsole;
-import de.lystx.hytoracloud.driver.service.console.progressbar.ProgressBar;
-import de.lystx.hytoracloud.driver.service.console.progressbar.ProgressBarStyle;
+import de.lystx.hytoracloud.driver.service.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.service.cloud.console.progressbar.ProgressBar;
+import de.lystx.hytoracloud.driver.service.cloud.console.progressbar.ProgressBarStyle;
 import io.vson.VsonValue;
 import io.vson.elements.object.VsonObject;
 import io.vson.manage.vson.VsonParser;

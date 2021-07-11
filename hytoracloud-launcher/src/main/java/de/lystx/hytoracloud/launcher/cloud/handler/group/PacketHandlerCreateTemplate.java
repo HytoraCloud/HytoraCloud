@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInCopyTemplate;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCopyTemplate;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
 
 @AllArgsConstructor
 public class PacketHandlerCreateTemplate implements PacketHandler {

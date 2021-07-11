@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
-import de.lystx.hytoracloud.driver.service.command.command.CommandInfo;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.command.CommandService;
+import de.lystx.hytoracloud.driver.service.managing.command.command.CommandInfo;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
 import lombok.AllArgsConstructor;
 
 import java.util.Arrays;

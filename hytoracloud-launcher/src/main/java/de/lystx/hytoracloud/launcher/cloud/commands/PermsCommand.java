@@ -1,13 +1,13 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
 
 import java.util.Arrays;
 import java.util.LinkedList;

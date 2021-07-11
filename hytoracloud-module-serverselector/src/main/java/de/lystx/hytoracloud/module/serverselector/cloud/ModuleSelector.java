@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.module.serverselector.cloud;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.module.Module;
+import de.lystx.hytoracloud.driver.service.cloud.module.Module;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCService;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.SignService;
 import de.lystx.hytoracloud.module.serverselector.packets.PacketOutServerSelector;

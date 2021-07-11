@@ -1,15 +1,14 @@
 
+import net.hytora.networking.connection.client.ClientListener;
 import net.hytora.networking.connection.client.HytoraClient;
 import net.hytora.networking.connection.server.HytoraServer;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.component.RepliableComponent;
-import net.hytora.networking.elements.other.ComponentSender;
+import net.hytora.networking.elements.component.ComponentSender;
 import net.hytora.networking.elements.other.HytoraLogin;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import packets.ExamplePacket;
 
-import java.util.function.Consumer;
+import java.net.InetSocketAddress;
 
 
 public class PacketConnectionTest {
@@ -38,7 +37,37 @@ public class PacketConnectionTest {
         hytoraServer.createConnection();
 
         //Connecting client with name "Lobby-1"
-        hytoraClient.login(new HytoraLogin("Lobby-1")).createConnection();
+        hytoraClient.listener(new ClientListener() {
+            @Override
+            public void onConnect(InetSocketAddress socketAddress) {
+
+            }
+
+            @Override
+            public void onHandshake() {
+
+            }
+
+            @Override
+            public void onDisconnect() {
+
+            }
+
+            @Override
+            public void onReceive(ComponentSender sender, Object object) {
+
+            }
+
+            @Override
+            public void packetIn(HytoraPacket packet) {
+                System.out.println("[IN] " + packet.getClass().getName());
+            }
+
+            @Override
+            public void packetOut(HytoraPacket packet) {
+                System.out.println("[OUT] " + packet.getClass().getName());
+            }
+        }).login(new HytoraLogin("Lobby-1")).createConnection();
 
 
         ExamplePacket packet = new ExamplePacket("julheeg", 16);

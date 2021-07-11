@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.listener;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCConfig;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import de.lystx.hytoracloud.module.serverselector.spigot.event.CloudServerNPCInteractEvent;
-import de.lystx.hytoracloud.bridge.bukkit.utils.Item;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.bridge.bukkit.utils.BukkitItem;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.NPC;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -98,7 +98,7 @@ public class NPCListener implements Listener {
         }
         Inventory inventory = Bukkit.createInventory(player, (config.getInventoryRows() * 9), this.replace(config.getInventoryTitle(), null, serviceGroup));
         if (config.isCorners()) {
-            ItemStack glass = new Item(Material.STAINED_GLASS_PANE, (short) 7).setNoName().build();
+            ItemStack glass = new BukkitItem(Material.STAINED_GLASS_PANE, (short) 7).setNoName().build();
 
             for (int i = 0; i < 8; i++) {
                 inventory.setItem(i, glass);
@@ -115,7 +115,7 @@ public class NPCListener implements Listener {
             }
         }
 
-        for (SerializableDocument document : config.getItems()) {
+        for (PropertyObject document : config.getItems()) {
             if (document.isEmpty()) {
                 continue;
             }
@@ -125,9 +125,9 @@ public class NPCListener implements Listener {
             }
 
             int slot = document.getInteger("slot");
-            inventory.setItem(slot, new Item(Material.valueOf(document.getString("type")))
+            inventory.setItem(slot, new BukkitItem(Material.valueOf(document.getString("type")))
                     .setDisplayName(this.replace(document.getString("name"), null, serviceGroup))
-                    .addLoreAll(lore)
+                    .addLores(lore)
                     .build());
         }
 
@@ -139,9 +139,9 @@ public class NPCListener implements Listener {
                     strings.add(this.replace(s, service, serviceGroup));
                 }
 
-                ItemStack itemStack = new Item(Material.valueOf(config.getItemType().toUpperCase()))
+                ItemStack itemStack = new BukkitItem(Material.valueOf(config.getItemType().toUpperCase()))
                         .setDisplayName(this.replace(config.getItemName(), service, serviceGroup))
-                        .addLoreArray(strings)
+                        .addLores(strings)
                         .build();
                 inventory.addItem(itemStack);
 

@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.driver.service.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;

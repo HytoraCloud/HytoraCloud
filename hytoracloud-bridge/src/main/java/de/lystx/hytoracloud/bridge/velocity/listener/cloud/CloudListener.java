@@ -1,65 +1,64 @@
 package de.lystx.hytoracloud.bridge.velocity.listener.cloud;
 
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.lystx.hytoracloud.bridge.velocity.HytoraCloudVelocityBridge;
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
+import net.kyori.adventure.text.Component;
 
-//TODO: CALL EVENTS
 public class CloudListener implements NetworkHandler {
 
-    private final ProxyServer proxyServer = HytoraCloudVelocityBridge.getInstance().getServer();
+    public void notify(int state, String servername) {
 
-    @Override
-    public void onServerStart(Service service) {
+        ProxyServer server = HytoraCloudVelocityBridge.getInstance().getServer();
 
+        for (Player player : server.getAllPlayers()) {
+            if (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.notify")) {
+                return;
+            }
+            PlayerInformation playerData = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(player.getUniqueId());
+            if (playerData != null && !playerData.isNotifyServerStart()) {
+                return;
+            }
+            String message = null;
+            switch (state){
+                case 1:
+                    message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerStartMessage().
+                            replace("&", "§").
+                            replace("%server%", servername).
+                            replace("%prefix%", CloudDriver.getInstance().getCloudPrefix());
+                    break;
+                case 2:
+                    message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerStopMessage().
+                            replace("&", "§").
+                            replace("%server%", servername).
+                            replace("%prefix%", CloudDriver.getInstance().getCloudPrefix());
+                    break;
+                case 3:
+                    return;
+
+            }
+            assert message != null;
+            player.sendMessage(Component.text(message));
+        }
     }
 
     @Override
-    public void onServerRegister(Service service) {
-
+    public void onServerStart(Service service) {
+        this.notify(3, service.getName());
     }
 
     @Override
     public void onServerQueue(Service service) {
-        NetworkHandler.super.onServerQueue(service);
+        this.notify(1, service.getName());
     }
 
     @Override
     public void onServerStop(Service service) {
-        NetworkHandler.super.onServerStop(service);
+        this.notify(2, service.getName());
     }
 
-    @Override
-    public void onServerUpdate(Service service) {
-        NetworkHandler.super.onServerUpdate(service);
-    }
-
-    @Override
-    public void onGroupUpdate(ServiceGroup group) {
-        NetworkHandler.super.onGroupUpdate(group);
-    }
-
-    @Override
-    public void onPlayerJoin(CloudPlayer cloudPlayer) {
-        NetworkHandler.super.onPlayerJoin(cloudPlayer);
-    }
-
-    @Override
-    public void onServerChange(CloudPlayer cloudPlayer, String server) {
-        NetworkHandler.super.onServerChange(cloudPlayer, server);
-    }
-
-    @Override
-    public void onPlayerQuit(CloudPlayer cloudPlayer) {
-        NetworkHandler.super.onPlayerQuit(cloudPlayer);
-    }
-
-    @Override
-    public void onNetworkPing(PlayerConnection connection) {
-        NetworkHandler.super.onNetworkPing(connection);
-    }
 }

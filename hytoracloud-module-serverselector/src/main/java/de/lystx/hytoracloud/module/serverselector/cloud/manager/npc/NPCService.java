@@ -2,11 +2,11 @@ package de.lystx.hytoracloud.module.serverselector.cloud.manager.npc;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
-import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.module.serverselector.cloud.ModuleSelector;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -87,7 +87,7 @@ public class NPCService implements ICloudService {
                                 "§8» §bState §8» §7%state%"
                         ),
                         "MINECART",
-                        Collections.singletonList(new SerializableDocument()
+                        Collections.singletonList(new PropertyObject()
                                 .append("slot", 4)
                                 .append("type", "NAME_TAG")
                                 .append("name", "§8» §3%group%")
@@ -113,9 +113,9 @@ public class NPCService implements ICloudService {
     public NPCConfig getNPCConfig() {
         this.load();
         JsonArray jsonArray = this.config.getArray("items");
-        List<SerializableDocument> vsonObjects = new LinkedList<>();
+        List<PropertyObject> vsonObjects = new LinkedList<>();
         for (JsonElement jsonElement : jsonArray) {
-            vsonObjects.add(SerializableDocument.fromDocument(new JsonEntity(jsonElement.toString())));
+            vsonObjects.add(PropertyObject.fromDocument(new JsonEntity(jsonElement.toString())));
         }
 
         return new NPCConfig(this.config.getInteger("inventoryRows", 0), this.config.getString("inventoryTitle"), this.config.getBoolean("corners"), this.config.getString("connectingMessage"), this.config.getString("itemName"), this.config.getList("lore", String.class), this.config.getString("itemType"), vsonObjects);

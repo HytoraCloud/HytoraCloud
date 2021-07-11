@@ -2,10 +2,10 @@ package de.lystx.hytoracloud.module.serverselector.spigot.manager.sign;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.layout.SignLayOut;
-import de.lystx.hytoracloud.driver.service.util.minecraft.ServerPinger;
+import de.lystx.hytoracloud.driver.utils.minecraft.ServerPinger;
 import lombok.Getter;
 import lombok.Setter;
 

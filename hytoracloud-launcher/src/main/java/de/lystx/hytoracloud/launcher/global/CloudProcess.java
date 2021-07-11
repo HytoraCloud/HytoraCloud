@@ -1,36 +1,36 @@
 package de.lystx.hytoracloud.launcher.global;
 
-import de.lystx.hytoracloud.driver.elements.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 //import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.DriverParent;
-import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.service.util.Utils;
-import de.lystx.hytoracloud.driver.service.util.other.AuthManager;
-import de.lystx.hytoracloud.driver.service.module.Module;
-import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.utillity.AuthManager;
+import de.lystx.hytoracloud.driver.service.cloud.module.Module;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
 import de.lystx.hytoracloud.launcher.global.impl.setup.InstanceChooser;
 import de.lystx.hytoracloud.driver.service.other.Updater;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketShutdown;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.service.command.CommandService;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.console.CloudConsole;
-import de.lystx.hytoracloud.driver.service.console.logger.LoggerService;
-import de.lystx.hytoracloud.driver.service.event.DefaultEventService;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.service.cloud.console.logger.LoggerService;
+import de.lystx.hytoracloud.driver.service.managing.event.service.DefaultEventService;
 import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.module.ModuleService;
+import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
 import de.lystx.hytoracloud.driver.service.other.NetworkService;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenPrinter;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
-import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenPrinter;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
-import de.lystx.hytoracloud.driver.service.util.log.LogService;
-import de.lystx.hytoracloud.driver.service.util.minecraft.NetworkInfo;
-import de.lystx.hytoracloud.driver.service.webserver.WebServer;
+import de.lystx.hytoracloud.driver.utils.log.LogService;
+import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
+import de.lystx.hytoracloud.driver.service.cloud.webserver.WebServer;
 import de.lystx.hytoracloud.launcher.global.commands.*;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import io.vson.elements.object.VsonObject;
@@ -166,7 +166,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         try {
             CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
                     CloudDriver.getInstance().getNetworkConfig(),
-                    CloudDriver.getInstance().getServiceManager().getServiceMap()
+                    CloudDriver.getInstance().getServiceManager().getCachedServices()
             ));
             CloudDriver.getInstance().getNetworkConfig().update();
             ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceGroups(this.getInstance(GroupService.class).getGroups());

@@ -1,10 +1,9 @@
 package de.lystx.hytoracloud.bridge.standalone.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommunication;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 
 public class PacketHandlerCommunication implements PacketHandler {

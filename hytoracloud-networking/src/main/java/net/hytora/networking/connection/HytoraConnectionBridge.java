@@ -6,16 +6,13 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import net.hytora.networking.connection.server.HytoraServer;
 import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.other.ComponentSender;
+import net.hytora.networking.elements.component.ComponentSender;
 
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.List;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
@@ -38,7 +35,7 @@ public class HytoraConnectionBridge implements ComponentSender {
     /**
      * If this login was verified
      */
-    private boolean verified;
+    private boolean enabled;
 
     /**
      * The output
@@ -79,18 +76,23 @@ public class HytoraConnectionBridge implements ComponentSender {
 
         this.syncOut = new Object();
         this.syncIn = new Object();
+        this.enabled = false;
+
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
-            try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream()); ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
+            try (
+                    ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
+            ) {
 
                 this.objectOutputStream = out;
                 this.objectInputStream = in;
 
                 if (this.waitLogin()) {
-                    //client.setSoTimeout(1000 * 3600 * 6); //TODO: CHECK -> would equal 6 hours before time out
+                    socket.setSoTimeout(1000 * 3600 * 6); //TODO: CHECK -> would equal 6 hours before time out
 
-                    this.verified = true;
+                    this.enabled = true;
                     this.server.getUserManager().registerUser(this);
 
                     //Handling the login handler
@@ -101,10 +103,11 @@ public class HytoraConnectionBridge implements ComponentSender {
                         }
                     }
 
-                    while (this.server.isOpened() && this.verified) {
+                    while (this.server.isOpened() && this.enabled) {
 
                         //Listening for incoming components
                         try {
+
                             Object incomingObject;
                             synchronized (this.syncIn) {
                                 incomingObject = this.objectInputStream.readObject();
@@ -112,39 +115,43 @@ public class HytoraConnectionBridge implements ComponentSender {
 
                             //Only components matter
                            if (incomingObject instanceof Component) {
-                               Component hytoraComponent = (Component) incomingObject;
+                               Component component = (Component) incomingObject;
 
-                                hytoraComponent.setSender(this.name); //Setting sender to this
+                                component.setSender(this.name); //Setting sender to this
 
                                //Checking for forwarding or receiver
-                                if (hytoraComponent.getReceiver().equalsIgnoreCase("SERVER")) { // to the server
+                                if (component.getReceiver().equalsIgnoreCase("SERVER")) { // to the server
 
-                                    if (hytoraComponent.isReply()) {
-                                        this.server.getCatcher().handleReply(hytoraComponent);
+                                    if (component.isReply()) {
+                                        this.server.getCatcher().handleReply(component);
                                     } else {
-                                        this.server.getCatcher().handleComponent(hytoraComponent, this);
+                                        this.server.getCatcher().handleComponent(component, this);
                                     }
 
                                 } else {
-                                    if (hytoraComponent.isReply()) {
-                                        this.server.getCatcher().handleReply(hytoraComponent);
+                                    if (component.isReply()) {
+                                        this.server.getCatcher().handleReply(component);
                                     } else {
-                                        if ((!hytoraComponent.getReceiver().equalsIgnoreCase("ALL"))) {
-                                            this.server.sendComponent(hytoraComponent);
+                                        if ((!component.getReceiver().equalsIgnoreCase("ALL"))) {
+                                            this.server.sendComponent(component);
                                         }
                                     }
                                 }
                             }
                         } catch (ClassNotFoundException e) {
-                            //We ignoring this one
+                            e.printStackTrace();
                         }
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {
-                //Ignoring this one too
+                if (e instanceof EOFException || e instanceof SocketException) {
+                    return;
+                }
+
+                e.printStackTrace();
             } finally {
-                if (this.verified) {
-                    this.verified = false;
+                if (this.enabled) {
+                    this.enabled = false;
                     this.server.getUserManager().unregisterUser(this);
                     try {
                         socket.close();
@@ -157,22 +164,29 @@ public class HytoraConnectionBridge implements ComponentSender {
     }
 
 
-
-
     /**
      * Sends a {@link Component}
      * to the other connection instance
      *
-     * @param hytoraComponent the component
+     * @param component the component
      */
-    public void sendComponent(Component hytoraComponent) {
-        if (!this.verified) {
+    public void sendComponent(Component component) {
+        this.sendObject(component);
+    }
+
+    /**
+     * Sends an object which is {@link Serializable}
+     *
+     * @param object the object
+     */
+    public void sendObject(Serializable object) {
+        if (!this.socket.isConnected()) {
             return;
         }
 
         try {
             synchronized (this.syncOut) {
-                this.objectOutputStream.writeObject(hytoraComponent);
+                this.objectOutputStream.writeObject(object);
                 this.objectOutputStream.flush();
             }
         } catch (IOException e) {
@@ -187,30 +201,10 @@ public class HytoraConnectionBridge implements ComponentSender {
      * @param consumer the consumer to handle the component
      */
     public void sendComponent(Consumer<Component> consumer) {
-        Component hytoraComponent = new Component();
-        consumer.accept(hytoraComponent);
+        Component component = new Component();
+        consumer.accept(component);
 
-        this.sendComponent(hytoraComponent);
-    }
-
-    /**
-     * Sends a reply instance
-     *
-     * @param hytoraReply the reply
-     */
-    public void sendReply(Component hytoraReply) {
-        if (!this.verified) {
-            return;
-        }
-
-        try {
-            synchronized (this.syncOut) {
-                this.objectOutputStream.writeObject(hytoraReply);
-                this.objectOutputStream.flush();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.sendComponent(component);
     }
 
     /**
@@ -225,7 +219,7 @@ public class HytoraConnectionBridge implements ComponentSender {
      */
     @SneakyThrows
     public void sendComponent(Component hytoraComponent, int delay, BiConsumer<Component, Boolean> replyConsumer) {
-        if (!this.verified) {
+        if (!this.enabled) {
             return;
         }
 
@@ -235,14 +229,7 @@ public class HytoraConnectionBridge implements ComponentSender {
 
         this.server.getCatcher().registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
 
-        try {
-            synchronized (this.syncOut) {
-                this.objectOutputStream.writeObject(hytoraComponent);
-                this.objectOutputStream.flush();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.sendComponent(hytoraComponent);
     }
 
 
@@ -258,34 +245,21 @@ public class HytoraConnectionBridge implements ComponentSender {
      */
     @SneakyThrows
     public void sendComponent(Consumer<Component> componentConsumer, int delay, BiConsumer<Component, Boolean> replyConsumer) {
-        if (!this.verified) {
+        if (!this.enabled) {
             return;
         }
 
-        Component hytoraComponent = new Component();
-        componentConsumer.accept(hytoraComponent);
+        Component component = new Component();
+        componentConsumer.accept(component);
 
 
-        Field requestID = hytoraComponent.getClass().getDeclaredField("requestID");
+        Field requestID = component.getClass().getDeclaredField("requestID");
         requestID.setAccessible(true);
-        requestID.set(hytoraComponent, this.server.getRandom().nextLong());
-        this.server.getCatcher().registerReplyHandler(hytoraComponent.getRequestID(), delay, replyConsumer);
+        requestID.set(component, this.server.getRandom().nextLong());
+        this.server.getCatcher().registerReplyHandler(component.getRequestID(), delay, replyConsumer);
 
-        try {
-            synchronized (this.syncOut) {
-                this.objectOutputStream.writeObject(hytoraComponent);
-                this.objectOutputStream.flush();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.sendComponent(component);
     }
-
-    /**
-     * Blacklisted logins
-     */
-    private final List<String> blacklisted = Arrays.asList("server", "all");
-
 
     /**
      * Starts the connection and checks if the login
@@ -307,19 +281,11 @@ public class HytoraConnectionBridge implements ComponentSender {
 
         }
 
-        if (blacklisted.contains(this.name.toLowerCase())) {
-            state = false;
-            response = "FORBIDDEN";
-        } else {
-            BiFunction<String, String, Boolean> loginManager = this.server.getLoginManager();
-            state = loginManager == null || loginManager.apply(this.name, password);
-            response = (state) ? "OK" : "INVALID";
-        }
+        BiFunction<String, String, Boolean> loginManager = this.server.getLoginManager();
+        state = loginManager == null || loginManager.apply(this.name, password);
+        response = (state) ? "OK" : "INVALID";
 
-        synchronized (this.syncOut) {
-            objectOutputStream.writeObject(response);
-            objectOutputStream.flush();
-        }
+        this.sendObject(response);
 
         return state;
     }
@@ -331,13 +297,13 @@ public class HytoraConnectionBridge implements ComponentSender {
      * @param content the content to reply
      */
     @SneakyThrows
-    public void reply(Object content) {
+    public void reply(Serializable content) {
         Component hytoraReply = new Component();
         hytoraReply.setMessage(content);
         Field reply = hytoraReply.getClass().getDeclaredField("reply");
         reply.setAccessible(true);
         reply.set(hytoraReply, true);
-        this.sendReply(hytoraReply);
+        this.sendComponent(hytoraReply);
     }
 
     /**
@@ -353,7 +319,7 @@ public class HytoraConnectionBridge implements ComponentSender {
         Field reply = hytoraReply.getClass().getDeclaredField("reply");
         reply.setAccessible(true);
         reply.set(hytoraReply, true);
-        this.sendReply(hytoraReply);
+        this.sendComponent(hytoraReply);
 
     }
 
@@ -361,7 +327,9 @@ public class HytoraConnectionBridge implements ComponentSender {
      * Disconnects from the server
      */
     public void disconnect() {
-        this.verified = false;
+        System.out.println("[Client] '" + this.getName() + "' has disconnected!");
+        this.enabled = false;
+        this.server.getUserManager().unregisterUser(this);
         try {
             this.socket.close();
         } catch (IOException e) {

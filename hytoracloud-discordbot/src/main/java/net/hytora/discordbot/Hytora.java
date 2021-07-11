@@ -1,9 +1,9 @@
 package net.hytora.discordbot;
 
 
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

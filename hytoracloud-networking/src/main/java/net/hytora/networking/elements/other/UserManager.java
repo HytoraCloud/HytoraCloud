@@ -1,7 +1,9 @@
 package net.hytora.networking.elements.other;
 
+import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.connection.HytoraConnectionBridge;
 import lombok.Getter;
+import net.hytora.networking.connection.server.HytoraServer;
 
 import java.util.*;
 
@@ -9,18 +11,18 @@ import java.util.*;
 public class UserManager {
 
     /**
-     * All single connected users
-     */
-    private final Map<String, HytoraConnectionBridge> singleListedUsers;
-
-    /**
      * All connected users with the same name
      */
-    private final Map<String, List<HytoraConnectionBridge>> setListedUsers;
+    private final Map<String, List<HytoraConnectionBridge>> connectedUsers;
 
-    public UserManager() {
-        this.singleListedUsers = new HashMap<>();
-        this.setListedUsers = new HashMap<>();
+    /**
+     * The connection for this manager
+     */
+    private final HytoraConnection hytoraConnection;
+
+    public UserManager(HytoraConnection hytoraConnection) {
+        this.connectedUsers = new HashMap<>();
+        this.hytoraConnection = hytoraConnection;
     }
 
     /**
@@ -31,43 +33,54 @@ public class UserManager {
      * @param connectionBridge the client
      */
     public void registerUser(HytoraConnectionBridge connectionBridge) {
-        HytoraConnectionBridge probably = this.singleListedUsers.get(connectionBridge.getName());
-        if (probably == null) {
-            this.singleListedUsers.put(connectionBridge.getName(), connectionBridge);
-            return;
+        List<HytoraConnectionBridge> bridges = new ArrayList<>(this.connectedUsers.getOrDefault(connectionBridge.getName(), new LinkedList<>()));
+
+        if (bridges.isEmpty()) {
+            this.connectedUsers.put(connectionBridge.getName(), Collections.singletonList(connectionBridge));
+        } else {
+            bridges.add(connectionBridge);
+            this.connectedUsers.put(connectionBridge.getName(), bridges);
         }
-        List<HytoraConnectionBridge> hytoraConnectionBridgeLinkedList = new LinkedList<>();
-        hytoraConnectionBridgeLinkedList.add(probably);
-        hytoraConnectionBridgeLinkedList.add(connectionBridge);
-        this.setListedUsers.put(connectionBridge.getName(), hytoraConnectionBridgeLinkedList);
-        this.singleListedUsers.remove(connectionBridge.getName());
+
+
     }
 
     /**
      * Removes a user from the manager
      *
-     * @param connectionBridge the client to remove
+     * @param bridge the client to remove
      */
-    public void unregisterUser(HytoraConnectionBridge connectionBridge) {
-        if (connectionBridge.getName() == null) {
-            return;
+    public void unregisterUser(HytoraConnectionBridge bridge) {
+
+        if (this.hytoraConnection instanceof HytoraServer) {
+
+            HytoraServer hytoraServer = (HytoraServer)hytoraConnection;
+            hytoraServer.getAcceptedNames().remove(bridge.getName());
+
+            if (!this.connectedUsers.containsKey(bridge.getName())) {
+                return;
+            }
+            List<HytoraConnectionBridge> bridges = new ArrayList<>(this.connectedUsers.get(bridge.getName()));
+
+            bridges.remove(bridge); //Removing bridge from the list of bridges with the same name
+
+            //If list is empty its removed from the hash map
+            if (bridges.isEmpty()) {
+                this.connectedUsers.remove(bridge.getName());
+            } else {
+                this.connectedUsers.put(bridge.getName(), bridges);
+            }
         }
-        if (this.singleListedUsers.containsValue(connectionBridge)) {
-            this.singleListedUsers.remove(connectionBridge.getName());
-        } else if (setListedUsers.containsKey(connectionBridge.getName())) {
-            this.setListedUsers.get(connectionBridge.getName()).remove(connectionBridge);
-        }
+
     }
 
     /**
      * Disconnects all users
      */
     public void disconnect() {
-        for (HytoraConnectionBridge bridge : this.singleListedUsers.values()) {
-            bridge.disconnect();
-        }
-        for (List<HytoraConnectionBridge> bridges : this.setListedUsers.values()) {
-            for (HytoraConnectionBridge bridge : bridges) {
+
+        for (List<HytoraConnectionBridge> bridges : new ArrayList<>(this.connectedUsers.values())) {
+            for (HytoraConnectionBridge bridge : new LinkedList<>(bridges)) {
                 bridge.disconnect();
             }
         }
@@ -94,16 +107,7 @@ public class UserManager {
      * @return The list containing the active references of the searched user.
      */
     public List<HytoraConnectionBridge> getUsers(String name) {
-        HytoraConnectionBridge probably;
-        if ((probably = this.singleListedUsers.get(name)) != null) {
-            return new LinkedList<>(Collections.singletonList(probably));
-        } else {
-            List<HytoraConnectionBridge> probably2;
-            if ((probably2 = this.setListedUsers.get(name)) != null) {
-                return probably2;
-            }
-        }
-        return new LinkedList<>();
+        return this.connectedUsers.getOrDefault(name, new LinkedList<>());
     }
 
     /**
@@ -112,9 +116,14 @@ public class UserManager {
      * @return a list
      */
     public List<HytoraConnectionBridge> getConnectedUsers() {
-        List<HytoraConnectionBridge> res = new LinkedList<>(singleListedUsers.values());
-        this.setListedUsers.values().forEach(res::addAll);
-        return res;
+
+        List<HytoraConnectionBridge> connections = new LinkedList<>();
+
+        for (List<HytoraConnectionBridge> value : connectedUsers.values()) {
+            connections.addAll(value);
+        }
+
+        return connections;
     }
 
     /**
@@ -122,7 +131,6 @@ public class UserManager {
      */
     public void shutdown() {
         this.disconnect();
-        this.singleListedUsers.clear();
-        this.setListedUsers.clear();
+        this.connectedUsers.clear();
     }
 }

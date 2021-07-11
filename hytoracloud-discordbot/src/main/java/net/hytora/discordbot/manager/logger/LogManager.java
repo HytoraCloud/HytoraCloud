@@ -1,14 +1,12 @@
 package net.hytora.discordbot.manager.logger;
 
-import de.lystx.hytoracloud.driver.service.util.other.StringCreator;
+import de.lystx.hytoracloud.driver.utils.utillity.StringCreator;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.Component;
 import net.hytora.discordbot.Hytora;
 import net.hytora.discordbot.util.Color;
 

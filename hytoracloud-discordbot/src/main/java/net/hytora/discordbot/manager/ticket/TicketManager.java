@@ -1,6 +1,5 @@
 package net.hytora.discordbot.manager.ticket;
 
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
 import lombok.Getter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -8,17 +7,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.hytora.discordbot.Hytora;
-import net.hytora.discordbot.manager.suggestion.Suggestion;
 import net.hytora.discordbot.util.button.DiscordButton;
-import net.hytora.discordbot.util.button.DiscordButtonAction;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Getter
 public class TicketManager extends ListenerAdapter {

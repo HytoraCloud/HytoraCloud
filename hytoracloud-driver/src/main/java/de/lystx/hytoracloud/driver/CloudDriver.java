@@ -1,56 +1,56 @@
 package de.lystx.hytoracloud.driver;
 
 import ch.qos.logback.classic.LoggerContext;
-import de.lystx.hytoracloud.driver.elements.interfaces.BooleanRequest;
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.other.ReceiverInfo;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketCallEvent;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInCopyTemplate;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInCreateTemplate;
-import de.lystx.hytoracloud.driver.elements.packets.both.PacketLogMessage;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStopServer;
-import de.lystx.hytoracloud.driver.elements.packets.both.PacketCommand;
-import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestModules;
-import de.lystx.hytoracloud.driver.elements.packets.result.ResultPacketStatistics;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.service.event.IEventService;
-import de.lystx.hytoracloud.driver.service.main.DefaultServiceRegistry;
-import de.lystx.hytoracloud.driver.service.main.IServiceRegistry;
-import de.lystx.hytoracloud.driver.service.command.CommandService;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.config.impl.fallback.Fallback;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.config.stats.Statistics;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.database.IDatabaseManager;
-import de.lystx.hytoracloud.driver.service.messenger.IChannelMessenger;
-import de.lystx.hytoracloud.driver.service.module.Module;
-import de.lystx.hytoracloud.driver.service.module.ModuleInfo;
-import de.lystx.hytoracloud.driver.service.module.ModuleService;
+import de.lystx.hytoracloud.driver.commons.interfaces.BooleanRequest;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketCallEvent;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCopyTemplate;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCreateTemplate;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketLogMessage;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestModules;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestStatistics;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.service.managing.event.service.IEventService;
+import de.lystx.hytoracloud.driver.service.global.main.DefaultServiceRegistry;
+import de.lystx.hytoracloud.driver.service.global.main.IServiceRegistry;
+import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.service.global.config.stats.Statistics;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.managing.database.IDatabaseManager;
+import de.lystx.hytoracloud.driver.service.global.messenger.IChannelMessenger;
+import de.lystx.hytoracloud.driver.service.cloud.module.Module;
+import de.lystx.hytoracloud.driver.service.cloud.module.ModuleInfo;
+import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
 import de.lystx.hytoracloud.driver.service.other.IBukkit;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.service.player.featured.inventory.CloudPlayerInventory;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.server.IServiceManager;
-import de.lystx.hytoracloud.driver.service.server.impl.TemplateService;
-import de.lystx.hytoracloud.driver.service.util.Utils;
-import de.lystx.hytoracloud.driver.service.util.log.Loggers;
-import de.lystx.hytoracloud.driver.service.util.minecraft.TicksPerSecond;
-import de.lystx.hytoracloud.driver.service.util.reflection.Reflections;
-import de.lystx.hytoracloud.driver.service.util.utillity.CloudRunnable;
-import de.lystx.hytoracloud.driver.service.util.utillity.CloudMap;
-import de.lystx.hytoracloud.driver.service.config.impl.MessageConfig;
-import de.lystx.hytoracloud.driver.service.event.DefaultEventService;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.event.CloudEvent;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.service.managing.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.log.Loggers;
+import de.lystx.hytoracloud.driver.utils.minecraft.TicksPerSecond;
+import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudRunnable;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
+import de.lystx.hytoracloud.driver.service.global.config.impl.MessageConfig;
+import de.lystx.hytoracloud.driver.service.managing.event.service.DefaultEventService;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.managing.event.base.CloudEvent;
 import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.lib.LibraryService;
+import de.lystx.hytoracloud.driver.service.cloud.lib.LibraryService;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -286,7 +286,7 @@ public class CloudDriver {
      * @param commandObject the command
      */
     public void registerCommand(Object commandObject) {
-        this.getInstance(CommandService.class).unregisterCommand(commandObject);
+        this.getInstance(CommandService.class).registerCommand(commandObject);
     }
 
     /**
@@ -459,7 +459,8 @@ public class CloudDriver {
      * @return service
      */
     public Service getThisService() {
-        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
+
         return this.serviceManager.getService(jsonEntity.getString("server"));
     }
 
@@ -470,7 +471,7 @@ public class CloudDriver {
      */
     public InetSocketAddress getHost() {
         if (driverType == CloudType.BRIDGE) {
-            JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/cloud.json"));
+            JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
             return new InetSocketAddress(jsonEntity.getString("host"), jsonEntity.getInteger("port"));
         } else if (driverType == CloudType.CLOUDSYSTEM) {
             NetworkConfig networkConfig = getInstance(ConfigService.class).getNetworkConfig();
@@ -582,8 +583,8 @@ public class CloudDriver {
     public Statistics getStatistics() {
         if (this.driverType == CloudType.BRIDGE) {
 
-            ResultPacketStatistics resultPacketStatistics = new ResultPacketStatistics();
-            Component component = resultPacketStatistics.toReply(connection);
+            PacketRequestStatistics packetRequestStatistics = new PacketRequestStatistics();
+            Component component = packetRequestStatistics.toReply(connection);
 
             return new Statistics(new VsonObject(component.reply().getMessage()));
         } else {

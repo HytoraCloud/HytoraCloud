@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.receiver;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.elements.packets.receiver.PacketReceiverLogin;
-import de.lystx.hytoracloud.driver.elements.packets.receiver.PacketReceiverShutdown;
+import de.lystx.hytoracloud.driver.commons.packets.out.receiver.PacketReceiverLogin;
+import de.lystx.hytoracloud.driver.commons.packets.out.receiver.PacketReceiverShutdown;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 

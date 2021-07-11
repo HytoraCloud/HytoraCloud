@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.managing;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
 
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketUpdateNetworkConfig;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
 import lombok.AllArgsConstructor;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;

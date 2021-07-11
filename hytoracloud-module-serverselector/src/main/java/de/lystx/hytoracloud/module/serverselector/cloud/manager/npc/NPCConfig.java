@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.module.serverselector.cloud.manager.npc;
 
-import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public class NPCConfig implements Serializable, Objectable<NPCConfig> {
     private final List<String> lore;
     private final String itemType;
 
-    private final List<SerializableDocument> items;
+    private final List<PropertyObject> items;
 
 
 }

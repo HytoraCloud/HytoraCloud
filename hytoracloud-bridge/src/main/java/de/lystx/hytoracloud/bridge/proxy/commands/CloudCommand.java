@@ -2,24 +2,23 @@ package de.lystx.hytoracloud.bridge.proxy.commands;
 
 import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketTPS;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInGetLog;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInStartGroup;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketShutdown;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.service.other.Updater;
-import de.lystx.hytoracloud.driver.elements.packets.result.ResultPacketTPS;
-import de.lystx.hytoracloud.driver.elements.packets.both.PacketReload;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.GlobalProxyConfig;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.GlobalProxyConfig;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.utils.Utils;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class CloudCommand implements TabCompletable {
                     } else if (args[0].equalsIgnoreCase("tps")) {
 
 
-                        CloudDriver.getInstance().sendPacket(new ResultPacketTPS(), response -> player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§6TPS§8: §b" + response.reply().getMessage()));
+                        CloudDriver.getInstance().sendPacket(new PacketRequestCloudTPS(), response -> player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§6TPS§8: §b" + response.reply().getMessage()));
 
 
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
@@ -158,7 +157,11 @@ public class CloudCommand implements TabCompletable {
                         CloudPlayer cachedPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
 
                         cachedPlayer.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7TPS of group §b" + group.getName() + "§8:");
-                        CloudDriver.getInstance().sendPacket(new PacketTPS(cachedPlayer.getName(),CloudDriver.getInstance().getServiceManager().getAllServices().get(0), null));
+
+                        for (Service service : group.getServices()) {
+
+                            player.sendMessage("  §8» §b" + service.getName() + " §8┃ §7" + service.getTPS());
+                        }
 
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         String s = args[1];

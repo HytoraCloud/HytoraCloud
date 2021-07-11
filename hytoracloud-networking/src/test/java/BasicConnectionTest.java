@@ -4,13 +4,10 @@ import net.hytora.networking.connection.client.HytoraClient;
 import net.hytora.networking.connection.server.HytoraServer;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.component.RepliableComponent;
-import net.hytora.networking.elements.other.ComponentSender;
+import net.hytora.networking.elements.component.ComponentSender;
 import net.hytora.networking.elements.other.HytoraLogin;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.PacketHandshake;
 
 import java.net.InetSocketAddress;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 

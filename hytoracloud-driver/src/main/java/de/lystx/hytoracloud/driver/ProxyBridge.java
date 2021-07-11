@@ -1,15 +1,15 @@
 package de.lystx.hytoracloud.driver;
 
-import de.lystx.hytoracloud.driver.elements.chat.CloudComponent;
-import de.lystx.hytoracloud.driver.elements.events.EventResult;
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketUnregisterPlayer;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.enums.ProxyVersion;
-import de.lystx.hytoracloud.driver.service.command.CommandService;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.events.EventResult;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,6 @@ public interface ProxyBridge {
         EventResult event = new EventResult();
         event.setCancelled(false);
 
-
         CloudPlayer cachedPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(connection.getUniqueId());
 
         if (cachedPlayer != null) {
@@ -36,7 +35,6 @@ public interface ProxyBridge {
             event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("%prefix%", CloudDriver.getInstance().getCloudPrefix()));
 
         } else {
-
             cachedPlayer = new CloudPlayer(connection);
             cachedPlayer.setProxy(CloudDriver.getInstance().getThisService());
             cachedPlayer.update();
@@ -78,11 +76,13 @@ public interface ProxyBridge {
      * Called when a player executes a command
      *
      * @param player the player
-     * @param command the command
+     * @param rawLine the raw line
      */
-   default boolean commandExecute(CloudPlayer player, String command) {
-       if (CloudDriver.getInstance().getServiceRegistry().getInstance(CommandService.class).getCommand(command.substring(1).split(" ")[0]) != null) {
-           CloudDriver.getInstance().getInstance(CommandService.class).execute(player, true, command);
+   default boolean commandExecute(CloudPlayer player, String rawLine) {
+       String command = rawLine.substring(1).split(" ")[0];
+
+       if (CloudDriver.getInstance().getInstance(CommandService.class).getCommand(command) != null) {
+           CloudDriver.getInstance().getInstance(CommandService.class).execute(player, true, rawLine);
            return true;
        }
        return false;
@@ -110,6 +110,14 @@ public interface ProxyBridge {
      * @return boolean if cancel
      */
    boolean onServerKick(CloudPlayer cloudPlayer, Service kickedFromService);
+
+    /**
+     * Called when a player connected on a service
+     *
+     * @param cloudPlayer the player
+     * @param service the service
+     */
+   void onServerConnect(CloudPlayer cloudPlayer, Service service);
 
     /**
      * Gets the current {@link NetworkHandler}
@@ -179,7 +187,7 @@ public interface ProxyBridge {
     List<String> getAllServices();
 
     /**
-     * Gets a map of all player informations
+     * Gets a map of all player information
      * a Name with the given UUID of the player
      *
      * @return map

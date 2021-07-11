@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.listener;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import org.bukkit.Material;

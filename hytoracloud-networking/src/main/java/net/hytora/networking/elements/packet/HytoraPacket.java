@@ -57,6 +57,50 @@ public abstract class HytoraPacket {
 
     }
 
+    public void toReply(HytoraConnection connection, Consumer<Component> consumer) {
+
+        long start = System.currentTimeMillis();
+        this.connection = connection;
+
+        connection.registerPacketHandler(new PacketHandler() {
+            @Override
+            public void handle(HytoraPacket packet) {
+
+                if (packet instanceof PacketRespond) {
+                    PacketRespond packetRespond = (PacketRespond)packet;
+                    if (packet.getPacketUUID().equals(packetUUID)) {
+
+                        if (packetRespond.getHytoraComponent() != null) {
+                            consumer.accept(packetRespond.getHytoraComponent());
+                        } else {
+                            Component component = new Component();
+
+                            component.append(map -> {
+                                map.put("_time", (System.currentTimeMillis() - start));
+                                map.put("_message", packetRespond.getMessage());
+                                map.put("_status", packetRespond.getStatus().name());
+                            });
+                            consumer.accept(component);
+                        }
+                        connection.unregisterPacketHandler(this);
+                    }
+                }
+            }
+        });
+        connection.sendPacket(this);
+    }
+
+    /**
+     * Requests a component as reply
+     *
+     * @param connection the connection
+     * @return component
+     */
+    public Component toReply(HytoraConnection connection) {
+        return this.toReply(connection, 3000);
+    }
+
+
     /**
      * Calls the Method
      * This will wait for the given Packet to respond
@@ -65,11 +109,10 @@ public abstract class HytoraPacket {
      *
      * @return the Response the Packet gets
      */
-    public Component toReply(HytoraConnection connection) {
+    public Component toReply(HytoraConnection connection, int timeOut) {
 
         long start = System.currentTimeMillis();
         this.connection = connection;
-        int timeOut = 3000;
         Component[] response = {null};
 
         connection.registerPacketHandler(new PacketHandler() {

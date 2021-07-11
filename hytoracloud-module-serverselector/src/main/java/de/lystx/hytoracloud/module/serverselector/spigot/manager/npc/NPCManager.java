@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.manager.npc;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
-import de.lystx.hytoracloud.driver.service.util.utillity.CloudMap;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCConfig;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.NPC;
 import io.vson.elements.object.VsonObject;

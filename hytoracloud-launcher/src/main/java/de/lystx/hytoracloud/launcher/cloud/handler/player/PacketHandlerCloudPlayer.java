@@ -1,12 +1,15 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.player;
 
-import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketUpdatePlayer;
-import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestPing;
-import de.lystx.hytoracloud.driver.service.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUpdatePlayer;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
+import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -36,6 +39,9 @@ public class PacketHandlerCloudPlayer implements PacketHandler {
 
                 playerManager.registerPlayer(cloudPlayer);
 
+                DriverEventPlayerJoin playerJoin = new DriverEventPlayerJoin(cloudPlayer);
+
+                CloudDriver.getInstance().callEvent(playerJoin);
 
             } else {
                 //Player already online so updating...
@@ -43,7 +49,21 @@ public class PacketHandlerCloudPlayer implements PacketHandler {
                 playerManager.update(cloudPlayer);
             }
 
-            playerManager.sync();
+        }
+
+        if (packet instanceof PacketUnregisterPlayer) {
+
+            PacketUnregisterPlayer packetUnregisterPlayer = (PacketUnregisterPlayer)packet;
+
+            CloudPlayer cachedPlayer = playerManager.getCachedPlayer(packetUnregisterPlayer.getName());
+
+            if (cachedPlayer != null) {
+                playerManager.unregisterPlayer(cachedPlayer);
+
+                DriverEventPlayerQuit playerQuit = new DriverEventPlayerQuit(cachedPlayer);
+
+                CloudDriver.getInstance().callEvent(playerQuit);
+            }
 
         }
 

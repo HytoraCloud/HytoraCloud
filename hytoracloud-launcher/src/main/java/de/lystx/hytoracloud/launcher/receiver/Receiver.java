@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.launcher.receiver;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
-import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.elements.packets.receiver.PacketReceiverShutdown;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.commons.packets.out.receiver.PacketReceiverShutdown;
 
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
 import de.lystx.hytoracloud.launcher.receiver.booting.ReceiverBootingSetupDone;
 import de.lystx.hytoracloud.launcher.receiver.booting.ReceiverBootingSetupNotDone;
 import lombok.Getter;

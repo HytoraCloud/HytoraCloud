@@ -4,13 +4,13 @@ import lombok.SneakyThrows;
 import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.connection.HytoraConnectionBridge;
 import net.hytora.networking.elements.component.RepliableComponent;
-import net.hytora.networking.elements.packet.PacketHandshake;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.other.UserManager;
 import net.hytora.networking.elements.component.Component;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -84,12 +84,18 @@ public class HytoraServer implements HytoraConnection {
         this.port = port;
         this.acceptedNames = new LinkedList<>();
 
-        this.userManager = new UserManager();
+        this.userManager = new UserManager(this);
         this.catcher = new ServerCatcher();
         this.packetManager = new PacketManager(this);
         this.random = new Random();
 
-        this.registerLoginHandler(hytoraConnectionBridge -> hytoraConnectionBridge.sendPacket(new PacketHandshake(), hytoraConnectionBridge.getName()));
+        this.registerLoginHandler(bridge -> {
+            this.sendComponent(component -> {
+                component.setChannel("hytora_internal");
+                component.setReceiver(bridge.getName());
+                component.put("handshake", "true");
+            });
+        });
     }
 
     /**
@@ -112,10 +118,10 @@ public class HytoraServer implements HytoraConnection {
                 while (this.opened && !server.isClosed()) {
                     Socket socket = server.accept();
                     socket.setSoTimeout(1000); // timeout 1 seconds while login
-                    new HytoraConnectionBridge(this, socket);
+                    HytoraConnectionBridge bridge = new HytoraConnectionBridge(this, socket);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                //Ignoring when server is closed
             } finally {
                 future.complete(this);
                 this.catcher.shutdown();
@@ -141,21 +147,39 @@ public class HytoraServer implements HytoraConnection {
      */
     @SneakyThrows
     public void sendComponent(Component component) {
+        this.sendObject(component, component.getReceiver());
+    }
 
-        if (component.getReceiver().equalsIgnoreCase("ALL")) {
-            for (HytoraConnectionBridge user : this.userManager.getConnectedUsers()) {
-                synchronized (user.getSyncOut()) {
-                    user.getObjectOutputStream().writeObject(component);
-                    user.getObjectOutputStream().flush();
+    @Override
+    public void sendObject(Serializable object) {
+        this.sendObject(object, "ALL");
+    }
+
+    /**
+     * Sends an serializable {@link Object} to a given receiver
+     *
+     * @param object the object
+     * @param receiver the receiver
+     */
+    public void sendObject(Serializable object, String receiver) {
+        try {
+            if (receiver.equalsIgnoreCase("ALL")) {
+                for (HytoraConnectionBridge user : this.userManager.getConnectedUsers()) {
+                    synchronized (user.getSyncOut()) {
+                        user.getObjectOutputStream().writeObject(object);
+                        user.getObjectOutputStream().flush();
+                    }
+                }
+            } else if (!receiver.equalsIgnoreCase("SERVER")) {
+                for (HytoraConnectionBridge user : this.userManager.getUsers(receiver)) {
+                    synchronized (user.getSyncOut()) {
+                        user.getObjectOutputStream().writeObject(object);
+                        user.getObjectOutputStream().flush();
+                    }
                 }
             }
-        } else if (!component.getReceiver().equalsIgnoreCase("SERVER")) {
-            for (HytoraConnectionBridge user : this.userManager.getUsers(component.getReceiver())) {
-                synchronized (user.getSyncOut()) {
-                    user.getObjectOutputStream().writeObject(component);
-                    user.getObjectOutputStream().flush();
-                }
-            }
+        } catch (Exception e) {
+            //IGNORING THIS ONE
         }
     }
 
@@ -267,7 +291,7 @@ public class HytoraServer implements HytoraConnection {
     }
 
     @Override
-    public boolean isConnected() {
+    public boolean isAvailable() {
         return opened;
     }
 }

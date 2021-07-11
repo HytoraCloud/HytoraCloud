@@ -1,16 +1,16 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInGetLog;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreen;
-import de.lystx.hytoracloud.driver.service.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreen;
+import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -3,21 +3,21 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.elements.service.Template;
-import de.lystx.hytoracloud.driver.service.command.CommandService;
-import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.config.impl.fallback.Fallback;
-import de.lystx.hytoracloud.driver.service.config.impl.fallback.FallbackConfig;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.service.Template;
+import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.FallbackConfig;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.FallbackSetup;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.GroupSetup;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.PermissionGroupSetup;
@@ -46,7 +46,7 @@ public class CreateCommand implements TabCompletable {
                         maxPlayers = setup.getMaxPlayers();
                     }
 
-                    SerializableDocument document = new SerializableDocument();
+                    PropertyObject document = new PropertyObject();
                     if (setup.getType().equalsIgnoreCase("PROXY")) {
                         ProxyConfig config = ProxyConfig.defaultConfig();
                         config.setOnlineMode(!setup.isOnlineMode());

@@ -1,17 +1,14 @@
 package de.lystx.hytoracloud.bridge.standalone.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerChangeServerCloudEvent;
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketCallEvent;
-import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketServiceUpdate;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStartedServer;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStopServer;
-import de.lystx.hytoracloud.driver.elements.service.Service;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStartedServer;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 
 public class PacketHandlerNetwork implements PacketHandler {
@@ -47,23 +44,8 @@ public class PacketHandlerNetwork implements PacketHandler {
         }
     }
 
-    public void handleEvent(PacketCallEvent packet) {
-       if (packet.getCloudEvent() instanceof CloudPlayerChangeServerCloudEvent) {
-
-            CloudPlayerChangeServerCloudEvent serverEvent = (CloudPlayerChangeServerCloudEvent)packet.getCloudEvent();
-            for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-                networkHandler.onServerChange(serverEvent.getCloudPlayer(), serverEvent.getNewServer());
-                networkHandler.onServerUpdate(CloudDriver.getInstance().getServiceManager().getService(serverEvent.getNewServer()));
-            }
-
-        }
-    }
-
     @Override
     public void handle(HytoraPacket packet) {
-        if (packet instanceof PacketCallEvent) {
-            this.handleEvent((PacketCallEvent) packet);
-        }
         if (packet instanceof PacketServiceUpdate) {
             this.handleUpdate((PacketServiceUpdate) packet);
         }

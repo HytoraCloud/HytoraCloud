@@ -2,9 +2,12 @@ package de.lystx.hytoracloud.bridge.proxy.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.ProxyBridge;
-import de.lystx.hytoracloud.driver.elements.packets.both.player.*;
-import de.lystx.hytoracloud.driver.elements.packets.both.service.PacketConnectServer;
-import de.lystx.hytoracloud.driver.elements.packets.request.other.PacketRequestPing;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketFallback;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketKickPlayer;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendComponent;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendMessage;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketConnectServer;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import net.hytora.networking.elements.packet.response.ResponseStatus;

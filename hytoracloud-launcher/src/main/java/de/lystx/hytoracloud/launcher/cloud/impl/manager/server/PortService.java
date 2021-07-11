@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.GlobalProxyConfig;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.GlobalProxyConfig;
 import lombok.Getter;
 
 import java.util.LinkedList;

@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.module.serverselector.spigot.listener;
 
 import de.lystx.hytoracloud.bridge.bukkit.HytoraCloudBukkitBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.PacketReader;
 import org.bukkit.Bukkit;

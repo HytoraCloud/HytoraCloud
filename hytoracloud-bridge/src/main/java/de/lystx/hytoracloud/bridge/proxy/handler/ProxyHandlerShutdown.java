@@ -2,14 +2,12 @@ package de.lystx.hytoracloud.bridge.proxy.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutStopServer;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
-
 
 
 public class ProxyHandlerShutdown implements PacketHandler {

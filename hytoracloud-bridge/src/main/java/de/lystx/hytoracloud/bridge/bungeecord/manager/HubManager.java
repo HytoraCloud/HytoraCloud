@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.bridge.bungeecord.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.config.impl.fallback.Fallback;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;

@@ -1,7 +1,7 @@
 package net.hytora.networking.connection;
 
 import net.hytora.networking.connection.server.HytoraServer;
-import net.hytora.networking.elements.other.ComponentSender;
+import net.hytora.networking.elements.component.ComponentSender;
 import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import net.hytora.networking.elements.component.Component;
@@ -98,5 +98,5 @@ public interface HytoraConnection extends ComponentSender, Closeable {
      *
      * @return boolean
      */
-    boolean isConnected();
+    boolean isAvailable();
 }

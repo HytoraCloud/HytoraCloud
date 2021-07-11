@@ -1,31 +1,31 @@
 package de.lystx.hytoracloud.launcher.cloud.booting;
 
-import de.lystx.hytoracloud.driver.enums.ProxyVersion;
-import de.lystx.hytoracloud.driver.enums.SpigotVersion;
+import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.elements.service.ServiceType;
-import de.lystx.hytoracloud.driver.elements.service.Template;
-import de.lystx.hytoracloud.driver.service.command.CommandService;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.database.DatabaseType;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.service.Template;
+import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.permission.PermissionService;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.service.managing.permission.PermissionService;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.CloudSetup;
 import de.lystx.hytoracloud.launcher.global.impl.setup.DatabaseSetup;
 import de.lystx.hytoracloud.driver.service.other.Updater;
-import de.lystx.hytoracloud.driver.service.util.Utils;
-import de.lystx.hytoracloud.driver.service.util.other.Action;
-import de.lystx.hytoracloud.driver.service.util.utillity.Value;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.utillity.Action;
+import de.lystx.hytoracloud.driver.utils.utillity.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 
@@ -88,7 +88,7 @@ public class CloudBootingSetupNotDone {
                     false,
                     false,
                     true,
-                    new SerializableDocument().append("proxyConfig", config)
+                    new PropertyObject().append("proxyConfig", config)
             ));
 
 
@@ -107,7 +107,7 @@ public class CloudBootingSetupNotDone {
                     false,
                     true,
                     true,
-                    new SerializableDocument()
+                    new PropertyObject()
             ));
             if (spigot.get() == null) {
                 cloudSystem.getParent().getConsole().getLogger().sendMessage("ERROR", "§cPlease redo the setup and provide a §evalid spigot version§c!");

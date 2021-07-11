@@ -3,13 +3,13 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.GlobalProxyConfig;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.GlobalProxyConfig;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
 
 import java.util.LinkedList;
 import java.util.List;

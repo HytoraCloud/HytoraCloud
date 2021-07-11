@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.module.serverselector.cloud.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.both.other.PacketInformation;
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.SignService;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import net.hytora.networking.elements.packet.HytoraPacket;

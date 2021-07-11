@@ -3,7 +3,7 @@ import net.hytora.networking.connection.client.HytoraClient;
 import net.hytora.networking.connection.server.HytoraServer;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.component.RepliableComponent;
-import net.hytora.networking.elements.other.ComponentSender;
+import net.hytora.networking.elements.component.ComponentSender;
 import net.hytora.networking.elements.other.HytoraLogin;
 
 import java.util.UUID;

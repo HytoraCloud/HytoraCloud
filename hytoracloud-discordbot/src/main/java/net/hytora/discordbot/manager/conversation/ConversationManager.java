@@ -1,12 +1,10 @@
 package net.hytora.discordbot.manager.conversation;
 
-import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.hytora.discordbot.Hytora;
 import net.hytora.discordbot.util.MultiConsumer;
 
 import java.util.*;

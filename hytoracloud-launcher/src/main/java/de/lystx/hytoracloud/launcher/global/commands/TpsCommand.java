@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.util.minecraft.NetworkInfo;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

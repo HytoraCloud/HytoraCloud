@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.driver.service.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.service.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.util.other.FileZipper;
-import de.lystx.hytoracloud.driver.service.util.utillity.Value;
+import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.utils.utillity.FileZipper;
+import de.lystx.hytoracloud.driver.utils.utillity.Value;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;

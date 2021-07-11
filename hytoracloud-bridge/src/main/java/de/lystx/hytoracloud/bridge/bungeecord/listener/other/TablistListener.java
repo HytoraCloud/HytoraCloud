@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.bungeecord.listener.other;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.out.PacketOutUpdateTabList;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
 
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;

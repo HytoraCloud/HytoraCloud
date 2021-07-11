@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.setup;
 
-import de.lystx.hytoracloud.driver.service.setup.AbstractSetup;
-import de.lystx.hytoracloud.driver.service.setup.Setup;
+import de.lystx.hytoracloud.driver.utils.setup.AbstractSetup;
+import de.lystx.hytoracloud.driver.utils.setup.Setup;
 import lombok.Getter;
 
 @Getter

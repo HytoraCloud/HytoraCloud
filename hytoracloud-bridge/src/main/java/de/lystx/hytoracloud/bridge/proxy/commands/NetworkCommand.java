@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.bridge.proxy.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.packets.result.ResultPacketTPS;
-import de.lystx.hytoracloud.driver.enums.ServiceState;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.config.stats.Statistics;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.global.config.stats.Statistics;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import lombok.SneakyThrows;
 
 import java.text.DecimalFormat;
@@ -38,11 +38,10 @@ public class NetworkCommand {
 
             player.sendMessage("§8» §bGlobal§8:");
             player.sendMessage("  §8➜ §bConnections §8┃ §7" + statistics.getStats().get("connections").intValue());
-            player.sendMessage("  §8➜ §bPings §8┃ §7" + statistics.getStats().get("pings").intValue());
             player.sendMessage("  §8➜ §bCommands §8┃ §7" + statistics.getStats().get("executedCommands").intValue());
             player.sendMessage("  §8➜ §bBooted §8┃ §7" + statistics.getStats().get("bootedUp").intValue());
             player.sendMessage("  §8➜ §bCPU Average §8┃ §7" + new DecimalFormat("##.##").format(((statistics.getStats().get("bootedUp") * 2) / statistics.getStats().get("allCPUUsage")) * 100));
-            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudDriver.getInstance().getResponse(new ResultPacketTPS()).getMessage());
+            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudDriver.getInstance().getResponse(new PacketRequestCloudTPS()).getMessage());
             player.sendMessage("§8§m--------------------------------------");
         } else {
             player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cYou aren't allowed to perform this command!");

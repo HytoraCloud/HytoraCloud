@@ -2,12 +2,12 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.elements.other.SerializableDocument;
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketInUpdateServiceGroup;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
 
 import java.lang.reflect.Field;
 
@@ -26,7 +26,7 @@ public class EditCommand  {
             }
             String key = args[1];
             String value = args[2];
-            ServiceGroup newGroup = new ServiceGroup(group.getUniqueId(), group.getName(), group.getTemplate(), group.getServiceType(), group.getReceiver(), group.getMaxServer(), group.getMinServer(), group.getMaxRam(), group.getMinRam(), group.getMaxPlayers(), group.getNewServerPercent(), group.isMaintenance(), group.isLobby(), group.isDynamic(), new SerializableDocument());
+            ServiceGroup newGroup = new ServiceGroup(group.getUniqueId(), group.getName(), group.getTemplate(), group.getServiceType(), group.getReceiver(), group.getMaxServer(), group.getMinServer(), group.getMaxRam(), group.getMinRam(), group.getMaxPlayers(), group.getNewServerPercent(), group.isMaintenance(), group.isLobby(), group.isDynamic(), new PropertyObject());
             if (key.equalsIgnoreCase("maintenance") || key.equalsIgnoreCase("mc")) {
                 try {
                     newGroup.setMaintenance(Boolean.parseBoolean(value));

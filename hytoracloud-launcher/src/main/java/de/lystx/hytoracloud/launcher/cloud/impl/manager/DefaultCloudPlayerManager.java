@@ -1,18 +1,16 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerJoinCloudEvent;
-import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerQuitCloudEvent;
-import de.lystx.hytoracloud.driver.elements.packets.both.player.PacketUnregisterPlayer;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.database.IDatabase;
-import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.service.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.service.player.impl.*;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.service.managing.database.IDatabase;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.*;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -68,8 +66,6 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
         if (this.getDriver().getParent().getWebServer() != null) {
             this.getDriver().getParent().getWebServer().update("players", this.toDocument());
         }
-
-        CloudDriver.getInstance().callEvent(new CloudPlayerJoinCloudEvent(cloudPlayer));
         CloudDriver.getInstance().getInstance(StatsService.class).getStatistics().add("connections");
 
         this.clearDoubles();
@@ -223,7 +219,6 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
             PacketUnregisterPlayer player = (PacketUnregisterPlayer)packet;
             CloudPlayer cloudPlayer = this.getCachedPlayer(player.getName());
             if (cloudPlayer != null) {
-                CloudDriver.getInstance().callEvent(new CloudPlayerQuitCloudEvent(cloudPlayer));
                 this.unregisterPlayer(cloudPlayer);
                 CloudDriver.getInstance().reload();
             }
@@ -241,6 +236,9 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
     public List<CloudPlayer> getPlayersOnGroup(ServiceGroup serviceGroup) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
+            if (cloudPlayer.getService() == null) {
+                continue;
+            }
             if (cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(serviceGroup.getName())) {
                 list.add(cloudPlayer);
             }
@@ -256,6 +254,9 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
     public List<CloudPlayer> getPlayersOnServer(Service service) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
+            if (cloudPlayer.getService() == null) {
+                continue;
+            }
             if (cloudPlayer.getService().getName().equalsIgnoreCase(service.getName())) {
                 list.add(cloudPlayer);
             }

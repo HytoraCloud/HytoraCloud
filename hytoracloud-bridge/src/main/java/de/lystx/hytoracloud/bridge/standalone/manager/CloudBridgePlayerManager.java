@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.bridge.standalone.manager;
 
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.service.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
 
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +34,9 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     public List<CloudPlayer> getPlayersOnGroup(ServiceGroup serviceGroup) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
+            if (cloudPlayer.getService() == null) {
+                continue;
+            }
             if (cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(serviceGroup.getName())) {
                 list.add(cloudPlayer);
             }
@@ -49,6 +52,9 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     public List<CloudPlayer> getPlayersOnServer(Service service) {
        List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
+            if (cloudPlayer.getService() == null) {
+                continue;
+            }
             if (cloudPlayer.getService().getName().equalsIgnoreCase(service.getName())) {
                 list.add(cloudPlayer);
             }
@@ -66,7 +72,6 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
         }
         CloudPlayer cloudPlayer = getCachedPlayer(player.getName());
         if (cloudPlayer == null) {
-            System.out.println("[Added] " + player.getName() + "@" + player.getUniqueId());
             this.onlinePlayers.add(player);
 
             for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {

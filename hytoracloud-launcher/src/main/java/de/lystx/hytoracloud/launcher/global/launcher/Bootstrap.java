@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.launcher.global.launcher;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.enums.CloudType;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;

@@ -10,20 +10,19 @@ import de.lystx.hytoracloud.bridge.bungeecord.listener.player.PlayerListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.bridge.bungeecord.manager.HubManager;
-import de.lystx.hytoracloud.driver.elements.chat.CloudComponent;
-import de.lystx.hytoracloud.driver.elements.chat.CloudComponentAction;
-import de.lystx.hytoracloud.driver.elements.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.elements.other.JsonEntity;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.enums.ProxyVersion;
-import de.lystx.hytoracloud.driver.service.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.messenger.ChannelMessageListener;
-import de.lystx.hytoracloud.driver.service.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.chat.CloudComponentAction;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 
 
 
-import de.lystx.hytoracloud.driver.service.util.other.Action;
+import de.lystx.hytoracloud.driver.utils.utillity.Action;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
@@ -127,6 +126,13 @@ public class HytoraCloudBungeeCordBridge extends Plugin {
                     } catch (NullPointerException e) {
                         return false;
                     }
+                }
+
+                @Override
+                public void onServerConnect(CloudPlayer cloudPlayer, Service service) {
+                    DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, service);
+
+                    CloudDriver.getInstance().callEvent(serverChange);
                 }
 
                 @Override
@@ -322,23 +328,6 @@ public class HytoraCloudBungeeCordBridge extends Plugin {
             System.out.println("[CloudAPI] Couldn't find ProxyConfig!");
         }
         System.out.println("[CloudProxy] Booted up in " + this.action.time() + "ms");
-
-
-        CloudDriver.getInstance().getChannelMessenger().registerChannelListener("hytoraCloud::player", new ChannelMessageListener() {
-            @Override
-            public void onReceiveMessage(String identifier, JsonEntity data, String[] targetComponents) {
-                if (identifier.equalsIgnoreCase("chatMessage")) {
-                    String player = data.getString("player");
-                    String chatMessage = data.getString("message");
-                    CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player);
-                    if (cloudPlayer == null) {
-                        return;
-                    }
-                    //TODO: CHAT EVENT
-                    //ProxyServer.getInstance().getPluginManager().callEvent(new ProxyServerChatEvent(cloudPlayer, chatMessage));
-                }
-            }
-        });
 
     }
 

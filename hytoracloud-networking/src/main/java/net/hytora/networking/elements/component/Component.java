@@ -1,8 +1,5 @@
 package net.hytora.networking.elements.component;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 import lombok.Getter;
@@ -48,7 +45,7 @@ public class Component implements Serializable {
      * The content of this message
      */
     @Setter
-    private Object message;
+    private Serializable message;
 
     /**
      * If this component
@@ -86,7 +83,7 @@ public class Component implements Serializable {
     public <K, V> Component append(Consumer<Map<K, V>> consumer) {
         Map<K, V> map = this.getContentAsMap();
         consumer.accept(map);
-        this.message = map;
+        this.message = (Serializable) map;
         return this;
     }
 
@@ -148,7 +145,7 @@ public class Component implements Serializable {
         }
         Map<Object, Object> contentAsMap = this.getContentAsMap();
         contentAsMap.remove(key);
-        this.message = contentAsMap;
+        this.message = (Serializable) contentAsMap;
     }
 
     @Override
@@ -158,9 +155,8 @@ public class Component implements Serializable {
         if (map.isEmpty()) {
             map.put("message", this.message);
         }
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(map);
 
+        return map.toString();
     }
 
 

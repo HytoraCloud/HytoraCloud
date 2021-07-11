@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.driver.service.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import net.hytora.networking.connection.server.HytoraServer;
 

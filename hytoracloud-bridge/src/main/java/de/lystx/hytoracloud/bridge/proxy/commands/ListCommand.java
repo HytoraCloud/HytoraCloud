@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.bridge.proxy.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.command.base.Command;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.util.Utils;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.utils.Utils;
 
 public class ListCommand{
 
@@ -41,7 +41,7 @@ public class ListCommand{
                             player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe service §e" + name + " §cseems not to be online!");
                             return;
                         }
-                        String online = "§a" + Utils.toStringList(CloudDriver.getInstance().getCloudPlayerManager().getPlayersOnServer(service)).toString();
+                        String online = "§a" + Utils.toStringList(CloudDriver.getInstance().getCloudPlayerManager().getPlayersOnServer(service));
                         online = online.replace("[", "").replace("]", "");
                         player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7Players on server §b" + service.getName() + "§8: " + online);
                     } else {

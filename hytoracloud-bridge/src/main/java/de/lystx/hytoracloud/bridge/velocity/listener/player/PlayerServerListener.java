@@ -6,18 +6,32 @@ import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.lystx.hytoracloud.bridge.bungeecord.HytoraCloudBungeeCordBridge;
+import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.velocity.HytoraCloudVelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.elements.events.player.CloudPlayerChangeServerCloudEvent;
-import de.lystx.hytoracloud.driver.elements.service.Service;
-import de.lystx.hytoracloud.driver.elements.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
 import net.kyori.adventure.text.Component;
 
 import java.util.Objects;
 
 public class PlayerServerListener {
+
+
+    @Subscribe
+    public void handle(ServerConnectedEvent event) {
+
+        Player player = event.getPlayer();
+        RegisteredServer server = event.getServer();
+
+        CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
+        Service service = CloudDriver.getInstance().getServiceManager().getService(server.getServerInfo().getName());
+
+        CloudBridge.getInstance().getProxyBridge().onServerConnect(cloudPlayer, service);
+
+        cloudPlayer.setService(service);
+        cloudPlayer.update();
+    }
 
     @Subscribe
     public void handle(ServerPreConnectEvent event) {
@@ -34,15 +48,6 @@ public class PlayerServerListener {
                     return;
                 }
                 event.setResult(ServerPreConnectEvent.ServerResult.allowed(Objects.requireNonNull(HytoraCloudVelocityBridge.getInstance().getServer().getServer(fallback.getName()).orElse(null))));
-            } else {
-                try {
-                    RegisteredServer info = event.getOriginalServer();
-
-                    CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUsername());
-                    CloudDriver.getInstance().callEvent(new CloudPlayerChangeServerCloudEvent(cloudPlayer, info.getServerInfo().getName()));
-                } catch (NullPointerException e) {
-                    // Ingoring
-                }
             }
         } catch (IllegalStateException e){
             e.printStackTrace();

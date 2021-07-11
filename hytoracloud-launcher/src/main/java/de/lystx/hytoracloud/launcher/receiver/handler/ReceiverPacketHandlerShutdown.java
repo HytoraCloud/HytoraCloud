@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.launcher.receiver.handler;
 
-import de.lystx.hytoracloud.driver.elements.packets.in.PacketShutdown;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.config.ConfigService;
+import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
 
 import lombok.AllArgsConstructor;
 
