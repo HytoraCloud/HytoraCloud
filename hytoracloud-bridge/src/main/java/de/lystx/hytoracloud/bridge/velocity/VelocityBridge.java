@@ -14,14 +14,14 @@ import de.lystx.hytoracloud.bridge.velocity.listener.other.TablistListener;
 import de.lystx.hytoracloud.bridge.velocity.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.velocity.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
 
@@ -77,11 +77,11 @@ public class VelocityBridge {
                             return;
                         }
 
-                        CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
+                        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
 
                         player.sendPlayerListHeaderAndFooter(
-                                Component.text(Objects.requireNonNull(formatTabList(cloudPlayer, tabList.getHeader()))),
-                                Component.text(Objects.requireNonNull(formatTabList(cloudPlayer, tabList.getFooter())))
+                                Component.text(Objects.requireNonNull(formatTabList(ICloudPlayer, tabList.getHeader()))),
+                                Component.text(Objects.requireNonNull(formatTabList(ICloudPlayer, tabList.getFooter())))
                         );
                     }
                 }
@@ -137,8 +137,8 @@ public class VelocityBridge {
                         return;
                     }
 
-                    CloudPlayer cloudPlayer = CloudPlayer.dummy(player.getUsername(), player.getUniqueId());
-                    IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+                    ICloudPlayer iCloudPlayer = ICloudPlayer.dummy(player.getUsername(), player.getUniqueId());
+                    IService fallback = CloudDriver.getInstance().getFallback(iCloudPlayer);
 
                     server.getServer(fallback.getName()).ifPresent(registeredServer -> player.createConnectionRequest(registeredServer).connect());
 
@@ -291,7 +291,7 @@ public class VelocityBridge {
 
 
         if (CloudDriver.getInstance().getProxyConfig() == null) {
-            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getThisService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
+            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getCurrentService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
             System.out.println("[CloudBridge] Couldn't find ProxyConfig!");
         }
 

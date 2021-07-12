@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.driver.utils.utillity.Value;
 
@@ -17,7 +17,7 @@ public class PermsCommand {
 
 	@Command(name = "perms", description = "Manages permissions", aliases = {"cloudperms", "hperms"})
 	public void execute(CloudCommandSender sender, String[] args) {
-		CloudPlayer player = (CloudPlayer)sender;
+		ICloudPlayer player = (ICloudPlayer)sender;
 		if (player.hasPermission("cloudsystem.perms.command")) {
 			if (args.length == 2) {
 				if (args[0].equalsIgnoreCase("user")) {
@@ -28,7 +28,7 @@ public class PermsCommand {
 							return;
 						}
 						PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(uniqueId);
-						CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(args[1]);
+						ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(args[1]);
 						player.sendMessage("§bInfo for §7" + args[1] + "§8:");
 						player.sendMessage("§8§m--------------------------------------");
 						player.sendMessage("§8");
@@ -36,7 +36,7 @@ public class PermsCommand {
 						player.sendMessage("§8» §bIP §8● §7" + data.getIpAddress() +" §8«");
 						player.sendMessage("§8» §bFirstLogin §8● §7" + CloudDriver.getInstance().getPermissionPool().getFormat().format(new Date(data.getFirstLogin())) +" §8«");
 						player.sendMessage("§8» §bLastLogin §8● §7" + CloudDriver.getInstance().getPermissionPool().getFormat().format(new Date(data.getLastLogin())) + " §8«");
-						player.sendMessage("§8» §bStatus §8● §7" + (cloudPlayer != null ? "§aOnline" : "§cOffline") +" §8«");
+						player.sendMessage("§8» §bStatus §8● §7" + (ICloudPlayer != null ? "§aOnline" : "§cOffline") +" §8«");
 						player.sendMessage("§8» §bPermissionGroups§8:");
 						data.getPermissionEntries().forEach(permissionEntry -> player.sendMessage("  §8» §b" + permissionEntry.getPermissionGroup() + " §8● §7" + (permissionEntry.getValidTime().trim().isEmpty() ? "Lifetime": permissionEntry.getValidTime()) +" §8«"));
 						player.sendMessage("§8» §bSpecial-perms §8● §7" + data.getExclusivePermissions());
@@ -267,7 +267,7 @@ public class PermsCommand {
 		}
 	  }
 
-	public void help(CloudPlayer player) {
+	public void help(ICloudPlayer player) {
 		player.sendMessage("§bCloudPerms §7Help§8:");
 		player.sendMessage("§8§m--------------------------------------");
 		player.sendMessage("  §8» §b/perms user <player> add <permission> §8┃ §7Adds a permission to a player");

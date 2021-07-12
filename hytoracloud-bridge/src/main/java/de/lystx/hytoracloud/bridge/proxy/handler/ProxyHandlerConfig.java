@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.proxy.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import net.hytora.networking.elements.packet.HytoraPacket;
@@ -20,9 +20,6 @@ public class ProxyHandlerConfig implements PacketHandler {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo info = (PacketOutGlobalInfo) packet;
 
-            //Setting network config
-            CloudDriver.getInstance().setNetworkConfig(info.getNetworkConfig());
-            CloudDriver.getInstance().getServiceManager().setCachedServices(info.toMap());
 
             //New config is maintenance -> switching
             if (info.getNetworkConfig().isMaintenance()) {

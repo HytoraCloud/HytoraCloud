@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.database;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 
 import java.util.List;
@@ -20,9 +20,9 @@ public interface IDatabase {
 
     /**
      * Inserts player to database
-     * @param cloudPlayer
+     * @param ICloudPlayer
      */
-    void registerPlayer(CloudPlayer cloudPlayer);
+    void registerPlayer(ICloudPlayer ICloudPlayer);
 
     /**
      *

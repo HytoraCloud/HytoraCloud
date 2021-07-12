@@ -95,7 +95,7 @@ public class PacketManager {
      *
      * @param tClass the object class
      */
-    private <T> T getInstance(Class<T> tClass) {
+    public static <T> T getInstance(Class<T> tClass) {
         try {
             Constructor<?> constructor;
 

@@ -1,13 +1,13 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import java.util.Calendar;
 
 /**
  * Used to define how long a {@link PermissionEntry}
  * will last until it expires and will be removed
- * from the given {@link CloudPlayer}
+ * from the given {@link ICloudPlayer}
  */
 public enum PermissionValidity {
 

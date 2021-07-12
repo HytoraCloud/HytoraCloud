@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.module.serverselector.spigot.event.CloudServerNPCInt
 import de.lystx.hytoracloud.bridge.bukkit.utils.BukkitItem;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.NPC;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -62,8 +62,8 @@ public class NPCListener implements Listener {
             event.setCancelled(true);
             if (event.getCurrentItem().getType().equals(Material.valueOf(SpigotSelector.getInstance().getNpcManager().getNpcConfig().getItemType()))) {
 
-                CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
-                if (cloudPlayer == null) {
+                ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
+                if (ICloudPlayer == null) {
                     player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cCouldn't find you in global CloudPlayers!");
                     return;
                 }
@@ -71,7 +71,7 @@ public class NPCListener implements Listener {
                 if (!SpigotSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage().trim().isEmpty()) {
                     player.sendMessage(this.replace(SpigotSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage(), IService, IService.getGroup()));
                 }
-                cloudPlayer.connect(IService);
+                ICloudPlayer.connect(IService);
             }
         }
     }

@@ -3,7 +3,6 @@ package de.lystx.hytoracloud.driver.utils.setup;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 
@@ -99,7 +98,7 @@ public abstract class AbstractSetup<T> {
                     "/_/ /_/\\__, /\\__/\\____/_/   \\__,_/\\____/_/\\____/\\__,_/\\__,_/   \n" +
                     "      /____/                                                   \n" +
                     "\n");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Version §7: §b" + Updater.getCloudVersion());
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Version §7: §b" + CloudDriver.getInstance().getVersion());
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Developer §7: §bLystx");
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Switched back to §bCloudSystem§f...");
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");

@@ -10,7 +10,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class CloudListener implements NetworkHandler {
 
-
     /**
      * Notifies all {@link ProxiedPlayer}s
      * on the Network if they have the permission to

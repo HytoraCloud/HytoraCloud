@@ -10,7 +10,15 @@ import net.hytora.networking.elements.packet.HytoraPacket;
 @Getter @AllArgsConstructor
 public class PacketCallEvent extends PacketCommunication {
 
+    /**
+     * The cloud event
+     */
     private CloudEvent cloudEvent;
+
+    /**
+     * Who should not receive the event
+     */
+    private String except;
 
 
     @Override
@@ -18,6 +26,7 @@ public class PacketCallEvent extends PacketCommunication {
         super.read(component);
 
         cloudEvent = component.get("event");
+        this.except = component.get("except");
     }
 
 
@@ -26,6 +35,7 @@ public class PacketCallEvent extends PacketCommunication {
         super.write(component);
 
         component.put("event", cloudEvent);
+        component.put("except", except);
     }
 
 }

@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import net.kyori.adventure.text.Component;
 
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class PlayerServerListener {
         Player player = event.getPlayer();
         RegisteredServer server = event.getServer();
 
-        CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
+        ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
         IService IService = CloudDriver.getInstance().getServiceManager().getService(server.getServerInfo().getName());
 
         CloudBridge.getInstance().getProxyBridge().onServerConnect(cloudPlayer, IService);

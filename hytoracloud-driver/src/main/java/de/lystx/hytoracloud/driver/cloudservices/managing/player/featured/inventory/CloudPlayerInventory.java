@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUpdate;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
 
@@ -18,10 +18,10 @@ public class CloudPlayerInventory implements Serializable {
     private CloudItem helmet, chestplate, leggings, boots;
     private Map<Integer, CloudItem> slots;
 
-    private final CloudPlayer cloudPlayer;
+    private final ICloudPlayer ICloudPlayer;
 
-    public CloudPlayerInventory(CloudPlayer cloudPlayer) {
-        this.cloudPlayer = cloudPlayer;
+    public CloudPlayerInventory(ICloudPlayer ICloudPlayer) {
+        this.ICloudPlayer = ICloudPlayer;
         this.slots = new HashMap<>();
     }
 
@@ -50,8 +50,8 @@ public class CloudPlayerInventory implements Serializable {
      *               values to null and clear the items
      */
     public void update(boolean clearAfter) {
-        CloudDriver.getInstance().getCloudInventories().put(this.cloudPlayer.getUniqueId(), this);
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketInventoryUpdate(this.cloudPlayer, this));
+        CloudDriver.getInstance().getCloudInventories().put(this.ICloudPlayer.getUniqueId(), this);
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketInventoryUpdate(this.ICloudPlayer, this));
         if (clearAfter) {
             this.slots = new HashMap<>();
             this.helmet = null;

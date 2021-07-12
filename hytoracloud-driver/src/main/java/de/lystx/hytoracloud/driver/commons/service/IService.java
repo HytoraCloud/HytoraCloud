@@ -1,8 +1,9 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
+import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import io.vson.elements.object.Objectable;
 
@@ -10,21 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-public interface IService extends Serializable, Objectable<IService> {
-
-    /**
-     * The name of this service
-     */
-    String getName();
-
-    void setName(String name);
-
-    /**
-     * The uuid of this service
-     */
-    UUID getUniqueId();
-
-    void setUniqueId(UUID uniqueId);
+public interface IService extends Serializable, Identifiable, Objectable<IService> {
 
     /**
      * The ID of this service
@@ -93,12 +80,12 @@ public interface IService extends Serializable, Objectable<IService> {
     boolean isInstanceOf(ServiceType serviceType);
 
     /**
-     * Returns the {@link CloudPlayer}s on this
+     * Returns the {@link ICloudPlayer}s on this
      * Service (for example "Lobby-1")
      *
      * @return List of cloudPlayers on this service
      */
-    List<CloudPlayer> getPlayers();
+    List<ICloudPlayer> getPlayers();
 
     /**
      * Returns the Motd of this Service

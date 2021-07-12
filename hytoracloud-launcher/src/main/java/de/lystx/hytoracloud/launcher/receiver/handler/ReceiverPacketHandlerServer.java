@@ -66,7 +66,6 @@ public class ReceiverPacketHandlerServer implements PacketHandler {
         } else if (packet instanceof PacketOutGlobalInfo) {
 
             PacketOutGlobalInfo packetOutGlobalInfo = (PacketOutGlobalInfo)packet;
-            CloudDriver.getInstance().setNetworkConfig(packetOutGlobalInfo.getNetworkConfig());
             this.receiver.getImplementedData().put("groups", new LinkedList<>(packetOutGlobalInfo.getGroups()));
 
         } else if (packet instanceof PacketOutRegisterServer) {

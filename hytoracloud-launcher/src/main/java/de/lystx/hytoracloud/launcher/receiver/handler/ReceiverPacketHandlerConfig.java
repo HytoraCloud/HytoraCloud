@@ -20,8 +20,6 @@ public class ReceiverPacketHandlerConfig implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo packetOutGlobalInfo = (PacketOutGlobalInfo)packet;
-            NetworkConfig networkConfig = packetOutGlobalInfo.getNetworkConfig();
-            receiver.getInstance(ConfigService.class).setNetworkConfig(networkConfig);
         }
     }
 }

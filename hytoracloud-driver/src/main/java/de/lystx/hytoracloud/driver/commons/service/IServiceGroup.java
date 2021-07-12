@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.commons.service;
 
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import io.vson.elements.object.Objectable;
 
@@ -115,12 +115,12 @@ public interface IServiceGroup extends Serializable, Identifiable, Objectable<IS
     void startNewService(int amount);
 
     /**
-     * Returns the {@link CloudPlayer}s on this
+     * Returns the {@link ICloudPlayer}s on this
      * ServiceGroup (for example "Lobby")
      *
      * @return List with CloudPlayers on this Group
      */
-    List<CloudPlayer> getPlayers();
+    List<ICloudPlayer> getPlayers();
 
     /**
      * Returns a List with all the

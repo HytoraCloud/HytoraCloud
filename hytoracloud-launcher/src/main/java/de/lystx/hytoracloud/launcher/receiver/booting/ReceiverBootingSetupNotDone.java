@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.receiver.booting;
 
+import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
@@ -7,7 +8,6 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.launcher.receiver.impl.ReceiverSetup;
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.utils.utillity.Value;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import lombok.Getter;
@@ -49,8 +49,8 @@ public class ReceiverBootingSetupNotDone {
             receiver.getInstance(CommandService.class).setActive(true);
 
             receiver.getParent().getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
-            Updater.download(spigot.get().getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading Spigot");
-            Updater.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? ProxyVersion.WATERFALL.getUrl() : ProxyVersion.BUNGEECORD.getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"), "Downloading " + bungeeCord.get());
+            Utils.download(spigot.get().getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"), "Downloading Spigot");
+            Utils.download(bungeeCord.get().equalsIgnoreCase("WATERFALL") ? ProxyVersion.WATERFALL.getUrl() : ProxyVersion.BUNGEECORD.getUrl(), new File(receiver.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"), "Downloading " + bungeeCord.get());
 
             receiver.getInstance(FileService.class).copyFileWithURL("/implements/server-icon.png", new File(receiver.getInstance(FileService.class).getGlobalDirectory(), "server-icon.png"));
 

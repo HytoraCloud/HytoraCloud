@@ -2,22 +2,21 @@ package de.lystx.hytoracloud.launcher.global;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 //import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.DriverParent;
+import de.lystx.hytoracloud.driver.commons.interfaces.DriverParent;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.utillity.AuthManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
-import de.lystx.hytoracloud.launcher.global.impl.setup.InstanceChooser;
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
+import de.lystx.hytoracloud.launcher.global.setups.InstanceChooser;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventService;
@@ -28,13 +27,11 @@ import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.utils.log.LogService;
-import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.webserver.WebServer;
 import de.lystx.hytoracloud.launcher.global.commands.*;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
-import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 
@@ -70,7 +67,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
                     System.exit(1);
                     return;
                 }
-                console.getLogger().sendMessage("INFO", "§7Starting §b" + (instanceChooser.getInstance().equalsIgnoreCase("2") ? "Receiver" : "CloudSystem") + " §7version §a" + Updater.getCloudVersion() + " §7by §bLystx§h...");
+                console.getLogger().sendMessage("INFO", "§7Starting §b" + (instanceChooser.getInstance().equalsIgnoreCase("2") ? "Receiver" : "CloudSystem") + " §7version §a" + CloudDriver.getInstance().getVersion() + " §7by §bLystx§h...");
                 Scheduler.getInstance().scheduleDelayedTask(() -> {
                     for (int i = 0; i < 100; i++) {
                         System.out.println();
@@ -100,7 +97,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
 
         if (cloudType.equals(CloudType.CLOUDSYSTEM)) {
             this.webServer = new WebServer(this);
-            this.webServer.update("", new VsonObject().append("info", "There's nothing to see here").append("version", Updater.getCloudVersion()));
+            this.webServer.update("", new JsonEntity().append("info", "There's nothing to see here").append("routes", this.webServer.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
             this.webServer.start();
         }
 
@@ -122,33 +119,9 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         this.getInstance(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
         this.getInstance(CommandService.class).registerCommand(new DownloadCommand());
 
-        this.getInstance(CommandService.class).registerCommand(new UpdateCommand(this));
         this.getInstance(CommandService.class).registerCommand(new LogCommand(this));
         this.getInstance(CommandService.class).registerCommand(new TpsCommand(this));
 
-    }
-
-    /**
-     * Checks if the Cloud is setup
-     * if the AutoUpdater is enabled
-     * and if it needs an AutoUpdater
-     *
-     * @return Boolean
-     */
-    public boolean autoUpdater() {
-        if (this.getInstance(ConfigService.class).getNetworkConfig().isSetupDone()) {
-            if (this.getInstance(ConfigService.class).getNetworkConfig().isAutoUpdater()) {
-                this.getInstance(CommandService.class).setActive(false);
-                if (!Updater.check(this.console)) {
-                    this.console.getLogger().sendMessage("INFO", "§2Succesfully downloaded Version §a" + Updater.getNewVersion() + "§2!");
-                } else {
-                    console.getLogger().sendMessage("INFO", "§2CloudSystem is §anewest version§2!");
-                }
-            }
-            this.getInstance(CommandService.class).setActive(true);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -156,28 +129,32 @@ public class CloudProcess extends CloudDriver implements DriverParent {
      */
     public void reload() {
 
+        //Reloading all modules
         for (Module module : this.getInstance(ModuleService.class).getModules()) {
             module.onReload();
         }
 
-        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
-            registeredService.reload();
-        }
-
-        ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceGroups(this.getInstance(GroupService.class).getGroups());
-        CloudDriver.getInstance().sendPacket(new PacketReload());
-
         try {
+
+            //Sending config and permission pool
+            CloudDriver.getInstance().getNetworkConfig().update();
+            CloudDriver.getInstance().getPermissionPool().update();
+
+            //Sending network config and services and groups
             CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
                     CloudDriver.getInstance().getNetworkConfig(),
                     CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
                     CloudDriver.getInstance().getServiceManager().getAllServices()
             ));
-            CloudDriver.getInstance().getNetworkConfig().update();
 
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+
+        //Updating webserver
+        CloudDriver.getInstance().getParent().getWebServer().update("players", new JsonEntity().append("players", CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()));
+        CloudDriver.getInstance().getParent().getWebServer().update("services", new JsonEntity().append("services", CloudDriver.getInstance().getServiceManager().getAllServices()));
+
     }
 
     /**
@@ -190,7 +167,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         }
 
         this.sendPacket(new PacketShutdown());
-        ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setRunning(false);
+        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).setRunning(false);
         this.console.interrupt();
 
         if (this.getServiceManager() != null) {
@@ -204,10 +181,6 @@ public class CloudProcess extends CloudDriver implements DriverParent {
             this.getInstance(ModuleService.class).shutdown();
         }
 
-        if (this.getInstance(ModuleService.class) != null) {
-            this.getInstance(StatsService.class).getStatistics().add("allCPUUsage", new NetworkInfo().getCPUUsage());
-
-        }
         this.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
             try {
                 FileUtils.deleteDirectory(this.getInstance(FileService.class).getDynamicServerDirectory());

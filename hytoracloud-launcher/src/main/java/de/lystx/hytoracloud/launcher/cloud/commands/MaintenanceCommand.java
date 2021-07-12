@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +29,6 @@ public class MaintenanceCommand implements TabCompletable {
                 }
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getInstance(ConfigService.class).saveAndReload();
-                CloudSystem.getInstance().getInstance(StatsService.class).getStatistics().add("maintenanceSwitched");
             } else if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("INFO", "§bWhitelisted Players§7:");
                 for (String whitelistedPlayer : config.getWhitelistedPlayers()) {

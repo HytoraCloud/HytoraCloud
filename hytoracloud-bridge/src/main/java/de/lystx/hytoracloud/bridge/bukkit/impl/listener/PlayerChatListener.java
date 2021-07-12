@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.bukkit.impl.listener;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -20,14 +20,12 @@ public class PlayerChatListener implements Listener {
 
 
         Player player = event.getPlayer();
-        CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
+        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
 
-        if (CloudBridge.getInstance().getProxyBridge().commandExecute(cloudPlayer, event.getMessage())) {
+        if (CloudBridge.getInstance().getProxyBridge().commandExecute(ICloudPlayer, event.getMessage())) {
             event.setCancelled(true);
         }
 
-        //TODO: CHECK SEND COMMAND
-       // CloudDriver.getInstance().sendPacket(new PacketInPlayerExecuteCommand(event.getPlayer().getName(), event.getMessage()));
     }
 
 

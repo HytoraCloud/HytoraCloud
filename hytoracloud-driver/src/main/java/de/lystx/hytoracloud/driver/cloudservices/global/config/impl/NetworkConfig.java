@@ -36,11 +36,6 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
     private boolean setupDone;
 
     /**
-     * If auto updater is enabled
-     */
-    private boolean autoUpdater;
-
-    /**
      * The proxy start port
      */
     private Integer proxyStartPort;
@@ -88,7 +83,6 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
     public static NetworkConfig defaultConfig() {
         return new NetworkConfig("localhost",
                 1401,
-                false,
                 false,
                 25565,
                 30000,

@@ -1,22 +1,21 @@
 package net.hytora.networking.elements.component;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import net.hytora.networking.elements.packet.PacketManager;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 @Getter
 public class Component implements Serializable {
-
-    /**
-     * The serialVersionUID
-     */
-    private static final long serialVersionUID = -3107782551846954635L;
 
     /**
      * the id of the request
@@ -94,8 +93,21 @@ public class Component implements Serializable {
      * @param value the value
      * @return current component
      */
-    public Component put(String key, Object value) {
+    public <V> Component put(String key, V value) {
         return this.append(map -> map.put(key, value));
+    }
+
+    /**
+     * Puts an {@link ComponentObject} in this component
+     *
+     * @param componentObject the object
+     * @param <V> generic type
+     * @return current component
+     */
+    public <V> Component putObject(ComponentObject<V> componentObject) {
+        this.put("_componentObject", componentObject.getClass().getName());
+        componentObject.write(this);
+        return this;
     }
 
     /**
@@ -119,7 +131,28 @@ public class Component implements Serializable {
      * @return object
      */
     public <T> T get(String key) {
-        return (T) this.getContentAsMap().get(key);
+
+        Object object = this.getContentAsMap().get(key);
+
+        return (T) object;
+    }
+
+    @SneakyThrows
+    public <V> V getComponentObject() {
+        if (!this.has("_componentObject")) {
+            return null;
+        }
+        String class_ = this.get("_componentObject");
+        this.remove("_componentObject");
+        Class<? extends ComponentObject<?>> componentClass = (Class<? extends ComponentObject<?>>) Class.forName(class_);
+
+        ComponentObject<V> componentObject = (ComponentObject<V>) PacketManager.getInstance(componentClass);
+
+        if (componentObject != null) {
+            return componentObject.read(this);
+        }
+
+        return null;
     }
 
     /**

@@ -5,7 +5,6 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
@@ -16,7 +15,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudComm
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import net.hytora.networking.connection.client.HytoraClient;
@@ -28,8 +27,8 @@ public class CloudCommand implements TabCompletable {
 
     @Command(name = "cloud", description = "Cloud Proy Command", aliases = {"hytoracloud", "hcloud", "cloudsystem", "klaud"})
     public void execute(CloudCommandSender commandSender, String[] args) {
-        if (commandSender instanceof CloudPlayer) {
-            CloudPlayer player = (CloudPlayer)commandSender;
+        if (commandSender instanceof ICloudPlayer) {
+            ICloudPlayer player = (ICloudPlayer)commandSender;
             if (player.hasPermission("cloudsystem.command")) {
                 if (args.length == 1) {
 
@@ -78,8 +77,7 @@ public class CloudCommand implements TabCompletable {
 
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
 
-                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7CloudSystem Version §a" + Updater.getCloudVersion());
-                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Your Cloud " + (Updater.isUpToDate() ? "is §aNewest version" : "§cneeds an update!"));
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7CloudSystem Version §a" + CloudDriver.getInstance().getVersion());
 
                     } else if (args[0].equalsIgnoreCase("shutdown")) {
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Cloud will be shut down in §e3 Seconds§8...");
@@ -128,7 +126,7 @@ public class CloudCommand implements TabCompletable {
                         networkConfig.setWhitelistedPlayers(whitelistedPlayers);
                         networkConfig.update();
 
-                        CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(playername);
+                        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(playername);
 
                         if (!add) {
                             if (!CloudDriver
@@ -137,7 +135,7 @@ public class CloudCommand implements TabCompletable {
                                     .getWhitelistedPlayers()
                                     .contains(player.getName())
                                     && !player.hasPermission("cloudsystem.network.maintenance")) {
-                                cloudPlayer.kick(
+                                ICloudPlayer.kick(
                                         CloudDriver.getInstance()
                                                 .getNetworkConfig()
                                                 .getMessageConfig()
@@ -175,8 +173,8 @@ public class CloudCommand implements TabCompletable {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe service §e" + s + " §cseems not to be online!");
                             return;
                         }
-                        CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
-                        CloudDriver.getInstance().sendPacket(new PacketInGetLog(IService.getName(), cloudPlayer.getName()));
+                        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
+                        CloudDriver.getInstance().sendPacket(new PacketInGetLog(IService.getName(), ICloudPlayer.getName()));
                     } else if (args[0].equalsIgnoreCase("tps")) {
                         String groupname = args[1];
                         IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(groupname);
@@ -184,7 +182,7 @@ public class CloudCommand implements TabCompletable {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cseems not to exist!");
                             return;
                         }
-                        CloudPlayer cachedPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
+                        ICloudPlayer cachedPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
 
                         cachedPlayer.sendMessage(CloudDriver.getInstance().getPrefix() + "§7TPS of group §b" + group.getName() + "§8:");
 
@@ -325,7 +323,7 @@ public class CloudCommand implements TabCompletable {
         }
     }
 
-    public void help(CloudPlayer player) {
+    public void help(ICloudPlayer player) {
         player.sendMessage("§bHytoraCloud §7Help§8:");
         player.sendMessage("§8§m--------------------------------------");
         player.sendMessage("  §8» §b/cloud list <group/proxy/server/maintenance> §8┃ §7Lists network specified things");

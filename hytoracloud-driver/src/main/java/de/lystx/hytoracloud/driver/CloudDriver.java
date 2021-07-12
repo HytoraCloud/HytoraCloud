@@ -2,7 +2,9 @@ package de.lystx.hytoracloud.driver;
 
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.hytoracloud.driver.commons.interfaces.BooleanRequest;
+import de.lystx.hytoracloud.driver.commons.interfaces.DriverParent;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketCallEvent;
@@ -12,7 +14,6 @@ import de.lystx.hytoracloud.driver.commons.packets.both.PacketLogMessage;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestModules;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestStatistics;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
@@ -24,8 +25,6 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.Statistics;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabaseManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleInfo;
@@ -34,7 +33,7 @@ import de.lystx.hytoracloud.driver.cloudservices.other.IBukkit;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudPlayerInventory;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import de.lystx.hytoracloud.driver.utils.Utils;
@@ -73,6 +72,13 @@ import java.util.function.Consumer;
 
 public class CloudDriver {
 
+    /**
+     *
+     * @return current version of cloud
+     */
+    public String getVersion() {
+        return "STABLE-1.8";
+    }
 
     /**
      * The instance of this Driver
@@ -272,6 +278,7 @@ public class CloudDriver {
         this.needsDependencies = !Utils.existsClass("jline.console.ConsoleReader");
         this.jlineCompleterInstalled = !Utils.existsClass("jline.console.completer.Completer");
 
+
     }
 
     /*
@@ -303,10 +310,15 @@ public class CloudDriver {
      *
      * @param cloudEvent the event to call
      */
-    //TODO: CHECK EVENTS
     public boolean callEvent(CloudEvent cloudEvent) {
-        if (this.connection != null) {
-            this.connection.sendPacket(new PacketCallEvent(cloudEvent));
+        if (this.isBridge()) {
+            if (this.connection != null) {
+                this.connection.sendPacket(new PacketCallEvent(cloudEvent, this.getCurrentService().getName()));
+            }
+        } else {
+            if (this.connection != null) {
+                this.connection.sendPacket(new PacketCallEvent(cloudEvent, "cloud"));
+            }
         }
         return this.eventService.callEvent(cloudEvent);
     }
@@ -469,7 +481,7 @@ public class CloudDriver {
      *
      * @return service
      */
-    public IService getThisService() {
+    public IService getCurrentService() {
         JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
 
         return this.serviceManager.getService(jsonEntity.getString("server"));
@@ -502,7 +514,7 @@ public class CloudDriver {
             throw new UnsupportedOperationException("Not available for " + driverType + "!");
         }
 
-        return CloudDriver.getInstance().getThisService().getGroup().getProperties().get("proxyConfig", ProxyConfig.class);
+        return CloudDriver.getInstance().getCurrentService().getGroup().getProperties().get("proxyConfig", ProxyConfig.class);
     }
 
     /*
@@ -572,23 +584,6 @@ public class CloudDriver {
     }
 
     /**
-     * Returns statistics of Cloud by Query
-     * @return statistics
-     */
-    @SneakyThrows
-    public Statistics getStatistics() {
-        if (this.driverType == CloudType.BRIDGE) {
-
-            PacketRequestStatistics packetRequestStatistics = new PacketRequestStatistics();
-            Component component = packetRequestStatistics.toReply(connection);
-
-            return new Statistics(new VsonObject(component.reply().getMessage()));
-        } else {
-            return this.getInstance(StatsService.class).getStatistics();
-        }
-    }
-
-    /**
      * Executes a task ONCE when accepted
      *
      * @param runnable the task to run
@@ -633,6 +628,16 @@ public class CloudDriver {
 
             return list;
         }
+    }
+
+    /**
+     * If this instance is bridge
+     * or cloudsystem or else
+     *
+     * @return boolean
+     */
+    public boolean isBridge() {
+        return this.driverType == CloudType.BRIDGE;
     }
 
 
@@ -748,7 +753,7 @@ public class CloudDriver {
      * @param player the player
      * @return boolean
      */
-    public boolean isFallback(CloudPlayer player) {
+    public boolean isFallback(ICloudPlayer player) {
         List<Fallback> fallbacks = this.getFallbacks(player);
         for (Fallback fallback : fallbacks) {
             if (player.getService().getGroup().getName().equalsIgnoreCase(fallback.getGroupName())) {
@@ -761,12 +766,12 @@ public class CloudDriver {
 
     /**
      * Returns {@link IService} of
-     * Fallback for {@link CloudPlayer}
+     * Fallback for {@link ICloudPlayer}
      *
      * @param player the player
      * @return fallback for player
      */
-    public IService getFallback(CloudPlayer player) {
+    public IService getFallback(ICloudPlayer player) {
         try {
             Fallback fallback = this.getHighestFallback(player);
             IService IService;
@@ -788,7 +793,7 @@ public class CloudDriver {
      * @param player the player
      * @return fallback
      */
-    public Fallback getHighestFallback(CloudPlayer player) {
+    public Fallback getHighestFallback(ICloudPlayer player) {
         List<Fallback> list = this.getFallbacks(player);
         list.sort(Comparator.comparingInt(Fallback::getPriority));
         return list.get(list.size() - 1) == null ? CloudDriver.getInstance().getNetworkConfig().getFallbackConfig().getDefaultFallback() : list.get(list.size() - 1);
@@ -803,7 +808,7 @@ public class CloudDriver {
      * @param player the player
      * @return list of available fallbacks for a player
      */
-    public List<Fallback> getFallbacks(CloudPlayer player) {
+    public List<Fallback> getFallbacks(ICloudPlayer player) {
         List<Fallback> list = new LinkedList<>();
         list.add(CloudDriver.getInstance().getNetworkConfig().getFallbackConfig().getDefaultFallback());
         for (Fallback fallback : CloudDriver.getInstance().getNetworkConfig().getFallbackConfig().getFallbacks()) {
@@ -821,7 +826,7 @@ public class CloudDriver {
      */
 
     public void shutdownDriver() {
-        CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getThisService()));
+        CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getCurrentService()));
         try {
             this.connection.close();
         } catch (IOException e) {

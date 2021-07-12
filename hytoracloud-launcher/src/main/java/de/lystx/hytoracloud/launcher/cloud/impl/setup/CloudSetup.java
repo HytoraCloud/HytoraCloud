@@ -61,24 +61,6 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
 
     @Setup(
             id = 5,
-            question = "Do you want the cloud to update it's self?",
-            message = {
-                    "INFO%% §cSadly the AutoUpdater is not supported at the moment!",
-                    "INFO%% §cJust enter §efalse §cor else there will be errors!"
-            },
-            onlyAnswers = {
-                    "true",
-                    "false"
-            },
-            changeAnswers = {
-                    "yes->true",
-                    "no->false"
-            }
-    )
-    private boolean autoUpdater;
-
-    @Setup(
-            id = 6,
             question = "Enable ProxyProtocol? If you don't know what this is just type false!",
             onlyAnswers = {
                     "true",
@@ -92,7 +74,7 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
     private boolean proxyProtocol;
 
     @Setup(
-            id = 7,
+            id = 6,
             question = "What Datbase do you want to use? (MYSQL, MONGODB, FILES)",
             message = {
                     "INFO%% §cIf you enter an §eOnline-Database §clike MongoDB or MySQL you will have to enter your data in the next step!",
@@ -107,7 +89,7 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
     private String database;
 
     @Setup(
-            id = 8,
+            id = 7,
             question = "What Proxy Software do you want to use ? (WATERFALL, BUNGEECORD, VELOCITY)",
             onlyAnswers = {
                     "BUNGEECORD",
@@ -118,7 +100,7 @@ public class CloudSetup extends AbstractSetup<CloudSetup> {
     private String bungeeCordType;
 
     @Setup(
-            id = 9,
+            id = 8,
             question = "What Spigot version do you prefer ? (1.8.8, 1.9, 1.10, 1.11 etc...)",
             message = {
                     "INFO%% §cI don't know why but after entering the version you have to hit §eenter §cagain to confirm it!",

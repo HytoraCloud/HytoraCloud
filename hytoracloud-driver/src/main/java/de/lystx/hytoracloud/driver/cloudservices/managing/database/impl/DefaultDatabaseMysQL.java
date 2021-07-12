@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
@@ -63,14 +63,14 @@ public class DefaultDatabaseMysQL implements IDatabase {
 
 
     @Override
-    public void registerPlayer(CloudPlayer cloudPlayer) {
-        if (!this.isRegistered(cloudPlayer.getUniqueId())) {
-            PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(cloudPlayer.getUniqueId(), cloudPlayer.getName(), cloudPlayer.getIpAddress());
-            this.saveOfflinePlayer(cloudPlayer.getUniqueId(), data);
+    public void registerPlayer(ICloudPlayer ICloudPlayer) {
+        if (!this.isRegistered(ICloudPlayer.getUniqueId())) {
+            PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), ICloudPlayer.getIpAddress());
+            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), data);
         } else {
-            PlayerInformation playerInformation = this.getOfflinePlayer(cloudPlayer.getUniqueId());
-            PlayerInformation newData = new PlayerInformation(cloudPlayer.getUniqueId(), cloudPlayer.getName(), playerInformation.getPermissionEntries(), playerInformation.getExclusivePermissions(), cloudPlayer.getIpAddress(), playerInformation.isNotifyServerStart(), playerInformation.getFirstLogin(), playerInformation.getLastLogin());
-            this.saveOfflinePlayer(cloudPlayer.getUniqueId(), newData);
+            PlayerInformation playerInformation = this.getOfflinePlayer(ICloudPlayer.getUniqueId());
+            PlayerInformation newData = new PlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), playerInformation.getPermissionEntries(), playerInformation.getExclusivePermissions(), ICloudPlayer.getIpAddress(), playerInformation.isNotifyServerStart(), playerInformation.getFirstLogin(), playerInformation.getLastLogin());
+            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), newData);
         }
     }
 

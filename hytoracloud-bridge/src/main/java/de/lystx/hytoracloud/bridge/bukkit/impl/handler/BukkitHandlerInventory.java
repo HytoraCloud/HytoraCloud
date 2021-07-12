@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUp
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudItem;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudPlayerInventory;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import org.bukkit.Bukkit;
@@ -24,7 +24,7 @@ public class BukkitHandlerInventory implements PacketHandler {
         if (rawPacket instanceof PacketOpenInventory) {
             PacketOpenInventory packet = (PacketOpenInventory)rawPacket;
             CloudInventory inventory = packet.getCloudInventory();
-            CloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(packet.getCloudPlayer().getName());
+            ICloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(packet.getICloudPlayer().getName());
             Player bukkitPlayer = Bukkit.getPlayer(player.getName());
 
             Inventory inv = Bukkit.createInventory(bukkitPlayer, inventory.getRows() * 9, inventory.getName());
@@ -33,7 +33,7 @@ public class BukkitHandlerInventory implements PacketHandler {
         } else if (rawPacket instanceof PacketInventoryUpdate) {
             PacketInventoryUpdate packetInventoryUpdate = (PacketInventoryUpdate)rawPacket;
             CloudPlayerInventory playerInventory = packetInventoryUpdate.getPlayerInventory();
-            CloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(packetInventoryUpdate.getCloudPlayer().getName());
+            ICloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(packetInventoryUpdate.getICloudPlayer().getName());
             Player bukkitPlayer = Bukkit.getPlayer(player.getName());
 
             bukkitPlayer.getInventory().setHelmet(this.fromCloudItem(playerInventory.getHelmet()));

@@ -62,27 +62,6 @@ public class PermissionPool implements Serializable {
 
 
     /**
-     * Loads the permissionPool by using the perms.json
-     * and going back many folders
-     * > Not recommended though
-     */
-    public PermissionPool loadNonePacketPool() {
-        this.cachedCloudPlayers.clear();
-        this.cachedPermissionGroups.clear();
-
-        File permsFile = new File("../../../../../perms.json");
-        File playerDirectory = new File("../../../../../database/players/");
-
-        this.loadGroupsFromFile(permsFile);
-
-        for (File file : Objects.requireNonNull(playerDirectory.listFiles())) {
-            JsonEntity jsonEntity = new JsonEntity(file);
-            this.cachedCloudPlayers.add(jsonEntity.getAs(PlayerInformation.class));
-        }
-        return this;
-    }
-
-    /**
      * Checks for lowest ID if none is found returns DefaultPermissionGroup.class
      * @return default permissionGroup
      */

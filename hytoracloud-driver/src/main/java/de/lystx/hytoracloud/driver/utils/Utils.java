@@ -1,5 +1,7 @@
 package de.lystx.hytoracloud.driver.utils;
 
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBar;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBarStyle;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
@@ -9,10 +11,14 @@ import java.io.*;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -169,6 +175,46 @@ public class Utils {
         } else {
             runnable.run();
         }
+    }
+
+
+    /**
+     * Downloads a file from a website
+     * @param search > URL
+     * @param location > File to download to
+     */
+    public static void download(String search, File location, String task)  {
+        InputStream inputStream;
+        OutputStream outputStream;
+
+        try {
+            ProgressBar pb = new ProgressBar(task, 100, 1000, System.err, ProgressBarStyle.ASCII, "", 1, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
+            URL url = new URL(search);
+            String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+            URLConnection con = url.openConnection();
+            con.setRequestProperty("User-Agent", USER_AGENT);
+
+            int contentLength = con.getContentLength();
+            inputStream = con.getInputStream();
+
+            outputStream = new FileOutputStream(location);
+            byte[] buffer = new byte[2048];
+            int length;
+            int downloaded = 0;
+
+            while ((length = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, length);
+                downloaded+=length;
+                pb.stepTo((long) ((downloaded * 100L) / (contentLength * 1.0)));
+            }
+            pb.setExtraMessage("Cleaning up...");
+            outputStream.close();
+            inputStream.close();
+            pb.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

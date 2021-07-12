@@ -65,9 +65,7 @@ public class FileService implements ICloudService {
     private File globalPluginsDirectory;
     private File bungeeCordPluginsDirectory;
     private File modulesDirectory;
-    private File statsFile;
     private File versionsDirectory;
-
 
     private VsonObject tempData;
 
@@ -103,8 +101,6 @@ public class FileService implements ICloudService {
 
         this.databaseDirectory = new File(this.cloudDirectory, "database/");
         this.cloudPlayerDirectory = new File(this.databaseDirectory, "players/");
-
-        this.statsFile = new File(this.databaseDirectory, "stats.json");
 
         this.groupsDirectory = new File(this.globalDirectory, "groups/");
         this.templatesDirectory = new File(this.globalDirectory, "templates/");

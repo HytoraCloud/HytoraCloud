@@ -11,7 +11,7 @@ import de.lystx.hytoracloud.driver.commons.service.Template;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
@@ -21,8 +21,7 @@ import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.CloudSetup;
-import de.lystx.hytoracloud.launcher.global.impl.setup.DatabaseSetup;
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
+import de.lystx.hytoracloud.launcher.global.setups.DatabaseSetup;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.utillity.Action;
 import de.lystx.hytoracloud.driver.utils.utillity.Value;
@@ -61,7 +60,6 @@ public class CloudBootingSetupNotDone {
             document.append("host", setup.getHostname());
             document.append("port", setup.getPort());
             document.append("proxyProtocol", setup.isProxyProtocol());
-            document.append("autoUpdater", setup.isAutoUpdater());
             document.save();
             spigot.setValue(SpigotVersion.byKey(setup.getSpigotVersion()));
             proxy.setValue(ProxyVersion.byKey(setup.getBungeeCordType()));
@@ -135,7 +133,6 @@ public class CloudBootingSetupNotDone {
                 });
             }
 
-            cloudSystem.getInstance(StatsService.class).getStatistics().add("registeredPlayers");
             cloudSystem.getParent().getConsole().sendMessage("INFO", "§7Now downloading §bBungeeCord §7and §bSpigot§h...");
             cloudSystem.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
                 Action action = new Action();
@@ -144,12 +141,12 @@ public class CloudBootingSetupNotDone {
                 File proxyFile = new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar");
 
                 if (!spigotFile.exists()) {
-                    Updater.download(spigot.get().getUrl(), spigotFile, "Downloading " + spigot.get().getJarName());
+                    Utils.download(spigot.get().getUrl(), spigotFile, "Downloading " + spigot.get().getJarName());
                 }
 
 
                 if (!proxyFile.exists()) {
-                    Updater.download(proxy.get().getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"), "Downloading " + proxy.get().getKey().toUpperCase());
+                    Utils.download(proxy.get().getUrl(), new File(cloudSystem.getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"), "Downloading " + proxy.get().getKey().toUpperCase());
                 }
 
 

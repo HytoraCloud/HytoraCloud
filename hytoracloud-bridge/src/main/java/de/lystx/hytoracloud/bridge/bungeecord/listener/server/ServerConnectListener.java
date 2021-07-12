@@ -14,12 +14,12 @@ public class ServerConnectListener implements Listener {
     public void onConnect(ServerConnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
         String servername = event.getTarget().getName();
-        IServiceGroup IServiceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(servername.split("-")[0]);
-        if (IServiceGroup != null && IServiceGroup.isMaintenance()) {
+        IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(servername.split("-")[0]);
+        if (serviceGroup != null && serviceGroup.isMaintenance()) {
             if (player.hasPermission("cloudsystem.group.maintenance")) {
                 event.setCancelled(false);
             } else {
-                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", IServiceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
+                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
 
                 player.sendMessage(new TextComponent(message));
                 event.setCancelled(true);

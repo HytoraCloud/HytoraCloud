@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.service.Template;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.utils.list.Filter;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter @Setter @AllArgsConstructor
-public class ServiceGroupObject implements IServiceGroup {
+public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGroupObject> implements IServiceGroup {
 
     /**
      * The UUID of this group
@@ -96,11 +96,7 @@ public class ServiceGroupObject implements IServiceGroup {
      */
     private PropertyObject properties;
 
-    /**
-     * Updates the {@link ServiceGroupObject} on all
-     * CloudInstances and syncs it's values all
-     * over the CloudNetwork
-     */
+    @Override
     public void update() {
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             CloudDriver.getInstance().getInstance(GroupService.class).updateGroup(this);
@@ -109,32 +105,18 @@ public class ServiceGroupObject implements IServiceGroup {
         }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketInUpdateServiceGroup(this));
     }
-
-    /**
-     * Starts a new {@link IService} from this group
-     */
+    @Override
     public void startNewService() {
         CloudDriver.getInstance().getServiceManager().startService(this);
     }
-
-    /**
-     * Starts new {@link IService}s from this group
-     *
-     * @param amount the amount of services
-     */
+    @Override
     public void startNewService(int amount) {
         for (int i = 0; i < amount; i++) {
             CloudDriver.getInstance().getServiceManager().startService(this);
         }
     }
-
-    /**
-     * Returns the {@link CloudPlayer}s on this
-     * ServiceGroup (for example "Lobby")
-     *
-     * @return List with CloudPlayers on this Group
-     */
-    public List<CloudPlayer> getPlayers() {
+    @Override
+    public List<ICloudPlayer> getPlayers() {
         return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()).find(cloudPlayer -> {
             if (cloudPlayer.getService() == null) {
                 return false;
@@ -142,20 +124,11 @@ public class ServiceGroupObject implements IServiceGroup {
             return cloudPlayer.getService().getGroup().getName().equalsIgnoreCase(this.getName());
         }).findAll());
     }
-
-    /**
-     * Returns a List with all the
-     * Services online on this group
-     *
-     * @return list with all services of this group
-     */
+    @Override
     public List<IService> getServices() {
         return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getServiceManager().getAllServices()).find(service -> service.getGroup().getName().equalsIgnoreCase(this.name)).findAll());
     }
-
-    /**
-     * Deletes all the templates of this group
-     */
+    @Override
     public void deleteAllTemplates() {
         File dir = this.template.getDirectory();
         for (File file : Objects.requireNonNull(dir.listFiles())) {
@@ -168,8 +141,18 @@ public class ServiceGroupObject implements IServiceGroup {
         dir.delete();
     }
 
+    @Override
     public String toString() {
         return this.name;
     }
 
+    @Override
+    Class<ServiceGroupObject> getWrapperClass() {
+        return ServiceGroupObject.class;
+    }
+
+    @Override
+    Class<IServiceGroup> getInterface() {
+        return IServiceGroup.class;
+    }
 }

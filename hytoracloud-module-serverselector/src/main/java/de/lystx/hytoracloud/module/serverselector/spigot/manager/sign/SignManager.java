@@ -34,7 +34,7 @@ public class SignManager {
      */
     public void run() {
         try {
-            if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+            if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
                 return;
             }
             CloudDriver.getInstance().execute(() -> this.signUpdater.run());

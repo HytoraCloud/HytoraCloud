@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.launcher.receiver.booting;
 
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
@@ -25,7 +25,7 @@ public class ReceiverBootingSetupDone {
                 "/_/ /_/\\__, /\\__/\\____/_/   \\__,_/\\____/_/\\____/\\__,_/\\__,_/   \n" +
                 "      /____/                                                   \n" +
                 "\n");
-        receiver.getParent().getConsole().getLogger().sendMessage("INFO", "§9Version §7: §b" + Updater.getCloudVersion());
+        receiver.getParent().getConsole().getLogger().sendMessage("INFO", "§9Version §7: §b" + CloudDriver.getInstance().getVersion());
         receiver.getParent().getConsole().getLogger().sendMessage("INFO", "§9Developer §7: §bLystx");
         receiver.getParent().getConsole().getLogger().sendMessage("INFO", "§bLoading §fReceiver§9...");
         receiver.getParent().getConsole().getLogger().sendMessage("§9-----------------------------------------");

@@ -4,12 +4,12 @@ import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
-import de.lystx.hytoracloud.launcher.global.impl.setup.VersionDownload;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.launcher.global.setups.VersionDownload;
 import java.io.File;
 
 public class DownloadCommand {
@@ -57,7 +57,7 @@ public class DownloadCommand {
 
                 versionsFile = new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), proxyVersion.getJarName());
 
-                Updater.download(proxyVersion.getUrl(), versionsFile, "Downloading " + proxyVersion.name());
+                Utils.download(proxyVersion.getUrl(), versionsFile, "Downloading " + proxyVersion.name());
             } else {
                 SpigotVersion spigotVersion = SpigotVersion.byKey(download.getSpigotVersion());
 
@@ -68,7 +68,7 @@ public class DownloadCommand {
 
                 versionsFile = new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), spigotVersion.getJarName());
 
-                Updater.download(spigotVersion.getUrl(), versionsFile, "Downloading " + spigotVersion.name());
+                Utils.download(spigotVersion.getUrl(), versionsFile, "Downloading " + spigotVersion.name());
             }
         });
     }

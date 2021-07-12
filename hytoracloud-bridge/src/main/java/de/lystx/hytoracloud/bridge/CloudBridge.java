@@ -12,9 +12,9 @@ import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgeServiceManager;
 import de.lystx.hytoracloud.bridge.standalone.manager.CloudBridgePlayerManager;
 import de.lystx.hytoracloud.bridge.standalone.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
@@ -22,7 +22,6 @@ import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterSe
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
@@ -80,20 +79,19 @@ public class CloudBridge {
         CloudDriver.getInstance().getServiceRegistry().denyService(ServiceOutputService.class);
         CloudDriver.getInstance().getServiceRegistry().denyService(ModuleService.class);
         CloudDriver.getInstance().getServiceRegistry().denyService(ConfigService.class);
-        CloudDriver.getInstance().getServiceRegistry().denyService(StatsService.class);
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "cloudPlayerManager", new CloudBridgePlayerManager());
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "serviceManager", new CloudBridgeServiceManager(this));
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "databaseManager", new CloudBridgeDatabaseService());
 
         CloudDriver.getInstance().registerPacketHandler(
-                new PacketHandlerConfig(),
-                new PacketHandlerCommand(),
-                new PacketHandlerNetwork(),
-                new PacketHandlerCommunication(),
-                new PacketHandlerPlayer(),
-                new PacketHandlerPermissionPool(),
-                new PacketHandlerCallEvent()
+                new BridgeHandlerConfig(),
+                new BridgeHandlerCommand(),
+                new BridgeHandlerNetwork(),
+                new BridgeHandlerCommunication(),
+                new BridgeHandlerPlayer(),
+                new BridgeHandlerPerms(),
+                new BridgeHandlerEvent()
         );
         this.bootstrap();
 
@@ -128,7 +126,6 @@ public class CloudBridge {
         CloudDriver.getInstance().registerCommand(new HubCommand());
         CloudDriver.getInstance().registerCommand(new WhereAmICommand());
         CloudDriver.getInstance().registerCommand(new WhereIsCommand());
-        CloudDriver.getInstance().registerCommand(new ListCommand());
         CloudDriver.getInstance().registerCommand(new NetworkCommand());
 
 
@@ -144,7 +141,7 @@ public class CloudBridge {
                     String player = component.get("player");
                     String message = component.get("message");
 
-                    CloudPlayer cloudPlayer = CloudPlayer.fromName(player);
+                    ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player);
 
                     DriverEventPlayerChat playerChat = new DriverEventPlayerChat(cloudPlayer, message);
 
@@ -211,7 +208,7 @@ public class CloudBridge {
 
                 CloudDriver.getInstance().executeIf(() -> {
 
-                    IService IService = CloudDriver.getInstance().getThisService();
+                    IService IService = CloudDriver.getInstance().getCurrentService();
                     System.out.println("[CloudBridge] Verifying Service '" + IService.getName() + "' that it is fully set up!");
                     try {
                         IService.setAuthenticated(true);
@@ -220,7 +217,7 @@ public class CloudBridge {
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
                     }
-                }, () -> CloudDriver.getInstance().getThisService() != null);
+                }, () -> CloudDriver.getInstance().getCurrentService() != null);
 
 
             }

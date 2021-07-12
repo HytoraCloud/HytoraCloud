@@ -14,7 +14,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
@@ -123,7 +123,7 @@ public class BukkitBridge extends JavaPlugin {
      * player being online
      */
     public void startStopTimer() {
-        if (!CloudDriver.getInstance().getThisService().getProperties().has("waitingForPlayers")) {
+        if (!CloudDriver.getInstance().getCurrentService().getProperties().has("waitingForPlayers")) {
             return;
         }
         this.taskId = CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
@@ -155,13 +155,13 @@ public class BukkitBridge extends JavaPlugin {
 
         Utils.doUntilEmpty(new LinkedList<>(Bukkit.getOnlinePlayers()),
             player -> {
-                CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
-                if (cloudPlayer != null) {
+                ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
+                if (ICloudPlayer != null) {
                     player.sendMessage(msg);
                     if (CloudDriver.getInstance().getServiceManager().getLobbies().size() == 1) {
                         Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> player.kickPlayer(msg));
                     } else {
-                        cloudPlayer.fallback();
+                        ICloudPlayer.fallback();
                     }
                 } else {
                     player.kickPlayer(msg);

@@ -13,7 +13,7 @@ public class BukkitHandlerShutdown implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketOutStopServer) {
             PacketOutStopServer packetOutStopServer = (PacketOutStopServer)packet;
-            if (packetOutStopServer.getService().equalsIgnoreCase(CloudDriver.getInstance().getThisService().getName())) {
+            if (packetOutStopServer.getService().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
                 BukkitBridge.getInstance().shutdown();
             }
         }

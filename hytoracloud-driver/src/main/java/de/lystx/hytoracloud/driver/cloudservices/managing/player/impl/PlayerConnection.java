@@ -21,32 +21,32 @@ public class PlayerConnection implements Serializable {
     /**
      * The UUId of this connection
      */
-    private UUID uniqueId;
+    private final UUID uniqueId;
 
     /**
      * The name of this connection
      */
-    private String name;
+    private final String name;
 
     /**
      * The address (host and port)
      */
-    private String address;
+    private final String address;
 
     /**
      * The protocolVersion
      */
-    private int protocolVersion;
+    private final int protocolVersion;
 
     /**
      * If the connection is online (Cracked users)
      */
-    private boolean online;
+    private final boolean online;
 
     /**
      * If its legacy or not
      */
-    private boolean legacyMode;
+    private final boolean legacyMode;
 
 
     /**

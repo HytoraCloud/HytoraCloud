@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.bridge.proxy.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketFallback;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketKickPlayer;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendComponent;

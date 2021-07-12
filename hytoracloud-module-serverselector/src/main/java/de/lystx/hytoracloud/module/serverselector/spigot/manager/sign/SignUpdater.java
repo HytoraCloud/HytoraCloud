@@ -106,7 +106,7 @@ public class SignUpdater {
 
         SignGroup signGroup = this.createSignGroup(current.getGroup().getName());
         if (signGroup == null) {
-            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getThisService().getName(), "SignSystem didnt find any signs!", false);
+            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getCurrentService().getName(), "SignSystem didnt find any signs!", false);
             return;
         }
         Map<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();

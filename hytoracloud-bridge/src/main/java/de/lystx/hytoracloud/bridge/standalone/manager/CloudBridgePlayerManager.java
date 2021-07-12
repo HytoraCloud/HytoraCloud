@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,59 +19,59 @@ import java.util.function.Consumer;
 @Setter @Getter
 public class CloudBridgePlayerManager implements ICloudPlayerManager {
 
-    private List<CloudPlayer> onlinePlayers;
+    private List<ICloudPlayer> onlinePlayers;
 
     public CloudBridgePlayerManager() {
         this.onlinePlayers = new LinkedList<>();
     }
 
     /**
-     * Returns all {@link CloudPlayer}s from a
+     * Returns all {@link ICloudPlayer}s from a
      * ServiceGroup by Name
      * @param IServiceGroup the group
      * @return
      */
-    public List<CloudPlayer> getPlayersOnGroup(IServiceGroup IServiceGroup) {
-        List<CloudPlayer> list = new LinkedList<>();
-        for (CloudPlayer cloudPlayer : this.onlinePlayers) {
-            if (cloudPlayer.getService() == null) {
+    public List<ICloudPlayer> getPlayersOnGroup(IServiceGroup IServiceGroup) {
+        List<ICloudPlayer> list = new LinkedList<>();
+        for (ICloudPlayer ICloudPlayer : this.onlinePlayers) {
+            if (ICloudPlayer.getService() == null) {
                 continue;
             }
-            if (cloudPlayer.getService().getGroup().getName().equalsIgnoreCase(IServiceGroup.getName())) {
-                list.add(cloudPlayer);
+            if (ICloudPlayer.getService().getGroup().getName().equalsIgnoreCase(IServiceGroup.getName())) {
+                list.add(ICloudPlayer);
             }
         }
         return list;
     }
 
     /**
-     * Returns {@link CloudPlayer}s on a {@link IService}
+     * Returns {@link ICloudPlayer}s on a {@link IService}
      * @param IService the service
      * @return
      */
-    public List<CloudPlayer> getPlayersOnServer(IService IService) {
-       List<CloudPlayer> list = new LinkedList<>();
-        for (CloudPlayer cloudPlayer : this.onlinePlayers) {
-            if (cloudPlayer.getService() == null) {
+    public List<ICloudPlayer> getPlayersOnServer(IService IService) {
+       List<ICloudPlayer> list = new LinkedList<>();
+        for (ICloudPlayer ICloudPlayer : this.onlinePlayers) {
+            if (ICloudPlayer.getService() == null) {
                 continue;
             }
-            if (cloudPlayer.getService().getName().equalsIgnoreCase(IService.getName())) {
-                list.add(cloudPlayer);
+            if (ICloudPlayer.getService().getName().equalsIgnoreCase(IService.getName())) {
+                list.add(ICloudPlayer);
             }
         }
         return list;
     }
 
     /**
-     * Updates a {@link CloudPlayer}
+     * Updates a {@link ICloudPlayer}
      * @param player the player to update
      */
-    public void update(CloudPlayer player) {
+    public void update(ICloudPlayer player) {
         if (player == null) {
             return;
         }
-        CloudPlayer cloudPlayer = getCachedPlayer(player.getName());
-        if (cloudPlayer == null) {
+        ICloudPlayer ICloudPlayer = getCachedPlayer(player.getName());
+        if (ICloudPlayer == null) {
             this.onlinePlayers.add(player);
 
             for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
@@ -82,7 +82,7 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
         }
 
         try {
-            onlinePlayers.set(onlinePlayers.indexOf(cloudPlayer), player);
+            onlinePlayers.set(onlinePlayers.indexOf(ICloudPlayer), player);
         } catch (IndexOutOfBoundsException e) {
             System.out.println("[CloudAPI] Oops @" + player.getName() + "....");
             //Ignoring on Server change
@@ -107,81 +107,81 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     }
 
     /**
-     * Returns a cached {@link CloudPlayer}
+     * Returns a cached {@link ICloudPlayer}
      * by Name
      * @param name
      * @return
      */
-    public CloudPlayer getCachedPlayer(String name) {
+    public ICloudPlayer getCachedPlayer(String name) {
         return this.onlinePlayers.stream().filter(cloudPlayer -> cloudPlayer.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-    public CloudPlayer getPlayer(String name) {
+    public ICloudPlayer getPlayer(String name) {
         return null;
     }
 
-    public CloudPlayer getPlayer(UUID uniqueId) {
+    public ICloudPlayer getPlayer(UUID uniqueId) {
         return null;
     }
 
 
     /**
-     * Returns a cached {@link CloudPlayer}
+     * Returns a cached {@link ICloudPlayer}
      * by UUID
      * @param uuid
      * @return
      */
-    public CloudPlayer getCachedPlayer(UUID uuid) {
+    public ICloudPlayer getCachedPlayer(UUID uuid) {
         return this.onlinePlayers.stream().filter(cloudPlayer -> cloudPlayer.getUniqueId().equals(uuid)).findFirst().orElse(null);
     }
 
     /**
-     * Returns {@link CloudPlayer} directly
+     * Returns {@link ICloudPlayer} directly
      * from Cloud with {@link CloudDriver#getResponse(Packet)}}
      * by Name
      * x asynchronous x
      * @param name
      */
-    public void getAsync(String name, Consumer<CloudPlayer> consumer) {
+    public void getAsync(String name, Consumer<ICloudPlayer> consumer) {
 
     }
 
     /**
-     * Returns {@link CloudPlayer} directly
+     * Returns {@link ICloudPlayer} directly
      * from Cloud with {@link CloudDriver#getResponse(Packet)}
      * by UUID
      * x asynchronous x
      * @param uuid
      */
-    public void getAsync(UUID uuid, Consumer<CloudPlayer> consumer) {
+    public void getAsync(UUID uuid, Consumer<ICloudPlayer> consumer) {
 
     }
 
     @NotNull
     @Override
-    public Iterator<CloudPlayer> iterator() {
+    public Iterator<ICloudPlayer> iterator() {
         return this.getOnlinePlayers().iterator();
     }
 
     /**
      * Removes a player from the Cache
-     * @param cloudPlayer
+     * @param ICloudPlayer
      */
-    public void unregisterPlayer(CloudPlayer cloudPlayer) {
-        if (this.getCachedPlayer(cloudPlayer.getName()) == null) {
+    public void unregisterPlayer(ICloudPlayer ICloudPlayer) {
+        if (this.getCachedPlayer(ICloudPlayer.getName()) == null) {
             return;
         }
-        this.onlinePlayers.remove(cloudPlayer);
+        this.onlinePlayers.remove(ICloudPlayer);
     }
 
     /**
      * Registers a Player
-     * @param cloudPlayer
+     * @param ICloudPlayer
      */
-    public void registerPlayer(CloudPlayer cloudPlayer) {
-        if (this.getCachedPlayer(cloudPlayer.getName()) == null) {
+    public void registerPlayer(ICloudPlayer ICloudPlayer) {
+        if (this.getCachedPlayer(ICloudPlayer.getName()) == null) {
 
-            this.onlinePlayers.add(cloudPlayer);
+            this.onlinePlayers.add(ICloudPlayer);
 
 
         }

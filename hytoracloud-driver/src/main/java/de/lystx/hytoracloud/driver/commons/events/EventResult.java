@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter @Setter
 public class EventResult {
 
     /**
@@ -21,6 +21,16 @@ public class EventResult {
      * Other objects
      */
     private Object[] objects;
+
+    public void setObjects(Object... objects) {
+        this.objects = objects;
+    }
+
+    public EventResult() {
+        this.cancelled = false;
+        this.component = "";
+        this.objects = new Object[999];
+    }
 
     public EventResult(boolean cancelled, String component) {
         this.cancelled = cancelled;

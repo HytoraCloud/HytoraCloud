@@ -36,7 +36,7 @@ public class ProxyPingListener {
 
             ServerPing.Builder builder = ping.asBuilder();
 
-            ProxyConfig proxyConfig = CloudDriver.getInstance().getThisService().getGroup().getProperties().has("proxyConfig") ? CloudDriver.getInstance().getThisService().getGroup().getProperties().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
+            ProxyConfig proxyConfig = CloudDriver.getInstance().getCurrentService().getGroup().getProperties().has("proxyConfig") ? CloudDriver.getInstance().getCurrentService().getGroup().getProperties().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
             if (!proxyConfig.isEnabled()) {
                 return;
             }
@@ -56,7 +56,6 @@ public class ProxyPingListener {
                 );
 
                 CloudDriver.getInstance().callEvent(new DriverEventNetworkPing(playerConnection));
-                CloudDriver.getInstance().getNetworkHandlers().forEach(networkHandler -> networkHandler.onNetworkPing(playerConnection));
 
             }
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {

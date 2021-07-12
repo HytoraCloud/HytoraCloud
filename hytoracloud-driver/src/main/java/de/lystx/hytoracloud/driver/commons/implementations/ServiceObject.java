@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketReques
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.utils.minecraft.ServerPinger;
 import de.lystx.hytoracloud.driver.utils.minecraft.ServiceInfo;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter @Setter @AllArgsConstructor
-public class ServiceObject implements IService {
+public class ServiceObject extends WrappedObject<IService, ServiceObject> implements IService {
 
     /**
      * The name of this service
@@ -95,14 +95,14 @@ public class ServiceObject implements IService {
     }
 
     /**
-     * Returns the {@link CloudPlayer}s on this
+     * Returns the {@link ICloudPlayer}s on this
      * Service (for example "Lobby-1")
      *
      * @return List of cloudPlayers on this service
      */
-    public List<CloudPlayer> getPlayers() {
-        List<CloudPlayer> list = new LinkedList<>();
-        for (CloudPlayer globalOnlinePlayer : CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()) {
+    public List<ICloudPlayer> getPlayers() {
+        List<ICloudPlayer> list = new LinkedList<>();
+        for (ICloudPlayer globalOnlinePlayer : CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()) {
             if (globalOnlinePlayer == null || globalOnlinePlayer.getService() == null) {
                 continue;
             }
@@ -227,4 +227,13 @@ public class ServiceObject implements IService {
         return service;
     }
 
+    @Override
+    Class<ServiceObject> getWrapperClass() {
+        return ServiceObject.class;
+    }
+
+    @Override
+    Class<IService> getInterface() {
+        return IService.class;
+    }
 }

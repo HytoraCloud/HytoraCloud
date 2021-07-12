@@ -42,8 +42,14 @@ public class PacketOutGlobalInfo extends HytoraPacket implements Serializable {
         Map<IServiceGroup, List<IService>> map = new HashMap<>();
 
         for (IServiceGroup group : this.groups) {
+            if (group == null) {
+                continue;
+            }
             List<IService> list = new LinkedList<>();
             for (IService service : this.services) {
+                if (service == null) {
+                    continue;
+                }
                 if (service.getGroup().getName().equalsIgnoreCase(group.getName())) {
                     list.add(service);
                 }

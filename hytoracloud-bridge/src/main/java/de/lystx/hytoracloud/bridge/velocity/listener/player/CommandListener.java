@@ -5,7 +5,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 public class CommandListener {
 
@@ -18,7 +18,7 @@ public class CommandListener {
         if (commandSource instanceof Player) {
             Player player = (Player)commandSource;
 
-            CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
+            ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
             if (CloudBridge.getInstance().getProxyBridge().commandExecute(cloudPlayer, command)) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
             } else {

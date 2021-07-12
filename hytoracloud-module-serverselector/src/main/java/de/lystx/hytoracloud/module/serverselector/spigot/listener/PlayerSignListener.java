@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.module.serverselector.spigot.listener;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import org.bukkit.Material;
@@ -28,8 +28,8 @@ public class PlayerSignListener implements Listener {
         }
         Sign sign = (Sign) event.getClickedBlock().getState();
         Player player = event.getPlayer();
-        CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
-        if (cloudPlayer == null) {
+        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
+        if (ICloudPlayer == null) {
             player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getErrorMessage().replace("&", "§").replace("%error%",
                     "You couldn't be found in global CloudPlayer list! Either rejoin or notify a server Administrator or a Cloud Administrator!").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
             return;
@@ -43,11 +43,11 @@ public class PlayerSignListener implements Listener {
             if (meta == null) {
                 return;
             }
-            if (meta.getName().equalsIgnoreCase(CloudDriver.getInstance().getThisService().getName())) {
+            if (meta.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
                 player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 return;
             }
-            cloudPlayer.connect(meta);
+            ICloudPlayer.connect(meta);
         }
     }
 }

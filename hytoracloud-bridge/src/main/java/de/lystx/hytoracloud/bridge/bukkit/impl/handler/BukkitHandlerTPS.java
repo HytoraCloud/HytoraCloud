@@ -17,7 +17,7 @@ public class BukkitHandlerTPS implements PacketHandler {
            System.out.println("SENDING TPS");
             PacketRequestTPS packetRequestTPS = (PacketRequestTPS)packet;
 
-            if (packetRequestTPS.getServer().equalsIgnoreCase(CloudDriver.getInstance().getThisService().getName())) {
+            if (packetRequestTPS.getServer().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
 
                 String tps;
                 double[] arrayOfDouble = (double[]) Reflections.getField("recentTps","MinecraftServer","getServer");

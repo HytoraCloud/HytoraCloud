@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import net.hytora.networking.elements.component.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -44,7 +44,6 @@ public class PlayerListener implements Listener {
             event.setCancelled(result.isCancelled());
             event.setCancelReason(result.getComponent() == null ? "§cNo reason defined" : result.getComponent());
         }
-
     }
 
 
@@ -81,14 +80,14 @@ public class PlayerListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         Server server = event.getServer();
 
-        CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
-        IService IService = CloudDriver.getInstance().getServiceManager().getService(server.getInfo().getName());
+        ICloudPlayer iCloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
+        IService service = CloudDriver.getInstance().getServiceManager().getService(server.getInfo().getName());
 
-        if (cloudPlayer == null || IService == null) {
+        if (iCloudPlayer == null || service == null) {
             return;
         }
 
-        CloudBridge.getInstance().getProxyBridge().onServerConnect(cloudPlayer, IService);
+        CloudBridge.getInstance().getProxyBridge().onServerConnect(iCloudPlayer, service);
     }
 
 
@@ -97,7 +96,7 @@ public class PlayerListener implements Listener {
 
         ProxiedPlayer player = event.getPlayer();
         Server playerServer = player.getServer();
-        CloudPlayer cloudPlayer = CloudPlayer.dummy(player.getName(), player.getUniqueId());
+        ICloudPlayer iCloudPlayer = ICloudPlayer.dummy(player.getName(), player.getUniqueId());
 
         if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
             IServiceGroup IServiceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(event.getTarget().getName().split("-")[0]);
@@ -108,8 +107,7 @@ public class PlayerListener implements Listener {
         }
 
         if (playerServer == null) {
-
-            IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+            IService fallback = CloudDriver.getInstance().getFallback(iCloudPlayer);
             ServerInfo fallbackInfo = ProxyServer.getInstance().getServerInfo(fallback.getName());
 
             if (fallbackInfo == null) {
@@ -118,19 +116,18 @@ public class PlayerListener implements Listener {
             }
             event.setTarget(fallbackInfo);
 
-            cloudPlayer.setService(fallback);
-            cloudPlayer.update();
+            iCloudPlayer.setService(fallback);
         } else {
-
-            cloudPlayer.setService(CloudDriver.getInstance().getServiceManager().getService(event.getTarget().getName()));
-            cloudPlayer.update();
+            iCloudPlayer.setService(CloudDriver.getInstance().getServiceManager().getService(event.getTarget().getName()));
         }
+        iCloudPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
+        iCloudPlayer.update();
     }
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        CloudPlayer cloudPlayer = CloudPlayer.fromName(player.getName());
+        ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player.getName());
 
         CloudBridge.getInstance().getProxyBridge().playerQuit(cloudPlayer);
 

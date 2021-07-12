@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.driver.utils.reflection;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import lombok.SneakyThrows;
@@ -55,12 +54,10 @@ public class Reflections {
 
 
     public static Object getPlayer(String name) {
-        if (CloudDriver.getInstance().getThisService().getGroup().getType() == ServiceType.SPIGOT) {
+        if (CloudDriver.getInstance().getCurrentService().getGroup().getType() == ServiceType.SPIGOT) {
             return getBukkitPlayer(name);
         } else {
-            ProxyBridge proxyBridge = CloudDriver.getInstance().getProxyBridge();
-            ProxyVersion version = proxyBridge.getVersion();
-
+            ProxyVersion version = CloudDriver.getInstance().getProxyBridge().getVersion();
             if (version.equals(ProxyVersion.BUNGEECORD) || version.equals(ProxyVersion.WATERFALL)) {
                 return getBungeePlayer(name);
             } else if (version.equals(ProxyVersion.VELOCITY)) {
@@ -69,6 +66,8 @@ public class Reflections {
         }
         return null;
     }
+
+
 
     /**
      * Returns a Player Object from velocity

@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
 import org.bukkit.*;
@@ -24,8 +24,8 @@ public class ServiceCommand {
 
     @Command(name = "service", description = "Bukkit server command", aliases = {"hs", "cloudserver"})
     public void execute(CloudCommandSender sender, String[] args) {
-        if (sender instanceof CloudPlayer) {
-            CloudPlayer player = (CloudPlayer) sender;
+        if (sender instanceof ICloudPlayer) {
+            ICloudPlayer player = (ICloudPlayer) sender;
 
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
@@ -40,17 +40,17 @@ public class ServiceCommand {
                         String format = new DecimalFormat("##.##").format(((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getProcessCpuLoad() * 100);
                         player.sendMessage("§bCloudService Info§8:");
                         player.sendMessage("§8§m--------------------------------------");
-                        player.sendMessage("  §8» §bServer §8┃ §7" + CloudDriver.getInstance().getThisService().getName());
-                        player.sendMessage("  §8» §bState §8┃ §7" + CloudDriver.getInstance().getThisService().getState().getColor() + CloudDriver.getInstance().getThisService().getState());
-                        player.sendMessage("  §8» §bID §8┃ §7" + CloudDriver.getInstance().getThisService().getId());
-                        player.sendMessage("  §8» §bUUID §8┃ §7" + CloudDriver.getInstance().getThisService().getUniqueId());
-                        player.sendMessage("  §8» §bPort §8┃ §7" + CloudDriver.getInstance().getThisService().getPort());
+                        player.sendMessage("  §8» §bServer §8┃ §7" + CloudDriver.getInstance().getCurrentService().getName());
+                        player.sendMessage("  §8» §bState §8┃ §7" + CloudDriver.getInstance().getCurrentService().getState().getColor() + CloudDriver.getInstance().getCurrentService().getState());
+                        player.sendMessage("  §8» §bID §8┃ §7" + CloudDriver.getInstance().getCurrentService().getId());
+                        player.sendMessage("  §8» §bUUID §8┃ §7" + CloudDriver.getInstance().getCurrentService().getUniqueId());
+                        player.sendMessage("  §8» §bPort §8┃ §7" + CloudDriver.getInstance().getCurrentService().getPort());
                         player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudDriver.getInstance().getConnection().remoteAddress().toString());
                         player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudDriver.getInstance().getHost());
-                        player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getThisService().getGroup().getTemplate().getName());
+                        player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getCurrentService().getGroup().getTemplate().getName());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
                         player.sendMessage("  §8» §bInternal CPU Usage §8┃ §7" + format);
-                        PropertyObject properties = CloudDriver.getInstance().getThisService().getProperties();
+                        PropertyObject properties = CloudDriver.getInstance().getCurrentService().getProperties();
                         if (!properties.keySet().isEmpty()) {
                             for (String key : properties.keySet()) {
                                 player.sendMessage("  §8» §b" + key + " §8┃ §7" + properties.get(key));
@@ -58,7 +58,7 @@ public class ServiceCommand {
                         }
                         player.sendMessage("§8§m--------------------------------------");
                     } else if (args[0].equalsIgnoreCase("removeSign")) {
-                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                        if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
@@ -85,7 +85,7 @@ public class ServiceCommand {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
                             return;
                         }
-                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                        if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
@@ -109,7 +109,7 @@ public class ServiceCommand {
                     }
                 } else if (args.length == 2) {
                     if (args[0].equalsIgnoreCase("createSign")) {
-                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                        if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
@@ -162,7 +162,7 @@ public class ServiceCommand {
                     }
                 } else if (args.length == 4) {
                     if (args[0].equalsIgnoreCase("createNPC")) {
-                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                        if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
@@ -199,18 +199,18 @@ public class ServiceCommand {
         }
     }
 
-    public void help(CloudPlayer cloudPlayer) {
-        cloudPlayer.sendMessage("§bCloudService §7Help§8:");
-        cloudPlayer.sendMessage("§8§m--------------------------------------");
-        cloudPlayer.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
+    public void help(ICloudPlayer ICloudPlayer) {
+        ICloudPlayer.sendMessage("§bCloudService §7Help§8:");
+        ICloudPlayer.sendMessage("§8§m--------------------------------------");
+        ICloudPlayer.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
         if (CloudDriver.getInstance().getModule("module-serverSelector") != null) {
-            cloudPlayer.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
-            cloudPlayer.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
-            cloudPlayer.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
-            cloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
+            ICloudPlayer.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
+            ICloudPlayer.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
+            ICloudPlayer.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
+            ICloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
         }
-        cloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
-        cloudPlayer.sendMessage("§8§m--------------------------------------");
+        ICloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
+        ICloudPlayer.sendMessage("§8§m--------------------------------------");
 
 
     }

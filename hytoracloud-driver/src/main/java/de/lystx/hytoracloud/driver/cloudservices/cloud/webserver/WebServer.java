@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.FileFormat;
 import io.vson.enums.VsonSettings;
@@ -18,40 +19,60 @@ import java.util.*;
 @Getter
 public class WebServer {
 
+    /**
+     * The http server instance
+     */
     private HttpServer server;
-    private CloudDriver cloudDriver;
-    private Map<String, HttpHandler> handlers;
-
-    private VsonObject config;
-    private int port;
-    private boolean enabled;
-    private List<String> whitelistedIps;
 
     /**
-     * Loads the webserver
-     * @param cloudDriver
+     * All the handlers
      */
-    public WebServer(CloudDriver cloudDriver) {
-        try {
-            this.config = new VsonObject(
-                    new File(cloudDriver.getInstance(FileService.class).getDatabaseDirectory(), "web.json"),
-                    VsonSettings.OVERRITE_VALUES,
-                    VsonSettings.CREATE_FILE_IF_NOT_EXIST);
+    private final Map<String, HttpHandler> handlers;
 
-            this.port = this.config.has("port") ? this.config.getInteger("port") : this.config.append("port", 2217).getInteger("port");
-            this.enabled = this.config.getBoolean("enabled", true);
-            this.whitelistedIps = this.config.has("whitelistedIps") ?
-                    this.config.getList("whitelistedIps", String.class) :
-                    this.config.append("whitelistedIps", Arrays.asList("0", "127.0.0.1", "0:0:0:0:0:0:0:1")).getList("whitelistedIps", String.class);
-            this.config.save();
-            try {
-                this.handlers = new HashMap<>();
-                this.cloudDriver = cloudDriver;
-                this.server = HttpServer.create(new InetSocketAddress(this.port), 0);
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> this.server.stop(0)));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    /**
+     * The registered routes
+     */
+    private final List<String> routes;
+
+    /**
+     * The config containing host and port
+     */
+    private final JsonEntity config;
+
+    /**
+     * The port
+     */
+    private final int port;
+
+    /**
+     * If the services is enabled
+     */
+    private final boolean enabled;
+
+    /**
+     * Whitelisted ips to view content
+     */
+    private final List<String> whitelistedIps;
+
+
+    public WebServer(CloudDriver cloudDriver) {
+
+        this.routes = new LinkedList<>();
+        this.handlers = new HashMap<>();
+
+        this.config = new JsonEntity(new File(cloudDriver.getInstance(FileService.class).getDatabaseDirectory(), "web.json"));
+
+        this.port = this.config.has("port") ? this.config.getInteger("port") : this.config.append("port", 2217).getInteger("port");
+        this.enabled = this.config.getBoolean("enabled", true);
+
+        this.whitelistedIps = this.config.has("whitelistedIps") ?
+                this.config.getList("whitelistedIps", String.class) :
+                this.config.append("whitelistedIps", Arrays.asList("0", "127.0.0.1", "0:0:0:0:0:0:0:1")).getList("whitelistedIps", String.class);
+        this.config.save();
+
+        try {
+            this.server = HttpServer.create(new InetSocketAddress(this.port), 0);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> this.server.stop(0)));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,41 +82,56 @@ public class WebServer {
      * Starts the Webserver
      */
     public void start() {
+        CloudDriver.getInstance().getScheduler().scheduleRepeatingTask(() -> {
+            this.update("", new JsonEntity().append("info", "There's nothing to see here").append("routes", this.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
+        }, 0L, 60L);
+
         if (this.enabled) {
             this.server.setExecutor(null);
             this.server.start();
         }
+
+
     }
 
     /**
      * Removes a "Route"
-     * @param web > URL
+     *
+     * @param web the route name
      */
     public void remove(String web) {
         try {
             String finalWeb = (web.startsWith("/") ? web : "/" + web);
             this.server.removeContext(finalWeb);
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            //IGNORING
         }
     }
 
     /**
      * Updates a "route"
-     * @param web
-     * @param document
+     *
+     * @param web the route
+     * @param jsonEntity the content
      */
-    public void update(String web, VsonObject document) {
-        this.update(web, document.toString(FileFormat.JSON));
+    public void update(String web, JsonEntity jsonEntity) {
+        this.update(web, jsonEntity.toString());
     }
 
     /**
      * Raw method to update
      * a string to a webRoute
-     * @param web
-     * @param content
+     *
+     * @param web the route name
+     * @param content the content
      */
     public void update(String web, String content) {
+        if (!web.trim().isEmpty()) {
+            if (!this.routes.contains(web)) {
+                this.routes.add(web);
+            }
+        }
+
         String finalWeb = (web.startsWith("/") ? web : "/" + web);
         this.remove(web);
         this.server.createContext(finalWeb, httpExchange -> {

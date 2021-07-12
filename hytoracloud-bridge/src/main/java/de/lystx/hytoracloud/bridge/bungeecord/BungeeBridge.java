@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.bridge.bungeecord;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.bungeecord.listener.other.TablistListener;
@@ -15,7 +15,7 @@ import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
 
@@ -68,16 +68,15 @@ public class BungeeBridge extends Plugin {
                             return;
                         }
 
-                        CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
+                        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
 
                         player.setTabHeader(
-                                new TextComponent(formatTabList(cloudPlayer, tabList.getHeader())),
-                                new TextComponent(formatTabList(cloudPlayer, tabList.getFooter())
+                                new TextComponent(formatTabList(ICloudPlayer, tabList.getHeader())),
+                                new TextComponent(formatTabList(ICloudPlayer, tabList.getFooter())
                                 )
                         );
                     }
                 }
-
 
                 @Override
                 public NetworkHandler getNetworkHandler() {
@@ -126,7 +125,7 @@ public class BungeeBridge extends Plugin {
                         return;
                     }
 
-                    CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
+                    ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
 
                     if (cloudPlayer == null) {
                         return;
@@ -279,7 +278,7 @@ public class BungeeBridge extends Plugin {
 
 
         if (CloudDriver.getInstance().getProxyConfig() == null) {
-            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getThisService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
+            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getCurrentService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
             System.out.println("[CloudAPI] Couldn't find ProxyConfig!");
         }
         System.out.println("[CloudProxy] Booted up in " + this.action.time() + "ms");

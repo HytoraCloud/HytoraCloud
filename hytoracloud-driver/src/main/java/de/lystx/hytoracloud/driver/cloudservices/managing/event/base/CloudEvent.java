@@ -1,6 +1,7 @@
 
 package de.lystx.hytoracloud.driver.cloudservices.managing.event.base;
 
+import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +17,13 @@ import java.io.Serializable;
 @Setter @Getter
 public class CloudEvent implements Serializable {
 
+    /**
+     * If the event is cancelled or not
+     */
     private boolean cancelled;
+
+    /**
+     * If you want to cancel something
+     */
+    private String targetComponent;
 }

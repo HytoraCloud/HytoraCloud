@@ -53,7 +53,7 @@ public class DefaultBukkit implements IBukkit {
      */
     public DefaultBukkit() {
         try {
-            this.serviceState = CloudDriver.getInstance().getThisService().getState();
+            this.serviceState = CloudDriver.getInstance().getCurrentService().getState();
         } catch (NullPointerException e) {
             //Exception thrown by PaperSpigot
             this.serviceState = ServiceState.LOBBY;
@@ -84,8 +84,8 @@ public class DefaultBukkit implements IBukkit {
         } catch (IllegalAccessException|java.lang.reflect.InvocationTargetException|NoSuchMethodException| NoSuchFieldException e) {
             e.printStackTrace();
         }
-        CloudDriver.getInstance().getThisService().setState(serviceState);
-        CloudDriver.getInstance().getThisService().update();
+        CloudDriver.getInstance().getCurrentService().setState(serviceState);
+        CloudDriver.getInstance().getCurrentService().update();
 
     }
 }

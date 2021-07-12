@@ -4,7 +4,6 @@ package de.lystx.hytoracloud.launcher.global.commands;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
@@ -34,7 +33,7 @@ public class InfoCommand implements TabCompletable {
                     networkInfo.calculate();
                     sender.sendMessage("INFO", "§cCalculating §eNetworkStats§c....");
                     sender.sendMessage("INFO", "§7----------------------------------");
-                    sender.sendMessage("INFO", "§bVersion §a: §f" + Updater.getCloudVersion());
+                    sender.sendMessage("INFO", "§bVersion §a: §f" + CloudDriver.getInstance().getVersion());
                     sender.sendMessage("INFO", "§bCPU-Usage §a: §f" + format.format(networkInfo.getCPUUsage()) + "%");
                     sender.sendMessage("INFO", "§bInternal CPU-Usage §a: §f" + format.format(networkInfo.getInternalCPUUsage()) + "%");
                     sender.sendMessage("INFO", "§bServer CPU §f: §a" + format.format(networkInfo.getUsedCPU()) + "%§h/§c" + format.format(networkInfo.getFreeCPU()));

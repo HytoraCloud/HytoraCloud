@@ -34,7 +34,7 @@ public class ProxyPingListener implements Listener {
             int port = event.getConnection().getVirtualHost().getPort();
             ServerPing ping = event.getResponse();
 
-            ProxyConfig proxyConfig = CloudDriver.getInstance().getThisService().getGroup().getProperties().has("proxyConfig") ? CloudDriver.getInstance().getThisService().getGroup().getProperties().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
+            ProxyConfig proxyConfig = CloudDriver.getInstance().getCurrentService().getGroup().getProperties().has("proxyConfig") ? CloudDriver.getInstance().getCurrentService().getGroup().getProperties().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
             if (!proxyConfig.isEnabled()) {
                 return;
             }
@@ -54,7 +54,6 @@ public class ProxyPingListener implements Listener {
                 );
 
                 CloudDriver.getInstance().callEvent(new DriverEventNetworkPing(playerConnection));
-                CloudDriver.getInstance().getNetworkHandlers().forEach(networkHandler -> networkHandler.onNetworkPing(playerConnection));
 
             }
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
@@ -65,9 +64,7 @@ public class ProxyPingListener implements Listener {
                 String[] playerInfo = (motd.getProtocolString().replace("||", "-_-")).split("-_-");
 
                 ServerPing.PlayerInfo[] playerInfos = new ServerPing.PlayerInfo[playerInfo.length];
-                IntStream.range(0, playerInfos.length).forEach(i -> {
-                    playerInfos[i] = new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(playerInfo[i].replace("-_-", ""), port)), UUID.randomUUID());
-                });
+                IntStream.range(0, playerInfos.length).forEach(i -> playerInfos[i] = new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', this.replace(playerInfo[i].replace("-_-", ""), port)), UUID.randomUUID()));
                 ping.setPlayers(new ServerPing.Players(proxyConfig.getMaxPlayers(), CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size(), playerInfos));
 
             }

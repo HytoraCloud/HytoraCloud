@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.commons.interfaces;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
 public interface NetworkHandler {
@@ -54,24 +54,24 @@ public interface NetworkHandler {
     /**
      * Called when player joins network
      *
-     * @param cloudPlayer the joined player
+     * @param ICloudPlayer the joined player
      */
-    default void onPlayerJoin(CloudPlayer cloudPlayer) {}
+    default void onPlayerJoin(ICloudPlayer ICloudPlayer) {}
 
     /**
      * Called when player switches server
      *
-     * @param cloudPlayer the player
+     * @param ICloudPlayer the player
      * @param server the server
      */
-    default void onServerChange(CloudPlayer cloudPlayer, String server) {}
+    default void onServerChange(ICloudPlayer ICloudPlayer, String server) {}
 
     /**
      * Called when player leaves network
      *
-     * @param cloudPlayer the player
+     * @param ICloudPlayer the player
      */
-    default void onPlayerQuit(CloudPlayer cloudPlayer) {}
+    default void onPlayerQuit(ICloudPlayer ICloudPlayer) {}
 
     /**
      * Called when network is pinged (only works on bungeeCord)

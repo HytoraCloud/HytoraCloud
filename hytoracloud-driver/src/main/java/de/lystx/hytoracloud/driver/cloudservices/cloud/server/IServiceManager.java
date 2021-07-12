@@ -16,9 +16,8 @@ public interface IServiceManager {
      * Updates a {@link IServiceGroup}
      *
      * @param group the old group
-     * @param newGroup the new group
      */
-    void updateGroup(IServiceGroup group, IServiceGroup newGroup);
+    void updateGroup(IServiceGroup group);
 
     /**
      * Updates a {@link IService} in every cache
@@ -73,6 +72,11 @@ public interface IServiceManager {
      */
     void stopService(IService IService);
 
+    /**
+     * Updates the cached {@link IService}s
+     *
+     * @param cachedServices the cached services and its groups
+     */
     void setCachedServices(Map<IServiceGroup, List<IService>> cachedServices);
 
     /**

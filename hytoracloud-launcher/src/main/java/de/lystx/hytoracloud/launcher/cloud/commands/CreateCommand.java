@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -71,7 +71,7 @@ public class CreateCommand implements TabCompletable {
                     );
                     sender.sendMessage("INFO", "§2Created ServiceGroup §a" + IServiceGroup.getName() + " §7| §bMemory " + IServiceGroup.getMemory() + " §7| §bMinServer " + IServiceGroup.getMinServer() + " §7| §bMaxServer" + IServiceGroup.getMaxServer());
                     CloudSystem.getInstance().getInstance(GroupService.class).createGroup(IServiceGroup);
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).needServices(IServiceGroup);
+                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).needServices(IServiceGroup);
                     CloudSystem.getInstance().reload();
                 });
             } else if (args[0].equalsIgnoreCase("fallback")) {

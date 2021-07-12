@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,7 +24,7 @@ public class PacketHandlerManageSigns implements PacketHandler {
     public void handleInformation(PacketInformation information) {
         if (information.getKey().equalsIgnoreCase("createSign")) {
             final Location location = Location.deserialize((Map<String, Object>) information.getObjectMap().get("location"));
-            CloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer((String) information.getObjectMap().get("player"));
+            ICloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer((String) information.getObjectMap().get("player"));
             IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup((String) information.getObjectMap().get("group"));
 
             CloudSign sign = new CloudSign((int) location.getX(), (int) location.getY(), (int) location.getZ(), group.getName(), location.getWorld().getName());
@@ -41,14 +41,14 @@ public class PacketHandlerManageSigns implements PacketHandler {
 
                 PacketInformation packetInformation = new PacketInformation("PacketInCreateSign", new CloudMap<String, Object>().append("sign", sign.serialize()));
                 CloudDriver.getInstance().sendPacket(packetInformation);
-                CloudDriver.getInstance().getThisService().update();
+                CloudDriver.getInstance().getCurrentService().update();
                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
             } else {
                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eCloudSign §calready exists!");
             }
         } else if (information.getKey().equalsIgnoreCase("deleteSign")) {
             final Location location = Location.deserialize((Map<String, Object>) information.getObjectMap().get("location"));
-            CloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer((String) information.getObjectMap().get("player"));
+            ICloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer((String) information.getObjectMap().get("player"));
 
             CloudSign cloudSign = SpigotSelector.getInstance().getSignManager().getSignUpdater().getCloudSign(location);
             if (cloudSign == null) {

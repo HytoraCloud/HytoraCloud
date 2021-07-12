@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 
 import java.util.Date;
@@ -28,7 +28,7 @@ public class PlayerCommand {
                 }
 
                 sender.sendMessage("INFO", "§7----------------------------------");
-                for (CloudPlayer onlinePlayer : ps.getOnlinePlayers()) {
+                for (ICloudPlayer onlinePlayer : ps.getOnlinePlayers()) {
                     sender.sendMessage("INFO", "§9" + onlinePlayer.getName() + " §7| §bServer " + (onlinePlayer.getService() == null ? "Logging in..." : onlinePlayer.getService().getName()) + " §7| §aProxy " + onlinePlayer.getProxy());
                 }
                 sender.sendMessage("INFO", "§7----------------------------------");
@@ -40,7 +40,7 @@ public class PlayerCommand {
                 CloudDriver.getInstance().getParent().reload();
 
                 PermissionPool pool = CloudDriver.getInstance().getPermissionPool();
-                CloudPlayer cloudPlayer = ps.getCachedPlayer(player);
+                ICloudPlayer ICloudPlayer = ps.getCachedPlayer(player);
 
                 try {
                     UUID uniqueId = pool.getUUIDByName(player);
@@ -49,11 +49,11 @@ public class PlayerCommand {
                         sender.sendMessage("ERROR", "§cThe player §e" + player + " §cseems not to ever joined the network!");
                         return;
                     }
-                    if (cloudPlayer == null) {
+                    if (ICloudPlayer == null) {
                         sender.sendMessage("ERROR", "§cOffline §bInformation §7on " + player + "§7:");
                     } else {
-                        playerData = pool.getPlayerInformation(cloudPlayer.getUniqueId());
-                        sender.sendMessage("ERROR", "§aOnline §bInformation §7on " + cloudPlayer.getName() + "§7:");
+                        playerData = pool.getPlayerInformation(ICloudPlayer.getUniqueId());
+                        sender.sendMessage("ERROR", "§aOnline §bInformation §7on " + ICloudPlayer.getName() + "§7:");
                     }
                     try {
                         PermissionGroup permissionGroup = pool.getHighestPermissionGroup(uniqueId);
@@ -66,9 +66,9 @@ public class PlayerCommand {
                         sender.sendMessage("INFO", "§7Ip Address | §b" + playerData.getIpAddress());
                         sender.sendMessage("INFO", "§7First login | §b" + pool.getFormat().format(new Date(playerData.getFirstLogin())));
                         sender.sendMessage("INFO", "§7Last login | §b" + pool.getFormat().format(new Date(playerData.getLastLogin())));
-                        if (cloudPlayer != null) {
-                            sender.sendMessage("INFO", "§7Proxy | §b" + cloudPlayer.getProxy());
-                            sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getService().getName());
+                        if (ICloudPlayer != null) {
+                            sender.sendMessage("INFO", "§7Proxy | §b" + ICloudPlayer.getProxy());
+                            sender.sendMessage("INFO", "§7Server | §b" + ICloudPlayer.getService().getName());
                         }
                     } catch (NullPointerException e) {
                         sender.sendMessage("ERROR", "§cAn error has occured while attempting to perform this command!");
@@ -89,13 +89,13 @@ public class PlayerCommand {
             for (int i = 2; i < args.length; i++) {
                 sb.append(args[i]).append(" ");
             }
-            CloudPlayer cloudPlayer = ps.getCachedPlayer(player);
-            if (cloudPlayer == null) {
+            ICloudPlayer ICloudPlayer = ps.getCachedPlayer(player);
+            if (ICloudPlayer == null) {
                 sender.sendMessage("ERROR", "§cThe player §e" + player + " §cseems not to be online!");
                 return;
             }
-            cloudPlayer.kick(sb.toString());
-            sender.sendMessage("INFO", "§7The player §b" + cloudPlayer.getName() + " §7was kicked for §a" + sb.toString() + "§7!");
+            ICloudPlayer.kick(sb.toString());
+            sender.sendMessage("INFO", "§7The player §b" + ICloudPlayer.getName() + " §7was kicked for §a" + sb.toString() + "§7!");
         } else {
             this.correctSyntax(sender);
         }

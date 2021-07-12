@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -35,12 +35,12 @@ public class DeleteCommand implements TabCompletable {
                 }
 
                 for (IService IService : CloudDriver.getInstance().getServiceManager().getServices(IServiceGroup)) {
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getIdService().removeID(IService.getGroup().getName(), IService.getId());
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removePort(IService.getPort());
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(IService.getPort());
+                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getIdService().removeID(IService.getGroup().getName(), IService.getId());
+                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removePort(IService.getPort());
+                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(IService.getPort());
                 }
 
-                ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).stopServices(IServiceGroup, false);
+                ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).stopServices(IServiceGroup, false);
                 CloudSystem.getInstance().getInstance(GroupService.class).deleteGroup(IServiceGroup);
                 CloudDriver.getInstance().getServiceManager().getAllServices().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
                 CloudSystem.getInstance().reload();

@@ -18,19 +18,57 @@ import org.jetbrains.annotations.Nullable;
 import java.io.Serializable;
 import java.util.*;
 
-//TODO: DOCUMENTATION (AGAIN)
 @Getter @Setter @AllArgsConstructor
 public class PlayerInformation implements Serializable, IPermissionUser, Objectable<PlayerInformation> {
 
+    /**
+     * The uuid of this player
+     */
     private UUID uniqueId;
+
+    /**
+     * The name of this player
+     */
     private String name;
+
+    /**
+     * The loaded permission entries
+     */
     private List<PermissionEntry> permissionEntries;
+
+    /**
+     * Exclusive permissions
+     */
     private List<String> permissions;
+
+    /**
+     * The ip address
+     */
     private String ipAddress;
+
+    /**
+     * if server messages received
+     */
     private boolean notifyServerStart;
+
+    /**
+     * If this is a default created
+     */
     private boolean isDefault;
+
+    /**
+     * First login
+     */
     private long firstLogin;
+
+    /**
+     * last login
+     */
     private long lastLogin;
+
+    /**
+     * Properties
+     */
     private Map<String, PropertyObject> properties;
 
     public PlayerInformation(UUID uniqueId, String name, List<PermissionEntry> permissionEntries, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
