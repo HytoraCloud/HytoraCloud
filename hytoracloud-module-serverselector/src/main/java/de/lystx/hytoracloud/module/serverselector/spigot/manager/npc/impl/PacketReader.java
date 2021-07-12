@@ -88,9 +88,9 @@ public class PacketReader {
                         List<UUID> uuidList = CloudDriver.getInstance().getImplementedData().getList("uuidList", UUID.class);
                         uuidList.remove(player.getUniqueId());
                         CloudDriver.getInstance().getImplementedData().put("uuidList", uuidList);
-                        player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7Removed NPC for group §b" + group + "§8!");
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Removed NPC for group §b" + group + "§8!");
                     } else {
-                        player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe NPC couldn't be found!");
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe NPC couldn't be found!");
                     }
                     return;
                 }

@@ -18,12 +18,13 @@ public class PacketHandlerConfig implements PacketHandler {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo packetOutGlobalInfo = ((PacketOutGlobalInfo)packet);
 
-            CloudDriver.getInstance().getImplementedData().put("networkConfig", packetOutGlobalInfo.getNetworkConfig());
-            CloudDriver.getInstance().getServiceManager().setCachedServices(packetOutGlobalInfo.getServices());
+            CloudDriver.getInstance().setNetworkConfig(packetOutGlobalInfo.getNetworkConfig());
+            CloudDriver.getInstance().getServiceManager().setCachedServices(packetOutGlobalInfo.toMap());
 
         } else if (packet instanceof PacketUpdateNetworkConfig) {
+
             PacketUpdateNetworkConfig packetUpdateNetworkConfig = (PacketUpdateNetworkConfig)packet;
-            CloudDriver.getInstance().getImplementedData().put("networkConfig", packetUpdateNetworkConfig.getNetworkConfig());
+            CloudDriver.getInstance().setNetworkConfig(packetUpdateNetworkConfig.getNetworkConfig());
         }
     }
 

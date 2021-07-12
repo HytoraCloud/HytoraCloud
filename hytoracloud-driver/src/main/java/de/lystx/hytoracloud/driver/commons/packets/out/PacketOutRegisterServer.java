@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.out;
 
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 
 
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Getter @Setter @AllArgsConstructor
 public class PacketOutRegisterServer extends HytoraPacket implements Serializable {
 
-    private Service service;
+    private IService service;
 
     @Override
     public void write(Component component) {

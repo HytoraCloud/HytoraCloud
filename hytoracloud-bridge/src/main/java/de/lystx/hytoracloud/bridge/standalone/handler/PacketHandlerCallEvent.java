@@ -6,7 +6,7 @@ import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 
-import de.lystx.hytoracloud.driver.service.managing.event.base.CloudEvent;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
 import lombok.Getter;
 
 @Getter

@@ -3,11 +3,10 @@ package de.lystx.hytoracloud.bridge.bungeecord.listener.player;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.bridge.bungeecord.BungeeBridge;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import net.hytora.networking.elements.component.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -83,13 +82,13 @@ public class PlayerListener implements Listener {
         Server server = event.getServer();
 
         CloudPlayer cloudPlayer = CloudPlayer.fromUUID(player.getUniqueId());
-        Service service = CloudDriver.getInstance().getServiceManager().getService(server.getInfo().getName());
+        IService IService = CloudDriver.getInstance().getServiceManager().getService(server.getInfo().getName());
 
-        if (cloudPlayer == null || service == null) {
+        if (cloudPlayer == null || IService == null) {
             return;
         }
 
-        CloudBridge.getInstance().getProxyBridge().onServerConnect(cloudPlayer, service);
+        CloudBridge.getInstance().getProxyBridge().onServerConnect(cloudPlayer, IService);
     }
 
 
@@ -101,20 +100,20 @@ public class PlayerListener implements Listener {
         CloudPlayer cloudPlayer = CloudPlayer.dummy(player.getName(), player.getUniqueId());
 
         if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
-            ServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(event.getTarget().getName().split("-")[0]);
-            if (serviceGroup.isMaintenance() && (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
-                player.disconnect(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getCloudPrefix()));
+            IServiceGroup IServiceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(event.getTarget().getName().split("-")[0]);
+            if (IServiceGroup.isMaintenance() && (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
+                player.disconnect(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", IServiceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 event.setCancelled(true);
             }
         }
 
         if (playerServer == null) {
 
-            Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+            IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
             ServerInfo fallbackInfo = ProxyServer.getInstance().getServerInfo(fallback.getName());
 
             if (fallbackInfo == null) {
-                player.disconnect(CloudDriver.getInstance().getCloudPrefix() + "§cNo fallback-server was found!");
+                player.disconnect(CloudDriver.getInstance().getPrefix() + "§cNo fallback-server was found!");
                 return;
             }
             event.setTarget(fallbackInfo);

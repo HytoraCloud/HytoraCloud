@@ -12,10 +12,10 @@ import de.lystx.hytoracloud.bridge.bungeecord.listener.server.ServerKickListener
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 
 
 
@@ -131,7 +131,7 @@ public class BungeeBridge extends Plugin {
                     if (cloudPlayer == null) {
                         return;
                     }
-                    Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+                    IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
 
                     ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(fallback.getName());
 
@@ -163,7 +163,7 @@ public class BungeeBridge extends Plugin {
                 }
 
                 @Override
-                public void stopServer(Service service) {
+                public void stopServer(IService service) {
                     ProxyServer.getInstance().getServers().remove(service.getName());
                 }
 
@@ -186,15 +186,13 @@ public class BungeeBridge extends Plugin {
                 }
 
                 @Override
-                public void registerService(Service service) {
-                    System.out.println("[Register] Registering '" + service.getName() + "'");
+                public void registerService(IService service) {
                     ServerInfo info = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()), "CloudService", false);
                     ProxyServer.getInstance().getServers().put(service.getName(), info);
                 }
 
                 @Override
                 public void removeServer(String server) {
-                    System.out.println("[Register] Removing '" + server + "'");
                     ProxyServer.getInstance().getServers().remove(server);
                 }
 

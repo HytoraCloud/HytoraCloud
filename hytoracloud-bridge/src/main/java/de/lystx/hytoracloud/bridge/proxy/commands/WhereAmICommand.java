@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.bridge.proxy.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import lombok.Getter;
 
 @Getter
@@ -16,13 +16,13 @@ public class WhereAmICommand {
         if (commandSender instanceof CloudPlayer) {
             CloudPlayer player = (CloudPlayer)commandSender;
 
-            Service proxy = CloudDriver.getInstance().getThisService();
-            Service service = player.getService();
+            IService proxy = CloudDriver.getInstance().getThisService();
+            IService IService = player.getService();
 
-            if (service == null) {
-                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cUnknown §8«» §a" + proxy.getName());
+            if (IService == null) {
+                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cUnknown §8«» §a" + proxy.getName());
             } else {
-                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§6" + service.getName() + "@" + service.getUniqueId() + " §8«» §a" + proxy.getName());
+                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§6" + IService.getName() + "@" + IService.getUniqueId() + " §8«» §a" + proxy.getName());
 
             }
         }

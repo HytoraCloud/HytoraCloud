@@ -5,8 +5,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.lystx.hytoracloud.bridge.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 import net.kyori.adventure.text.Component;
 
 public class CloudListener implements NetworkHandler {
@@ -29,13 +29,13 @@ public class CloudListener implements NetworkHandler {
                     message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerStartMessage().
                             replace("&", "§").
                             replace("%server%", servername).
-                            replace("%prefix%", CloudDriver.getInstance().getCloudPrefix());
+                            replace("%prefix%", CloudDriver.getInstance().getPrefix());
                     break;
                 case 2:
                     message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerStopMessage().
                             replace("&", "§").
                             replace("%server%", servername).
-                            replace("%prefix%", CloudDriver.getInstance().getCloudPrefix());
+                            replace("%prefix%", CloudDriver.getInstance().getPrefix());
                     break;
                 case 3:
                     return;
@@ -47,18 +47,18 @@ public class CloudListener implements NetworkHandler {
     }
 
     @Override
-    public void onServerStart(Service service) {
-        this.notify(3, service.getName());
+    public void onServerStart(IService IService) {
+        this.notify(3, IService.getName());
     }
 
     @Override
-    public void onServerQueue(Service service) {
-        this.notify(1, service.getName());
+    public void onServerQueue(IService IService) {
+        this.notify(1, IService.getName());
     }
 
     @Override
-    public void onServerStop(Service service) {
-        this.notify(2, service.getName());
+    public void onServerStop(IService IService) {
+        this.notify(2, IService.getName());
     }
 
 }

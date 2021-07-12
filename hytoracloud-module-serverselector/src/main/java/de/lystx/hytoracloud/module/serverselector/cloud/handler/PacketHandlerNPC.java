@@ -31,14 +31,14 @@ public class PacketHandlerNPC implements PacketHandler {
                 JsonEntity vsonObject = new JsonEntity(VsonObject.encode((Map<String, Object>) information.getObjectMap().get("vsonObject")).toJson());
                 this.cloudDriver.getInstance(NPCService.class).append(key, vsonObject);
                 this.cloudDriver.getInstance(NPCService.class).save();
-                this.cloudDriver.getInstance(NPCService.class).load();
+                this.cloudDriver.getInstance(NPCService.class).reload();
                 this.cloudDriver.reload();
             } else if (information.getKey().equalsIgnoreCase("PacketInDeleteNPC")) {
 
                 String key = (String) information.getObjectMap().get("key");
                 this.cloudDriver.getInstance(NPCService.class).remove(key);
                 this.cloudDriver.getInstance(NPCService.class).save();
-                this.cloudDriver.getInstance(NPCService.class).load();
+                this.cloudDriver.getInstance(NPCService.class).reload();
                 this.cloudDriver.reload();
             }
 

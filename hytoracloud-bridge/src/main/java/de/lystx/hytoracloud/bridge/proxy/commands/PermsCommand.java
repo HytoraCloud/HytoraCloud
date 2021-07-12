@@ -1,13 +1,13 @@
 package de.lystx.hytoracloud.bridge.proxy.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 import de.lystx.hytoracloud.driver.utils.utillity.Value;
 
 import java.util.Date;
@@ -24,7 +24,7 @@ public class PermsCommand {
 					try {
 						UUID uniqueId = CloudDriver.getInstance().getPermissionPool().getUUIDByName(args[1]);
 						if (!CloudDriver.getInstance().getPermissionPool().isRegistered(uniqueId)) {
-							player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
+							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 							return;
 						}
 						PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(uniqueId);
@@ -43,12 +43,12 @@ public class PermsCommand {
 						player.sendMessage("§8");
 						player.sendMessage("§8§m--------------------------------------");
 					} catch (Exception e) {
-						player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a §eValid §cUser!");
+						player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a §eValid §cUser!");
 					}
 				} else if (args[0].equalsIgnoreCase("group")) {
 					if (args[1].equalsIgnoreCase("list")) {
 						if (CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups().isEmpty()) {
-							player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThere aren't any groups created!");
+							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere aren't any groups created!");
 							return;
 						}
 						player.sendMessage("§bGroups§8:");
@@ -87,13 +87,13 @@ public class PermsCommand {
 						player.sendMessage("§8");
 						player.sendMessage("§8§m--------------------------------------");
 					} else {
-						player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe group §e" + args[1] + " §cdoesn't exist!");
+						player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + args[1] + " §cdoesn't exist!");
 					}
 				}
 			} else if (args.length == 3) {
 				if (args[0].equalsIgnoreCase("user")) {
 					if (args[2].equalsIgnoreCase("add") || args[2].equalsIgnoreCase("remove")) {
-						player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a permission!");
+						player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a permission!");
 					} else {
 						help(player);
 					}
@@ -108,14 +108,14 @@ public class PermsCommand {
 						try {
 							UUID uniqueId = CloudDriver.getInstance().getPermissionPool().getUUIDByName(args[1]);
 							if (!CloudDriver.getInstance().getPermissionPool().isRegistered(uniqueId)) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the Permissions-Database!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the Permissions-Database!");
 								return;
 							}
 							CloudDriver.getInstance().getPermissionPool().setPermissionToUser(uniqueId, permission, true);
 							CloudDriver.getInstance().getPermissionPool().update();
-							player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You added the permission §b" + permission + " §7 to the player §b" + args[1] + "§8!");
+							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You added the permission §b" + permission + " §7 to the player §b" + args[1] + "§8!");
 						} catch (Exception e) {
-							player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a §evalid Player§c!");
+							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a §evalid Player§c!");
 						}
 
 					} else if (args[2].equalsIgnoreCase("remove")) {
@@ -123,14 +123,14 @@ public class PermsCommand {
 						try {
 							UUID uniqueId = CloudDriver.getInstance().getPermissionPool().getUUIDByName(args[1]);
 							if (!CloudDriver.getInstance().getPermissionPool().isRegistered(uniqueId)) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the Permissions-Database!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the Permissions-Database!");
 								return;
 							}
 							CloudDriver.getInstance().getPermissionPool().setPermissionToUser(uniqueId, permission, false);
 							CloudDriver.getInstance().getPermissionPool().update();
-							player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You removed the permission §b" + permission + " §7 from the player §b" + args[1] + "§8!");
+							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You removed the permission §b" + permission + " §7 from the player §b" + args[1] + "§8!");
 						} catch (Exception e) {
-							player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a §evalid Player§c!");
+							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a §evalid Player§c!");
 						}
 
 
@@ -142,7 +142,7 @@ public class PermsCommand {
 					PermissionPool permissionPool = CloudDriver.getInstance().getPermissionPool();
 					PermissionGroup permissionGroup = permissionPool.getPermissionGroupByName(groupname);
 					if (permissionGroup == null) {
-						player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe group §e" + groupname + " §cdoesn't exist!");
+						player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cdoesn't exist!");
 						return;
 					}
 					if (args[2].equalsIgnoreCase("add")) {
@@ -151,14 +151,14 @@ public class PermsCommand {
 						permissionGroup.addPermission(permission);
 						permissionGroup.update();
 
-						player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You added the permission §b" + permission + " §7to the group §b" + permissionGroup.getName());
+						player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You added the permission §b" + permission + " §7to the group §b" + permissionGroup.getName());
 					} else if (args[2].equalsIgnoreCase("remove")) {
 						String permission = args[3];
 
 						permissionGroup.removePermission(permission);
 						permissionGroup.update();
 
-						player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You removed the permission §b" + permission + " §7from the group §b" + permissionGroup.getName());
+						player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You removed the permission §b" + permission + " §7from the group §b" + permissionGroup.getName());
 					} else {
 						this.help(player);
 					}
@@ -172,20 +172,20 @@ public class PermsCommand {
 							String rang = args[4];
 							PermissionGroup group = CloudDriver.getInstance().getPermissionPool().getPermissionGroupByName(rang);
 							if (group == null) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe group §e" + rang + " §cdoesn't exist!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + rang + " §cdoesn't exist!");
 								return;
 							}
 							UUID uuid = CloudDriver.getInstance().getPermissionPool().getUUIDByName(args[1]);
 							if (uuid == null) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 								return;
 							}
 							if (!CloudDriver.getInstance().getPermissionPool().isRegistered(uuid)) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 								return;
 							}
 							if (!CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups(uuid).contains(group)) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cdoesn't have this rank!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cdoesn't have this rank!");
 								return;
 							}
 
@@ -193,9 +193,9 @@ public class PermsCommand {
 								UUID uniqueId = CloudDriver.getInstance().getPermissionPool().getUUIDByName(args[1]);
 								CloudDriver.getInstance().getPermissionPool().removePermissionGroupFromUser(uniqueId, group);
 								CloudDriver.getInstance().getPermissionPool().update();
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7The player §b" + args[1] + " §7is was removed from group §b" + rang + "§8!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The player §b" + args[1] + " §7is was removed from group §b" + rang + "§8!");
 							} catch (Exception e) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a §eValid User§c!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a §eValid User§c!");
 							}
 
 						} else {
@@ -213,27 +213,27 @@ public class PermsCommand {
 						if (args[3].equalsIgnoreCase("add")) {
 							String rang = args[4];
 							if (CloudDriver.getInstance().getPermissionPool().getPermissionGroupByName(rang) == null) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe group §e" + rang + " §cdoesn't exist!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + rang + " §cdoesn't exist!");
 								return;
 							}
 							UUID uuid = CloudDriver.getInstance().getPermissionPool().getUUIDByName(args[1]);
 							if (uuid == null) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 								return;
 							}
 							if (!CloudDriver.getInstance().getPermissionPool().isRegistered(uuid)) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 								return;
 							}
 							if (CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups(uuid).contains(CloudDriver.getInstance().getPermissionPool().getPermissionGroupByName(rang))) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[1] + " §calready has this rank!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §calready has this rank!");
 								return;
 							}
 							String data = args[5];
 							int time;
 							PermissionValidity validity = PermissionValidity.formatValidity(data);
 							if (validity == null) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a valid timespan like §e1d §cor §e1y §cor §e1min§c!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a valid timespan like §e1d §cor §e1y §cor §e1min§c!");
 								return;
 							} else if (validity == PermissionValidity.LIFETIME) {
 								time = -1;
@@ -245,10 +245,10 @@ public class PermsCommand {
 								UUID uniqueId = CloudDriver.getInstance().getPermissionPool().getUUIDByName(args[1]);
 								CloudDriver.getInstance().getPermissionPool().addPermissionGroupToUser(uniqueId, CloudDriver.getInstance().getPermissionPool().getPermissionGroupByName(rang), time, validity);
 								CloudDriver.getInstance().getPermissionPool().update();
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7The player §b" + args[1] + " §7is now member of group §b" + rang + " §8[§b" + validity.name() + "§8]");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The player §b" + args[1] + " §7is now member of group §b" + rang + " §8[§b" + validity.name() + "§8]");
 
 							} catch (Exception e) {
-								player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a §eValid User§c!");
+								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a §eValid User§c!");
 							}
 						} else {
 							help(player);
@@ -263,7 +263,7 @@ public class PermsCommand {
 				help(player);
 			}
 		} else {
-			player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cYou aren't allowed to perform this command!");
+			player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");
 		}
 	  }
 

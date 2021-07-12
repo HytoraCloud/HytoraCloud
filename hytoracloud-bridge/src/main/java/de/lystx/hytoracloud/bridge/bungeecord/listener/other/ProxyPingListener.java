@@ -7,10 +7,10 @@ import java.util.stream.IntStream;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.events.network.DriverEventNetworkPing;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.Motd;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
@@ -34,7 +34,7 @@ public class ProxyPingListener implements Listener {
             int port = event.getConnection().getVirtualHost().getPort();
             ServerPing ping = event.getResponse();
 
-            ProxyConfig proxyConfig = CloudDriver.getInstance().getThisService().getServiceGroup().getProperties().has("proxyConfig") ? CloudDriver.getInstance().getThisService().getServiceGroup().getProperties().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
+            ProxyConfig proxyConfig = CloudDriver.getInstance().getThisService().getGroup().getProperties().has("proxyConfig") ? CloudDriver.getInstance().getThisService().getGroup().getProperties().toDocument().getObject("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
             if (!proxyConfig.isEnabled()) {
                 return;
             }
@@ -88,11 +88,11 @@ public class ProxyPingListener implements Listener {
     }
 
     public String replace(String string, int port) {
-        Service service = CloudDriver.getInstance().getServiceManager().getProxy(port);
+        IService IService = CloudDriver.getInstance().getServiceManager().getProxy(port);
         return string
                 .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getProxyConfig().getMaxPlayers()))
                 .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size()))
-                .replace("%proxy%", service == null ? "no_proxy_available" : service.getName())
-                .replace("%maintenance%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().isMaintenance()));
+                .replace("%proxy%", IService == null ? "no_proxy_available" : IService.getName())
+                .replace("%maintenance%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().isMaintenance()));
     }
 }

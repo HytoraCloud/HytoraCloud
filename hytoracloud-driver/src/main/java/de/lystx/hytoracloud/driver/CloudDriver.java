@@ -13,43 +13,43 @@ import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestModules;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestStatistics;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.service.managing.event.service.IEventService;
-import de.lystx.hytoracloud.driver.service.global.main.DefaultServiceRegistry;
-import de.lystx.hytoracloud.driver.service.global.main.IServiceRegistry;
-import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.Fallback;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.global.config.stats.Statistics;
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.managing.database.IDatabaseManager;
-import de.lystx.hytoracloud.driver.service.cloud.module.Module;
-import de.lystx.hytoracloud.driver.service.cloud.module.ModuleInfo;
-import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
-import de.lystx.hytoracloud.driver.service.other.IBukkit;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.service.managing.player.featured.inventory.CloudPlayerInventory;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.cloud.server.IServiceManager;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.IEventService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.DefaultServiceRegistry;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.IServiceRegistry;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.Statistics;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabaseManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleInfo;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.other.IBukkit;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.log.Loggers;
 import de.lystx.hytoracloud.driver.utils.minecraft.TicksPerSecond;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
 import de.lystx.hytoracloud.driver.utils.utillity.CloudRunnable;
 import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
-import de.lystx.hytoracloud.driver.service.global.config.impl.MessageConfig;
-import de.lystx.hytoracloud.driver.service.managing.event.service.DefaultEventService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.MessageConfig;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventService;
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.managing.event.base.CloudEvent;
-import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.cloud.lib.LibraryService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
+import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.lib.LibraryService;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -187,6 +187,12 @@ public class CloudDriver {
     private final IEventService eventService;
 
     /**
+     * The current network config
+     */
+    @Getter @Setter
+    private NetworkConfig networkConfig;
+
+    /**
      * Used to execute tasks
      */
     @Getter
@@ -234,11 +240,14 @@ public class CloudDriver {
         this.implementedData = new CloudMap<>();
 
         this.permissionPool = new PermissionPool();
-        this.implementedData.put("networkConfig", NetworkConfig.defaultConfig());
+        this.networkConfig = NetworkConfig.defaultConfig();
+
+        CloudDriver.getInstance().getServiceRegistry().registerService(new FileService());
+        FileService instance = this.getInstance(FileService.class);
 
         //Check for libraries and colored console
         if (driverType.equals(CloudType.RECEIVER) || driverType.equals(CloudType.CLOUDSYSTEM) || driverType.equals(CloudType.NONE)) {
-            this.libraryService = new LibraryService(new File("./local/libs/"), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.libraryService = new LibraryService(instance.getLibraryDirectory(), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.libraryService.installDefaultLibraries();
             AnsiConsole.systemInstall();
 
@@ -246,12 +255,11 @@ public class CloudDriver {
             Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
             loggers.disable();
         } else {
-            this.libraryService = new LibraryService(new File("../../../../../libs/"), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
+            this.libraryService = new LibraryService(new File("../../../../../global/libs/"), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.libraryService.installDefaultLibraries();
         }
 
         //Register Default-Services
-        CloudDriver.getInstance().getServiceRegistry().registerService(new FileService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new Scheduler());
         CloudDriver.getInstance().getServiceRegistry().registerService(new DefaultEventService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new CommandService());
@@ -295,6 +303,7 @@ public class CloudDriver {
      *
      * @param cloudEvent the event to call
      */
+    //TODO: CHECK EVENTS
     public boolean callEvent(CloudEvent cloudEvent) {
         if (this.connection != null) {
             this.connection.sendPacket(new PacketCallEvent(cloudEvent));
@@ -381,6 +390,16 @@ public class CloudDriver {
     public void sendPacket(HytoraPacket packet) {
         this.sendPacket(packet,  null);
     }
+
+    /**
+     * Sends a networking {@link Component}
+     *
+     * @param component the component
+     */
+    public void sendComponent(Component component) {
+        this.connection.sendComponent(component);
+    }
+
     /**
      * Sends a packet with a consumer
      * @param packet the packet to send
@@ -445,19 +464,19 @@ public class CloudDriver {
     private String chatFormat;
 
     /**
-     * Returns the current {@link Service} the Driver is running on
+     * Returns the current {@link IService} the Driver is running on
      * might be Lobby or Proxy whatever
      *
      * @return service
      */
-    public Service getThisService() {
+    public IService getThisService() {
         JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
 
         return this.serviceManager.getService(jsonEntity.getString("server"));
     }
 
     /**
-     * Gets the Host for {@link Service}s to connect to
+     * Gets the Host for {@link IService}s to connect to
      *
      * @return inetAddress
      */
@@ -483,7 +502,7 @@ public class CloudDriver {
             throw new UnsupportedOperationException("Not available for " + driverType + "!");
         }
 
-        return CloudDriver.getInstance().getThisService().getServiceGroup().getProperties().get("proxyConfig", ProxyConfig.class);
+        return CloudDriver.getInstance().getThisService().getGroup().getProperties().get("proxyConfig", ProxyConfig.class);
     }
 
     /*
@@ -506,26 +525,11 @@ public class CloudDriver {
     }
 
     /**
-     * Returns the {@link NetworkConfig}
-     *
-     * @return config
-     */
-    public NetworkConfig getNetworkConfig() {
-        NetworkConfig networkConfig;
-        if (driverType == CloudType.BRIDGE || driverType == CloudType.RECEIVER) {
-            networkConfig = implementedData.getObject("networkConfig", NetworkConfig.class);
-        } else {
-            networkConfig = this.getInstance(ConfigService.class).getNetworkConfig();
-        }
-        return networkConfig;
-    }
-
-    /**
      * Returns the Cloud prefix from the {@link MessageConfig}
      *
      * @return string prefix
      */
-    public String getCloudPrefix() {
+    public String getPrefix() {
         if (this.getNetworkConfig() == null) {
             return "§8[§cNullCloud§8]";
         }
@@ -688,11 +692,11 @@ public class CloudDriver {
     /**
      * Copies a server into a specific Template
      *
-     * @param service the service to copy
+     * @param IService the service to copy
      * @param template the template to copy it to
      */
-    public void copyTemplate(Service service, String template) {
-        this.copyTemplate(service, template, null);
+    public void copyTemplate(IService IService, String template) {
+        this.copyTemplate(IService, template, null);
     }
 
     /**
@@ -700,19 +704,19 @@ public class CloudDriver {
      * but it only copies a specific folder like "world"
      * or the "plugins" folder or "plugins/YourFolder"
      *
-     * @param service the service
+     * @param IService the service
      * @param template the template
      * @param specificDirectory a specific directory
      */
-    public void copyTemplate(Service service, String template, String specificDirectory) {
+    public void copyTemplate(IService IService, String template, String specificDirectory) {
         if (driverType == CloudType.BRIDGE) {
-            PacketInCopyTemplate packetInCopyTemplate = new PacketInCopyTemplate(service, template, specificDirectory);
+            PacketInCopyTemplate packetInCopyTemplate = new PacketInCopyTemplate(IService, template, specificDirectory);
             this.sendPacket(packetInCopyTemplate);
             return;
         }
         TemplateService instance = getInstance(TemplateService.class);
 
-        instance.copy(service, template, specificDirectory);
+        instance.copy(IService, template, specificDirectory);
     }
 
     /**
@@ -721,7 +725,7 @@ public class CloudDriver {
      * @param group the group to copy
      * @param template the template
      */
-    public void createTemplate(ServiceGroup group, String template) {
+    public void createTemplate(IServiceGroup group, String template) {
         if (driverType == CloudType.BRIDGE) {
             PacketInCreateTemplate packetInCreateTemplate = new PacketInCreateTemplate(group, template);
             this.sendPacket(packetInCreateTemplate);
@@ -747,7 +751,7 @@ public class CloudDriver {
     public boolean isFallback(CloudPlayer player) {
         List<Fallback> fallbacks = this.getFallbacks(player);
         for (Fallback fallback : fallbacks) {
-            if (player.getService().getServiceGroup().getName().equalsIgnoreCase(fallback.getGroupName())) {
+            if (player.getService().getGroup().getName().equalsIgnoreCase(fallback.getGroupName())) {
                 return true;
             }
         }
@@ -756,22 +760,22 @@ public class CloudDriver {
 
 
     /**
-     * Returns {@link Service} of
+     * Returns {@link IService} of
      * Fallback for {@link CloudPlayer}
      *
      * @param player the player
      * @return fallback for player
      */
-    public Service getFallback(CloudPlayer player) {
+    public IService getFallback(CloudPlayer player) {
         try {
             Fallback fallback = this.getHighestFallback(player);
-            Service service;
+            IService IService;
             try {
-                service = CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
+                IService = CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
             } catch (Exception e){
-                service = CloudDriver.getInstance().getServiceManager().getService(fallback.getGroupName() + "-1");
+                IService = CloudDriver.getInstance().getServiceManager().getService(fallback.getGroupName() + "-1");
             }
-            return service;
+            return IService;
         } catch (NullPointerException e) {
             return null;
         }

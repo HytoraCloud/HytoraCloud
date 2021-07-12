@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.listener;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import org.bukkit.Material;
@@ -31,7 +31,7 @@ public class PlayerSignListener implements Listener {
         CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
         if (cloudPlayer == null) {
             player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getErrorMessage().replace("&", "§").replace("%error%",
-                    "You couldn't be found in global CloudPlayer list! Either rejoin or notify a server Administrator or a Cloud Administrator!").replace("%prefix%", CloudDriver.getInstance().getCloudPrefix()));
+                    "You couldn't be found in global CloudPlayer list! Either rejoin or notify a server Administrator or a Cloud Administrator!").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -39,12 +39,12 @@ public class PlayerSignListener implements Listener {
             if (cloudSign == null) {
                 return;
             }
-            Service meta = SpigotSelector.getInstance().getSignManager().getSignUpdater().getService(cloudSign);
+            IService meta = SpigotSelector.getInstance().getSignManager().getSignUpdater().getService(cloudSign);
             if (meta == null) {
                 return;
             }
             if (meta.getName().equalsIgnoreCase(CloudDriver.getInstance().getThisService().getName())) {
-                player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getCloudPrefix()));
+                player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 return;
             }
             cloudPlayer.connect(meta);

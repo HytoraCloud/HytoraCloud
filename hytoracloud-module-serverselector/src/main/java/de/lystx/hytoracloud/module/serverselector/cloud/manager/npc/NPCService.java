@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.module.serverselector.cloud.ModuleSelector;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -46,7 +46,7 @@ public class NPCService implements ICloudService {
 
     @SneakyThrows
     public NPCService() {
-        this.load();
+        this.reload();
 
 
 
@@ -59,7 +59,7 @@ public class NPCService implements ICloudService {
     /**
      * Loads config and all NPCs
      */
-    public void load() {
+    public void reload() {
         try {
             this.jsonEntity = new JsonEntity(npcFile);
             this.config = new JsonEntity(npcLayout);
@@ -111,7 +111,7 @@ public class NPCService implements ICloudService {
      */
     @SneakyThrows
     public NPCConfig getNPCConfig() {
-        this.load();
+        this.reload();
         JsonArray jsonArray = this.config.getArray("items");
         List<PropertyObject> vsonObjects = new LinkedList<>();
         for (JsonElement jsonElement : jsonArray) {

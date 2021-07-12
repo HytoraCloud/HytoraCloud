@@ -4,11 +4,11 @@ import com.sun.management.OperatingSystemMXBean;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
 import org.bukkit.*;
@@ -32,7 +32,7 @@ public class ServiceCommand {
                     if (args[0].equalsIgnoreCase("info")) {
                         if (!this.executed) {
                             this.executed = true;
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7Loading §bService Infos§8...");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Loading §bService Infos§8...");
                             CloudDriver.getInstance().getModules(); //Requesting Modules to load
                         }
                         long used = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
@@ -41,13 +41,13 @@ public class ServiceCommand {
                         player.sendMessage("§bCloudService Info§8:");
                         player.sendMessage("§8§m--------------------------------------");
                         player.sendMessage("  §8» §bServer §8┃ §7" + CloudDriver.getInstance().getThisService().getName());
-                        player.sendMessage("  §8» §bState §8┃ §7" + CloudDriver.getInstance().getThisService().getServiceState().getColor() + CloudDriver.getInstance().getThisService().getServiceState());
-                        player.sendMessage("  §8» §bID §8┃ §7" + CloudDriver.getInstance().getThisService().getServiceID());
+                        player.sendMessage("  §8» §bState §8┃ §7" + CloudDriver.getInstance().getThisService().getState().getColor() + CloudDriver.getInstance().getThisService().getState());
+                        player.sendMessage("  §8» §bID §8┃ §7" + CloudDriver.getInstance().getThisService().getId());
                         player.sendMessage("  §8» §bUUID §8┃ §7" + CloudDriver.getInstance().getThisService().getUniqueId());
                         player.sendMessage("  §8» §bPort §8┃ §7" + CloudDriver.getInstance().getThisService().getPort());
                         player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudDriver.getInstance().getConnection().remoteAddress().toString());
                         player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudDriver.getInstance().getHost());
-                        player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getThisService().getServiceGroup().getTemplate().getName());
+                        player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getThisService().getGroup().getTemplate().getName());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
                         player.sendMessage("  §8» §bInternal CPU Usage §8┃ §7" + format);
                         PropertyObject properties = CloudDriver.getInstance().getThisService().getProperties();
@@ -58,12 +58,12 @@ public class ServiceCommand {
                         }
                         player.sendMessage("§8§m--------------------------------------");
                     } else if (args[0].equalsIgnoreCase("removeSign")) {
-                        if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThis is not a Lobby server!");
+                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
                         if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
                             return;
                         }
                         Set<Material> materials = new HashSet<>();
@@ -78,30 +78,30 @@ public class ServiceCommand {
 
                             CloudDriver.getInstance().sendPacket(packetInformation);
                         } else {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe block you are looking at, is not a sign!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
                         }
                     } else if (args[0].equalsIgnoreCase("removeNPC")) {
                         if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
                             return;
                         }
-                        if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThis is not a Lobby server!");
+                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
                         if (CloudDriver.getInstance().getBukkit().isNewVersion()) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cNPCs are not supported on version §e" + CloudDriver.getInstance().getBukkit().getVersion() + "§c!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + CloudDriver.getInstance().getBukkit().getVersion() + "§c!");
                             return;
                         }
 
                         List<UUID> uuidList = CloudDriver.getInstance().getImplementedData().getList("uuidList", UUID.class);
                         if (!uuidList.contains(player.getUniqueId())) {
                             uuidList.add(player.getUniqueId());
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7Leftclick the §bNPC §7you want to remove§8! §cTo cancel type this command §eagain§c!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Leftclick the §bNPC §7you want to remove§8! §cTo cancel type this command §eagain§c!");
                         } else {
                             uuidList.remove(player.getUniqueId());
 
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cDeletion was §ecancelled§c!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cDeletion was §ecancelled§c!");
                         }
                         CloudDriver.getInstance().getImplementedData().put("uuidList", uuidList);
                     } else {
@@ -109,16 +109,16 @@ public class ServiceCommand {
                     }
                 } else if (args.length == 2) {
                     if (args[0].equalsIgnoreCase("createSign")) {
-                        if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThis is not a Lobby server!");
+                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
                         if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
                             return;
                         }
                         String serverGroup = args[1];
-                        ServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(serverGroup);
+                        IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(serverGroup);
                         if (group != null) {
                             Set<Material> materials = new HashSet<>();
                             materials.add(Material.AIR);
@@ -134,10 +134,10 @@ public class ServiceCommand {
                                 CloudDriver.getInstance().sendPacket(packetInformation);
 
                             } else {
-                                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe block you are looking at, is not a sign!");
+                                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
                             }
                         } else {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe group §e" + serverGroup + " §cdoesn't exist!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + serverGroup + " §cdoesn't exist!");
                         }
                     } else if (args[0].equalsIgnoreCase("setState")) {
                         String name = args[1];
@@ -149,29 +149,29 @@ public class ServiceCommand {
                             }
                         }
                         if (!cont) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cPlease provide a valid §eServiceState§c!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a valid §eServiceState§c!");
                             return;
                         }
                         ServiceState state = ServiceState.valueOf(name.toUpperCase());
 
                         CloudDriver.getInstance().getBukkit().setServiceState(state);
                         CloudDriver.getInstance().getBukkit().update();
-                        player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You set the ServiceState of this service to " + state.getColor() + state.name());
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You set the ServiceState of this service to " + state.getColor() + state.name());
                     } else {
                         this.help(player);
                     }
                 } else if (args.length == 4) {
                     if (args[0].equalsIgnoreCase("createNPC")) {
-                        if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThis is not a Lobby server!");
+                        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
                         if (CloudDriver.getInstance().getBukkit().isNewVersion()) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
                             return;
                         }
                         if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
                             return;
                         }
                         String groupName = args[1];
@@ -194,7 +194,7 @@ public class ServiceCommand {
                     this.help(player);
                 }
             } else {
-                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cYou aren't allowed to perform this command!");
+                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");
             }
         }
     }

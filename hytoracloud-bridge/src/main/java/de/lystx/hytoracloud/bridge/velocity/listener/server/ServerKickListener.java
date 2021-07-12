@@ -6,8 +6,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.lystx.hytoracloud.bridge.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 
 public class ServerKickListener {
 
@@ -22,7 +22,7 @@ public class ServerKickListener {
                 return;
             }
             event.setResult(() -> false);
-            Service highestFallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+            IService highestFallback = CloudDriver.getInstance().getFallback(cloudPlayer);
             player.createConnectionRequest(VelocityBridge.getInstance().getServer().getServer(highestFallback.getName()).orElse(null)).connect();
 
         } catch (NullPointerException e) {

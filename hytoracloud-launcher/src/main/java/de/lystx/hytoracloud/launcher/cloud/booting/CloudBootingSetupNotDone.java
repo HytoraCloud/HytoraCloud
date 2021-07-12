@@ -6,28 +6,26 @@ import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.service.Template;
-import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.managing.database.DatabaseType;
-import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.managing.permission.PermissionService;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
+import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.CloudSetup;
 import de.lystx.hytoracloud.launcher.global.impl.setup.DatabaseSetup;
-import de.lystx.hytoracloud.driver.service.other.Updater;
+import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.utillity.Action;
 import de.lystx.hytoracloud.driver.utils.utillity.Value;
-import io.vson.elements.object.VsonObject;
-import io.vson.enums.VsonSettings;
 
 import java.io.File;
 import java.util.UUID;
@@ -71,7 +69,7 @@ public class CloudBootingSetupNotDone {
             ProxyConfig config = ProxyConfig.defaultConfig();
             config.setMaxPlayers(setup.getMaxPlayers());
 
-            cloudSystem.getInstance(GroupService.class).createGroup(new ServiceGroup(
+            cloudSystem.getInstance(GroupService.class).createGroup(new ServiceGroupObject(
                     UUID.randomUUID(),
                     "Bungee",
                     new Template("Bungee", "default", true),
@@ -80,7 +78,6 @@ public class CloudBootingSetupNotDone {
                     -1,
                     1,
                     512,
-                    128,
                     50,
                     100,
                     false,
@@ -90,7 +87,7 @@ public class CloudBootingSetupNotDone {
             ));
 
 
-            cloudSystem.getInstance(GroupService.class).createGroup(new ServiceGroup(
+            cloudSystem.getInstance(GroupService.class).createGroup(new ServiceGroupObject(
                     UUID.randomUUID(),
                     "Lobby",
                     new Template("Lobby", "default", true),
@@ -100,7 +97,6 @@ public class CloudBootingSetupNotDone {
                     1,
                     512,
                     128,
-                    50,
                     100,
                     false,
                     true,

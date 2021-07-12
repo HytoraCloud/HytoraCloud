@@ -3,10 +3,10 @@ package de.lystx.hytoracloud.bridge.proxy.commands;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.global.config.stats.Statistics;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.Statistics;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import lombok.SneakyThrows;
 
 import java.text.DecimalFormat;
@@ -41,10 +41,10 @@ public class NetworkCommand {
             player.sendMessage("  §8➜ §bCommands §8┃ §7" + statistics.getStats().get("executedCommands").intValue());
             player.sendMessage("  §8➜ §bBooted §8┃ §7" + statistics.getStats().get("bootedUp").intValue());
             player.sendMessage("  §8➜ §bCPU Average §8┃ §7" + new DecimalFormat("##.##").format(((statistics.getStats().get("bootedUp") * 2) / statistics.getStats().get("allCPUUsage")) * 100));
-            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudDriver.getInstance().getResponse(new PacketRequestCloudTPS()).getMessage());
+            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudDriver.getInstance().getResponse(new PacketRequestCloudTPS()).reply().getMessage());
             player.sendMessage("§8§m--------------------------------------");
         } else {
-            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cYou aren't allowed to perform this command!");
+            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");
         }
     }
 }

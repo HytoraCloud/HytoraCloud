@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.bukkit.impl.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
@@ -16,8 +16,8 @@ public class BukkitHandlerGroupUpdate implements PacketHandler {
         if (packet instanceof PacketInUpdateServiceGroup) {
 
             PacketInUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketInUpdateServiceGroup) packet;
-            ServiceGroup group = CloudDriver.getInstance().getThisService().getServiceGroup();
-            ServiceGroup newGroup = packetPlayOutUpdateServiceGroup.getServiceGroup();
+            IServiceGroup group = CloudDriver.getInstance().getThisService().getGroup();
+            IServiceGroup newGroup = packetPlayOutUpdateServiceGroup.getIServiceGroup();
 
             if (newGroup.getName().equalsIgnoreCase(group.getName())) {
                 if (newGroup.isMaintenance()) {
@@ -25,7 +25,7 @@ public class BukkitHandlerGroupUpdate implements PacketHandler {
                         if (onlinePlayer.hasPermission("cloudsystem.group.maintenance")) {
                             continue;
                         }
-                        onlinePlayer.kickPlayer(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getCloudPrefix())
+                        onlinePlayer.kickPlayer(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix())
                                 .replace("%group%", group.getName()));
                     }
                 }

@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.events.player.permissions;
 
-import de.lystx.hytoracloud.driver.service.managing.event.base.CloudEvent;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

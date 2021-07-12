@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 
 
 public interface NetworkHandler {
@@ -11,45 +11,45 @@ public interface NetworkHandler {
     /**
      * Called when a service is connected
      *
-     * @param service the started service
+     * @param IService the started service
      */
-    default void onServerStart(Service service) {}
+    default void onServerStart(IService IService) {}
 
 
     /**
      * Called when a service is registered
      *
-     * @param service the registered service
+     * @param IService the registered service
      */
-    default void onServerRegister(Service service) {}
+    default void onServerRegister(IService IService) {}
 
     /**
      * Called when service is queued
      *
-     * @param service the queued service
+     * @param IService the queued service
      */
-    default void onServerQueue(Service service) {}
+    default void onServerQueue(IService IService) {}
 
     /**
      * Called when service stops
      *
-     * @param service the stopped service
+     * @param IService the stopped service
      */
-    default void onServerStop(Service service) {}
+    default void onServerStop(IService IService) {}
 
     /**
      * Called when service updates
      *
-     * @param service the updated service
+     * @param IService the updated service
      */
-    default void onServerUpdate(Service service) {}
+    default void onServerUpdate(IService IService) {}
 
     /**
      * Called when group updates
      *
      * @param group the updated group
      */
-    default void onGroupUpdate(ServiceGroup group) {}
+    default void onGroupUpdate(IServiceGroup group) {}
 
     /**
      * Called when player joins network

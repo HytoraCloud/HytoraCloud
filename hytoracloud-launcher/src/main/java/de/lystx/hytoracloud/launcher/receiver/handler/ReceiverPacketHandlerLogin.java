@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 
 import de.lystx.hytoracloud.driver.commons.enums.other.Decision;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class ReceiverPacketHandlerLogin implements PacketHandler {
                     this.receiver.getParent().getConsole().getLogger().sendMessage("NETWORK", "§cThere is already a Receiver with the name §e" + packetReceiverLoginResult.getReceiverInfo().getName() + " §cconnected to the CloudSystem!");
                 } else if (packetReceiverLoginResult.getDecision().equals(Decision.TRUE)) {
                     this.receiver.getParent().getConsole().getLogger().sendMessage("NETWORK", "§aSuccessfully connected to CloudSystem with right key");
-                    this.receiver.getServiceRegistry().registerService(new DefaultServiceManager(packetReceiverLoginResult.getServiceGroups()));
+                    this.receiver.getServiceRegistry().registerService(new DefaultServiceManager(packetReceiverLoginResult.getIServiceGroups()));
                 } else if (packetReceiverLoginResult.getDecision().equals(Decision.FALSE)) {
                     this.receiver.getParent().getConsole().getLogger().sendMessage("NETWORK", "§cThe provided §ekey §cwas §ewrong §cconnection refused!");
                 } else if (packetReceiverLoginResult.getDecision().equals(Decision.MAYBE)) {

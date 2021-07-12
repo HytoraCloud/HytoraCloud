@@ -7,7 +7,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.bridge.proxy.handler.*;
 import de.lystx.hytoracloud.bridge.velocity.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.velocity.listener.player.*;
 import de.lystx.hytoracloud.bridge.velocity.listener.other.ProxyPingListener;
@@ -20,9 +19,9 @@ import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 
 
 
@@ -139,7 +138,7 @@ public class VelocityBridge {
                     }
 
                     CloudPlayer cloudPlayer = CloudPlayer.dummy(player.getUsername(), player.getUniqueId());
-                    Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+                    IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
 
                     server.getServer(fallback.getName()).ifPresent(registeredServer -> player.createConnectionRequest(registeredServer).connect());
 
@@ -169,9 +168,9 @@ public class VelocityBridge {
                 }
 
                 @Override
-                public void stopServer(Service service) {
+                public void stopServer(IService IService) {
 
-                    RegisteredServer registeredServer = server.getServer(service.getName()).orElse(null);
+                    RegisteredServer registeredServer = server.getServer(IService.getName()).orElse(null);
                     if (registeredServer == null) {
                         return;
                     }
@@ -199,18 +198,20 @@ public class VelocityBridge {
                 }
 
                 @Override
-                public void registerService(Service service) {
+                public void registerService(IService IService) {
 
                     //Proxy's do not need to be registered
-                    if (service.getServiceGroup().getServiceType().isProxy()) {
+                    if (IService.getGroup().getType().isProxy()) {
                         return;
                     }
 
                     //Server not already registered
-                    if (server.getServer(service.getName()).orElse(null) == null) {
-                        ServerInfo serverInfo = new ServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()));
+                    if (server.getServer(IService.getName()).orElse(null) == null) {
+                        ServerInfo serverInfo = new ServerInfo(IService.getName(), new InetSocketAddress(IService.getHost(), IService.getPort()));
                         server.registerServer(serverInfo);
+
                     }
+
 
                 }
 

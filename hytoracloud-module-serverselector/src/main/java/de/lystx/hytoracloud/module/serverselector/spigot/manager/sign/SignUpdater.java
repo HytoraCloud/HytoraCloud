@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.module.serverselector.spigot.manager.sign;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
@@ -35,7 +35,7 @@ public class SignUpdater {
 
     private final ServerPinger serverPinger;
     private final Map<String , Map<Integer, CloudSign>> freeSigns;
-    private final Map<CloudSign, Service> cloudSigns;
+    private final Map<CloudSign, IService> cloudSigns;
 
     private int animationsTick = 0;
     private int animationScheduler;
@@ -64,7 +64,7 @@ public class SignUpdater {
     /**
      * Iterates through all
      * online services
-     * and executes the {@link SignUpdater#update(Service)} Method
+     * and executes the {@link SignUpdater#update(IService)} Method
      * Also increases the animationsTick by 1 until its max
      * then resets it to 0
      */
@@ -75,10 +75,10 @@ public class SignUpdater {
             this.freeSigns.clear();
             this.cloudSigns.clear();
 
-            for (ServiceGroup globalServerGroup : CloudDriver.getInstance().getServiceManager().getServiceGroups()) {
-                for (Service service : CloudDriver.getInstance().getServiceManager().getServices(globalServerGroup)) {
-                    if (!service.getServiceState().equals(ServiceState.INGAME) && !service.getServiceState().equals(ServiceState.OFFLINE)) {
-                        this.update(service);
+            for (IServiceGroup globalServerGroup : CloudDriver.getInstance().getServiceManager().getServiceGroups()) {
+                for (IService IService : CloudDriver.getInstance().getServiceManager().getServices(globalServerGroup)) {
+                    if (!IService.getState().equals(ServiceState.INGAME) && !IService.getState().equals(ServiceState.OFFLINE)) {
+                        this.update(IService);
                     }
                 }
             }
@@ -95,36 +95,36 @@ public class SignUpdater {
     }
 
     /**
-     * Updates Sign for a single {@link Service}
+     * Updates Sign for a single {@link IService}
      * @param current > Service to update
      */
-    public void update(Service current) {
-        if (current.getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+    public void update(IService current) {
+        if (current.getGroup().getType().equals(ServiceType.PROXY)) {
             //Proxys do not have signs
             return;
         }
 
-        SignGroup signGroup = this.createSignGroup(current.getServiceGroup().getName());
+        SignGroup signGroup = this.createSignGroup(current.getGroup().getName());
         if (signGroup == null) {
             CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getThisService().getName(), "SignSystem didnt find any signs!", false);
             return;
         }
         Map<Integer, CloudSign> signs = signGroup.getCloudSignHashMap();
 
-        CloudSign cloudSign = signs.get(current.getServiceID());
+        CloudSign cloudSign = signs.get(current.getId());
         cloudSigns.put(cloudSign, current);
 
-        if (this.freeSigns.containsKey(current.getServiceGroup().getName())) {
-            Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(current.getServiceGroup().getName());
-            onlineSigns.put(current.getServiceID(), cloudSign);
-            this.freeSigns.replace(current.getServiceGroup().getName(), onlineSigns);
+        if (this.freeSigns.containsKey(current.getGroup().getName())) {
+            Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(current.getGroup().getName());
+            onlineSigns.put(current.getId(), cloudSign);
+            this.freeSigns.replace(current.getGroup().getName(), onlineSigns);
         } else {
             Map<Integer, CloudSign> onlineSins = new HashMap<>();
-            onlineSins.put(current.getServiceID(), cloudSign);
-            this.freeSigns.put(current.getServiceGroup().getName(), onlineSins);
+            onlineSins.put(current.getId(), cloudSign);
+            this.freeSigns.put(current.getGroup().getName(), onlineSins);
         }
 
-        this.setOfflineSigns(current.getServiceGroup().getName(), current, this.freeSigns); //Sets offline signs for current group
+        this.setOfflineSigns(current.getGroup().getName(), current, this.freeSigns); //Sets offline signs for current group
 
         if (cloudSign != null) {
             Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()), cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
@@ -180,10 +180,10 @@ public class SignUpdater {
      * Sets the offline signs
      * and updates them
      * @param group
-     * @param service
+     * @param IService
      * @param freeSigns
      */
-    public void setOfflineSigns(String group, Service service, Map<String, Map<Integer, CloudSign>> freeSigns) {
+    public void setOfflineSigns(String group, IService IService, Map<String, Map<Integer, CloudSign>> freeSigns) {
         this.getOfflineSigns(group, freeSigns).forEach(cloudSign -> {
             Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
             if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
@@ -197,8 +197,8 @@ public class SignUpdater {
 
             Sign sign = (Sign) blockAt.getState();
             if (CloudDriver.getInstance().getServiceManager().getServiceGroup(group) != null && CloudDriver.getInstance().getServiceManager().getServiceGroup(group).isMaintenance()) {
-                this.cloudSigns.put(cloudSign, service);
-                this.signUpdate(sign, service, null);
+                this.cloudSigns.put(cloudSign, IService);
+                this.signUpdate(sign, IService, null);
                 return;
             }
             VsonArray array = SpigotSelector.getInstance().getSignManager().getSignLayOut().getOfflineLayOut();
@@ -210,7 +210,7 @@ public class SignUpdater {
                 jsonObject = (VsonObject) array.get(animationsTick);
             }
             for (int i = 0; i != 4; i++) {
-                sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).asString(), service, null));
+                sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).asString(), IService, null));
             }
             sign.update(true);
             Bukkit.getScheduler().runTask(SpigotSelector.getInstance(), () ->  this.setBlock(sign.getLocation(), ServiceState.OFFLINE));
@@ -239,8 +239,8 @@ public class SignUpdater {
             List<CloudSign> offlineSigns = new ArrayList<>();
             for (Integer count : allSigns) {
                 CloudSign sign = this.createSignGroup(name).getCloudSignHashMap().get(count);
-                Service s = CloudDriver.getInstance().getServiceManager().getService(sign.getGroup() + "-" + count);
-                if (s == null || s.getServiceState().equals(ServiceState.INGAME) || s.getServiceState().equals(ServiceState.OFFLINE)) {
+                IService s = CloudDriver.getInstance().getServiceManager().getService(sign.getGroup() + "-" + count);
+                if (s == null || s.getState().equals(ServiceState.INGAME) || s.getState().equals(ServiceState.OFFLINE)) {
                     offlineSigns.add(sign);
                 }
             }
@@ -252,16 +252,16 @@ public class SignUpdater {
     /**
      * Updates a Sign
      * @param sign
-     * @param service
+     * @param IService
      * @param serverPinger
      */
-    public void signUpdate(Sign sign, Service service, ServerPinger serverPinger) {
+    public void signUpdate(Sign sign, IService IService, ServerPinger serverPinger) {
         VsonObject jsonObject;
         ServiceState state ;
-        if (service.getServiceState().equals(ServiceState.MAINTENANCE) || service.getServiceGroup().isMaintenance()) {
+        if (IService.getState().equals(ServiceState.MAINTENANCE) || IService.getGroup().isMaintenance()) {
             jsonObject = SpigotSelector.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
             state = ServiceState.MAINTENANCE;
-        } else if (service.getServiceState().equals(ServiceState.FULL) || serverPinger.getPlayers() >= serverPinger.getMaxplayers()) {
+        } else if (IService.getState().equals(ServiceState.FULL) || serverPinger.getPlayers() >= serverPinger.getMaxplayers()) {
             jsonObject = SpigotSelector.getInstance().getSignManager().getSignLayOut().getFullLayOut();
             state = ServiceState.FULL;
         } else {
@@ -269,7 +269,7 @@ public class SignUpdater {
             state = ServiceState.LOBBY;
         }
         for (int i = 0; i != 4; i++) {
-            sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).asString(), service, serverPinger));
+            sign.setLine(i, this.replace(jsonObject.get(String.valueOf(i)).asString(), IService, serverPinger));
         }
         sign.update(true);
         Bukkit.getScheduler().runTask(SpigotSelector.getInstance(), () ->  this.setBlock(sign.getLocation(), state));
@@ -320,20 +320,20 @@ public class SignUpdater {
     /**
      * Replaces all PlaceHolders
      * @param line
-     * @param service
+     * @param IService
      * @param serverPinger
      * @return
      */
-    public String replace(String line, Service service, ServerPinger serverPinger) {
+    public String replace(String line, IService IService, ServerPinger serverPinger) {
 
-        ServiceGroup group = service.getServiceGroup();
+        IServiceGroup group = IService.getGroup();
 
         line = ChatColor.translateAlternateColorCodes('&', line);
-        line = line.replace("%server%", service.getName());
+        line = line.replace("%server%", IService.getName());
         line = line.replace("%group%", group.getName());
         line = line.replace("%template%", group.getTemplate().getName());
-        line = line.replace("%type%", group.getServiceType().name());
-        line = line.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
+        line = line.replace("%type%", group.getType().name());
+        line = line.replace("%state%", IService.getState().getColor() + IService.getState().name());
         try {
             if (serverPinger != null) {
                 line = line.replace("%motd%", serverPinger.getMotd());
@@ -349,7 +349,7 @@ public class SignUpdater {
      * @param cloudSign
      * @return
      */
-    public Service getService(CloudSign cloudSign) {
+    public IService getService(CloudSign cloudSign) {
         return cloudSigns.get(cloudSign);
     }
 

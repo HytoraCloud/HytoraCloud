@@ -1,6 +1,5 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.GlobalProxyConfig;
 import lombok.Getter;
 
 import java.util.LinkedList;
@@ -10,7 +9,7 @@ import java.util.List;
  * This Service searches for a free Port
  * for a certain group
  * It will look for ports within a specific range
- * you can define in your {@link GlobalProxyConfig} under
+ * you can define in your {@link de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig} under
  * proxyStartPort or serverStartPort
  */
 @Getter

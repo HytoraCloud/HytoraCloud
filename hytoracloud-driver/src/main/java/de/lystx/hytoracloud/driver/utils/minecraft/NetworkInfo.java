@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.utils.minecraft;
 
 import com.sun.management.OperatingSystemMXBean;
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 
 import java.lang.management.ManagementFactory;
 import java.util.List;
@@ -107,13 +107,13 @@ public class NetworkInfo {
     }
 
     /**
-     * @param services
+     * @param IServices
      * @return memory probably used by given services
      */
-    public int getUsedMemory(List<Service> services) {
+    public int getUsedMemory(List<IService> IServices) {
         int m = 0;
-        for (Service service : services) {
-            m += service.getServiceGroup().getMaxRam();
+        for (IService IService : IServices) {
+            m += IService.getGroup().getMemory();
         }
 
         return m;

@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.module.serverselector.cloud.manager.sign;
 
-import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.module.serverselector.cloud.ModuleSelector;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.layout.SignLayOut;
@@ -47,14 +47,13 @@ public class SignService implements ICloudService {
         this.signFile = new File(this.signDirectory, "signs.json");
         this.layOutFile = new File(this.signDirectory, "signLayouts.json");
 
-        this.load();
-        this.loadSigns();
+        this.reload();
     }
 
     /**
      * Loads LayOuts and signs
      */
-    public void load() {
+    public void reload() {
         this.cloudSigns = new LinkedList<>();
         if (!this.layOutFile.exists()) {
             this.signLayOut = new SignLayOut(new DefaultSignLayout(VsonSettings.CREATE_FILE_IF_NOT_EXIST));
@@ -70,12 +69,7 @@ public class SignService implements ICloudService {
         if (!this.signFile.exists()) {
             new VsonObject(VsonSettings.CREATE_FILE_IF_NOT_EXIST).save(this.signFile);
         }
-    }
 
-    /**
-     * Loads signs
-     */
-    public void loadSigns() {
         try {
             VsonObject config = new VsonObject(this.signFile, VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
             for (String key : config.keys()) {

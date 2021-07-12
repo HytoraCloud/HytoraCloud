@@ -2,15 +2,15 @@ package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.managing.database.IDatabase;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.*;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.*;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;
@@ -230,16 +230,16 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
     /**
      * Returns all {@link CloudPlayer}s from a
      * ServiceGroup by Name
-     * @param serviceGroup the group
+     * @param IServiceGroup the group
      * @return
      */
-    public List<CloudPlayer> getPlayersOnGroup(ServiceGroup serviceGroup) {
+    public List<CloudPlayer> getPlayersOnGroup(IServiceGroup IServiceGroup) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
             if (cloudPlayer.getService() == null) {
                 continue;
             }
-            if (cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(serviceGroup.getName())) {
+            if (cloudPlayer.getService().getGroup().getName().equalsIgnoreCase(IServiceGroup.getName())) {
                 list.add(cloudPlayer);
             }
         }
@@ -247,17 +247,17 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
     }
 
     /**
-     * Returns {@link CloudPlayer}s on a {@link Service}
-     * @param service the service
+     * Returns {@link CloudPlayer}s on a {@link IService}
+     * @param IService the service
      * @return
      */
-    public List<CloudPlayer> getPlayersOnServer(Service service) {
+    public List<CloudPlayer> getPlayersOnServer(IService IService) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
             if (cloudPlayer.getService() == null) {
                 continue;
             }
-            if (cloudPlayer.getService().getName().equalsIgnoreCase(service.getName())) {
+            if (cloudPlayer.getService().getName().equalsIgnoreCase(IService.getName())) {
                 list.add(cloudPlayer);
             }
         }
@@ -269,6 +269,16 @@ public class DefaultCloudPlayerManager implements ICloudService, PacketHandler, 
     @Override
     public Iterator<CloudPlayer> iterator() {
         return this.onlinePlayers.iterator();
+    }
+
+    @Override
+    public void reload() {
+
+    }
+
+    @Override
+    public void save() {
+
     }
 }
 

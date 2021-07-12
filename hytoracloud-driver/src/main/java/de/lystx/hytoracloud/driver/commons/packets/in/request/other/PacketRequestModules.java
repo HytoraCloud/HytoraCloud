@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver.commons.packets.in.request.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.cloud.module.Module;
-import de.lystx.hytoracloud.driver.service.cloud.module.ModuleInfo;
-import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleInfo;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

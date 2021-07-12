@@ -17,7 +17,7 @@ public class PacketHandlerCommand implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketCommand) {
             PacketCommand packetCommand = (PacketCommand)packet;
-            if (CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType().equals(ServiceType.PROXY)) {
+            if (CloudDriver.getInstance().getThisService().getGroup().getType().equals(ServiceType.PROXY)) {
                 BungeeBridge.getInstance().executeCommand(packetCommand.getCommand());
                 return;
             }

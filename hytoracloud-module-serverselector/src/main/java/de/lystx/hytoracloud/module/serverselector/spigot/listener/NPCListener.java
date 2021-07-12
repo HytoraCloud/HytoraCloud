@@ -6,9 +6,9 @@ import de.lystx.hytoracloud.module.serverselector.cloud.manager.npc.NPCConfig;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import de.lystx.hytoracloud.module.serverselector.spigot.event.CloudServerNPCInteractEvent;
 import de.lystx.hytoracloud.bridge.bukkit.utils.BukkitItem;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.NPC;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -26,7 +26,7 @@ import java.util.*;
 @Getter
 public class NPCListener implements Listener {
 
-    private final Map<UUID, Map<Integer, Service>> services;
+    private final Map<UUID, Map<Integer, IService>> services;
 
     public NPCListener() {
         this.services = new HashMap<>();
@@ -39,7 +39,7 @@ public class NPCListener implements Listener {
         Player player = event.getPlayer();
         String group = SpigotSelector.getInstance().getNpcManager().getGroupNPCS().get(npcV18R3V18R3);
         if (group == null) {
-            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cCan't handle NPC because group was not found!");
+            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cCan't handle NPC because group was not found!");
             return;
         }
         CloudDriver.getInstance().execute(() -> player.openInventory(this.getInventory(player, group)));
@@ -57,21 +57,21 @@ public class NPCListener implements Listener {
             return;
         }
         Player player = (Player) event.getWhoClicked();
-        Map<Integer, Service> serviceMap = this.services.getOrDefault(player.getUniqueId(), new HashMap<>());
+        Map<Integer, IService> serviceMap = this.services.getOrDefault(player.getUniqueId(), new HashMap<>());
         if (player.getOpenInventory() != null && !serviceMap.isEmpty()) {
             event.setCancelled(true);
             if (event.getCurrentItem().getType().equals(Material.valueOf(SpigotSelector.getInstance().getNpcManager().getNpcConfig().getItemType()))) {
 
                 CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
                 if (cloudPlayer == null) {
-                    player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cCouldn't find you in global CloudPlayers!");
+                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cCouldn't find you in global CloudPlayers!");
                     return;
                 }
-                Service service = serviceMap.get(event.getSlot());
+                IService IService = serviceMap.get(event.getSlot());
                 if (!SpigotSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage().trim().isEmpty()) {
-                    player.sendMessage(this.replace(SpigotSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage(), service, service.getServiceGroup()));
+                    player.sendMessage(this.replace(SpigotSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage(), IService, IService.getGroup()));
                 }
-                cloudPlayer.connect(service);
+                cloudPlayer.connect(IService);
             }
         }
     }
@@ -89,14 +89,14 @@ public class NPCListener implements Listener {
      * @return > Group Inventory
      */
     public Inventory getInventory(Player player, String group) {
-        Map<Integer, Service> serviceMap = new HashMap<>();
+        Map<Integer, IService> serviceMap = new HashMap<>();
         NPCConfig config = SpigotSelector.getInstance().getNpcManager().getNpcConfig();
-        ServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(group);
-        if (serviceGroup == null) {
-            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThere was an error!");
+        IServiceGroup IServiceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(group);
+        if (IServiceGroup == null) {
+            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere was an error!");
             return null;
         }
-        Inventory inventory = Bukkit.createInventory(player, (config.getInventoryRows() * 9), this.replace(config.getInventoryTitle(), null, serviceGroup));
+        Inventory inventory = Bukkit.createInventory(player, (config.getInventoryRows() * 9), this.replace(config.getInventoryTitle(), null, IServiceGroup));
         if (config.isCorners()) {
             ItemStack glass = new BukkitItem(Material.STAINED_GLASS_PANE, (short) 7).setNoName().build();
 
@@ -121,31 +121,31 @@ public class NPCListener implements Listener {
             }
             List<String> lore = document.get("lore", List.class);
             for (String s : lore) {
-                lore.set(lore.indexOf(s), this.replace(s, null, serviceGroup));
+                lore.set(lore.indexOf(s), this.replace(s, null, IServiceGroup));
             }
 
             int slot = document.getInteger("slot");
             inventory.setItem(slot, new BukkitItem(Material.valueOf(document.getString("type")))
-                    .setDisplayName(this.replace(document.getString("name"), null, serviceGroup))
+                    .setDisplayName(this.replace(document.getString("name"), null, IServiceGroup))
                     .addLores(lore)
                     .build());
         }
 
-        for (Service service : CloudDriver.getInstance().getServiceManager().getServices(serviceGroup)) {
+        for (IService IService : CloudDriver.getInstance().getServiceManager().getServices(IServiceGroup)) {
             try {
                 List<String> strings = new LinkedList<>();
 
                 for (String s : config.getLore()) {
-                    strings.add(this.replace(s, service, serviceGroup));
+                    strings.add(this.replace(s, IService, IServiceGroup));
                 }
 
                 ItemStack itemStack = new BukkitItem(Material.valueOf(config.getItemType().toUpperCase()))
-                        .setDisplayName(this.replace(config.getItemName(), service, serviceGroup))
+                        .setDisplayName(this.replace(config.getItemName(), IService, IServiceGroup))
                         .addLores(strings)
                         .build();
                 inventory.addItem(itemStack);
 
-                serviceMap.put(this.getSlot(itemStack, inventory), service);
+                serviceMap.put(this.getSlot(itemStack, inventory), IService);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -173,37 +173,37 @@ public class NPCListener implements Listener {
     /**
      * Returns String with placeHolders
      * @param input
-     * @param service
-     * @param serviceGroup
+     * @param IService
+     * @param IServiceGroup
      * @return
      */
-    public String replace(String input, Service service, ServiceGroup serviceGroup) {
+    public String replace(String input, IService IService, IServiceGroup IServiceGroup) {
         try {
-            if (service != null) {
-                input = input.replace("%service%", service.getName());
-                input = input.replace("%uuid%", service.getUniqueId().toString());
-                input = input.replace("%port%", "" + service.getPort());
-                input = input.replace("%id%", "" + service.getServiceID());
-                input = input.replace("%state%", service.getServiceState().getColor() + service.getServiceState().name());
+            if (IService != null) {
+                input = input.replace("%service%", IService.getName());
+                input = input.replace("%uuid%", IService.getUniqueId().toString());
+                input = input.replace("%port%", "" + IService.getPort());
+                input = input.replace("%id%", "" + IService.getId());
+                input = input.replace("%state%", IService.getState().getColor() + IService.getState().name());
 
-                String motd = service.getMotd() == null ? "no_motd" : service.getMotd();
-                String maxPlayers = String.valueOf(service.getMaxPlayers());
-                String online = String.valueOf(service.getOnlinePlayers().size());
+                String motd = IService.getMotd() == null ? "no_motd" : IService.getMotd();
+                String maxPlayers = String.valueOf(IService.getMaxPlayers());
+                String online = String.valueOf(IService.getPlayers().size());
                 input = input.replace("%motd%", motd);
                 input = input.replace("%max%", maxPlayers);
                 input = input.replace("%online%", online);
 
             }
-            if (serviceGroup != null) {
-                ServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(serviceGroup.getName());
+            if (IServiceGroup != null) {
+                IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName());
                 input = input.replace("%group%", group.getName());
-                input = input.replace("%template%", serviceGroup.getTemplate().getName());
-                input = input.replace("%type%", serviceGroup.getServiceType().name());
-                input = input.replace("%newServer%", "" + serviceGroup.getNewServerPercent());
+                input = input.replace("%template%", IServiceGroup.getTemplate().getName());
+                input = input.replace("%type%", IServiceGroup.getType().name());
+                input = input.replace("%newServer%", "" + IServiceGroup.getNewServerPercent());
                 input = input.replace("%online_services%", group.getServices().size() + "");
-                input = input.replace("%online_players%", group.getOnlinePlayers().size() + "");
+                input = input.replace("%online_players%", group.getPlayers().size() + "");
             }
-            input = input.replace("%prefix%", CloudDriver.getInstance().getCloudPrefix());
+            input = input.replace("%prefix%", CloudDriver.getInstance().getPrefix());
 
         } catch (NullPointerException e) {
             e.printStackTrace();

@@ -16,13 +16,12 @@ import de.lystx.hytoracloud.launcher.cloud.handler.services.PacketHandlerRegiste
 import de.lystx.hytoracloud.launcher.cloud.handler.services.PacketHandlerServiceUpdate;
 import de.lystx.hytoracloud.launcher.cloud.handler.services.PacketHandlerStart;
 import de.lystx.hytoracloud.launcher.cloud.handler.services.PacketHandlerStopServer;
-import de.lystx.hytoracloud.driver.service.other.Updater;
-import de.lystx.hytoracloud.driver.service.other.BackupService;
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
-import de.lystx.hytoracloud.driver.service.other.NetworkService;
+import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
@@ -53,7 +52,6 @@ public class CloudBootingSetupDone {
         CloudDriver.getInstance().getDatabaseManager().getDatabase().connect();
         CloudDriver.getInstance().getServiceRegistry().registerService(new NetworkService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new ModuleService());
-        CloudDriver.getInstance().getServiceRegistry().registerService(new BackupService());
 
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", CloudDriver.getInstance().getInstance(NetworkService.class).getHytoraServer());
@@ -65,7 +63,7 @@ public class CloudBootingSetupDone {
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerStart(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerReload(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerShutdown(cloudSystem));
-        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerConfig(cloudSystem));
+        CloudDriver.getInstance().registerPacketHandler(new PacketHandlerConfig());
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerGroupUpdate(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerCopyTemplate(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new PacketHandlerPermissionPool(cloudSystem));

@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class PacketInCopyTemplate extends HytoraPacket implements Serializable {
 
-    private Service service;
+    private IService IService;
     private String template;
     private String specificDirectory;
 
@@ -20,7 +20,7 @@ public class PacketInCopyTemplate extends HytoraPacket implements Serializable {
     public void write(Component component) {
 
         component.append(map -> {
-            map.put("s", service);
+            map.put("s", IService);
             map.put("t", template);
             map.put("sD", specificDirectory);
         });
@@ -29,7 +29,7 @@ public class PacketInCopyTemplate extends HytoraPacket implements Serializable {
     @Override
     public void read(Component component) {
 
-        service = (Service) component.get("s");
+        IService = (IService) component.get("s");
         template = component.get("t");
         specificDirectory = component.get("sD");
     }

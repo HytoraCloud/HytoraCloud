@@ -7,11 +7,11 @@ import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartService;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.service.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +21,7 @@ import java.util.*;
 public class CloudBridgeServiceManager implements IServiceManager {
 
     private final CloudBridge cloudBridge;
-    private Map<ServiceGroup, List<Service>> cachedServices;
+    private Map<IServiceGroup, List<IService>> cachedServices;
 
     public CloudBridgeServiceManager(CloudBridge cloudBridge) {
         this.cloudBridge = cloudBridge;
@@ -29,75 +29,75 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
     /**
-     * Returns {@link ServiceGroup} by GroupName
+     * Returns {@link IServiceGroup} by GroupName
      * @param groupName
      * @return
      */
-    public ServiceGroup getServiceGroup(String groupName) {
+    public IServiceGroup getServiceGroup(String groupName) {
         return this.cachedServices.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
     }
 
     /**
-     * Returns Proxy ({@link Service}) by port
+     * Returns Proxy ({@link IService}) by port
      * @param port
      * @return
      */
-    public Service getProxy(Integer port) {
+    public IService getProxy(Integer port) {
         return this.getAllServices().stream().filter(service -> service.getPort() == port).findFirst().orElse(null);
     }
 
     @Override
-    public void notifyStop(Service service) {
+    public void notifyStop(IService IService) {
         throw new UnsupportedOperationException("Not Available for CloudBridge!");
     }
 
 
     @Override
-    public void updateGroup(ServiceGroup group, ServiceGroup newGroup) {
-        ServiceGroup serviceGroup = this.getServiceGroup(group.getName());
-        List<Service> services = this.cachedServices.get(serviceGroup);
-        this.cachedServices.remove(serviceGroup);
-        this.cachedServices.put(group, services);
+    public void updateGroup(IServiceGroup group, IServiceGroup newGroup) {
+        IServiceGroup IServiceGroup = this.getServiceGroup(group.getName());
+        List<IService> IServices = this.cachedServices.get(IServiceGroup);
+        this.cachedServices.remove(IServiceGroup);
+        this.cachedServices.put(group, IServices);
     }
 
     @Override
-    public void updateService(Service service) {
-        Service safeGet = this.getService(service.getName());
-        ServiceGroup serviceGroup = this.getServiceGroup(safeGet.getServiceGroup().getName());
-        List<Service> services = this.cachedServices.get(serviceGroup);
-        services.set(services.indexOf(safeGet), service);
+    public void updateService(IService IService) {
+        IService safeGet = this.getService(IService.getName());
+        IServiceGroup IServiceGroup = this.getServiceGroup(safeGet.getGroup().getName());
+        List<IService> IServices = this.cachedServices.get(IServiceGroup);
+        IServices.set(IServices.indexOf(safeGet), IService);
     }
 
     @Override
-    public void startServices(List<ServiceGroup> serviceGroups) {
-        for (ServiceGroup serviceGroup : serviceGroups) {
-            startService(serviceGroup);
+    public void startServices(List<IServiceGroup> IServiceGroups) {
+        for (IServiceGroup IServiceGroup : IServiceGroups) {
+            startService(IServiceGroup);
         }
     }
 
     @Override
-    public void startService(ServiceGroup serviceGroup, Service service, PropertyObject properties) {
-        service.setServiceGroup(serviceGroup);
-        this.cloudBridge.getClient().sendPacket(new PacketInStartService(service, properties));
+    public void startService(IServiceGroup IServiceGroup, IService IService, PropertyObject properties) {
+        IService.setGroup(IServiceGroup);
+        this.cloudBridge.getClient().sendPacket(new PacketInStartService(IService, properties));
     }
 
     @Override
-    public void startService(ServiceGroup serviceGroup, Service service) {
+    public void startService(IServiceGroup IServiceGroup, IService IService) {
         throw new UnsupportedOperationException("Not Available for CloudAPI!");
     }
 
     /**
-     * Starts a new {@link Service}
-     * from a {@link ServiceGroup}
-     * @param serviceGroup
+     * Starts a new {@link IService}
+     * from a {@link IServiceGroup}
+     * @param IServiceGroup
      */
-    public void startService(ServiceGroup serviceGroup) {
-        this.cloudBridge.getClient().sendPacket(new PacketInStartGroup(serviceGroup));
+    public void startService(IServiceGroup IServiceGroup) {
+        this.cloudBridge.getClient().sendPacket(new PacketInStartGroup(IServiceGroup));
     }
 
     @Override
-    public void startService(ServiceGroup serviceGroup, PropertyObject properties) {
-        this.cloudBridge.getClient().sendPacket(new PacketInStartGroupWithProperties(serviceGroup, properties));
+    public void startService(IServiceGroup IServiceGroup, PropertyObject properties) {
+        this.cloudBridge.getClient().sendPacket(new PacketInStartGroupWithProperties(IServiceGroup, properties));
     }
 
 
@@ -114,7 +114,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
     /**
-     * Starts a {@link Service}
+     * Starts a {@link IService}
      * @param serviceGroup
      */
     public void startService(String serviceGroup) {
@@ -125,8 +125,8 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * Returns all Services
      * @return
      */
-    public List<Service> getAllServices() {
-        List<Service> list = new LinkedList<>();
+    public List<IService> getAllServices() {
+        List<IService> list = new LinkedList<>();
         if (this.cachedServices != null) {
             this.cachedServices.values().forEach(list::addAll);
         }
@@ -139,13 +139,13 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param serviceState
      * @return
      */
-    public List<Service> getAllServices(ServiceState serviceState) {
-        List<Service> list = new LinkedList<>();
+    public List<IService> getAllServices(ServiceState serviceState) {
+        List<IService> list = new LinkedList<>();
         this.getAllServices().forEach(service -> {
-            if (!service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
+            if (!service.getGroup().getType().equals(ServiceType.SPIGOT)) {
                 return;
             }
-            if (service.getServiceState().equals(serviceState)) {
+            if (service.getState().equals(serviceState)) {
                 list.add(service);
             }
         });
@@ -156,11 +156,11 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * Returns all Lobby-Servers
      * @return
      */
-    public List<Service> getLobbies() {
-        List<Service> list = new LinkedList<>();
-        for (Service service : this.getAllServices()) {
-            if (service.getServiceGroup().isLobby() && service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
-                list.add(service);
+    public List<IService> getLobbies() {
+        List<IService> list = new LinkedList<>();
+        for (IService IService : this.getAllServices()) {
+            if (IService.getGroup().isLobby() && IService.getGroup().getType().equals(ServiceType.SPIGOT)) {
+                list.add(IService);
             }
         };
         return list;
@@ -171,11 +171,11 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param serviceType
      * @return
      */
-    public List<Service> getAllServices(ServiceType serviceType) {
-        List<Service> list = new LinkedList<>();
-        for (Service service : this.getAllServices()) {
-            if (service.getServiceGroup().getServiceType().equals(serviceType)) {
-                list.add(service);
+    public List<IService> getAllServices(ServiceType serviceType) {
+        List<IService> list = new LinkedList<>();
+        for (IService IService : this.getAllServices()) {
+            if (IService.getGroup().getType().equals(serviceType)) {
+                list.add(IService);
             }
         }
         return list;
@@ -184,15 +184,15 @@ public class CloudBridgeServiceManager implements IServiceManager {
     /**
      * Returns all Service
      * from a Group
-     * @param serviceGroup
+     * @param IServiceGroup
      * @return
      */
-    public List<Service> getCachedServices(ServiceGroup serviceGroup) {
+    public List<IService> getCachedServices(IServiceGroup IServiceGroup) {
 
         try {
-            List<Service> services = new LinkedList<>(this.cachedServices.get(this.getServiceGroup(serviceGroup.getName())));
-            services.sort(Comparator.comparingInt(Service::getServiceID));
-            return services;
+            List<IService> IServices = new LinkedList<>(this.cachedServices.get(this.getServiceGroup(IServiceGroup.getName())));
+            IServices.sort(Comparator.comparingInt(IService::getId));
+            return IServices;
         } catch (NullPointerException e) {
             return new LinkedList<>();
         }
@@ -203,56 +203,69 @@ public class CloudBridgeServiceManager implements IServiceManager {
      * @param name
      * @return
      */
-    public Service getService(String name) {
-        for (List<Service> value : this.cachedServices.values()) {
-            for (Service service : value) {
-                if (service.getName().equalsIgnoreCase(name)) {
-                    return service;
+    public IService getService(String name) {
+        for (List<IService> value : this.cachedServices.values()) {
+            for (IService IService : value) {
+                if (IService.getName().equalsIgnoreCase(name)) {
+                    return IService;
                 }
             }
         }
         return null;
     }
 
+    @Override
+    public void registerService(IService service) {
+        IService service1 = this.getService(service.getName());
+
+        if (service1 == null) {
+            IServiceGroup serviceGroup = this.getServiceGroup(service.getGroup().getName());
+            List<IService> cachedServices = this.getCachedServices(serviceGroup);
+
+            cachedServices.add(service);
+            this.cachedServices.put(serviceGroup, cachedServices);
+        }
+    }
+
     /**
-     * Stops all services from a {@link ServiceGroup}
+     * Stops all services from a {@link IServiceGroup}
      * @param group
      */
-    public void stopServices(ServiceGroup group) {
+    public void stopServices(IServiceGroup group) {
         this.cachedServices.get(this.getServiceGroup(group.getName())).forEach(this::stopService);
     }
 
     @Override
-    public List<Service> getServices(ServiceGroup serviceGroup) {
-        List<Service> list = new LinkedList<>();
-        for (Service allService : this.getAllServices()) {
-            if (allService.getServiceGroup().getName().equalsIgnoreCase(serviceGroup.getName())) {
-                list.add(allService);
+    public List<IService> getServices(IServiceGroup IServiceGroup) {
+        List<IService> list = new LinkedList<>();
+        for (IService allIService : this.getAllServices()) {
+            if (allIService.getGroup().getName().equalsIgnoreCase(IServiceGroup.getName())) {
+                list.add(allIService);
             }
         }
         return list;
     }
 
     /**
-     * Returns all {@link ServiceGroup}s
+     * Returns all {@link IServiceGroup}s
      * @return
      */
-    public List<ServiceGroup> getServiceGroups() {
+    public List<IServiceGroup> getServiceGroups() {
         return new LinkedList<>(this.cachedServices == null ? new ArrayList<>() : this.cachedServices.keySet());
     }
 
     /**
-     * Stops a single {@link Service}
-     * @param service
+     * Stops a single {@link IService}
+     * @param IService
      */
-    public void stopService(Service service) {
-        this.cloudBridge.getClient().sendPacket(new PacketInStopServer(service));
+    public void stopService(IService IService) {
+        this.cloudBridge.getClient().sendPacket(new PacketInStopServer(IService));
     }
 
     @Override
     public void stopServices() {
-        for (Service allService : this.getAllServices()) {
-            stopService(allService);
+        for (IService allIService : this.getAllServices()) {
+            stopService(allIService);
         }
     }
 

@@ -6,8 +6,6 @@ import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketCallEvent;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.managing.event.service.DefaultEventService;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

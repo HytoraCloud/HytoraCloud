@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

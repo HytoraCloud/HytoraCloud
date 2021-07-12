@@ -4,20 +4,21 @@ import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.service.Template;
-import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.Fallback;
-import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.FallbackConfig;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.FallbackSetup;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.GroupSetup;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.PermissionGroupSetup;
@@ -52,7 +53,7 @@ public class CreateCommand implements TabCompletable {
                         config.setOnlineMode(!setup.isOnlineMode());
                         document.append("proxyConfig", config);
                     }
-                    ServiceGroup serviceGroup = new ServiceGroup(
+                    IServiceGroup IServiceGroup = new ServiceGroupObject(
                             UUID.randomUUID(),
                             setup.getServerName(),
                             new Template(setup.getServerName(), "default", true),
@@ -60,8 +61,7 @@ public class CreateCommand implements TabCompletable {
                             setup.getReceiver(),
                             setup.getMaxyServer(),
                             setup.getMinServer(),
-                            setup.getMaxMem(),
-                            setup.getMinMem(),
+                            setup.getMemory(),
                             maxPlayers,
                             setup.getNewPlayersInPercent(),
                             false,
@@ -69,9 +69,9 @@ public class CreateCommand implements TabCompletable {
                             setup.isDynamic(),
                             document
                     );
-                    sender.sendMessage("INFO", "§2Created ServiceGroup §a" + serviceGroup.getName() + " §7| §bMaxMB " + serviceGroup.getMaxRam() + " §7| §bMinMB " + serviceGroup.getMinRam() + " §7| §bMinServer " + serviceGroup.getMinServer() + " §7| §bMaxServer" + serviceGroup.getMaxServer());
-                    CloudSystem.getInstance().getInstance(GroupService.class).createGroup(serviceGroup);
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).needServices(serviceGroup);
+                    sender.sendMessage("INFO", "§2Created ServiceGroup §a" + IServiceGroup.getName() + " §7| §bMemory " + IServiceGroup.getMemory() + " §7| §bMinServer " + IServiceGroup.getMinServer() + " §7| §bMaxServer" + IServiceGroup.getMaxServer());
+                    CloudSystem.getInstance().getInstance(GroupService.class).createGroup(IServiceGroup);
+                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).needServices(IServiceGroup);
                     CloudSystem.getInstance().reload();
                 });
             } else if (args[0].equalsIgnoreCase("fallback")) {

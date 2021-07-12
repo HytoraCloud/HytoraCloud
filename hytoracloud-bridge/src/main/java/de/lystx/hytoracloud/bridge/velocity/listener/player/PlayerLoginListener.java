@@ -9,11 +9,9 @@ import com.velocitypowered.api.proxy.Player;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.velocity.elements.PlayerPermissionProvider;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import net.kyori.adventure.text.Component;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerLoginListener {
 

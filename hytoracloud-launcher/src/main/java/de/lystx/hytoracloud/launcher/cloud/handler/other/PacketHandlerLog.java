@@ -6,11 +6,11 @@ import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreen;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,8 +32,8 @@ public class PacketHandlerLog implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInGetLog) {
             PacketInGetLog packetInGetLog = (PacketInGetLog)packet;
-            Service service = CloudDriver.getInstance().getServiceManager().getService(packetInGetLog.getService());
-            Service getSafe = CloudDriver.getInstance().getServiceManager().getService(service.getName());
+            IService IService = CloudDriver.getInstance().getServiceManager().getService(packetInGetLog.getService());
+            IService getSafe = CloudDriver.getInstance().getServiceManager().getService(IService.getName());
             if (getSafe == null) {
                 return;
             }
@@ -41,7 +41,7 @@ public class PacketHandlerLog implements PacketHandler {
             if (cloudPlayer == null) {
                 return;
             }
-            CloudScreen screen = cloudSystem.getInstance(CloudScreenService.class).getMap().get(service.getName());
+            ServiceOutput screen = cloudSystem.getInstance(ServiceOutputService.class).getMap().get(IService.getName());
             if (screen == null) {
                 cloudPlayer.sendMessage(this.cloudSystem.getInstance(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + "§cThe screen for this §eserver §ccouldn't be found!");
                 return;
@@ -52,7 +52,7 @@ public class PacketHandlerLog implements PacketHandler {
             }
             try {
                 String realLink = this.post(sb.toString(), false);
-                String link = "§7The §blog for §7service §b" + service.getName() + " §7was uploaded to §a" + realLink + " §8!";
+                String link = "§7The §blog for §7service §b" + IService.getName() + " §7was uploaded to §a" + realLink + " §8!";
                 cloudPlayer.sendMessage(this.cloudSystem.getInstance(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + link);
             } catch (IOException e) {
                 e.printStackTrace();

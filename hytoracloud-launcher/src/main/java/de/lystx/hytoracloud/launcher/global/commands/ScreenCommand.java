@@ -3,13 +3,13 @@ package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreen;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenPrinter;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import lombok.AllArgsConstructor;
 
 import java.util.ConcurrentModificationException;
@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ScreenCommand implements TabCompletable {
 
-    private final CloudScreenPrinter screenPrinter;
+    private final ServiceOutputPrinter screenPrinter;
     private final CloudProcess cloudInstance;
 
     @Command(name = "screen", description = "Shows output of services", aliases = "sc")
@@ -35,10 +35,10 @@ public class ScreenCommand implements TabCompletable {
                 }
             } else if (subject.equalsIgnoreCase("list")) {
                 sender.sendMessage("§9CloudScreens§7:");
-                cloudInstance.getInstance(CloudScreenService.class).getMap().forEach((s, screen) -> sender.sendMessage("INFO", s));
+                cloudInstance.getInstance(ServiceOutputService.class).getMap().forEach((s, screen) -> sender.sendMessage("INFO", s));
             } else {
                 String serverName = args[0];
-                CloudScreen screen = cloudInstance.getInstance(CloudScreenService.class).getMap().get(serverName);
+                ServiceOutput screen = cloudInstance.getInstance(ServiceOutputService.class).getMap().get(serverName);
                 if (screen != null) {
                     if (screen.isRunningOnThisCloudInstance()) {
                         if (screen.getCachedLines().isEmpty()) {
@@ -51,7 +51,7 @@ public class ScreenCommand implements TabCompletable {
                         this.screenPrinter.create(screen);
                         try {
                             for (String cachedLine : screen.getCachedLines()) {
-                                sender.sendMessage(screen.getScreenName(), cachedLine);
+                                sender.sendMessage(screen.getServiceName(), cachedLine);
                             }
                         } catch (ConcurrentModificationException ignored) {
                         }
@@ -77,11 +77,11 @@ public class ScreenCommand implements TabCompletable {
     @Override
     public List<String> onTabComplete(CloudDriver cloudDriver, String[] args) {
         List<String> list = new LinkedList<>();
-        for (Service service : CloudDriver.getInstance().getServiceManager().getAllServices()) {
-            if (CloudDriver.getInstance().getServiceManager().getService(service.getName()) == null) {
+        for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
+            if (CloudDriver.getInstance().getServiceManager().getService(IService.getName()) == null) {
                 continue;
             }
-            list.add(service.getName());
+            list.add(IService.getName());
         }
         return list;
     }

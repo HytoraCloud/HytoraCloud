@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.bridge.standalone.manager;
 
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
 
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,16 +28,16 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     /**
      * Returns all {@link CloudPlayer}s from a
      * ServiceGroup by Name
-     * @param serviceGroup the group
+     * @param IServiceGroup the group
      * @return
      */
-    public List<CloudPlayer> getPlayersOnGroup(ServiceGroup serviceGroup) {
+    public List<CloudPlayer> getPlayersOnGroup(IServiceGroup IServiceGroup) {
         List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
             if (cloudPlayer.getService() == null) {
                 continue;
             }
-            if (cloudPlayer.getService().getServiceGroup().getName().equalsIgnoreCase(serviceGroup.getName())) {
+            if (cloudPlayer.getService().getGroup().getName().equalsIgnoreCase(IServiceGroup.getName())) {
                 list.add(cloudPlayer);
             }
         }
@@ -45,17 +45,17 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     }
 
     /**
-     * Returns {@link CloudPlayer}s on a {@link Service}
-     * @param service the service
+     * Returns {@link CloudPlayer}s on a {@link IService}
+     * @param IService the service
      * @return
      */
-    public List<CloudPlayer> getPlayersOnServer(Service service) {
+    public List<CloudPlayer> getPlayersOnServer(IService IService) {
        List<CloudPlayer> list = new LinkedList<>();
         for (CloudPlayer cloudPlayer : this.onlinePlayers) {
             if (cloudPlayer.getService() == null) {
                 continue;
             }
-            if (cloudPlayer.getService().getName().equalsIgnoreCase(service.getName())) {
+            if (cloudPlayer.getService().getName().equalsIgnoreCase(IService.getName())) {
                 list.add(cloudPlayer);
             }
         }

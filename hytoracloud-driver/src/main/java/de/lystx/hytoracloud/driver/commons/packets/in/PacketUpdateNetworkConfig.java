@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;
@@ -26,7 +26,7 @@ public class PacketUpdateNetworkConfig extends PacketCommunication implements Se
     public void read(Component component) {
         super.read(component);
 
-        networkConfig = (NetworkConfig) component.get("n");
+        networkConfig = component.get("config");
     }
 
     @Override
@@ -34,7 +34,7 @@ public class PacketUpdateNetworkConfig extends PacketCommunication implements Se
         super.write(component);
 
 
-        component.put("n", networkConfig);
+        component.put("config", networkConfig);
     }
 
 }

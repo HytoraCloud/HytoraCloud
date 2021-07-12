@@ -3,15 +3,15 @@ package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.other.Updater;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
 import lombok.AllArgsConstructor;
 
@@ -54,18 +54,18 @@ public class InfoCommand implements TabCompletable {
                     return;
                 case "servers":
                     sender.sendMessage("INFO", "§7----------------------------------");
-                    for (Service service : CloudDriver.getInstance().getServiceManager().getAllServices()) {
-                        sender.sendMessage("§h> §a" + service.getName() + " §h[§d" + service.getUniqueId() + " §7| §6Authenticated: " + (service.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
-                        sender.sendMessage("  §8> §bID: #" +  service.getServiceID() + " §7| §eState: " + service.getServiceState().getColor() + service.getServiceState().name());
-                        sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getHost().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getServiceGroup().getReceiver());
-                        sender.sendMessage("  §8> §bType: " +  service.getServiceGroup().getServiceType() + " §7| §eTemplate: " + service.getServiceGroup().getTemplate().getName());
-                        sender.sendMessage("  §8> §bHost: " +  service.getHost() + " §7| §ePlayers: " + service.getOnlinePlayers().size() + "/" + service.getServiceGroup().getMaxPlayers());
-                        if (service.getProperties().keySet().isEmpty()) {
+                    for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
+                        sender.sendMessage("§h> §a" + IService.getName() + " §h[§d" + IService.getUniqueId() + " §7| §6Authenticated: " + (IService.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
+                        sender.sendMessage("  §8> §bID: #" +  IService.getId() + " §7| §eState: " + IService.getState().getColor() + IService.getState().name());
+                        sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getHost().getAddress().getHostAddress() + ":" + IService.getPort() + " §7| §eReceiver: " + IService.getGroup().getReceiver());
+                        sender.sendMessage("  §8> §bType: " +  IService.getGroup().getType() + " §7| §eTemplate: " + IService.getGroup().getTemplate().getName());
+                        sender.sendMessage("  §8> §bHost: " +  IService.getHost() + " §7| §ePlayers: " + IService.getPlayers().size() + "/" + IService.getGroup().getMaxPlayers());
+                        if (IService.getProperties().keySet().isEmpty()) {
                             sender.sendMessage("  §8> §bProperties: §cNone");
                         } else {
-                            sender.sendMessage("  §8> §bProperties: §a" + service.getProperties().keySet().size());
-                            for (String s : service.getProperties().keySet()) {
-                                sender.sendMessage("     §8> §e" + s + ": §6" + service.getProperties().get(s));
+                            sender.sendMessage("  §8> §bProperties: §a" + IService.getProperties().keySet().size());
+                            for (String s : IService.getProperties().keySet()) {
+                                sender.sendMessage("     §8> §e" + s + ": §6" + IService.getProperties().get(s));
                             }
                         }
                     }
@@ -78,18 +78,18 @@ public class InfoCommand implements TabCompletable {
                         return;
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
-                    for (ServiceGroup serviceGroup : instance.getGroups()) {
+                    for (IServiceGroup IServiceGroup : instance.getGroups()) {
 
 
-                        int max = serviceGroup.getServices().size() * serviceGroup.getMaxPlayers();
+                        int max = IServiceGroup.getServices().size() * IServiceGroup.getMaxPlayers();
 
-                        sender.sendMessage("§h> §b" + serviceGroup.getName() + " §h[" + serviceGroup.getUniqueId() + "§h] §h:");
-                        sender.sendMessage("  §8> §bType: " + serviceGroup.getServiceType() + " §7| §eReceiver: " + serviceGroup.getReceiver());
-                        sender.sendMessage("  §8> §bPlayers: " +  serviceGroup.getOnlinePlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getTemplate().getName());
-                        sender.sendMessage("  §8> §bMinRAM: " +  serviceGroup.getMinRam() + " §7| §eMaxRAM: " + serviceGroup.getMaxRam());
-                        sender.sendMessage("  §8> §bMinServer: " +  serviceGroup.getMinServer() + " §7| §eMaxServer: " + serviceGroup.getMaxServer());
-                        sender.sendMessage("  §8> §bNew-Server-At: " +  serviceGroup.getNewServerPercent() + "% §7| §eProperties: " + serviceGroup.getProperties().keySet().size());
-                        sender.sendMessage("  §8> §bLobby: " +  serviceGroup.isLobby() + " §7| §eDynamic: " + serviceGroup.isDynamic());
+                        sender.sendMessage("§h> §b" + IServiceGroup.getName() + " §h[" + IServiceGroup.getUniqueId() + "§h] §h:");
+                        sender.sendMessage("  §8> §bType: " + IServiceGroup.getType() + " §7| §eReceiver: " + IServiceGroup.getReceiver());
+                        sender.sendMessage("  §8> §bPlayers: " +  IServiceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + IServiceGroup.getTemplate().getName());
+                        sender.sendMessage("  §8> §bMemory: " + IServiceGroup.getMemory());
+                        sender.sendMessage("  §8> §bMinServer: " +  IServiceGroup.getMinServer() + " §7| §eMaxServer: " + IServiceGroup.getMaxServer());
+                        sender.sendMessage("  §8> §bNew-Server-At: " +  IServiceGroup.getNewServerPercent() + "% §7| §eProperties: " + IServiceGroup.getProperties().keySet().size());
+                        sender.sendMessage("  §8> §bLobby: " +  IServiceGroup.isLobby() + " §7| §eDynamic: " + IServiceGroup.isDynamic());
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
             }

@@ -5,11 +5,11 @@ import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayer
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUpdatePlayer;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
-import de.lystx.hytoracloud.driver.service.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;

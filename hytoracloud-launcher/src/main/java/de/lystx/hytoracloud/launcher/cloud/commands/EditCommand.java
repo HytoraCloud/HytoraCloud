@@ -4,10 +4,11 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 
 import java.lang.reflect.Field;
 
@@ -18,7 +19,7 @@ public class EditCommand  {
 
         if (args.length == 3) {
             String groupName = args[0];
-            ServiceGroup group = CloudSystem.getInstance().getInstance(GroupService.class).getGroup(groupName);
+            IServiceGroup group = CloudSystem.getInstance().getInstance(GroupService.class).getGroup(groupName);
 
             if (group == null) {
                 sender.sendMessage("ERROR", "§cThe group §e" + groupName + " §cseems not to exist!");
@@ -26,7 +27,7 @@ public class EditCommand  {
             }
             String key = args[1];
             String value = args[2];
-            ServiceGroup newGroup = new ServiceGroup(group.getUniqueId(), group.getName(), group.getTemplate(), group.getServiceType(), group.getReceiver(), group.getMaxServer(), group.getMinServer(), group.getMaxRam(), group.getMinRam(), group.getMaxPlayers(), group.getNewServerPercent(), group.isMaintenance(), group.isLobby(), group.isDynamic(), new PropertyObject());
+            IServiceGroup newGroup = new ServiceGroupObject(group.getUniqueId(), group.getName(), group.getTemplate(), group.getType(), group.getReceiver(), group.getMaxServer(), group.getMinServer(), group.getMemory(), group.getMaxPlayers(), group.getNewServerPercent(), group.isMaintenance(), group.isLobby(), group.isDynamic(), new PropertyObject());
             if (key.equalsIgnoreCase("maintenance") || key.equalsIgnoreCase("mc")) {
                 try {
                     newGroup.setMaintenance(Boolean.parseBoolean(value));
@@ -62,13 +63,7 @@ public class EditCommand  {
                 }
             } else if (key.equalsIgnoreCase("maxRam")) {
                 try {
-                    newGroup.setMaxRam(Integer.parseInt(value));
-                } catch (Exception e) {
-                    sender.sendMessage("ERROR", "§cedit " + group.getName() + " " + key + " <integer>");
-                }
-            } else if (key.equalsIgnoreCase("minRam")) {
-                try {
-                    newGroup.setMinRam(Integer.parseInt(value));
+                    newGroup.setMemory(Integer.parseInt(value));
                 } catch (Exception e) {
                     sender.sendMessage("ERROR", "§cedit " + group.getName() + " " + key + " <integer>");
                 }
@@ -98,7 +93,7 @@ public class EditCommand  {
         } else {
             sender.sendMessage("ERROR", "§cedit <group> <key> <value>");
             sender.sendMessage("ERROR", "§cValid fields: §e");
-            for (Field declaredField : ServiceGroup.class.getDeclaredFields()) {
+            for (Field declaredField : IServiceGroup.class.getDeclaredFields()) {
                 sender.sendMessage("ERROR", " §c> §e" + declaredField.getName());
             }
         }

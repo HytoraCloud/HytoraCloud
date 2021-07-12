@@ -3,13 +3,9 @@ package de.lystx.hytoracloud.bridge.velocity.listener.player;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
-import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
-import net.kyori.adventure.text.Component;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 
 public class CommandListener {
 

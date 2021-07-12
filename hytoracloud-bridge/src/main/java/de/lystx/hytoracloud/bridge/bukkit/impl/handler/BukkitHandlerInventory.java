@@ -5,10 +5,10 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketOpenInventory;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUpdate;
 
-import de.lystx.hytoracloud.driver.service.managing.player.featured.inventory.CloudInventory;
-import de.lystx.hytoracloud.driver.service.managing.player.featured.inventory.CloudItem;
-import de.lystx.hytoracloud.driver.service.managing.player.featured.inventory.CloudPlayerInventory;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudItem;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import org.bukkit.Bukkit;

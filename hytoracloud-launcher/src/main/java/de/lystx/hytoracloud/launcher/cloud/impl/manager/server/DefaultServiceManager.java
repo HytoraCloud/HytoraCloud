@@ -2,29 +2,29 @@ package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.implementations.ServiceObject;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStart;
 import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStop;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.service.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.cloud.server.IServiceManager;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.ServiceStarter;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.ServiceStopper;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.ServiceStarter;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.ServiceStopper;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.utillity.Action;
 import de.lystx.hytoracloud.driver.utils.utillity.Value;
@@ -53,16 +53,16 @@ import java.util.function.Consumer;
 )
 public class DefaultServiceManager implements ICloudService, IServiceManager, NetworkHandler {
 
-    private Map<ServiceGroup, List<Service>> cachedServices;
-    private List<Service> globalServices;
+    private Map<IServiceGroup, List<IService>> cachedServices;
+    private List<IService> globalIServices;
     private final Map<String, Action> actions;
 
 
-    private final List<Service> unverifiedServices;
+    private final List<IService> unverifiedIServices;
 
-    private final List<Service> cloudServers;
-    private final List<Service> cloudProxies;
-    private final List<Service> lobbies;
+    private final List<IService> cloudServers;
+    private final List<IService> cloudProxies;
+    private final List<IService> lobbies;
     private boolean startUp;
 
     private final IDService idService;
@@ -70,14 +70,14 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
     private boolean running = true;
 
-    private List<ServiceGroup> serviceGroups;
+    private List<IServiceGroup> serviceGroups;
 
-    public DefaultServiceManager(List<ServiceGroup> serviceGroups) {
+    public DefaultServiceManager(List<IServiceGroup> serviceGroups) {
         this.serviceGroups = serviceGroups;
         this.actions = new HashMap<>();
         this.cachedServices = new HashMap<>();
-        this.globalServices = new LinkedList<>();
-        this.unverifiedServices = new LinkedList<>();
+        this.globalIServices = new LinkedList<>();
+        this.unverifiedIServices = new LinkedList<>();
 
         this.startUp = false;
         this.cloudServers = new LinkedList<>();
@@ -87,7 +87,7 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         this.idService = new IDService();
         if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
-            this.portService = new PortService(networkConfig.getGlobalProxyConfig().getProxyStartPort(), networkConfig.getGlobalProxyConfig().getServerStartPort());
+            this.portService = new PortService(networkConfig.getProxyStartPort(), networkConfig.getServerStartPort());
         } else {
             ReceiverInfo receiverInfo = CloudDriver.getInstance().getImplementedData().getObject("receiverInfo", ReceiverInfo.class);
             this.portService = new PortService(Integer.parseInt((receiverInfo.getValues().get("proxyStartPort") + "").split("\\.")[0]), Integer.parseInt((receiverInfo.getValues().get("serverStartPort") + "").split("\\.")[0]));
@@ -104,77 +104,77 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param group
      * @param newGroup
      */
-    public void updateGroup(ServiceGroup group, ServiceGroup newGroup) {
-        List<Service> list = this.getCachedServices(this.getServiceGroup(group.getName()));
+    public void updateGroup(IServiceGroup group, IServiceGroup newGroup) {
+        List<IService> list = this.getCachedServices(this.getServiceGroup(group.getName()));
         this.cachedServices.put(this.getServiceGroup(group.getName()), list);
 
     }
 
     /**
      * Sends notify to console
-     * @param service
+     * @param IService
      */
-    public void notifyStart(Service service) {
+    public void notifyStart(IService IService) {
 
         if (!this.running) {
             return;
         }
-        List<Service> list = this.getCachedServices(service.getServiceGroup());
-        if (!list.contains(service)) {
-            list.add(service);
-            this.cachedServices.put(this.getServiceGroup(service.getServiceGroup().getName()), list);
+        List<IService> list = this.getCachedServices(IService.getGroup());
+        if (!list.contains(IService)) {
+            list.add(IService);
+            this.cachedServices.put(this.getServiceGroup(IService.getGroup().getName()), list);
         }
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
 
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + service.getServiceGroup().getReceiver() + " §7was told to queue §3" + service.getName() + " §h[§7ID: §b" + service.getServiceID() + " §7| §7Port: §b" + service.getPort() + " §7| §7Mode: §b" + service.getServiceGroup().getServiceType() + " §7| §7Storage: §b" + (service.getServiceGroup().isDynamic() ? "DYNAMIC": "STATIC") + "§h]");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + IService.getGroup().getReceiver() + " §7was told to queue §3" + IService.getName() + " §h[§7ID: §b" + IService.getId() + " §7| §7Port: §b" + IService.getPort() + " §7| §7Mode: §b" + IService.getGroup().getType() + " §7| §7Storage: §b" + (IService.getGroup().isDynamic() ? "DYNAMIC": "STATIC") + "§h]");
 
     }
 
     /**
      * Sends stop notify
-     * @param service
+     * @param IService
      */
-    public void notifyStop(Service service) {
+    public void notifyStop(IService IService) {
 
         if (!this.running) {
             return;
         }
-        List<Service> services = this.cachedServices.get(service.getServiceGroup());
-        Service remove = this.getService(service.getName());
-        if (services == null) services = new LinkedList<>();
-        services.remove(remove);
-        this.cachedServices.put(this.getServiceGroup(service.getServiceGroup().getName()), services);
+        List<IService> IServices = this.cachedServices.get(IService.getGroup());
+        IService remove = this.getService(IService.getName());
+        if (IServices == null) IServices = new LinkedList<>();
+        IServices.remove(remove);
+        this.cachedServices.put(this.getServiceGroup(IService.getGroup().getName()), IServices);
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + service.getServiceGroup().getReceiver() + " §7stopped §c" + service.getName() + "§f!");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + IService.getGroup().getReceiver() + " §7stopped §c" + IService.getName() + "§f!");
     }
 
     /**
      * Updates service
-     * @param service
+     * @param IService
      * @param state
      */
-    public void updateService(Service service) {
+    public void updateService(IService IService) {
         if (!this.running) {
             return;
         }
 
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerUpdate(service);
+            networkHandler.onServerUpdate(IService);
         }
 
-        List<Service> services = this.getCachedServices(service.getServiceGroup());
+        List<IService> IServices = this.getCachedServices(IService.getGroup());
 
-        services.set(services.indexOf(this.getService(service.getName())), service.deepCopy());
+        IServices.set(IServices.indexOf(this.getService(IService.getName())), IService.deepCopy());
 
-        ServiceGroup serviceGroup = this.getServiceGroup(service.getServiceGroup().getName());
-        if (serviceGroup == null) {
-            serviceGroup = service.getServiceGroup();
+        IServiceGroup IServiceGroup = this.getServiceGroup(IService.getGroup().getName());
+        if (IServiceGroup == null) {
+            IServiceGroup = IService.getGroup();
         }
-        this.cachedServices.put(serviceGroup, services);
+        this.cachedServices.put(IServiceGroup, IServices);
     }
 
     /**
@@ -185,66 +185,66 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
     }
 
     /**
-     * Checks if {@link ServiceGroup} is allowed
+     * Checks if {@link IServiceGroup} is allowed
      * to start on this receiver
-     * @param serviceGroup
+     * @param IServiceGroup
      * @return
      */
-    public boolean isRightReceiver(ServiceGroup serviceGroup) {
+    public boolean isRightReceiver(IServiceGroup IServiceGroup) {
         if (getDriver().getDriverType().equals(CloudType.RECEIVER)) {
             ReceiverInfo info = getDriver().getImplementedData().getObject("receiverInfo", ReceiverInfo.class);
-            return serviceGroup.getReceiver().equalsIgnoreCase(info.getName());
+            return IServiceGroup.getReceiver().equalsIgnoreCase(info.getName());
         } else if (getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            return serviceGroup.getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER);
+            return IServiceGroup.getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER);
         }
         return true;
     }
 
     /**
      * Starts services from list
-     * @param serviceGroups
+     * @param IServiceGroups
      */
-    public void startServices(List<ServiceGroup> serviceGroups) {
+    public void startServices(List<IServiceGroup> IServiceGroups) {
         if (!this.running) {
             return;
         }
-        for (ServiceGroup serviceGroup : serviceGroups) {
-            if (!this.isRightReceiver(serviceGroup)) {
+        for (IServiceGroup IServiceGroup : IServiceGroups) {
+            if (!this.isRightReceiver(IServiceGroup)) {
                 continue;
             }
-            this.getDriver().getInstance(TemplateService.class).createTemplate(serviceGroup);
-            for (int i = 0; i < serviceGroup.getMinServer(); i++) {
-                int id = this.idService.getFreeID(serviceGroup.getName());
-                int port = serviceGroup.getServiceType().equals(ServiceType.SPIGOT) ? this.portService.getFreePort() : this.portService.getFreeProxyPort();
+            this.getDriver().getInstance(TemplateService.class).createTemplate(IServiceGroup);
+            for (int i = 0; i < IServiceGroup.getMinServer(); i++) {
+                int id = this.idService.getFreeID(IServiceGroup.getName());
+                int port = IServiceGroup.getType().equals(ServiceType.SPIGOT) ? this.portService.getFreePort() : this.portService.getFreeProxyPort();
 
-                Service service = new Service(serviceGroup, id, port);
+                IService IService = new ServiceObject(IServiceGroup, id, port);
 
-                if (serviceGroup.getServiceType().equals(ServiceType.SPIGOT)) {
-                    if (serviceGroup.isLobby()) {
-                        this.lobbies.add(service);
+                if (IServiceGroup.getType().equals(ServiceType.SPIGOT)) {
+                    if (IServiceGroup.isLobby()) {
+                        this.lobbies.add(IService);
                     } else {
-                        this.cloudServers.add(service);
+                        this.cloudServers.add(IService);
                     }
                 } else {
-                    cloudProxies.add(service);
+                    cloudProxies.add(IService);
                 }
             }
         }
-        this.cloudServers.sort(Comparator.comparingInt(Service::getServiceID));
-        this.cloudProxies.sort(Comparator.comparingInt(Service::getServiceID));
-        this.lobbies.sort(Comparator.comparingInt(Service::getServiceID));
+        this.cloudServers.sort(Comparator.comparingInt(IService::getId));
+        this.cloudProxies.sort(Comparator.comparingInt(IService::getId));
+        this.lobbies.sort(Comparator.comparingInt(IService::getId));
 
-        for (Service proxy : cloudProxies) {
-            this.startService(proxy.getServiceGroup(), proxy);
+        for (IService proxy : cloudProxies) {
+            this.startService(proxy.getGroup(), proxy);
         }
 
         this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-            for (Service service : this.lobbies) {
-                this.startService(service.getServiceGroup(), service);
+            for (IService IService : this.lobbies) {
+                this.startService(IService.getGroup(), IService);
             }
             this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-                for (Service service : this.cloudServers) {
-                    this.startService(service.getServiceGroup(), service);
+                for (IService IService : this.cloudServers) {
+                    this.startService(IService.getGroup(), IService);
                 }
             }, 2L);
         }, 3L);
@@ -254,11 +254,11 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * Returns all Lobby-Servers
      * @return
      */
-    public List<Service> getLobbies() {
-        List<Service> list = new LinkedList<>();
-        for (Service service : this.getAllServices()) {
-            if (service.getServiceGroup().isLobby() && service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
-                list.add(service);
+    public List<IService> getLobbies() {
+        List<IService> list = new LinkedList<>();
+        for (IService IService : this.getAllServices()) {
+            if (IService.getGroup().isLobby() && IService.getGroup().getType().equals(ServiceType.SPIGOT)) {
+                list.add(IService);
             }
         };
         return list;
@@ -268,64 +268,58 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * Registers service after packetHandler handled
      * @param service
      */
-    public Service registerService(String service) {
-        if (!this.running) {
-            return null;
-        }
+    public IService registerService(String service) {
 
+        IService iService = this.unverifiedIServices.stream().filter(s -> s.getName().equalsIgnoreCase(service)).findFirst().orElse(null);
 
-        Service safeService = this.unverifiedServices.stream().filter(s -> s.getName().equalsIgnoreCase(service)).findFirst().orElse(null);
-
-        if (safeService == null) {
+        if (iService == null) {
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("ERROR", "§cTried to register §e" + service + " §calthough it hasn't been started properly!");
             return null;
         }
 
         //Calling handlers
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerRegister(safeService);
+            networkHandler.onServerRegister(iService);
         }
 
-        List<Service> list = this.getCachedServices(safeService.getServiceGroup());
-        Service contains = list.stream().filter(service1 -> service1.getName().equalsIgnoreCase(safeService.getName())).findFirst().orElse(null);
+        List<IService> list = this.getCachedServices(iService.getGroup());
 
-        Action action = this.actions.getOrDefault(safeService.getName(), new Action());
-        if (contains == null) {
-            list.add(safeService);
-            this.cachedServices.put(this.getServiceGroup(safeService.getServiceGroup().getName()), list);
-
-            //Sending it was registered
-            this.actions.remove(safeService.getName());
+        IService checkGet = list.stream().filter(s -> s.getName().equalsIgnoreCase(service)).findFirst().orElse(null);
+        if (checkGet == null) {
+            list.add(iService);
+            this.cachedServices.put(this.getServiceGroup(iService.getGroup().getName()), list);
         }
 
-        this.getDriver().sendPacket(new PacketOutRegisterServer(safeService));
+        Action action = this.actions.getOrDefault(iService.getName(), new Action());
+        this.actions.remove(iService.getName());
+
         //If in screen not sending message!
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
-            return safeService;
+            return iService;
         }
-        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Service §b" + safeService.getName() + " §7has connected §h[§b" + safeService.getServiceGroup().getReceiver() + "@" + safeService.getHost() + "§h] §7in §b" + action.getMS() + "s§f!");
+        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Service §b" + iService.getName() + " §7has connected §h[§b" + iService.getGroup().getReceiver() + "@" + iService.getHost() + "§h] §7in §b" + action.getMS() + "s§f!");
 
-        return safeService;
+        return iService;
     }
 
     /**
      * Checks if serviceGroup needs services
-     * @param serviceGroup
+     * @param IServiceGroup
      */
-    public void needServices(ServiceGroup serviceGroup) {
-        if (!this.isRightReceiver(serviceGroup)) {
+    public void needServices(IServiceGroup IServiceGroup) {
+        if (!this.isRightReceiver(IServiceGroup)) {
             return;
         }
         if (!this.running) {
             return;
         }
         this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-            if (this.getCachedServices(serviceGroup).size() < serviceGroup.getMinServer()) {
-                for (int i = this.getCachedServices(serviceGroup).size(); i < serviceGroup.getMinServer(); i++) {
-                    int id = idService.getFreeID(serviceGroup.getName());
-                    int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-                    Service service = new Service(serviceGroup, id, port);
-                    this.startService(serviceGroup, service);
+            if (this.getCachedServices(IServiceGroup).size() < IServiceGroup.getMinServer()) {
+                for (int i = this.getCachedServices(IServiceGroup).size(); i < IServiceGroup.getMinServer(); i++) {
+                    int id = idService.getFreeID(IServiceGroup.getName());
+                    int port = IServiceGroup.getType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
+                    IService IService = new ServiceObject(IServiceGroup, id, port);
+                    this.startService(IServiceGroup, IService);
                 }
             }
         }, 3L);
@@ -333,70 +327,70 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
     /**
      * Starts service
-     * @param serviceGroup
-     * @param service
+     * @param IServiceGroup
+     * @param IService
      * @param properties
      */
-    public void startService(ServiceGroup serviceGroup, Service service, PropertyObject properties) {
+    public void startService(IServiceGroup IServiceGroup, IService IService, PropertyObject properties) {
         if (!this.running) {
             return;
         }
-        if (!this.isRightReceiver(serviceGroup)) {
+        if (!this.isRightReceiver(IServiceGroup)) {
             return;
         }
         if (this.getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            if (this.getDriver().getInstance(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
+            if (this.getDriver().getInstance(GroupService.class).getGroup(IServiceGroup.getName(), this.serviceGroups) == null) {
                 return;
             }
         }
-        if (serviceGroup.getMaxServer() != -1 && this.getCachedServices(serviceGroup).size() >= serviceGroup.getMaxServer()) {
-            this.getDriver().getParent().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are §9[§e" + this.getCachedServices(serviceGroup).size() + "§9/§e" + serviceGroup.getMaxServer() + "§9] §cservices of this group online!");
+        if (IServiceGroup.getMaxServer() != -1 && this.getCachedServices(IServiceGroup).size() >= IServiceGroup.getMaxServer()) {
+            this.getDriver().getParent().getConsole().getLogger().sendMessage("INFO", "§cThe service §e" + IService.getName() + " §cwasn't started because there are §9[§e" + this.getCachedServices(IServiceGroup).size() + "§9/§e" + IServiceGroup.getMaxServer() + "§9] §cservices of this group online!");
             return;
         }
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerQueue(service);
+            networkHandler.onServerQueue(IService);
         }
 
 
         CloudDriver.getInstance().getInstance(StatsService.class).getStatistics().add("startedServices");
-        this.unverifiedServices.add(service);
+        this.unverifiedIServices.add(IService);
 
-        if (service.getPort() <= 0) {
-            int port = service.getServiceGroup().getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-            int id = this.idService.getFreeID(serviceGroup.getName());
-            service = new Service(serviceGroup, id, port);
+        if (IService.getPort() <= 0) {
+            int port = IService.getGroup().getType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
+            int id = this.idService.getFreeID(IServiceGroup.getName());
+            IService = new ServiceObject(IServiceGroup, id, port);
         }
-        service.setProperties((properties == null ? new PropertyObject() : properties));
-        this.globalServices.add(service);
-        List<Service> services = this.getCachedServices(serviceGroup);
-        services.add(service);
+        IService.setProperties((properties == null ? new PropertyObject() : properties));
+        this.globalIServices.add(IService);
+        List<IService> IServices = this.getCachedServices(IServiceGroup);
+        IServices.add(IService);
 
 
-        ServiceGroup serviceGroup1 = this.getServiceGroup(serviceGroup.getName());
-        if (serviceGroup1 == null) {
-            this.cachedServices.put(serviceGroup, services);
+        IServiceGroup IServiceGroup1 = this.getServiceGroup(IServiceGroup.getName());
+        if (IServiceGroup1 == null) {
+            this.cachedServices.put(IServiceGroup, IServices);
         } else {
-            this.cachedServices.put(serviceGroup1, services);
+            this.cachedServices.put(IServiceGroup1, IServices);
         }
 
-        this.actions.put(service.getName(), new Action());
+        this.actions.put(IService.getName(), new Action());
 
 
-        ServiceStarter serviceStarter = new ServiceStarter(service, properties);
+        ServiceStarter serviceStarter = new ServiceStarter(IService, properties);
 
         if (serviceStarter.checkForSpigot()) {
             try {
                 serviceStarter.copyFiles();
                 serviceStarter.createProperties();
                 serviceStarter.createCloudFiles();
-                serviceStarter.start(new Consumer<Service>() {
+                serviceStarter.start(new Consumer<IService>() {
                     @Override
-                    public void accept(Service service) {
-                        notifyStart(service);
-                        CloudDriver.getInstance().callEvent(new DriverEventServiceStart(service));
+                    public void accept(IService IService) {
+                        notifyStart(IService);
+                        CloudDriver.getInstance().callEvent(new DriverEventServiceStart(IService));
 
                         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-                            networkHandler.onServerStart(service);
+                            networkHandler.onServerStart(IService);
                         }
                     }
                 });
@@ -410,92 +404,92 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
     /**
      * Starts service from group
-     * @param serviceGroup
-     * @param service
+     * @param IServiceGroup
+     * @param IService
      */
-    public void startService(ServiceGroup serviceGroup, Service service) {
+    public void startService(IServiceGroup IServiceGroup, IService IService) {
         if (!this.running) {
             return;
         }
-        this.startService(serviceGroup, service, null);
+        this.startService(IServiceGroup, IService, null);
     }
 
     /**
      * Starts service with no properties
-     * @param serviceGroup
+     * @param IServiceGroup
      * @return
      */
-    public void startService(ServiceGroup serviceGroup) {
+    public void startService(IServiceGroup IServiceGroup) {
         if (!this.running) {
             return;
         }
-        this.startService(serviceGroup, (PropertyObject) null);
+        this.startService(IServiceGroup, (PropertyObject) null);
     }
 
     /**
      * Starts service with properties
-     * @param serviceGroup
+     * @param IServiceGroup
      * @param properties
      * @return
      */
-    public void startService(ServiceGroup serviceGroup, PropertyObject properties) {
+    public void startService(IServiceGroup IServiceGroup, PropertyObject properties) {
         if (!this.running) {
             return;
         }
-        int id = this.idService.getFreeID(serviceGroup.getName());
-        int port = serviceGroup.getServiceType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-        Service service = new Service(serviceGroup, id, port);
-        this.startService(serviceGroup, service, properties);
+        int id = this.idService.getFreeID(IServiceGroup.getName());
+        int port = IServiceGroup.getType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
+        IService IService = new ServiceObject(IServiceGroup, id, port);
+        this.startService(IServiceGroup, IService, properties);
     }
 
     /**
      * Stops service
-     * @param service
+     * @param IService
      */
-    public void stopService(Service service) {
-        this.stopService(service, true);
+    public void stopService(IService IService) {
+        this.stopService(IService, true);
     }
 
     /**
      * Stops service
-     * @param service
+     * @param IService
      * @param newServices > Should new services start if needed
      */
-    public void stopService(Service service, boolean newServices) {
-        if (!this.isRightReceiver(service.getServiceGroup())) {
+    public void stopService(IService IService, boolean newServices) {
+        if (!this.isRightReceiver(IService.getGroup())) {
             return;
         }
 
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerStop(service);
+            networkHandler.onServerStop(IService);
         }
 
         try {
-            this.getDriver().sendPacket(new PacketOutStopServer(service.getName()));
+            this.getDriver().sendPacket(new PacketOutStopServer(IService.getName()));
             try {
-                this.idService.removeID(service.getServiceGroup().getName(), service.getServiceID());
-                this.portService.removeProxyPort(service.getPort());
-                this.portService.removePort(service.getPort());
+                this.idService.removeID(IService.getGroup().getName(), IService.getId());
+                this.portService.removeProxyPort(IService.getPort());
+                this.portService.removePort(IService.getPort());
             } catch (NullPointerException e) {
                 //Ignoring Ubuntu Error
             }
 
-            List<Service> services = this.cachedServices.get(this.getServiceGroup(service.getServiceGroup().getName()));
-            Service remove = this.getService(service.getName());
-            if (services == null) services = new LinkedList<>();
-            services.remove(remove);
-            this.cachedServices.put(this.getServiceGroup(service.getServiceGroup().getName()), services);
+            List<IService> IServices = this.cachedServices.get(this.getServiceGroup(IService.getGroup().getName()));
+            IService remove = this.getService(IService.getName());
+            if (IServices == null) IServices = new LinkedList<>();
+            IServices.remove(remove);
+            this.cachedServices.put(this.getServiceGroup(IService.getGroup().getName()), IServices);
 
 
-            ServiceStopper serviceStopper = new ServiceStopper(service);
-            if (!CloudDriver.getInstance().callEvent(new DriverEventServiceStop(service))) {
-                serviceStopper.stop(new Consumer<Service>() {
+            ServiceStopper serviceStopper = new ServiceStopper(IService);
+            if (!CloudDriver.getInstance().callEvent(new DriverEventServiceStop(IService))) {
+                serviceStopper.stop(new Consumer<IService>() {
                     @Override
-                    public void accept(Service service) {
+                    public void accept(IService IService) {
                         if (!newServices) {
                             return;
                         }
-                        needServices(service.getServiceGroup());
+                        needServices(IService.getGroup());
                     }
                 });
             }
@@ -511,14 +505,14 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param serviceState
      * @return
      */
-    public List<Service> getAllServices(ServiceState serviceState) {
-        List<Service> list = new LinkedList<>();
-        for (Service service : this.getAllServices()) {
-            if (!service.getServiceGroup().getServiceType().equals(ServiceType.SPIGOT)) {
+    public List<IService> getAllServices(ServiceState serviceState) {
+        List<IService> list = new LinkedList<>();
+        for (IService IService : this.getAllServices()) {
+            if (!IService.getGroup().getType().equals(ServiceType.SPIGOT)) {
                 continue;
             }
-            if (service.getServiceState().equals(serviceState)) {
-                list.add(service);
+            if (IService.getState().equals(serviceState)) {
+                list.add(IService);
             }
         }
         return list;
@@ -529,11 +523,11 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param serviceType
      * @return
      */
-    public List<Service> getAllServices(ServiceType serviceType) {
-        List<Service> list = new LinkedList<>();
-        for (Service service : this.getAllServices()) {
-            if (service.getServiceGroup().getServiceType().equals(serviceType)) {
-                list.add(service);
+    public List<IService> getAllServices(ServiceType serviceType) {
+        List<IService> list = new LinkedList<>();
+        for (IService IService : this.getAllServices()) {
+            if (IService.getGroup().getType().equals(serviceType)) {
+                list.add(IService);
             }
         }
         return list;
@@ -545,42 +539,42 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      */
     public void stopServices() {
         List<String> already = new LinkedList<>();
-        for (ServiceGroup serviceGroup : new LinkedList<>(this.cachedServices.keySet())) {
-            if (this.getDriver().getInstance(GroupService.class) != null && this.getDriver().getInstance(GroupService.class).getGroup(serviceGroup.getName(), this.serviceGroups) == null) {
+        for (IServiceGroup IServiceGroup : new LinkedList<>(this.cachedServices.keySet())) {
+            if (this.getDriver().getInstance(GroupService.class) != null && this.getDriver().getInstance(GroupService.class).getGroup(IServiceGroup.getName(), this.serviceGroups) == null) {
                 continue;
             }
-            if (!already.contains(serviceGroup.getName())) {
-                already.add(serviceGroup.getName());
+            if (!already.contains(IServiceGroup.getName())) {
+                already.add(IServiceGroup.getName());
                 if (this.getDriver().getParent().getScreenPrinter().getScreen() == null && !this.getDriver().getParent().getScreenPrinter().isInScreen()) {
-                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Stopping services of the group §3" + serviceGroup.getName() + " §h[§7Services: §3" + this.cachedServices.get(serviceGroup).size() + "§h]");
+                    this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Stopping services of the group §3" + IServiceGroup.getName() + " §h[§7Services: §3" + this.cachedServices.get(IServiceGroup).size() + "§h]");
                 }
             }
         }
 
-        for (Object s : (this.globalServices == null ? new LinkedList<>() : this.globalServices)) {
-            Service globalService = (Service)s;
-            Service service = this.getService(globalService.getName());
-            if (service == null) {
+        for (Object s : (this.globalIServices == null ? new LinkedList<>() : this.globalIServices)) {
+            IService globalIService = (IService)s;
+            IService IService = this.getService(globalIService.getName());
+            if (IService == null) {
                 continue;
             }
-            this.stopService(service);
+            this.stopService(IService);
         }
     }
 
     /**
      * Stops services from group
-     * @param serviceGroup
+     * @param IServiceGroup
      */
-    public void stopServices(ServiceGroup serviceGroup) {
-        this.stopServices(serviceGroup, true);
+    public void stopServices(IServiceGroup IServiceGroup) {
+        this.stopServices(IServiceGroup, true);
     }
 
     @Override
-    public List<Service> getServices(ServiceGroup serviceGroup) {
-        List<Service> list = new LinkedList<>();
-        for (Service allService : this.getAllServices()) {
-            if (allService.getServiceGroup().getName().equalsIgnoreCase(serviceGroup.getName())) {
-                list.add(allService);
+    public List<IService> getServices(IServiceGroup IServiceGroup) {
+        List<IService> list = new LinkedList<>();
+        for (IService allIService : this.getAllServices()) {
+            if (allIService.getGroup().getName().equalsIgnoreCase(IServiceGroup.getName())) {
+                list.add(allIService);
             }
         }
         return list;
@@ -588,21 +582,21 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
 
     /**
      * Stops services from group
-     * @param serviceGroup
+     * @param IServiceGroup
      * @param newOnes > Should new ones start
      */
-    public void stopServices(ServiceGroup serviceGroup, boolean newOnes) {
-        if (!this.isRightReceiver(serviceGroup)) {
+    public void stopServices(IServiceGroup IServiceGroup, boolean newOnes) {
+        if (!this.isRightReceiver(IServiceGroup)) {
             return;
         }
-        Value<Integer> count = new Value<>(this.getCachedServices(serviceGroup).size());
+        Value<Integer> count = new Value<>(this.getCachedServices(IServiceGroup).size());
         try {
-            for (Service service : new LinkedList<>(this.getCachedServices(serviceGroup))) {
-                this.stopService(service, false);
+            for (IService IService : new LinkedList<>(this.getCachedServices(IServiceGroup))) {
+                this.stopService(IService, false);
                 count.setValue(count.get() - 1);
 
                 if (count.get() == 0 && newOnes) {
-                    this.needServices(serviceGroup);
+                    this.needServices(IServiceGroup);
                 }
             }
         } catch (ConcurrentModificationException e) {
@@ -615,8 +609,8 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param serviceGroup
      * @return
      */
-    public List<Service> getCachedServices(ServiceGroup serviceGroup) {
-        List<Service> list = this.cachedServices.get(this.getServiceGroup(serviceGroup.getName()));
+    public List<IService> getCachedServices(IServiceGroup serviceGroup) {
+        List<IService> list = this.cachedServices.get(this.getServiceGroup(serviceGroup.getName()));
         if (list == null) list = new LinkedList<>();
 
         return list;
@@ -627,12 +621,12 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param name
      * @return
      */
-    public Service getService(String name) {
+    public IService getService(String name) {
         try {
-            for (List<Service> value : new LinkedList<>(this.cachedServices.values())) {
-                for (Service service : value) {
-                    if (service.getName().equalsIgnoreCase(name)) {
-                        return service;
+            for (List<IService> value : new LinkedList<>(this.cachedServices.values())) {
+                for (IService IService : value) {
+                    if (IService.getName().equalsIgnoreCase(name)) {
+                        return IService;
                     }
                 }
             }
@@ -642,9 +636,22 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
         return null;
     }
 
-    public List<Service> getAllServices() {
-        List<Service> list = new LinkedList<>();
-        for (List<Service> value : new LinkedList<>(this.cachedServices.values())) {
+    @Override
+    public void registerService(IService service) {
+        IService service1 = this.getService(service.getName());
+
+        if (service1 == null) {
+            IServiceGroup serviceGroup = this.getServiceGroup(service.getGroup().getName());
+            List<IService> cachedServices = this.getCachedServices(serviceGroup);
+
+            cachedServices.add(service);
+            this.cachedServices.put(serviceGroup, cachedServices);
+        }
+    }
+
+    public List<IService> getAllServices() {
+        List<IService> list = new LinkedList<>();
+        for (List<IService> value : new LinkedList<>(this.cachedServices.values())) {
             list.addAll(value);
         }
         return list;
@@ -655,18 +662,32 @@ public class DefaultServiceManager implements ICloudService, IServiceManager, Ne
      * @param name
      * @return
      */
-    public ServiceGroup getServiceGroup(String name) {
+    public IServiceGroup getServiceGroup(String name) {
         return this.cachedServices.keySet().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
+    @Override
+    public List<IServiceGroup> getServiceGroups() {
+        return new LinkedList<>(this.cachedServices.keySet());
+    }
+
     /**
-     * Returns Proxy ({@link Service}) by port
+     * Returns Proxy ({@link IService}) by port
      * @param port
      * @return
      */
     @Override
-    public Service getProxy(Integer port) {
+    public IService getProxy(Integer port) {
         return this.getAllServices().stream().filter(service -> service.getPort() == port).findFirst().orElse(null);
     }
 
+    @Override
+    public void reload() {
+
+    }
+
+    @Override
+    public void save() {
+
+    }
 }

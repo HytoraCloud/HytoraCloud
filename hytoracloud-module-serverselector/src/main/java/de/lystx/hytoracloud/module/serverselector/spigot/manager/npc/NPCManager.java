@@ -105,7 +105,7 @@ public class NPCManager {
      */
     public void updateNPCS(JsonEntity jsonEntity, Player player, boolean join) {
         this.jsonEntity = jsonEntity;
-        if (!CloudDriver.getInstance().getThisService().getServiceGroup().isLobby()) {
+        if (!CloudDriver.getInstance().getThisService().getGroup().isLobby()) {
             return;
         }
         if (CloudDriver.getInstance().getBukkit().isNewVersion()) {

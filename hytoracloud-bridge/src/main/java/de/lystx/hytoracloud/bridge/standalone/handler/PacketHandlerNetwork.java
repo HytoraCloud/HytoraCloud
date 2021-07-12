@@ -6,9 +6,9 @@ import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.event.handler.Event;
-import de.lystx.hytoracloud.driver.service.managing.event.handler.EventListener;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.handler.Event;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.handler.EventListener;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
@@ -22,31 +22,31 @@ public class PacketHandlerNetwork implements PacketHandler, EventListener {
 
     @Event
     public void handle(DriverEventServiceStart event) {
-        Service service = event.getService();
+        IService IService = event.getIService();
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerQueue(service);
+            networkHandler.onServerQueue(IService);
         }
     }
 
     public void handleRegister(PacketOutRegisterServer packet) {
-        Service service = packet.getService();
+        IService IService = packet.getService();
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerStart(service);
+            networkHandler.onServerStart(IService);
         }
     }
 
     public void handleStop(PacketOutStopServer packet) {
-        Service service = CloudDriver.getInstance().getServiceManager().getService(packet.getService());
+        IService IService = CloudDriver.getInstance().getServiceManager().getService(packet.getService());
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerStop(service);
+            networkHandler.onServerStop(IService);
         }
     }
 
 
     public void handleUpdate(PacketServiceUpdate packet) {
-        Service service = packet.getService();
+        IService IService = packet.getIService();
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
-            networkHandler.onServerUpdate(service);
+            networkHandler.onServerUpdate(IService);
         }
     }
 

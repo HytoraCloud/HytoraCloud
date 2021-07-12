@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.launcher.global;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 //import de.lystx.cloudsystem.global.commands.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -8,29 +9,29 @@ import de.lystx.hytoracloud.driver.DriverParent;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.utillity.AuthManager;
-import de.lystx.hytoracloud.driver.service.cloud.module.Module;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import de.lystx.hytoracloud.launcher.global.impl.setup.InstanceChooser;
-import de.lystx.hytoracloud.driver.service.other.Updater;
+import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.cloud.console.CloudConsole;
-import de.lystx.hytoracloud.driver.service.cloud.console.logger.LoggerService;
-import de.lystx.hytoracloud.driver.service.managing.event.service.DefaultEventService;
-import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
-import de.lystx.hytoracloud.driver.service.other.NetworkService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventService;
+import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenPrinter;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.utils.log.LogService;
 import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
-import de.lystx.hytoracloud.driver.service.cloud.webserver.WebServer;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.webserver.WebServer;
 import de.lystx.hytoracloud.launcher.global.commands.*;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import io.vson.elements.object.VsonObject;
@@ -45,7 +46,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
 
     protected WebServer webServer;
     protected CloudConsole console;
-    protected CloudScreenPrinter screenPrinter;
+    protected ServiceOutputPrinter screenPrinter;
     protected AuthManager authManager;
 
 
@@ -95,7 +96,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
 
         CloudDriver.getInstance().getServiceRegistry().registerService(new LogService());
 
-        this.screenPrinter = new CloudScreenPrinter(this.console, this);
+        this.screenPrinter = new ServiceOutputPrinter(this.console, this);
 
         if (cloudType.equals(CloudType.CLOUDSYSTEM)) {
             this.webServer = new WebServer(this);
@@ -106,7 +107,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         CloudDriver.getInstance().getServiceRegistry().registerService(new ConfigService());
 
         CloudDriver.getInstance().getServiceRegistry().registerService(new TemplateService());
-        CloudDriver.getInstance().getServiceRegistry().registerService(new CloudScreenService());
+        CloudDriver.getInstance().getServiceRegistry().registerService(new ServiceOutputService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new DefaultEventService());
 
         this.getInstance(CommandService.class).registerCommand(new ShutdownCommand(this));
@@ -123,7 +124,6 @@ public class CloudProcess extends CloudDriver implements DriverParent {
 
         this.getInstance(CommandService.class).registerCommand(new UpdateCommand(this));
         this.getInstance(CommandService.class).registerCommand(new LogCommand(this));
-        this.getInstance(CommandService.class).registerCommand(new BackupCommand(this));
         this.getInstance(CommandService.class).registerCommand(new TpsCommand(this));
 
     }
@@ -160,16 +160,20 @@ public class CloudProcess extends CloudDriver implements DriverParent {
             module.onReload();
         }
 
+        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
+            registeredService.reload();
+        }
+
+        ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceGroups(this.getInstance(GroupService.class).getGroups());
         CloudDriver.getInstance().sendPacket(new PacketReload());
-        CloudDriver.getInstance().getInstance(ConfigService.class).reload();
 
         try {
             CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
                     CloudDriver.getInstance().getNetworkConfig(),
-                    CloudDriver.getInstance().getServiceManager().getCachedServices()
+                    CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
+                    CloudDriver.getInstance().getServiceManager().getAllServices()
             ));
             CloudDriver.getInstance().getNetworkConfig().update();
-            ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setServiceGroups(this.getInstance(GroupService.class).getGroups());
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -180,6 +184,11 @@ public class CloudProcess extends CloudDriver implements DriverParent {
      * Shuts down the Cloud
      */
     public void shutdown() {
+
+        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
+            registeredService.save();
+        }
+
         this.sendPacket(new PacketShutdown());
         ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).setRunning(false);
         this.console.interrupt();

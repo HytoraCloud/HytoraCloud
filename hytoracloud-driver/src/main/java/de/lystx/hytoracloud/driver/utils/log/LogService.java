@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.driver.utils.log;
 
-import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.service.other.FileService;
-import de.lystx.hytoracloud.driver.service.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -58,6 +58,11 @@ public class LogService implements ICloudService {
             return;
         }
         this.logs.add(message);
+    }
+
+    @Override
+    public void reload() {
+
     }
 
     /**

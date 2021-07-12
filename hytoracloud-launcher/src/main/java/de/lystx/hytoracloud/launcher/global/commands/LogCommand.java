@@ -3,12 +3,12 @@ package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreen;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import lombok.AllArgsConstructor;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -35,21 +35,21 @@ public class LogCommand implements TabCompletable {
             String finalText;
             if (args[0].equalsIgnoreCase("all")) {
                 StringBuilder sb = new StringBuilder();
-                for (Service service : CloudDriver.getInstance().getServiceManager().getAllServices()) {
-                    sb.append("================ LOG OF " + service.getName() + " ================").append("\n").append("\n").append("\n");
-                    sb.append(this.getLog(service, cloudInstance));
-                    sb.append("================ END OF LOG FOR " + service.getName() + " ================").append("\n").append("\n").append("\n");
+                for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
+                    sb.append("================ LOG OF " + IService.getName() + " ================").append("\n").append("\n").append("\n");
+                    sb.append(this.getLog(IService, cloudInstance));
+                    sb.append("================ END OF LOG FOR " + IService.getName() + " ================").append("\n").append("\n").append("\n");
                 
                 }
                 finalText = sb.toString();
             } else {
                 String s = args[0];
-                Service service = CloudDriver.getInstance().getServiceManager().getService(s);
-                if (service == null) {
+                IService IService = CloudDriver.getInstance().getServiceManager().getService(s);
+                if (IService == null) {
                     sender.sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
                     return;
                 }
-                finalText = this.getLog(service, cloudInstance);
+                finalText = this.getLog(IService, cloudInstance);
             }
             try {
                 String realLink = this.post(finalText, cloudType,false, file);
@@ -68,9 +68,9 @@ public class LogCommand implements TabCompletable {
         }
     }
 
-    public String getLog(Service service, CloudDriver cloudDriver) {
+    public String getLog(IService IService, CloudDriver cloudDriver) {
 
-        CloudScreen screen = cloudDriver.getInstance(CloudScreenService.class).getMap().get(service.getName());
+        ServiceOutput screen = cloudDriver.getInstance(ServiceOutputService.class).getMap().get(IService.getName());
         if (screen == null) {
             return null;
         }
@@ -135,8 +135,8 @@ public class LogCommand implements TabCompletable {
     @Override
     public List<String> onTabComplete(CloudDriver cloudDriver, String[] args) {
         List<String> list = new java.util.ArrayList<>(Collections.singletonList("all"));
-        for (Service service : CloudDriver.getInstance().getServiceManager().getAllServices()) {
-            list.add(service.getName());
+        for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
+            list.add(IService.getName());
         }
         return list;
     }

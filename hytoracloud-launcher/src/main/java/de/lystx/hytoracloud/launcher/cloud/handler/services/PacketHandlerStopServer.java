@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.launcher.cloud.handler.services;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
@@ -22,11 +22,11 @@ public class PacketHandlerStopServer implements PacketHandler {
         if (packet instanceof PacketInStopServer) {
             PacketInStopServer packetInStopServer = (PacketInStopServer)packet;
             try {
-                Service service = packetInStopServer.getService();
-                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getScreenName().equalsIgnoreCase(service.getName())) {
+                IService IService = packetInStopServer.getIService();
+                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getServiceName().equalsIgnoreCase(IService.getName())) {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }
-                CloudDriver.getInstance().getServiceManager().stopService(CloudDriver.getInstance().getServiceManager().getService(service.getName()));
+                CloudDriver.getInstance().getServiceManager().stopService(CloudDriver.getInstance().getServiceManager().getService(IService.getName()));
                 this.cloudSystem.getInstance(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 2L);
             } catch (NullPointerException ignored) {
             }

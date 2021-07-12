@@ -3,19 +3,19 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.DefaultServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.Fallback;
-import de.lystx.hytoracloud.driver.service.global.config.impl.fallback.FallbackConfig;
-import de.lystx.hytoracloud.driver.service.managing.permission.PermissionService;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -28,23 +28,23 @@ public class DeleteCommand implements TabCompletable {
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String group = args[1];
-                ServiceGroup serviceGroup = CloudSystem.getInstance().getInstance(GroupService.class).getGroup(group);
-                if (serviceGroup == null) {
+                IServiceGroup IServiceGroup = CloudSystem.getInstance().getInstance(GroupService.class).getGroup(group);
+                if (IServiceGroup == null) {
                     sender.sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
 
-                for (Service service : CloudDriver.getInstance().getServiceManager().getServices(serviceGroup)) {
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getIdService().removeID(service.getServiceGroup().getName(), service.getServiceID());
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removePort(service.getPort());
-                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(service.getPort());
+                for (IService IService : CloudDriver.getInstance().getServiceManager().getServices(IServiceGroup)) {
+                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getIdService().removeID(IService.getGroup().getName(), IService.getId());
+                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removePort(IService.getPort());
+                    ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(IService.getPort());
                 }
 
-                ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).stopServices(serviceGroup, false);
-                CloudSystem.getInstance().getInstance(GroupService.class).deleteGroup(serviceGroup);
-                CloudDriver.getInstance().getServiceManager().getAllServices().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(serviceGroup.getName()));
+                ((DefaultServiceManager) CloudDriver.getInstance().getServiceManager()).stopServices(IServiceGroup, false);
+                CloudSystem.getInstance().getInstance(GroupService.class).deleteGroup(IServiceGroup);
+                CloudDriver.getInstance().getServiceManager().getAllServices().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
                 CloudSystem.getInstance().reload();
-                sender.sendMessage("INFO", "§9The ServiceGroup §b" + serviceGroup.getName() + " §9was deleted!");
+                sender.sendMessage("INFO", "§9The ServiceGroup §b" + IServiceGroup.getName() + " §9was deleted!");
             } else if (args[0].equalsIgnoreCase("fallback")) {
                 String fallback = args[1];
 
@@ -104,7 +104,7 @@ public class DeleteCommand implements TabCompletable {
                     list.add(permissionGroup.getName());
                 }
             } else if (args[1].equalsIgnoreCase("group")) {
-                for (ServiceGroup group : cloudDriver.getInstance(GroupService.class).getGroups()) {
+                for (IServiceGroup group : cloudDriver.getInstance(GroupService.class).getGroups()) {
                     list.add(group.getName());
                 }
             } else if (args[1].equalsIgnoreCase("fallback")) {

@@ -5,14 +5,13 @@ import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.service.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 
 import java.util.*;
 
@@ -33,7 +32,7 @@ public interface ProxyBridge {
         if (cachedPlayer != null) {
             //Request timed out couldn't log in.... kicking
             event.setCancelled(true);
-            event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("%prefix%", CloudDriver.getInstance().getCloudPrefix()));
+            event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
 
         } else {
             cachedPlayer = new CloudPlayer(connection);
@@ -42,18 +41,18 @@ public interface ProxyBridge {
 
             if (CloudDriver.getInstance().getProxyConfig().isEnabled()) {
 
-                if (CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().isMaintenance()
-                        && !CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().getWhitelistedPlayers().contains(cachedPlayer.getName())
+                if (CloudDriver.getInstance().getNetworkConfig().isMaintenance()
+                        && !CloudDriver.getInstance().getNetworkConfig().getWhitelistedPlayers().contains(cachedPlayer.getName())
                         && !CloudDriver.getInstance().getPermissionPool().hasPermission(cachedPlayer.getUniqueId(), "cloudsystem.network.maintenance")) {
 
                     event.setCancelled(true);
-                    event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getCloudPrefix()));
+                    event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
 
                 }
 
                 if ((CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size() + 1) >= CloudDriver.getInstance().getProxyConfig().getMaxPlayers()) {
                     event.setCancelled(true);
-                    event.setComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getCloudPrefix()));
+                    event.setComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 }
             }
         }
@@ -101,7 +100,7 @@ public interface ProxyBridge {
      */
     default String formatTabList(CloudPlayer cloudPlayer, String input) {
         try {
-            Service service;
+            IService IService;
             PermissionGroup permissionGroup;
             if (cloudPlayer == null || cloudPlayer.getPermissionGroup() == null) {
                 permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
@@ -109,21 +108,21 @@ public interface ProxyBridge {
                 permissionGroup = cloudPlayer.getCachedPermissionGroup();
             }
             if (cloudPlayer == null || cloudPlayer.getService() == null) {
-                service = CloudDriver.getInstance().getThisService();
+                IService = CloudDriver.getInstance().getThisService();
             } else {
-                service = CloudDriver.getInstance().getServiceManager().getService(cloudPlayer.getService().getName());
+                IService = CloudDriver.getInstance().getServiceManager().getService(cloudPlayer.getService().getName());
             }
             return input
                     .replace("&", "§")
                     .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getProxyConfig().getMaxPlayers()))
                     .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size()))
-                    .replace("%id%", service.getServiceID() + "")
-                    .replace("%group%", service.getServiceGroup().getName() + "")
+                    .replace("%id%", IService.getId() + "")
+                    .replace("%group%", IService.getGroup().getName() + "")
                     .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
-                    .replace("%receiver%", CloudDriver.getInstance().getThisService().getServiceGroup().getReceiver())
+                    .replace("%receiver%", CloudDriver.getInstance().getThisService().getGroup().getReceiver())
                     .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
                     .replace("%proxy%", CloudDriver.getInstance().getThisService().getName())
-                    .replace("%server%", service.getName());
+                    .replace("%server%", IService.getName());
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -140,12 +139,12 @@ public interface ProxyBridge {
      * If a player gets kicked of a service
      *
      * @param cloudPlayer the player
-     * @param kickedFromService the service
+     * @param kickedFromIService the service
      * @return boolean if cancel
      */
-    default boolean onServerKick(CloudPlayer cloudPlayer, Service kickedFromService) {
+    default boolean onServerKick(CloudPlayer cloudPlayer, IService kickedFromIService) {
         try {
-            Service fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+            IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
             cloudPlayer.connect(fallback);
             return true;
         } catch (NullPointerException e) {
@@ -157,14 +156,14 @@ public interface ProxyBridge {
      * Called when a player connected on a service
      *
      * @param cloudPlayer the player
-     * @param service the service
+     * @param IService the service
      */
-    default void onServerConnect(CloudPlayer cloudPlayer, Service service) {
+    default void onServerConnect(CloudPlayer cloudPlayer, IService IService) {
 
-        cloudPlayer.setService(service);
+        cloudPlayer.setService(IService);
         cloudPlayer.update();
 
-        DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, service);
+        DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, IService);
         CloudDriver.getInstance().callEvent(serverChange);
     }
 
@@ -224,9 +223,9 @@ public interface ProxyBridge {
     /**
      * Unregisters a Service from cache
      *
-     * @param service the service
+     * @param IService the service
      */
-    void stopServer(Service service);
+    void stopServer(IService IService);
 
     /**
      * Gets all services as String in a list
@@ -246,9 +245,9 @@ public interface ProxyBridge {
     /**
      * Registers a Service in cache
      *
-     * @param service the service
+     * @param IService the service
      */
-    void registerService(Service service);
+    void registerService(IService IService);
 
     /**
      * Removes a server name from cache

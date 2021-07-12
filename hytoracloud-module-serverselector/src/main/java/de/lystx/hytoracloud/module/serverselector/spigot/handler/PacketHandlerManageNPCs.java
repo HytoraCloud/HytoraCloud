@@ -2,11 +2,11 @@ package de.lystx.hytoracloud.module.serverselector.spigot.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.module.serverselector.spigot.manager.npc.impl.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,10 +29,10 @@ public class PacketHandlerManageNPCs implements PacketHandler {
 
                 NPC npc = SpigotSelector.getInstance().getNpcManager().getNPC(Location.deserialize((Map<String, Object>) information.getObjectMap().get("loc")));
                 if (npc != null) {
-                    player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThere is already an §eNPC §cfor this location!");
+                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere is already an §eNPC §cfor this location!");
                     return;
                 }
-                ServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup((String) information.getObjectMap().get("group"));
+                IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup((String) information.getObjectMap().get("group"));
                 if (group != null) {
                     SpigotSelector
                             .getInstance()
@@ -43,9 +43,9 @@ public class PacketHandlerManageNPCs implements PacketHandler {
                                     group.getName(),
                                     skin
                             );
-                    player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You created an NPC for the group §b" + group.getName() + " §7with skin §b" + skin + "§8!");
+                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You created an NPC for the group §b" + group.getName() + " §7with skin §b" + skin + "§8!");
                 } else {
-                    player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe group §e" + information.getObjectMap().get("group") + " §cdoesn't exist!");
+                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + information.getObjectMap().get("group") + " §cdoesn't exist!");
                 }
             }
         }

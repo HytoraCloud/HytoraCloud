@@ -14,23 +14,23 @@ import de.lystx.hytoracloud.bridge.standalone.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterService;
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.Motd;
-import de.lystx.hytoracloud.driver.service.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
-import de.lystx.hytoracloud.driver.service.cloud.module.ModuleService;
-import de.lystx.hytoracloud.driver.service.managing.permission.PermissionService;
-import de.lystx.hytoracloud.driver.service.cloud.screen.CloudScreenService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.utils.Utils;
 
 
 
-import de.lystx.hytoracloud.driver.service.managing.player.featured.labymod.LabyModAddon;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.labymod.LabyModAddon;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -77,7 +77,7 @@ public class CloudBridge {
 
         //Deny following services to access
         CloudDriver.getInstance().getServiceRegistry().denyService(PermissionService.class);
-        CloudDriver.getInstance().getServiceRegistry().denyService(CloudScreenService.class);
+        CloudDriver.getInstance().getServiceRegistry().denyService(ServiceOutputService.class);
         CloudDriver.getInstance().getServiceRegistry().denyService(ModuleService.class);
         CloudDriver.getInstance().getServiceRegistry().denyService(ConfigService.class);
         CloudDriver.getInstance().getServiceRegistry().denyService(StatsService.class);
@@ -195,9 +195,9 @@ public class CloudBridge {
                     public void accept(Component component) {
 
                         Component.Reply reply = component.reply();
-                        Service service = JsonEntity.fromClass(reply.getMessage(), Service.class);
+                        IService IService = component.get("service");
 
-                        System.out.println("[CloudBridge] Received Reply from Cloud for '" + service.getName() + "'");
+                        System.out.println("[CloudBridge] Received Reply from Cloud for '" + IService.getName() + "'");
                     }
                 });
 
@@ -211,12 +211,12 @@ public class CloudBridge {
 
                 CloudDriver.getInstance().executeIf(() -> {
 
-                    Service service = CloudDriver.getInstance().getThisService();
-                    System.out.println("[CloudBridge] Verifying Service '" + service.getName() + "' that it is fully set up!");
+                    IService IService = CloudDriver.getInstance().getThisService();
+                    System.out.println("[CloudBridge] Verifying Service '" + IService.getName() + "' that it is fully set up!");
                     try {
-                        service.setAuthenticated(true);
-                        service.setHost(InetAddress.getLocalHost().getHostAddress());
-                        service.update();
+                        IService.setAuthenticated(true);
+                        IService.setHost(InetAddress.getLocalHost().getHostAddress());
+                        IService.update();
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
                     }
@@ -264,7 +264,7 @@ public class CloudBridge {
     public Motd loadRandomMotd() {
         Motd motd;
         List<Motd> motds;
-        if (CloudDriver.getInstance().getNetworkConfig().getGlobalProxyConfig().isMaintenance()) {
+        if (CloudDriver.getInstance().getNetworkConfig().isMaintenance()) {
             motds = CloudDriver.getInstance().getProxyConfig().getMotdMaintenance();
         } else {
             motds = CloudDriver.getInstance().getProxyConfig().getMotdNormal();

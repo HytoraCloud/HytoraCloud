@@ -4,8 +4,8 @@ import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketUpdatePermissionPool;
-import de.lystx.hytoracloud.driver.service.managing.permission.PermissionService;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.packet.HytoraPacket;

@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.in.request.perms;
 
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
 
 
 import lombok.AllArgsConstructor;

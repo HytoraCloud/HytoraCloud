@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.out.receiver;
 
 import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.other.Decision;
 
 
@@ -18,11 +18,11 @@ public class PacketReceiverLoginResult extends HytoraPacket implements Serializa
 
     private ReceiverInfo receiverInfo;
     private Decision decision;
-    private List<ServiceGroup> serviceGroups;
+    private List<IServiceGroup> IServiceGroups;
 
     @Override
     public void write(Component component) {
-        component.put("r", receiverInfo).put("d", decision.name()).put("s", serviceGroups);
+        component.put("r", receiverInfo).put("d", decision.name()).put("s", IServiceGroups);
     }
 
     @Override
@@ -30,6 +30,6 @@ public class PacketReceiverLoginResult extends HytoraPacket implements Serializa
 
         receiverInfo = component.get("r");
         decision = Decision.valueOf(component.get("d"));
-        serviceGroups = component.get("s");
+        IServiceGroups = component.get("s");
     }
 }

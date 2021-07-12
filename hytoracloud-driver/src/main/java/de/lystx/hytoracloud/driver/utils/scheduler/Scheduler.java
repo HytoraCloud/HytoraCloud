@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver.utils.scheduler;
 
 
-import de.lystx.hytoracloud.driver.service.global.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.service.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -295,4 +295,13 @@ public class Scheduler implements ICloudService {
 		return instance;
 	}
 
+	@Override
+	public void reload() {
+
+	}
+
+	@Override
+	public void save() {
+
+	}
 }

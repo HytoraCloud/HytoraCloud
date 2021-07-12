@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 
 
 import lombok.AllArgsConstructor;

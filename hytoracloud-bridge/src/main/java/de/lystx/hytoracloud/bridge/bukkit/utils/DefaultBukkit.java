@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.bukkit.utils;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.service.other.IBukkit;
+import de.lystx.hytoracloud.driver.cloudservices.other.IBukkit;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,7 +53,7 @@ public class DefaultBukkit implements IBukkit {
      */
     public DefaultBukkit() {
         try {
-            this.serviceState = CloudDriver.getInstance().getThisService().getServiceState();
+            this.serviceState = CloudDriver.getInstance().getThisService().getState();
         } catch (NullPointerException e) {
             //Exception thrown by PaperSpigot
             this.serviceState = ServiceState.LOBBY;
@@ -84,7 +84,7 @@ public class DefaultBukkit implements IBukkit {
         } catch (IllegalAccessException|java.lang.reflect.InvocationTargetException|NoSuchMethodException| NoSuchFieldException e) {
             e.printStackTrace();
         }
-        CloudDriver.getInstance().getThisService().setServiceState(serviceState);
+        CloudDriver.getInstance().getThisService().setState(serviceState);
         CloudDriver.getInstance().getThisService().update();
 
     }

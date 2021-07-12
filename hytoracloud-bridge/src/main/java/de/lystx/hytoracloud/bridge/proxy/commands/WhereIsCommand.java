@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.bridge.proxy.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.command.base.CloudCommandSender;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import lombok.Getter;
 
 @Getter
@@ -18,22 +18,22 @@ public class WhereIsCommand {
                 if (args.length == 1) {
                     CloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(args[0]);
                     if (cloudPlayer == null) {
-                        player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe player §e" + args[0] + " §cseems not to be online!");
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[0] + " §cseems not to be online!");
                         return;
                     }
-                    Service service = cloudPlayer.getService();
+                    IService IService = cloudPlayer.getService();
 
-                    if (service == null) {
-                        player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe service of §e" + cloudPlayer.getName() + " §ccould not be found!");
+                    if (IService == null) {
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe service of §e" + cloudPlayer.getName() + " §ccould not be found!");
                         return;
                     }
 
-                    player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7Server of §b" + cloudPlayer.getName() + " §8: §a" + service.getName());
+                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Server of §b" + cloudPlayer.getName() + " §8: §a" + IService.getName());
                 } else {
-                    player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§c/whereis <player>");
+                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§c/whereis <player>");
                 }
             } else {
-                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cYou aren't allowed to perform this command!");
+                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");
             }
         }
     }

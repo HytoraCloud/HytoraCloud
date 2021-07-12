@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
-import de.lystx.hytoracloud.driver.commons.service.Service;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 
 
 import lombok.AllArgsConstructor;
@@ -14,15 +14,15 @@ import java.io.Serializable;
 @AllArgsConstructor @Getter
 public class PacketInStopServer extends HytoraPacket implements Serializable {
 
-    private Service service;
+    private IService IService;
 
     @Override
     public void write(Component component) {
-        component.put("s", service);
+        component.put("s", IService);
     }
 
     @Override
     public void read(Component component) {
-        service = (Service) component.get("s");
+        IService = (IService) component.get("s");
     }
 }

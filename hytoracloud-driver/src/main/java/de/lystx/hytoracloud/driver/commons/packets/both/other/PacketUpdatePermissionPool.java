@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.other;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.service.managing.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

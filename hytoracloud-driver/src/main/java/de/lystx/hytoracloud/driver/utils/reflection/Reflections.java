@@ -55,7 +55,7 @@ public class Reflections {
 
 
     public static Object getPlayer(String name) {
-        if (CloudDriver.getInstance().getThisService().getServiceGroup().getServiceType() == ServiceType.SPIGOT) {
+        if (CloudDriver.getInstance().getThisService().getGroup().getType() == ServiceType.SPIGOT) {
             return getBukkitPlayer(name);
         } else {
             ProxyBridge proxyBridge = CloudDriver.getInstance().getProxyBridge();

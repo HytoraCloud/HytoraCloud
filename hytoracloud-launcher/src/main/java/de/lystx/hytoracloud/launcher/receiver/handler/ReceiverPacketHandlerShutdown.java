@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.global.config.ConfigService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 
 import lombok.AllArgsConstructor;
 

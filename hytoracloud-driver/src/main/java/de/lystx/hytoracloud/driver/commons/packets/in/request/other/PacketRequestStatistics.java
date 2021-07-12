@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.commons.packets.in.request.other;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
 
-import de.lystx.hytoracloud.driver.service.global.config.stats.StatsService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.stats.StatsService;
 import io.vson.enums.FileFormat;
 import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.elements.packet.EmptyPacket;

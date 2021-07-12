@@ -2,10 +2,10 @@ package de.lystx.hytoracloud.launcher.cloud.handler.group;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCreateTemplate;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.service.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import lombok.AllArgsConstructor;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
@@ -19,8 +19,8 @@ public class PacketHandlerCopyTemplate implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInCreateTemplate) {
             PacketInCreateTemplate packetInCreateTemplate = (PacketInCreateTemplate)packet;
-            ServiceGroup group = packetInCreateTemplate.getServiceGroup();
-            ServiceGroup get = this.cloudSystem.getInstance(GroupService.class).getGroup(group.getName());
+            IServiceGroup group = packetInCreateTemplate.getIServiceGroup();
+            IServiceGroup get = this.cloudSystem.getInstance(GroupService.class).getGroup(group.getName());
             if (get == null) {
                 return;
             }

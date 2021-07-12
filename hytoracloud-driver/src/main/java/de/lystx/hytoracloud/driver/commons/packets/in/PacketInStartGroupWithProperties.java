@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.commons.packets.in;
 
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 
 import lombok.AllArgsConstructor;
@@ -15,18 +15,18 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class PacketInStartGroupWithProperties extends HytoraPacket implements Serializable {
 
-    private ServiceGroup serviceGroup;
+    private IServiceGroup IServiceGroup;
     private PropertyObject properties;
 
 
     @Override
     public void write(Component component) {
-        component.put("group", serviceGroup).put("json", properties.toString());
+        component.put("group", IServiceGroup).put("json", properties.toString());
     }
 
     @Override
     public void read(Component component) {
-        serviceGroup = component.get("group");
+        IServiceGroup = component.get("group");
         properties = PropertyObject.fromDocument(new JsonEntity((String) component.get("json")));
     }
 }

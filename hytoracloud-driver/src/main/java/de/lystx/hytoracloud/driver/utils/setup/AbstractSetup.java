@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver.utils.setup;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.service.cloud.console.CloudConsole;
-import de.lystx.hytoracloud.driver.service.cloud.console.color.ConsoleColor;
-import de.lystx.hytoracloud.driver.service.other.Updater;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
+import de.lystx.hytoracloud.driver.cloudservices.other.Updater;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 

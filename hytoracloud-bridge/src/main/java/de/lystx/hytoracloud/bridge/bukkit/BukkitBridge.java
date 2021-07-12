@@ -9,12 +9,12 @@ import de.lystx.hytoracloud.bridge.bukkit.impl.handler.*;
 import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerChatListener;
 import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerJoinListener;
 import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerQuitListener;
-import de.lystx.hytoracloud.driver.service.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 
 
 
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
@@ -146,7 +146,7 @@ public class BukkitBridge extends JavaPlugin {
         if (this.taskId != -1) {
             CloudDriver.getInstance().getScheduler().cancelTask(this.taskId);
         }
-        String msg = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getCloudPrefix());
+        String msg = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix());
         int size = Bukkit.getOnlinePlayers().size();
         if (size <= 0) {
             CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> CloudDriver.getInstance().shutdownDriver(), 5L);

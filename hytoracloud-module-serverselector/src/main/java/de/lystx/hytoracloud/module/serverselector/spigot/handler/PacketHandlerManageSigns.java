@@ -2,14 +2,14 @@ package de.lystx.hytoracloud.module.serverselector.spigot.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
-import de.lystx.hytoracloud.driver.commons.service.ServiceGroup;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 import de.lystx.hytoracloud.module.serverselector.cloud.manager.sign.base.CloudSign;
 import de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.service.managing.player.impl.CloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.CloudPlayer;
 import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,7 +25,7 @@ public class PacketHandlerManageSigns implements PacketHandler {
         if (information.getKey().equalsIgnoreCase("createSign")) {
             final Location location = Location.deserialize((Map<String, Object>) information.getObjectMap().get("location"));
             CloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer((String) information.getObjectMap().get("player"));
-            ServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup((String) information.getObjectMap().get("group"));
+            IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup((String) information.getObjectMap().get("group"));
 
             CloudSign sign = new CloudSign((int) location.getX(), (int) location.getY(), (int) location.getZ(), group.getName(), location.getWorld().getName());
             if (SpigotSelector.getInstance().getSignManager().getSignUpdater().getCloudSign(location) == null) {
@@ -42,9 +42,9 @@ public class PacketHandlerManageSigns implements PacketHandler {
                 PacketInformation packetInformation = new PacketInformation("PacketInCreateSign", new CloudMap<String, Object>().append("sign", sign.serialize()));
                 CloudDriver.getInstance().sendPacket(packetInformation);
                 CloudDriver.getInstance().getThisService().update();
-                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
+                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
             } else {
-                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThe §eCloudSign §calready exists!");
+                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eCloudSign §calready exists!");
             }
         } else if (information.getKey().equalsIgnoreCase("deleteSign")) {
             final Location location = Location.deserialize((Map<String, Object>) information.getObjectMap().get("location"));
@@ -52,7 +52,7 @@ public class PacketHandlerManageSigns implements PacketHandler {
 
             CloudSign cloudSign = SpigotSelector.getInstance().getSignManager().getSignUpdater().getCloudSign(location);
             if (cloudSign == null) {
-                player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§cThis §eCloudSign §cseems not to be registered!");
+                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis §eCloudSign §cseems not to be registered!");
                 return;
             }
             Block block = Bukkit.getWorld(cloudSign.getWorld()).getBlockAt(cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
@@ -65,7 +65,7 @@ public class PacketHandlerManageSigns implements PacketHandler {
             SpigotSelector.getInstance().getSignManager().getCloudSigns().remove(cloudSign);
             PacketInformation packetInformation = new PacketInformation("PacketInDeleteSign", new CloudMap<String, Object>().append("sign", cloudSign.serialize()));
             CloudDriver.getInstance().sendPacket(packetInformation);
-            player.sendMessage(CloudDriver.getInstance().getCloudPrefix() + "§7You removed a CloudSign for the group §b" + cloudSign.getGroup().toUpperCase());
+            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You removed a CloudSign for the group §b" + cloudSign.getGroup().toUpperCase());
 
         }
     }

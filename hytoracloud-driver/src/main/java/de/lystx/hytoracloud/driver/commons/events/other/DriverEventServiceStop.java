@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.driver.commons.events.other;
 
-import de.lystx.hytoracloud.driver.commons.service.Service;
-import de.lystx.hytoracloud.driver.service.managing.event.base.CloudEvent;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter @AllArgsConstructor
 public class DriverEventServiceStop extends CloudEvent {
 
-    private final Service service;
+    private final IService IService;
 }

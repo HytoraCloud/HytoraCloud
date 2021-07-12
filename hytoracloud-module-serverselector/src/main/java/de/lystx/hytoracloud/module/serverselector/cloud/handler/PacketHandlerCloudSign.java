@@ -25,9 +25,7 @@ public class PacketHandlerCloudSign implements PacketHandler {
                 CloudSign get = this.cloudDriver.getInstance(SignService.class).getCloudSign(sign.getX(), sign.getY(), sign.getZ(), sign.getWorld());
                 if (get == null) {
                     this.cloudDriver.getInstance(SignService.class).getCloudSigns().add(sign);
-                    this.cloudDriver.getInstance(SignService.class).save();
-                    this.cloudDriver.getInstance(SignService.class).load();
-                    this.cloudDriver.getInstance(SignService.class).loadSigns();
+                    this.cloudDriver.getInstance(SignService.class).saveAndReload();
                     this.cloudDriver.reload();
                 }
             } else if (packetInformation.getKey().equalsIgnoreCase("PacketInDeleteSign")) {
@@ -35,9 +33,7 @@ public class PacketHandlerCloudSign implements PacketHandler {
                 CloudSign get = this.cloudDriver.getInstance(SignService.class).getCloudSign(sign.getX(), sign.getY(), sign.getZ(), sign.getWorld());
                 if (get != null) {
                     this.cloudDriver.getInstance(SignService.class).getCloudSigns().remove(get);
-                    this.cloudDriver.getInstance(SignService.class).save();
-                    this.cloudDriver.getInstance(SignService.class).load();
-                    this.cloudDriver.getInstance(SignService.class).loadSigns();
+                    this.cloudDriver.getInstance(SignService.class).saveAndReload();
                     this.cloudDriver.reload();
                 }
             }
