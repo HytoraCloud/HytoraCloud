@@ -1,34 +1,53 @@
-# HytoraCloud
-Open source Minecraft Server management
+![gh-banner](https://user-images.githubusercontent.com/53837207/125361395-88250500-e36d-11eb-9a80-8381b4b98992.png)
 
-![hytoraCloud_banner](https://user-images.githubusercontent.com/63949927/110115056-d457ab80-7db5-11eb-89e0-0a143d4954de.png)
-
-
-HytoraCloud is a project that has taken the last 10 months of my life.
-HytoraCloud is used to manage all of your BungeeCord and Spigot servers together in one big process.
-
-Compatible Network Softwares:
-
- -  Spigot : bukkit, (paperSpigot in maintenance)
- -  BungeeCord: bungeeCord, waterFall
-  
-Cloning project:
-
-1. Clone the project from GitHub
-![image](https://user-images.githubusercontent.com/63949927/110113639-af623900-7db3-11eb-9ab6-7c9c3fd8b502.png)
-
-2. Add Vson as Library to the project
-![image](https://user-images.githubusercontent.com/63949927/110113737-d02a8e80-7db3-11eb-9295-474f6bca01c5.png)
-
-3. Checking for lombok (Make sure you have lombok plugin installed)
-![image](https://user-images.githubusercontent.com/63949927/110113783-e5072200-7db3-11eb-9b7e-4c5c1c6a026d.png)
-
-4. Adding artifacts (Only extract compile output and vson the other libraries are loading intern)
-  > Also make sure that the output directory of the CloudAPI is the resources folder of the CLoudSystem ("/resources/implements/plugins/CloudAPI.jar")
-![image](https://user-images.githubusercontent.com/63949927/110113841-fb14e280-7db3-11eb-9a32-3b965e4e8fb3.png)
-
-5.Building and exporting
-  > First build the CloudAPI then rebuild the CloudSystem and finally build the CloudSystem
-![image](https://user-images.githubusercontent.com/63949927/110113963-31526200-7db4-11eb-94e0-783a46eaac38.png) 
-![image](https://user-images.githubusercontent.com/63949927/110114057-4f1fc700-7db4-11eb-9ddd-48df9ad15a8c.png)
-![image](https://user-images.githubusercontent.com/63949927/110114138-71194980-7db4-11eb-8386-e162aac9099f.png)
+# ☁️ HytoraCloud
+HytoraCloud is a server-management system used, to manage all your servers for you. That means: start them and stop them when necessary. It also has many more features which you can see down below.
+# 📑 Features
+- [X] Template system
+- [X] QuerySystem for CloudAPI (Real time results)
+- [X] Dynamic Fallback System
+- [X] Database Support (MySQL, MongoDB, Files)
+- [X] Static / Dynamic Servers
+- [X] Sign System with custom layout
+- [X] NPCSystem (Customizable Inventory)
+- [X] PermissionsSystem
+- [X] Web Rest API
+- [X] Hub-Command / Cloud-Command / Perms-Command / List-Command / Service-Command (Bukkit)
+- [X] Log System (paste upload)
+- [X] Auto-Starting servers
+- [X] Multi-Proxy available
+- [X] Toggle Server- start and stop messages (for yourself)
+- [X] Spigot installation command with a backup of old versions
+- [X] Small Module System (not that many features at the moment)
+- [X] Screen System (Output of services)
+- [X] Big CloudAPI and easy to understand (Documentation on Discord)
+- [X] Easy to use Chat and Tablist (Prefix) System
+- [X] ProxySystem (Motd / Whitelist / Tablist)
+- [X] Statistics of cloud
+- [X] Colored Console
+- [X] Viewing TPS of CloudSystem and all online Services
+# 🙏 Thanks to:
+### 🧑🏻‍🤝‍🧑🏻 Contributors
+* Lystx
+* EzxD
+### 🚧 Used Open-Source projects
+* [arangodb](https://github.com/arangodb/arangodb)
+* [bungeecord](https://github.com/SpigotMC/BungeeCord)
+* [commons-io](https://github.com/apache/commons-io)
+* [commons-lang](https://github.com/apache/commons-lang)
+* [commons-logging](https://github.com/apache/commons-logging)
+* [dnsjava](https://github.com/dnsjava/dnsjava)
+* [gson](https://github.com/google/gson)
+* [guava](https://github.com/google/guava)
+* [httpcomponents](https://github.com/apache/httpcomponents-core)
+* [jline](https://github.com/jline/jline3)
+* [log4j](https://github.com/apache/log4j)
+* [logback](https://github.com/qos-ch/logback)
+* [lombok](https://github.com/projectlombok/lombok)
+* [mongodb-java-driver](https://github.com/mongodb/mongo-java-driver)
+* [mysql-connector-java](https://github.com/osheroff/mysql-binlog-connector-java)
+* [netty](https://github.com/netty/netty)
+* [spigot](https://hub.spigotmc.org/stash/projects/spigot)
+* [velocity](https://github.com/VelocityPowered/Velocity)
+# 📋 Pull Requests
+PR's are always welcome. Please note that we have to review them, which may take a while. If you have any questions, you can contact [@Lystx](https://github.com/Lystx) via. the discord server.
