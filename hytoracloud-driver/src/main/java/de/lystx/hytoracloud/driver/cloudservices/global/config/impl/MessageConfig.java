@@ -10,18 +10,61 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class MessageConfig implements Serializable {
 
-    private String prefix;
-    private String serverStartMessage;
-    private String serverStopMessage;
-    private String alreadyHubMessage;
-    private String noHubMessage;
-    private String maintenanceKickMessage;
-    private String networkStillBootingMessage;
-    private String groupMaintenanceMessage;
-    private String alreadyConnectedMessage;
-    private String alreadyOnNetworkMessage;
-    private String serverShutdownMessage;
-    private String errorMessage;
+    /**
+     * The prefix of all messages
+     */
+    private final String prefix;
 
+    /**
+     * When a server starts
+     */
+    private final String serviceStart;
+
+    /**
+     * When a server stops
+     */
+    private final String serviceStop;
+
+    /**
+     * When you're executing "/hub" but
+     * you're already on the hub
+     */
+    private final String alreadyLobby;
+
+    /**
+     * When no lobby server could be found
+     */
+    private final String noLobbyFound;
+
+    /**
+     * When the network is in maintenance
+     */
+    private final String maintenanceNetwork;
+
+    /**
+     * When a group is in maintenance
+     */
+    private final String maintenanceGroup;
+
+    /**
+     * When you're already connected to a service
+     */
+    private final String alreadyConnected;
+
+    /**
+     * When a server gets stopped and you're on it
+     */
+    private final String bukkitShutdown;
+
+    /**
+     * When you weren't registered via proxy before
+     */
+    private final String onlyProxyJoin;
+
+    /**
+     * When the cloud is shut down
+     * and everyone gets kicked
+     */
+    private final String cloudShutdown;
 
 }

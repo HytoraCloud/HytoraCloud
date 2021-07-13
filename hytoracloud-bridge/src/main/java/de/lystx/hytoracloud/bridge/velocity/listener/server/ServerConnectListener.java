@@ -19,7 +19,7 @@ public class ServerConnectListener {
             if (player.hasPermission("cloudsystem.group.maintenance")) {
                 event.setResult(ServerPreConnectEvent.ServerResult.allowed(VelocityBridge.getInstance().getServer().getServer(servername).get()));
             } else {
-                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", IServiceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
+                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", IServiceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
                 player.sendMessage(Component.text(message));
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
             }

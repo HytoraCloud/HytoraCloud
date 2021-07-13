@@ -120,6 +120,14 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
     void update();
 
     /**
+     * Gets the usage of the service
+     *
+     * @return memory as long
+     */
+    @Deprecated
+    long getMemoryUsage();
+
+    /**
      * Stops this service
      */
     void shutdown();
@@ -130,4 +138,12 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      */
     IService deepCopy();
 
+    /**
+     * Uploads the log of the server
+     * to hastebin and returns the url
+     * to view the content online
+     *
+     * @return url link of log
+     */
+    String getLogUrl();
 }

@@ -94,7 +94,7 @@ public class CloudBootingSetupNotDone {
                     -1,
                     1,
                     512,
-                    128,
+                    50,
                     100,
                     false,
                     true,

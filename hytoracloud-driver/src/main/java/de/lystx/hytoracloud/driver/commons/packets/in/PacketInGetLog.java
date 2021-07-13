@@ -19,20 +19,15 @@ import java.io.Serializable;
 public class PacketInGetLog extends HytoraPacket implements Serializable {
 
     private String service;
-    private String player;
 
     @Override
     public void write(Component component) {
-        component.append(map -> {
-            map.put("s", service);
-            map.put("p", player);
-        });
+        component.append(map -> map.put("s", service));
     }
 
     @Override
     public void read(Component component) {
 
         service = component.get("s");
-        player = component.get("p");
     }
 }

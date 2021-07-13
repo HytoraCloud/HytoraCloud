@@ -13,7 +13,6 @@ public class PacketInformation extends PacketCommunication {
     private String key;
     private Map<String, Object> objectMap;
 
-
     @Override
     public void read(Component component) {
         super.read(component);

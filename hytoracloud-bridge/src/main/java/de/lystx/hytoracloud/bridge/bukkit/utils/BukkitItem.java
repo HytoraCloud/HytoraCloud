@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.bridge.bukkit.utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudItem;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -211,5 +212,31 @@ public class BukkitItem {
         return item;
     }
 
+    /**
+     * Transforms a CloudItem to a Bukkit ItemStack
+     *
+     * @param cloudItem the clouditem
+     * @return itemstack
+     */
+    public static ItemStack fromCloudItem(CloudItem cloudItem) {
+        if (cloudItem == null) {
+            return null;
+        }
+        BukkitItem bukkitItemStack = new BukkitItem(
+                Material.valueOf(cloudItem.getMaterial()),
+                cloudItem.getId(),
+                cloudItem.getAmount()
+        );
+        bukkitItemStack.addLores(cloudItem.getLore());
+        bukkitItemStack.setUnbreakable(cloudItem.isUnbreakable());
+        if (cloudItem.isGlow()) {
+            bukkitItemStack.setGlow();
+        }
+        bukkitItemStack.setDisplayName(cloudItem.getDisplayName());
+        if (cloudItem.getSkullOwner() != null) {
+            bukkitItemStack.setSkullOwner(cloudItem.getSkullOwner());
+        }
+        return bukkitItemStack.build();
+    }
 
 }

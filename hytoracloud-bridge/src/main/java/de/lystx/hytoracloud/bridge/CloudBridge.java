@@ -29,7 +29,6 @@ import de.lystx.hytoracloud.driver.utils.Utils;
 
 
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.labymod.LabyModAddon;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -71,8 +70,6 @@ public class CloudBridge {
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.client);
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "driverType", CloudType.BRIDGE);
 
-        CloudDriver.getInstance().execute(LabyModAddon::load);
-
 
         //Deny following services to access
         CloudDriver.getInstance().getServiceRegistry().denyService(PermissionService.class);
@@ -91,7 +88,8 @@ public class CloudBridge {
                 new BridgeHandlerCommunication(),
                 new BridgeHandlerPlayer(),
                 new BridgeHandlerPerms(),
-                new BridgeHandlerEvent()
+                new BridgeHandlerEvent(),
+                new BridgeHandlerServiceUsage()
         );
         this.bootstrap();
 

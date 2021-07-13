@@ -1,7 +1,16 @@
 package de.lystx.hytoracloud.bridge.bukkit.impl.command;
 
 import com.sun.management.OperatingSystemMXBean;
+import de.lystx.hytoracloud.bridge.bukkit.signselector.ServerSelector;
+import de.lystx.hytoracloud.bridge.bukkit.signselector.manager.npc.impl.NPC;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
+import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -12,6 +21,8 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
@@ -33,7 +44,6 @@ public class ServiceCommand {
                         if (!this.executed) {
                             this.executed = true;
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Loading §bService Infos§8...");
-                            CloudDriver.getInstance().getModules(); //Requesting Modules to load
                         }
                         long used = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
                         long max = Runtime.getRuntime().maxMemory() / 1048576L;
@@ -62,29 +72,34 @@ public class ServiceCommand {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
-                        if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
-                            return;
-                        }
                         Set<Material> materials = new HashSet<>();
                         materials.add(Material.AIR);
-                        Location loc = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
-                        if (loc.getBlock().getType().equals(Material.WALL_SIGN)) {
+                        Location location = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
 
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("player", player.getName());
-                            map.put("location", loc.serialize());
-                            PacketInformation packetInformation = new PacketInformation("deleteSign", map);
+                        if (location.getBlock().getType().equals(Material.WALL_SIGN)) {
+                            CloudSign cloudSign = ServerSelector.getInstance().getSignManager().getSignUpdater().getCloudSign(location);
+                            if (cloudSign == null) {
+                                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis §eCloudSign §cseems not to be registered!");
+                                return;
+                            }
+                            Block block = Bukkit.getWorld(cloudSign.getWorld()).getBlockAt(cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
+                            Sign signBlock = (Sign) block.getState();
+                            signBlock.setLine(0, "§8§m------");
+                            signBlock.setLine(1, "§4⚠⚠⚠⚠⚠");
+                            signBlock.setLine(2, "§8» §cRemoved");
+                            signBlock.setLine(3, "§8§m------");
+                            signBlock.update(true);
+                            ServerSelector.getInstance().getSignManager().getCloudSigns().remove(cloudSign);
 
-                            CloudDriver.getInstance().sendPacket(packetInformation);
+                            CloudDriver.getInstance().sendPacket(new PacketInCloudSignDelete(cloudSign));
+                            CloudDriver.getInstance().getCurrentService().update();
+
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You removed a CloudSign for the group §b" + cloudSign.getGroup().toUpperCase());
+
                         } else {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
                         }
                     } else if (args[0].equalsIgnoreCase("removeNPC")) {
-                        if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
-                            return;
-                        }
                         if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
@@ -113,26 +128,39 @@ public class ServiceCommand {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThis is not a Lobby server!");
                             return;
                         }
-                        if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
-                            return;
-                        }
                         String serverGroup = args[1];
                         IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(serverGroup);
+
+
                         if (group != null) {
+                            if (group.getType() == ServiceType.PROXY) {
+                                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYou can not create §eCloudSigns §cfor §eProxyGroups§c!");
+                                return;
+                            }
+
                             Set<Material> materials = new HashSet<>();
                             materials.add(Material.AIR);
-                            Location loc = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
-                            if (loc.getBlock().getType().equals(Material.WALL_SIGN)) {
+                            Location location = Bukkit.getPlayer(player.getName()).getTargetBlock(materials, 5).getLocation();
+                            if (location.getBlock().getType().equals(Material.WALL_SIGN)) {
 
-                                Map<String, Object> map = new HashMap<>();
-                                map.put("player", player.getName());
-                                map.put("location", loc.serialize());
-                                map.put("group", group.getName());
-                                PacketInformation packetInformation = new PacketInformation("createSign", map);
+                                CloudSign sign = new CloudSign((int) location.getX(), (int) location.getY(), (int) location.getZ(), group.getName(), location.getWorld().getName());
+                                if (ServerSelector.getInstance().getSignManager().getSignUpdater().getCloudSign(location) == null) {
+                                    Block block = Bukkit.getWorld(sign.getWorld()).getBlockAt(sign.getX(), sign.getY(), sign.getZ());
+                                    Sign signBlock = (Sign) block.getState();
+                                    signBlock.setLine(0, "§8§m------");
+                                    signBlock.setLine(1, "§b" + group.getName().toUpperCase());
+                                    signBlock.setLine(2, "RELOADING...");
+                                    signBlock.setLine(3, "§8§m------");
+                                    signBlock.update(true);
+                                    ServerSelector.getInstance().getSignManager().getCloudSigns().add(sign);
 
-                                CloudDriver.getInstance().sendPacket(packetInformation);
+                                    CloudDriver.getInstance().sendPacket(new PacketInCloudSignCreate(sign));
+                                    CloudDriver.getInstance().getCurrentService().update();
 
+                                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You created a CloudSign for the group §b" + group.getName());
+                                } else {
+                                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eCloudSign §calready exists!");
+                                }
                             } else {
                                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe block you are looking at, is not a sign!");
                             }
@@ -170,23 +198,25 @@ public class ServiceCommand {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
                             return;
                         }
-                        if (CloudDriver.getInstance().getModule("module-serverSelector") == null) {
-                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe §eServerSelector-Module §cis not in modules folder!");
-                            return;
-                        }
                         String groupName = args[1];
 
-                        Map<String, Object> map = new HashMap<>();
+                        String skin = args[3];
+                        String name = args[2].replace("_", " ").replace("&", "§");
+                        Location location = Bukkit.getPlayer(player.getName()).getLocation();
 
-                        map.put("key", "createNPC");
-                        map.put("player", player.getName());
-                        map.put("skin", args[3]);
-                        map.put("name", args[2].replace("_", " "));
-                        map.put("loc", Bukkit.getPlayer(player.getName()).getLocation().serialize());
-                        map.put("group", groupName);
-                        PacketInformation packetInformation = new PacketInformation("createNPC", map);
-
-                        CloudDriver.getInstance().sendPacket(packetInformation);
+                        NPC npc = ServerSelector.getInstance().getNpcManager().getNPC(location);
+                        if (npc != null) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere is already an §eNPC §cfor this location!");
+                            return;
+                        }
+                        IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(groupName);
+                        if (group != null) {
+                            CloudDriver.getInstance().sendPacket(new PacketInNPCCreate(new NPCMeta(UUID.randomUUID(), name, skin, groupName, location.serialize())));
+                            ServerSelector.getInstance().getNpcManager().updateNPCS();
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You created an NPC for the group §b" + group.getName() + " §7with skin §b" + skin + "§8!");
+                        } else {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + groupName + " §cdoesn't exist!");
+                        }
                     } else {
                         this.help(player);
                     }
@@ -199,18 +229,16 @@ public class ServiceCommand {
         }
     }
 
-    public void help(ICloudPlayer ICloudPlayer) {
-        ICloudPlayer.sendMessage("§bCloudService §7Help§8:");
-        ICloudPlayer.sendMessage("§8§m--------------------------------------");
-        ICloudPlayer.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
-        if (CloudDriver.getInstance().getModule("module-serverSelector") != null) {
-            ICloudPlayer.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
-            ICloudPlayer.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
-            ICloudPlayer.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
-            ICloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
-        }
-        ICloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
-        ICloudPlayer.sendMessage("§8§m--------------------------------------");
+    public void help(ICloudPlayer cloudPlayer) {
+        cloudPlayer.sendMessage("§bCloudService §7Help§8:");
+        cloudPlayer.sendMessage("§8§m--------------------------------------");
+        cloudPlayer.sendMessage("  §8» §b/service info §8┃ §7Displays info about this service");
+        cloudPlayer.sendMessage("  §8» §b/service createSign <Group> §8┃ §7Creates a CloudSign");
+        cloudPlayer.sendMessage("  §8» §b/service removeSign §8┃ §7Removes a CloudSign");
+        cloudPlayer.sendMessage("  §8» §b/service createNPC <Group> <Name> <Skin> §8┃ §7Creates an NPC");
+        cloudPlayer.sendMessage("  §8» §b/service removeNPC §8┃ §7Removes an NPC");
+        cloudPlayer.sendMessage("  §8» §b/service setState <State> §8┃ §7Sets the state of this service");
+        cloudPlayer.sendMessage("§8§m--------------------------------------");
 
 
     }

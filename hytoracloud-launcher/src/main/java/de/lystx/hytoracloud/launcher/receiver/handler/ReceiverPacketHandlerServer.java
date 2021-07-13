@@ -40,7 +40,6 @@ public class ReceiverPacketHandlerServer implements PacketHandler {
         } else if (packet instanceof PacketInUpdateServiceGroup) {
 
             PacketInUpdateServiceGroup packetInUpdateServiceGroup = (PacketInUpdateServiceGroup)packet;
-            //TODO: Manage groups
             //this.receiver.getService().updateGroup(this.receiver.getGroup(packetInUpdateServiceGroup.getServiceGroup().getName()), packetInUpdateServiceGroup.getServiceGroup());
 
         } else if (packet instanceof PacketInCreateTemplate) {

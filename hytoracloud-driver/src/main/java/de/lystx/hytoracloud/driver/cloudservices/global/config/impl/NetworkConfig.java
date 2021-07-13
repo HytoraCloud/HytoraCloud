@@ -5,7 +5,6 @@ import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.labymod.LabyModConfig;
 
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
@@ -61,11 +60,6 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
     private List<String> whitelistedPlayers;
 
     /**
-     * The LabyMod config
-     */
-    private LabyModConfig labyModConfig;
-
-    /**
      * The message config
      */
     private MessageConfig messageConfig;
@@ -89,24 +83,18 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
                 false,
                 true,
                 new LinkedList<>(),
-                new LabyModConfig(
-                        false,
-                        "§8» §7HytoraCloud §8× §b%service% §8[§b%online_players%§8/§b%max_players%§8]",
-                        true
-                ),
                 new MessageConfig(
                         "§8» §bCloud §8┃ §7",
                         "%prefix%§7The server §a%server% §7is now starting§8...",
                         "%prefix%§7The server §c%server% §7is now stopping§8...",
-                        "%prefix%§cYou are already on a lobbyserver!",
-                        "%prefix%§cNo lobbyserver could be found!",
+                        "%prefix%§cYou are already on a Lobby-Server!",
+                        "%prefix%§cNo Lobby-Server could be found!",
                         "%prefix%§cThe network is not available for you at this time",
-                        "%prefix%§cThe CloudSystem is still booting up! There are no servers to connect on at this time!",
-                        "%prefix%§cThe servergroup §e%group% §cis in maintenance!",
-                        "%prefix%§cYou are alread connected to this service!",
-                        "%prefix%§cYou are alread on the network!",
+                        "%prefix%§cThe group §e%group% §cis in maintenance!",
+                        "%prefix%§cYou are already connected to this Service!",
                         "%prefix%§cThis server was shut down!",
-                        "%prefix%§cAn error occured§8: §e%error%"
+                        "%prefix%§cPlease only join through any of the Proxys!",
+                        "%prefix%§cHytoraCloud was §estopped§c!"
                         ),
                 new FallbackConfig(
                         new Fallback(1, "Lobby", null),

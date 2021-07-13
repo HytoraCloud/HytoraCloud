@@ -1,8 +1,12 @@
 package de.lystx.hytoracloud.driver.commons.implementations;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestTPS;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -15,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -23,11 +28,6 @@ import java.util.UUID;
 
 @Getter @Setter @AllArgsConstructor
 public class ServiceObject extends WrappedObject<IService, ServiceObject> implements IService {
-
-    /**
-     * The name of this service
-     */
-    private String name;
 
     /**
      * The uuid of this service
@@ -70,36 +70,28 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     private boolean authenticated;
 
     public ServiceObject(IServiceGroup group, int id, int port) {
-        this(group.getName() + "-" + id, UUID.randomUUID(), id, port, CloudDriver.getInstance().getHost().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
+        this(UUID.randomUUID(), id, port, CloudDriver.getInstance().getHost().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
     }
 
-    /**
-     * Adds a property to this service
-     *
-     * @param key the name of the property
-     * @param data the data
-     */
+    @Override
     public void addProperty(String key, PropertyObject data) {
         this.properties.append(key, data);
     }
 
-    /**
-     * Checks if Service is for example
-     * SPIGOT or PROXY
-     *
-     * @param serviceType the type to compare with
-     * @return boolean
-     */
+    @Override
     public boolean isInstanceOf(ServiceType serviceType) {
         return this.group.getType().equals(serviceType);
     }
 
-    /**
-     * Returns the {@link ICloudPlayer}s on this
-     * Service (for example "Lobby-1")
-     *
-     * @return List of cloudPlayers on this service
-     */
+    public String getName() {
+        return this.group.getName() + "-" + this.id;
+    }
+
+    @Override
+    public void setName(String name) {
+    }
+
+    @Override
     public List<ICloudPlayer> getPlayers() {
         List<ICloudPlayer> list = new LinkedList<>();
         for (ICloudPlayer globalOnlinePlayer : CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()) {
@@ -114,13 +106,18 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return list;
     }
 
-    /**
-     * Returns the Motd of this Service
-     * might lag if the Service has not been
-     * pinged before
-     *
-     * @return Motd of service
-     */
+    //TODO: CHECK THIS
+    @Override
+    public long getMemoryUsage() {
+        PacketServiceMemoryUsage packet = new PacketServiceMemoryUsage(this.getName());
+        Component component = packet.toReply(CloudDriver.getInstance().getConnection());
+        if (component.reply().getMessage().equalsIgnoreCase("The request timed out")) {
+            return -1L;
+        }
+        return Long.parseLong(component.reply().getMessage());
+    }
+
+    @Override
     public String getMotd() {
         if (group.getType().equals(ServiceType.PROXY)) {
             throw new UnsupportedOperationException("Not available for Proxy!");
@@ -128,13 +125,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return this.ping().getMotd();
     }
 
-    /**
-     * Returns the Maximum PLayers of this Service
-     * might lag if the Service has not been
-     * pinged before
-     *
-     * @return Maximum PLayers of service
-     */
+    @Override
     public int getMaxPlayers() {
         if (group.getType().equals(ServiceType.PROXY)) {
             throw new UnsupportedOperationException("Not available for Proxy!");
@@ -142,14 +133,9 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return this.ping().getMaxplayers();
     }
 
-    /**
-     * Gets the formatted tps of this
-     * minecraft server
-     *
-     * @return tps in string with color
-     */
+    @Override
     public String getTPS() {
-        PacketRequestTPS packetRequestTPS = new PacketRequestTPS(this.name);
+        PacketRequestTPS packetRequestTPS = new PacketRequestTPS(this.getName());
 
         Component component = packetRequestTPS.toReply(CloudDriver.getInstance().getConnection(), 3000);
         String message = component.reply().getMessage();
@@ -157,17 +143,12 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return message.equalsIgnoreCase("The request timed out") ? "§c???" : message;
     }
 
-    /**
-     * Updates this Service
-     * and syncs it all over the cloud
-     */
+    @Override
     public void update() {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketServiceUpdate(this));
     }
 
-    /**
-     * Stops this service
-     */
+    @Override
     public void shutdown() {
         CloudDriver.getInstance().getServiceManager().stopService(this);
     }
@@ -207,13 +188,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public String toString() {
-        return name;
+        return getName();
     }
 
-    /**
-     * Copies this service 1:1
-     * @return copied service
-     */
+
+    @Override
     public IService deepCopy() {
         IService service = new ServiceObject(this.group, this.id, this.port);
         service.setId(this.id);
@@ -225,6 +204,14 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         service.setProperties(this.properties);
         service.setAuthenticated(this.authenticated);
         return service;
+    }
+
+    @Override
+    public String getLogUrl() {
+        PacketInGetLog packet = new PacketInGetLog(this.getName());
+        Component component = packet.toReply(CloudDriver.getInstance().getConnection());
+        String message = component.reply().getMessage();
+        return component.reply().getMessage();
     }
 
     @Override

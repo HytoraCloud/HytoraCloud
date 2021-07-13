@@ -12,7 +12,6 @@
         <module>hytoracloud-bridge</module>
         <module>hytoracloud-driver</module>
         <module>hytoracloud-launcher</module>
-        <module>hytoracloud-module-serverselector</module>
         <module>hytoracloud-discordbot</module>
         <module>hytoracloud-networking</module>
     </modules>

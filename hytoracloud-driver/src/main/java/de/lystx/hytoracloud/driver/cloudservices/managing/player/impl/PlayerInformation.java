@@ -138,7 +138,6 @@ public class PlayerInformation implements Serializable, IPermissionUser, Objecta
     public void update() {
         CloudDriver.getInstance().getPermissionPool().updatePlayer(this);
         CloudDriver.getInstance().getPermissionPool().update();
-        CloudDriver.getInstance().getPermissionPool().update(); //TODO: Fix work after one update();
     }
 
     @Override

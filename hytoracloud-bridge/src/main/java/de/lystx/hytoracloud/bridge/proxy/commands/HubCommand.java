@@ -13,7 +13,7 @@ public class HubCommand {
             ICloudPlayer player = (ICloudPlayer) commandSender;
 
             if (CloudDriver.getInstance().isFallback(player)) {
-                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyHubMessage().replace("%prefix%", CloudDriver.getInstance().getPrefix());
+                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyLobby().replace("%prefix%", CloudDriver.getInstance().getPrefix());
                 if (!message.trim().isEmpty()) player.sendMessage(message);
             } else {
                 player.connect(CloudDriver.getInstance().getFallback(player));

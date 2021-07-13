@@ -32,7 +32,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.other.IBukkit;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
@@ -49,7 +49,6 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.lib.LibraryService;
-import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -640,6 +639,15 @@ public class CloudDriver {
         return this.driverType == CloudType.BRIDGE;
     }
 
+    /**
+     * Sets a field of this class
+     *
+     * @param name the name
+     * @param obj the object
+     */
+    public void setInstance(String name, Object obj) {
+        Utils.setField(CloudDriver.class, this, name, obj);
+    }
 
     /**
      * Returns a module by name

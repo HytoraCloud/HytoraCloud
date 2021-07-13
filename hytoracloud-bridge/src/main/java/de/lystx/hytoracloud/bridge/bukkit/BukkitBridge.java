@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.bridge.bukkit;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.bukkit.impl.command.ServiceCommand;
 import de.lystx.hytoracloud.bridge.bukkit.impl.command.StopCommand;
+import de.lystx.hytoracloud.bridge.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.bridge.bukkit.utils.DefaultBukkit;
 import de.lystx.hytoracloud.bridge.bukkit.utils.NametagManager;
 import de.lystx.hytoracloud.bridge.bukkit.impl.handler.*;
@@ -10,9 +11,6 @@ import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerChatListener;
 import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerJoinListener;
 import de.lystx.hytoracloud.bridge.bukkit.impl.listener.PlayerQuitListener;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-
-
-
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -29,46 +27,62 @@ import java.util.*;
 @Getter @Setter
 public class BukkitBridge extends JavaPlugin {
 
+    /**
+     * The instance
+     */
     @Getter
     private static BukkitBridge instance;
 
+    /**
+     * The nametag manager
+     */
     private NametagManager nametagManager;
 
+    /**
+     * The manager to manage signs and npc
+     */
+    private ServerSelector serverSelector;
+
+    /**
+     * the scheduler id for the waiting
+     * task to cancel it
+     */
     private int taskId;
 
     @Override
     public void onEnable() {
+        instance = this;
+
         CloudBridge.load();
 
         if (CloudDriver.getInstance().getConnection() == null || !CloudDriver.getInstance().getConnection().isAvailable()) {
             CloudBridge.load();
         }
-        CloudDriver.getInstance().execute(() -> {
-            instance = this;
 
-            Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "bukkit", new DefaultBukkit());
 
-            CloudDriver.getInstance().getBukkit().setVersion(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
+        CloudDriver.getInstance().setInstance("bukkit", new DefaultBukkit());
+        CloudDriver.getInstance().getBukkit().setVersion(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
 
-            //Initializing Objects
-            this.nametagManager = new NametagManager();
-            this.taskId = -1;
-            this.bootstrap();
+        //Initializing Objects
+        this.serverSelector = new ServerSelector(this);
+        this.nametagManager = new NametagManager();
+        this.taskId = -1;
 
-        });
+        this.bootstrap();
 
     }
 
 
     @Override
     public void onDisable() {
+        this.serverSelector.shutdown();
+
         try {
             CloudDriver.getInstance().getConnection().close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LABYMOD");
-        this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "LMC");
+
     }
 
     /**
@@ -102,9 +116,6 @@ public class BukkitBridge extends JavaPlugin {
         CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerCloudPlayer());
         CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerTPS());
 
-        //Start checking for players or stop server
-        this.startStopTimer();
-
         //Registering Events
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerChatListener(), this);
@@ -113,6 +124,9 @@ public class BukkitBridge extends JavaPlugin {
         // Registering commands
         CloudDriver.getInstance().registerCommand(new ServiceCommand());
         CloudDriver.getInstance().registerCommand(new StopCommand());
+
+        //Start checking for players or stop server
+        CloudDriver.getInstance().executeIf(this::startStopTimer, () -> CloudDriver.getInstance().getCurrentService() != null);
 
     }
 
@@ -146,7 +160,7 @@ public class BukkitBridge extends JavaPlugin {
         if (this.taskId != -1) {
             CloudDriver.getInstance().getScheduler().cancelTask(this.taskId);
         }
-        String msg = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix());
+        String msg = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getBukkitShutdown().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix());
         int size = Bukkit.getOnlinePlayers().size();
         if (size <= 0) {
             CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> CloudDriver.getInstance().shutdownDriver(), 5L);

@@ -13,6 +13,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketOptions;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
@@ -90,7 +91,8 @@ public class HytoraConnectionBridge implements ComponentSender {
                 this.objectInputStream = in;
 
                 if (this.waitLogin()) {
-                    socket.setSoTimeout(1000 * 3600 * 6); //TODO: CHECK -> would equal 6 hours before time out
+
+                    socket.setSoTimeout(0);
 
                     this.enabled = true;
                     this.server.getUserManager().registerUser(this);

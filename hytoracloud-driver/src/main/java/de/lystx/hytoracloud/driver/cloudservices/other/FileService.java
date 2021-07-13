@@ -36,7 +36,6 @@ public class FileService implements ICloudService {
 
     private File cloudDirectory;
     private File libraryDirectory;
-    private File tempDirectory;
     private File configFile;
     private File permissionsFile;
 
@@ -67,8 +66,6 @@ public class FileService implements ICloudService {
     private File modulesDirectory;
     private File versionsDirectory;
 
-    private VsonObject tempData;
-
     @SneakyThrows
     public FileService() {
         this.startBat = new File("start.bat");
@@ -78,7 +75,6 @@ public class FileService implements ICloudService {
 
         this.globalDirectory = new File(this.cloudDirectory, "global/");
         this.pluginsDirectory = new File(this.globalDirectory, "plugins/");
-        this.tempDirectory = new File(this.globalDirectory, "temp/");
         this.bungeeCordPluginsDirectory = new File(this.pluginsDirectory, "bungee/");
         this.globalPluginsDirectory = new File(this.pluginsDirectory, "global/");
         this.spigotPluginsDirectory = new File(this.pluginsDirectory, "spigot/");
@@ -104,9 +100,6 @@ public class FileService implements ICloudService {
 
         this.groupsDirectory = new File(this.globalDirectory, "groups/");
         this.templatesDirectory = new File(this.globalDirectory, "templates/");
-
-        this.tempData = new VsonObject(new File(this.tempDirectory, "temp.vson"), VsonSettings.CREATE_FILE_IF_NOT_EXIST, VsonSettings.OVERRITE_VALUES);
-
 
         if (!CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
             this.check();
@@ -143,7 +136,6 @@ public class FileService implements ICloudService {
         this.templatesDirectory.mkdirs();
 
         this.globalDirectory.mkdirs();
-        this.tempDirectory.mkdirs();
         this.pluginsDirectory.mkdirs();
         this.bungeeCordPluginsDirectory.mkdirs();
         this.spigotPluginsDirectory.mkdirs();
@@ -156,13 +148,6 @@ public class FileService implements ICloudService {
         }
 
         CloudDriver.getInstance().executeIf(() -> {
-
-            if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDSYSTEM) && !this.tempData.getBoolean("hadOptionToUseModules", false)) {
-                this.copyFileWithURL("/implements/modules/module-serverSelector.jar", new File(this.modulesDirectory, "module-serverSelector.jar"));
-                this.tempData.append("hadOptionToUseModules", true);
-                this.tempData.save();
-            }
-
             if (Utils.existsClass("org.apache.commons.io.FileUtils")) {
                 try {
                     for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {

@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.player;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import lombok.AllArgsConstructor;

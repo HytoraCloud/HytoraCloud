@@ -4,18 +4,13 @@ import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerTemplateCopy;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerTemplateCreate;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerGroupUpdate;
-import de.lystx.hytoracloud.launcher.cloud.handler.managing.CloudHandlerConfig;
-import de.lystx.hytoracloud.launcher.cloud.handler.managing.CloudHandlerMessage;
-import de.lystx.hytoracloud.launcher.cloud.handler.managing.CloudHandlerPerms;
+import de.lystx.hytoracloud.launcher.cloud.handler.managing.*;
 import de.lystx.hytoracloud.launcher.cloud.handler.other.*;
 import de.lystx.hytoracloud.launcher.cloud.handler.player.CloudHandlerPlayer;
 import de.lystx.hytoracloud.launcher.cloud.handler.other.CloudHandlerCommunication;
 import de.lystx.hytoracloud.launcher.cloud.handler.receiver.CloudHandlerReceiver;
 import de.lystx.hytoracloud.launcher.cloud.handler.receiver.CloudHandlerReceiverServer;
-import de.lystx.hytoracloud.launcher.cloud.handler.services.CloudHandlerRegister;
-import de.lystx.hytoracloud.launcher.cloud.handler.services.CloudHandlerUpdate;
-import de.lystx.hytoracloud.launcher.cloud.handler.services.CloudHandlerStart;
-import de.lystx.hytoracloud.launcher.cloud.handler.services.CloudHandlerStop;
+import de.lystx.hytoracloud.launcher.cloud.handler.services.*;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -72,6 +67,10 @@ public class CloudBootingSetupDone {
         CloudDriver.getInstance().registerPacketHandler(new CloudHandlerLog(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new CloudHandlerEvent(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new CloudHandlerRequest(cloudSystem));
+        CloudDriver.getInstance().registerPacketHandler(new CloudHandlerMemoryUsage(cloudSystem));
+
+        CloudDriver.getInstance().registerPacketHandler(new CloudHandlerSignSystem(cloudSystem));
+        CloudDriver.getInstance().registerPacketHandler(new CloudHandlerNPC(cloudSystem));
 
         CloudDriver.getInstance().registerPacketHandler(new CloudHandlerReceiver(cloudSystem));
         CloudDriver.getInstance().registerPacketHandler(new CloudHandlerReceiverServer(cloudSystem));

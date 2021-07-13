@@ -1,7 +1,0 @@
-{
-  "name": "module-serverSelector",
-  "author": "Lystx",
-  "version": "1.0",
-  "main": "de.lystx.hytoracloud.module.serverselector.cloud.ModuleSelector",
-  "copyType": "COPY_SPIGOT"
-}

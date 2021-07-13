@@ -16,14 +16,13 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     public void handleLogin(PlayerLoginEvent event) {
-        IService IService = CloudDriver.getInstance().getCurrentService();
 
+        IService service = CloudDriver.getInstance().getCurrentService();
         Player player = event.getPlayer();
-        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
+        ICloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getName());
 
-        if (ICloudPlayer == null) {
-            //TODO: ADD Message
-            event.setKickMessage("%prefix% §cYou were not registered via Proxy before!".replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+        if (cloudPlayer == null) {
+            event.setKickMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getOnlyProxyJoin().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             return;
         }
@@ -37,10 +36,10 @@ public class PlayerJoinListener implements Listener {
 
         if (percent <= 100 && (((double) Bukkit.getOnlinePlayers().size()) / (double) Bukkit.getMaxPlayers()) * 100 >= percent) {
 
-            PropertyObject jsonObject = new PropertyObject();
-            jsonObject.append("waitingForPlayers", true);
+            PropertyObject propertyObject = new PropertyObject();
+            propertyObject.append("waitingForPlayers", true);
 
-            CloudDriver.getInstance().getServiceManager().startService(IService.getGroup(), jsonObject);
+            CloudDriver.getInstance().getServiceManager().startService(service.getGroup(), propertyObject);
         }
 
         CloudDriver.getInstance().updatePermissions(event.getPlayer(), new CloudPermissibleBase(event.getPlayer()));

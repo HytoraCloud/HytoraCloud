@@ -26,13 +26,13 @@ public class CloudListener implements NetworkHandler {
             String message = null;
             switch (state){
                 case 1:
-                    message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerStartMessage().
+                    message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServiceStart().
                             replace("&", "§").
                             replace("%server%", servername).
                             replace("%prefix%", CloudDriver.getInstance().getPrefix());
                     break;
                 case 2:
-                    message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerStopMessage().
+                    message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServiceStop().
                             replace("&", "§").
                             replace("%server%", servername).
                             replace("%prefix%", CloudDriver.getInstance().getPrefix());

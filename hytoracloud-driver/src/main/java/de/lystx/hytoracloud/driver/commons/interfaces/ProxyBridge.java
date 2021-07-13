@@ -7,7 +7,6 @@ import de.lystx.hytoracloud.driver.commons.implementations.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
-import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
@@ -36,7 +35,7 @@ public interface ProxyBridge {
         if (cachedPlayer != null) {
             //Request timed out couldn't log in.... kicking
             event.setCancelled(true);
-            event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnectedMessage().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+            event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
 
         } else {
             cachedPlayer = new PlayerObject(connection);
@@ -57,7 +56,7 @@ public interface ProxyBridge {
                         && !CloudDriver.getInstance().getPermissionPool().hasPermission(cachedPlayer.getUniqueId(), "cloudsystem.network.maintenance")) {
 
                     event.setCancelled(true);
-                    event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceKickMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                    event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceNetwork().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
 
                 }
 

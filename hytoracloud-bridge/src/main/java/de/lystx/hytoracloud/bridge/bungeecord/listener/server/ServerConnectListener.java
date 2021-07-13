@@ -19,7 +19,7 @@ public class ServerConnectListener implements Listener {
             if (player.hasPermission("cloudsystem.group.maintenance")) {
                 event.setCancelled(false);
             } else {
-                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
+                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
 
                 player.sendMessage(new TextComponent(message));
                 event.setCancelled(true);

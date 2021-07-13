@@ -25,7 +25,7 @@ public class BukkitHandlerGroupUpdate implements PacketHandler {
                         if (onlinePlayer.hasPermission("cloudsystem.group.maintenance")) {
                             continue;
                         }
-                        onlinePlayer.kickPlayer(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getGroupMaintenanceMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix())
+                        onlinePlayer.kickPlayer(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix())
                                 .replace("%group%", group.getName()));
                     }
                 }

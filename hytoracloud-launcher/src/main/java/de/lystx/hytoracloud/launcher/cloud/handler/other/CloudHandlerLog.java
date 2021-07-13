@@ -14,6 +14,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputServi
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -32,18 +33,14 @@ public class CloudHandlerLog implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInGetLog) {
             PacketInGetLog packetInGetLog = (PacketInGetLog)packet;
-            IService IService = CloudDriver.getInstance().getServiceManager().getService(packetInGetLog.getService());
-            IService getSafe = CloudDriver.getInstance().getServiceManager().getService(IService.getName());
+            IService service = CloudDriver.getInstance().getServiceManager().getService(packetInGetLog.getService());
+            IService getSafe = CloudDriver.getInstance().getServiceManager().getService(service.getName());
             if (getSafe == null) {
                 return;
             }
-            ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(packetInGetLog.getPlayer());
-            if (ICloudPlayer == null) {
-                return;
-            }
-            ServiceOutput screen = cloudSystem.getInstance(ServiceOutputService.class).getMap().get(IService.getName());
+            ServiceOutput screen = cloudSystem.getInstance(ServiceOutputService.class).getMap().get(service.getName());
             if (screen == null) {
-                ICloudPlayer.sendMessage(this.cloudSystem.getInstance(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + "§cThe screen for this §eserver §ccouldn't be found!");
+                packet.reply(ResponseStatus.FAILED, this.cloudSystem.getInstance(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + "§cThe screen for this §eserver §ccouldn't be found!");
                 return;
             }
             StringBuilder sb = new StringBuilder();
@@ -52,8 +49,7 @@ public class CloudHandlerLog implements PacketHandler {
             }
             try {
                 String realLink = this.post(sb.toString(), false);
-                String link = "§7The §blog for §7service §b" + IService.getName() + " §7was uploaded to §a" + realLink + " §8!";
-                ICloudPlayer.sendMessage(this.cloudSystem.getInstance(ConfigService.class).getNetworkConfig().getMessageConfig().getPrefix() + link);
+                packet.reply(ResponseStatus.SUCCESS, realLink);
             } catch (IOException e) {
                 e.printStackTrace();
             }

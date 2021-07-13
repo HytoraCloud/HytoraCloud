@@ -9,12 +9,9 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudInventory;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.utils.uuid.NameChange;
-import lombok.*;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.component.ComponentObject;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 import java.io.Serializable;

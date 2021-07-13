@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.bridge.bukkit.impl.listener;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import org.bukkit.Bukkit;
@@ -14,16 +15,17 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 public class PlayerChatListener implements Listener {
 
-
     @EventHandler
     public void handle(PlayerCommandPreprocessEvent event) {
 
-
         Player player = event.getPlayer();
-        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
+        ICloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(player.getUniqueId());
 
-        if (CloudBridge.getInstance().getProxyBridge().commandExecute(ICloudPlayer, event.getMessage())) {
+        String command = event.getMessage().substring(1).split(" ")[0];
+
+        if (CloudDriver.getInstance().getInstance(CommandService.class).getCommand(command) != null) {
             event.setCancelled(true);
+            CloudDriver.getInstance().getInstance(CommandService.class).execute(cloudPlayer, true, event.getMessage());
         }
 
     }

@@ -23,9 +23,9 @@ public class CommandListener implements Listener {
         if (event.isCommand() || event.isProxyCommand()) {
 
             ProxiedPlayer proxiedPlayer = (ProxiedPlayer)event.getSender();
-            ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(proxiedPlayer.getUniqueId());
+            ICloudPlayer cloudPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(proxiedPlayer.getUniqueId());
 
-            if (CloudBridge.getInstance().getProxyBridge().commandExecute(ICloudPlayer, event.getMessage())) {
+            if (CloudBridge.getInstance().getProxyBridge().commandExecute(cloudPlayer, event.getMessage())) {
                 event.setCancelled(true);
             }
 
@@ -35,24 +35,28 @@ public class CommandListener implements Listener {
 
     @EventHandler
     public void handleTab(TabCompleteEvent event) {
-        ProxiedPlayer player = (ProxiedPlayer)event.getSender();
-        String cmd = event.getCursor().split(" ")[0].substring(1);
-        Queue<String> input = new LinkedList<>(Arrays.asList(event.getCursor().split(cmd)));
-        input.poll();
+        try {
+            ProxiedPlayer player = (ProxiedPlayer)event.getSender();
+            String cmd = event.getCursor().split(" ")[0].substring(1);
+            Queue<String> input = new LinkedList<>(Arrays.asList(event.getCursor().split(cmd)));
+            input.poll();
 
-        if (CloudDriver.getInstance().getInstance(CommandService.class).getCommand(cmd) == null) {
-            return;
-        }
-
-        Object object = CloudDriver.getInstance().getInstance(CommandService.class).getInvokers().get(cmd);
-        if (object instanceof TabCompletable) {
-            List<String> list = ((TabCompletable) object).onTabComplete(CloudDriver.getInstance(), input.toArray(new String[0]));
-            try {
-                list.sort(null);
-            } catch (UnsupportedOperationException e) {
-                //Ignoring this error
+            if (CloudDriver.getInstance().getInstance(CommandService.class).getCommand(cmd) == null) {
+                return;
             }
-            event.getSuggestions().addAll(list);
+
+            Object object = CloudDriver.getInstance().getInstance(CommandService.class).getInvokers().get(cmd);
+            if (object instanceof TabCompletable) {
+                List<String> list = ((TabCompletable) object).onTabComplete(CloudDriver.getInstance(), input.toArray(new String[0]));
+                try {
+                    list.sort(null);
+                } catch (UnsupportedOperationException e) {
+                    //Ignoring this error
+                }
+                event.getSuggestions().addAll(list);
+            }
+        } catch (Exception e) {
+            //IGNORING
         }
     }
 }

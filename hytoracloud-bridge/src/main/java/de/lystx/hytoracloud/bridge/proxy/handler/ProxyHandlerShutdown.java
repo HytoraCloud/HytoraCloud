@@ -22,7 +22,7 @@ public class ProxyHandlerShutdown implements PacketHandler {
         IService IService = CloudDriver.getInstance().getServiceManager().getService(packetOutStopServer.getService());
         if (IService.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
             for (ICloudPlayer ICloudPlayer : CloudDriver.getInstance().getCloudPlayerManager()) {
-                ICloudPlayer.kick(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServerShutdownMessage().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                ICloudPlayer.kick(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getBukkitShutdown().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
             }
             CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> CloudBridge.getInstance().getProxyBridge().stopProxy(), 1L);
         }

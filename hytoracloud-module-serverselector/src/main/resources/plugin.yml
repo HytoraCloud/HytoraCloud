@@ -1,7 +1,0 @@
-main: de.lystx.hytoracloud.module.serverselector.spigot.SpigotSelector
-name: module-serverSelector
-author: Lystx
-version: 1.0
-loadbefore:
-  - CloudAPI
-commands:

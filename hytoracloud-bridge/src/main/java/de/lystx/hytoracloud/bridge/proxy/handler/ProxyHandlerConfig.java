@@ -43,7 +43,7 @@ public class ProxyHandlerConfig implements PacketHandler {
                                         CloudDriver.getInstance()
                                                 .getNetworkConfig()
                                                 .getMessageConfig()
-                                                .getMaintenanceKickMessage()
+                                                .getMaintenanceNetwork()
                                                 .replace("%prefix%",
                                                         CloudDriver.getInstance().getPrefix()));
                             }

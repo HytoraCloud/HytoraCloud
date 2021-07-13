@@ -5,9 +5,9 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketOpenInventory;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUpdate;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudInventory;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudItem;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.inventory.CloudPlayerInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudInventory;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudItem;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
@@ -28,7 +28,7 @@ public class BukkitHandlerInventory implements PacketHandler {
             Player bukkitPlayer = Bukkit.getPlayer(player.getName());
 
             Inventory inv = Bukkit.createInventory(bukkitPlayer, inventory.getRows() * 9, inventory.getName());
-            inventory.getItems().forEach((slot, item) -> inv.setItem(slot, this.fromCloudItem(item)));
+            inventory.getItems().forEach((slot, item) -> inv.setItem(slot, BukkitItem.fromCloudItem(item)));
             bukkitPlayer.openInventory(inv);
         } else if (rawPacket instanceof PacketInventoryUpdate) {
             PacketInventoryUpdate packetInventoryUpdate = (PacketInventoryUpdate)rawPacket;
@@ -36,37 +36,12 @@ public class BukkitHandlerInventory implements PacketHandler {
             ICloudPlayer player = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(packetInventoryUpdate.getICloudPlayer().getName());
             Player bukkitPlayer = Bukkit.getPlayer(player.getName());
 
-            bukkitPlayer.getInventory().setHelmet(this.fromCloudItem(playerInventory.getHelmet()));
-            bukkitPlayer.getInventory().setChestplate(this.fromCloudItem(playerInventory.getChestplate()));
-            bukkitPlayer.getInventory().setLeggings(this.fromCloudItem(playerInventory.getLeggings()));
-            bukkitPlayer.getInventory().setBoots(this.fromCloudItem(playerInventory.getBoots()));
-            playerInventory.getSlots().forEach((slot, item) -> bukkitPlayer.getInventory().setItem(slot, this.fromCloudItem(item)));
+            bukkitPlayer.getInventory().setHelmet(BukkitItem.fromCloudItem(playerInventory.getHelmet()));
+            bukkitPlayer.getInventory().setChestplate(BukkitItem.fromCloudItem(playerInventory.getChestplate()));
+            bukkitPlayer.getInventory().setLeggings(BukkitItem.fromCloudItem(playerInventory.getLeggings()));
+            bukkitPlayer.getInventory().setBoots(BukkitItem.fromCloudItem(playerInventory.getBoots()));
+            playerInventory.getSlots().forEach((slot, item) -> bukkitPlayer.getInventory().setItem(slot, BukkitItem.fromCloudItem(item)));
         }
     }
 
-    /**
-     * Transforms a CloudItem to a Bukkit ItemStack
-     * @param cloudItem
-     * @return
-     */
-    public ItemStack fromCloudItem(CloudItem cloudItem) {
-        if (cloudItem == null) {
-            return null;
-        }
-        BukkitItem bukkitItemStack = new BukkitItem(
-                Material.valueOf(cloudItem.getMaterial()),
-                cloudItem.getId(),
-                cloudItem.getAmount()
-        );
-        bukkitItemStack.addLores(cloudItem.getLore());
-        bukkitItemStack.setUnbreakable(cloudItem.isUnbreakable());
-        if (cloudItem.isGlow()) {
-            bukkitItemStack.setGlow();
-        }
-        bukkitItemStack.setDisplayName(cloudItem.getDisplayName());
-        if (cloudItem.getSkullOwner() != null) {
-            bukkitItemStack.setSkullOwner(cloudItem.getSkullOwner());
-        }
-        return bukkitItemStack.build();
-    }
 }

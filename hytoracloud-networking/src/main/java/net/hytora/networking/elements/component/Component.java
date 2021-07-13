@@ -100,13 +100,13 @@ public class Component implements Serializable {
     /**
      * Puts an {@link ComponentObject} in this component
      *
-     * @param componentObject the object
+     * @param object the object
      * @param <V> generic type
      * @return current component
      */
-    public <V> Component putObject(ComponentObject<V> componentObject) {
-        this.put("_componentObject", componentObject.getClass().getName());
-        componentObject.write(this);
+    public <V> Component putObject(String key, ComponentObject<V> object) {
+        this.put(key, object.getClass().getName());
+        object.write(this);
         return this;
     }
 
@@ -138,14 +138,14 @@ public class Component implements Serializable {
     }
 
     @SneakyThrows
-    public <V> V getComponentObject() {
-        if (!this.has("_componentObject")) {
+    public <V> V getComponentObject(String key) {
+        if (!this.has(key)) {
             return null;
         }
-        String class_ = this.get("_componentObject");
-        this.remove("_componentObject");
-        Class<? extends ComponentObject<?>> componentClass = (Class<? extends ComponentObject<?>>) Class.forName(class_);
+        String class_ = this.get(key);
+        this.remove(key);
 
+        Class<? extends ComponentObject<?>> componentClass = (Class<? extends ComponentObject<?>>) Class.forName(class_);
         ComponentObject<V> componentObject = (ComponentObject<V>) PacketManager.getInstance(componentClass);
 
         if (componentObject != null) {
