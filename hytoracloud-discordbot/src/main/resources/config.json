@@ -1,12 +1,12 @@
 {
-  "token": "ODU0MDQzMDM4MzQ1ODU1MDY2.YMeLjw.FEPTcVNLjIPZrLiz5aF7Xh1ybsA",
+  "token": "****",
   "guildID": "760166807905763340",
   "botManagingId": "802306594549137448",
   "command": "%",
   "roles": {
     "default": {
-      "color": "CYAN",
-      "name": "User",
+      "color": "RGB,46,204,113",
+      "name": "Member",
       "showOrder": true,
       "mentionable": false
     },
@@ -25,7 +25,7 @@
     "channel": "853558279531266068"
   },
   "reactionRoles": {
-    "channel": "852596014334476318",
+    "channel": "858411339374133248",
     "News-Ping": "\uD83D\uDCCC",
     "Changelog-Ping": "\uD83D\uDCD7"
   }

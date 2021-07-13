@@ -279,13 +279,23 @@ public class Hytora {
         boolean showOrder = jsonEntity.getBoolean("showOrder");
         boolean mentionable = jsonEntity.getBoolean("mentionable");
 
+        int[] rgb = new int[3];
+
+        if (color.startsWith("RGB,")) {
+            String[] split = color.split(",");
+
+            rgb[0] = Integer.parseInt(split[1]);
+            rgb[1] = Integer.parseInt(split[2]);
+            rgb[2] = Integer.parseInt(split[3]);
+        }
+
         Role role = guild.getRoles().stream().filter(role1 -> role1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
 
         if (role == null) {
             try {
                 guild.createRole()
                         .setName(name)
-                        .setColor((Color) Color.class.getDeclaredField(color).get(Color.WHITE))
+                        .setColor(rgb[0] == 0 ? (Color) Color.class.getDeclaredField(color).get(Color.WHITE) :  new Color(rgb[0], rgb[1], rgb[2]))
                         .setHoisted(showOrder)
                         .setMentionable(mentionable)
                         .queue(consumer);
