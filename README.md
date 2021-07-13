@@ -1,4 +1,4 @@
-# Disclaimer: This project is currently being reworked on. Please do not use the version currently available because it won't work properly. Join [our discord](https://discord.gg/q4qf3Dx8Pk) for the newest updates.
+# ⚠️ Disclaimer: This project is currently being reworked on. Please do not use the version currently available because it won't work properly. Join [our discord](https://discord.gg/q4qf3Dx8Pk) for the newest updates. ⚠️
 ![gh-banner](https://user-images.githubusercontent.com/53837207/125361395-88250500-e36d-11eb-9a80-8381b4b98992.png)
 # ☁️ HytoraCloud
 HytoraCloud is a server-management system used, to manage all your servers for you. That means: start them and stop them when necessary. It also has many more features which you can see down below.
