@@ -1,6 +1,9 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server;
 
 import com.google.gson.JsonObject;
+import de.lystx.hytoracloud.driver.cloudservices.other.ObjectPool;
+import de.lystx.hytoracloud.driver.commons.interfaces.Acceptable;
+import de.lystx.hytoracloud.driver.commons.interfaces.BooleanRequest;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -10,7 +13,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import java.util.List;
 import java.util.Map;
 
-public interface IServiceManager {
+public interface IServiceManager extends ObjectPool<IService> {
 
     /**
      * Updates a {@link IServiceGroup}
@@ -22,55 +25,55 @@ public interface IServiceManager {
     /**
      * Updates a {@link IService} in every cache
      *
-     * @param IService the service to update
+     * @param service the service to update
      */
-    void updateService(IService IService);
+    void updateService(IService service);
 
     /**
      * Starts {@link IService}s from a given list
      *
-     * @param IServiceGroups the groups to start
+     * @param serviceGroups the groups to start
      */
-    void startServices(List<IServiceGroup> IServiceGroups);
+    void startServices(List<IServiceGroup> serviceGroups);
 
     /**
      * Starts a {@link IService} from a {@link IServiceGroup} with properties as {@link JsonObject}
      *
-     * @param IServiceGroup the group
-     * @param IService the service
+     * @param serviceGroup the group
+     * @param service the service
      * @param properties the properties
      */
-    void startService(IServiceGroup IServiceGroup, IService IService, PropertyObject properties);
+    void startService(IServiceGroup serviceGroup, IService service, PropertyObject properties);
 
     /**
      * Starts a {@link IService} from a {@link IServiceGroup} with no properties as {@link PropertyObject}
      *
-     * @param IServiceGroup the group
-     * @param IService the service
+     * @param serviceGroup the group
+     * @param service the service
      */
-    void startService(IServiceGroup IServiceGroup, IService IService);
+    void startService(IServiceGroup serviceGroup, IService service);
 
     /**
      * Starts a {@link IService} from a {@link IServiceGroup}
      *
-     * @param IServiceGroup the group
+     * @param serviceGroup the group
      */
-    void startService(IServiceGroup IServiceGroup);
+    void startService(IServiceGroup serviceGroup);
 
     /**
      * Starts a random {@link IService} from a {@link IServiceGroup} with properties as {@link PropertyObject}
      *
-     * @param IServiceGroup the group
+     * @param serviceGroup the group
      * @param properties the properties
      */
-    void startService(IServiceGroup IServiceGroup, PropertyObject properties);
+    void startService(IServiceGroup serviceGroup, PropertyObject properties);
 
     /**
      * Stops a {@link IService}
      *
-     * @param IService the service to stop
+     * @param service the service to stop
      */
-    void stopService(IService IService);
+    void stopService(IService service);
 
     /**
      * Updates the cached {@link IService}s
@@ -82,36 +85,29 @@ public interface IServiceManager {
     /**
      * Stops all services
      */
-    void stopServices();
+    void shutdownAll();
 
     /**
      * Notifies about a {@link IService} thats stopping
      *
-     * @param IService the stopping service
+     * @param service the stopping service
      */
-    void notifyStop(IService IService);
+    void notifyStop(IService service);
 
     /**
      * Stops all {@link IService}s from a {@link IServiceGroup}
      *
-     * @param IServiceGroup the group
+     * @param serviceGroup the group
      */
-    void stopServices(IServiceGroup IServiceGroup);
+    void shutdownAll(IServiceGroup serviceGroup);
 
     /**
      * Gets a list of all {@link IService}s from a {@link IServiceGroup}
      *
-     * @param IServiceGroup the group
+     * @param serviceGroup the group
      * @return list of services
      */
-    List<IService> getServices(IServiceGroup IServiceGroup);
-
-    /**
-     * Gets a list of all online {@link IService}s
-     *
-     * @return list of services
-     */
-    List<IService> getAllServices();
+    List<IService> getServices(IServiceGroup serviceGroup);
 
     /**
      * Gets a list of all online {@link IService}s that match a given {@link ServiceType}
@@ -119,7 +115,23 @@ public interface IServiceManager {
      * @param serviceType the type of services
      * @return list of services
      */
-    List<IService> getAllServices(ServiceType serviceType);
+    List<IService> getCachedObjects(ServiceType serviceType);
+
+    /**
+     * Gets a list of all online {@link IService}s if the request returns true
+     *
+     * @param request the request
+     * @return list of services
+     */
+    List<IService> getCachedObjects(Acceptable<IService> request);
+
+    /**
+     * Gets a list of all online {@link IService}s that match a given {@link ServiceState}
+     *
+     * @param serviceState the state of services
+     * @return list of services
+     */
+    List<IService> getCachedObjects(ServiceState serviceState);
 
     /**
      * Gets a list of all online {@link IService}s that are LobbyServers
@@ -129,37 +141,12 @@ public interface IServiceManager {
     List<IService> getLobbies();
 
     /**
-     * Gets a list of all online {@link IService}s that match a given {@link ServiceState}
-     *
-     * @param serviceState the state of services
-     * @return list of services
-     */
-    List<IService> getAllServices(ServiceState serviceState);
-
-    /**
-     * Gets a {@link IService} by its name
-     *
-     * @param name the name
-     * @return service or null if not found
-     */
-    IService getService(String name);
-
-    /**
      * Registers a {@link IService}
      * if its not already registered
      *
      * @param service the service
      */
     void registerService(IService service);
-
-    /**
-     * Gets a {@link IService} as proxy by its port
-     * to identify a Proxy you're on right now
-     *
-     * @param port the port of the connection
-     * @return proxy or null
-     */
-    IService getProxy(Integer port);
 
     /**
      * Gets a {@link IServiceGroup} by its name
@@ -174,13 +161,6 @@ public interface IServiceManager {
      *
      * @return list of groups
      */
-    List<IServiceGroup> getServiceGroups();
-
-    /**
-     * Gets the cache of the {@link IService}s and {@link IServiceGroup}s
-     *
-     * @return map cache
-     */
-    Map<IServiceGroup, List<IService>> getCachedServices();
+    List<IServiceGroup> getCachedGroups();
 
 }

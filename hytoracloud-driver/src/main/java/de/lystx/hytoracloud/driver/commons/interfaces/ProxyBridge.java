@@ -1,10 +1,11 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
 import de.lystx.hytoracloud.driver.commons.implementations.PlayerObject;
-import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
@@ -30,7 +31,7 @@ public interface ProxyBridge {
         EventResult event = new EventResult();
         event.setCancelled(false);
 
-        ICloudPlayer cachedPlayer = CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(connection.getUniqueId());
+        ICloudPlayer cachedPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(connection.getUniqueId());
 
         if (cachedPlayer != null) {
             //Request timed out couldn't log in.... kicking
@@ -60,7 +61,7 @@ public interface ProxyBridge {
 
                 }
 
-                if ((CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size() + 1) >= CloudDriver.getInstance().getProxyConfig().getMaxPlayers()) {
+                if ((CloudDriver.getInstance().getPlayerManager().getCachedObjects().size() + 1) >= CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()) {
                     event.setCancelled(true);
                     event.setComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 }
@@ -121,12 +122,12 @@ public interface ProxyBridge {
             if (ICloudPlayer == null || ICloudPlayer.getService() == null) {
                 IService = CloudDriver.getInstance().getCurrentService();
             } else {
-                IService = CloudDriver.getInstance().getServiceManager().getService(ICloudPlayer.getService().getName());
+                IService = CloudDriver.getInstance().getServiceManager().getCachedObject(ICloudPlayer.getService().getName());
             }
             return input
                     .replace("&", "§")
-                    .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getProxyConfig().getMaxPlayers()))
-                    .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers().size()))
+                    .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()))
+                    .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()))
                     .replace("%id%", IService.getId() + "")
                     .replace("%group%", IService.getGroup().getName() + "")
                     .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())

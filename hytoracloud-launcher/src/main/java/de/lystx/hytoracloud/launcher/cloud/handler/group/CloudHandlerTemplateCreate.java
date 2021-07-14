@@ -19,7 +19,7 @@ public class CloudHandlerTemplateCreate implements PacketHandler {
         if (packet instanceof PacketInCopyTemplate) {
             PacketInCopyTemplate packetInCopyTemplate = (PacketInCopyTemplate)packet;
             IService IService = packetInCopyTemplate.getIService();
-            IService get = CloudDriver.getInstance().getServiceManager().getService(IService.getName());
+            IService get = CloudDriver.getInstance().getServiceManager().getCachedObject(IService.getName());
             if (get == null) {
                 return;
             }

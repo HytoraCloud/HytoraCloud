@@ -7,6 +7,8 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudComm
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import lombok.AllArgsConstructor;
 
+import java.util.Arrays;
+
 
 @AllArgsConstructor
 public class ReloadCommand {
@@ -17,8 +19,6 @@ public class ReloadCommand {
     public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
 
-            IService service = CloudDriver.getInstance().getServiceManager().getService("Lobby-1");
-            sender.sendMessage("Memory", "§a" + service.getMemoryUsage() + "/" + service.getGroup().getMemory() + " MB");
             sender.sendMessage("COMMAND", "§2Debug!");
             return;
         }

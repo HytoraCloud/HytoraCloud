@@ -191,7 +191,7 @@ public class ServiceStarter {
                         "\n" +
                         "# What should we display for the maximum number of players? (Velocity does not support a cap\n" +
                         "# on the number of players online.)\n" +
-                        "show-max-players = " + config.getMaxPlayers() + "\n" +
+                        "show-max-players = " + CloudDriver.getInstance().getNetworkConfig().getMaxPlayers() + "\n" +
                         "\n" +
                         "# Should we authenticate players with Mojang? By default, this is on.\n" +
                         "online-mode = " + config.isOnlineMode() + "\n" +
@@ -273,7 +273,7 @@ public class ServiceStarter {
 
                 writer = new FileWriter(serverLocation + "/config.yml");
 
-                writer.write("player_limit: " + config.getMaxPlayers() + "\n" +
+                writer.write("player_limit: " + CloudDriver.getInstance().getNetworkConfig().getMaxPlayers() + "\n" +
                         "permissions:\n" +
                         "  default: []\n" +
                         "  admin:\n" +
@@ -384,9 +384,9 @@ public class ServiceStarter {
         }
 
         JsonEntity jsonEntity = new JsonEntity(hytoraCloud);
-        jsonEntity.append("@logType", CloudDriver.getInstance().getHost().getClass().getName());
-        jsonEntity.append("host", CloudDriver.getInstance().getHost().getAddress().getHostAddress());
-        jsonEntity.append("port", CloudDriver.getInstance().getHost().getPort());
+        jsonEntity.append("@logType", CloudDriver.getInstance().getCurrentHost().getClass().getName());
+        jsonEntity.append("host", CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress());
+        jsonEntity.append("port", CloudDriver.getInstance().getCurrentHost().getPort());
         jsonEntity.append("server", IService.getName());
         jsonEntity.save();
     }

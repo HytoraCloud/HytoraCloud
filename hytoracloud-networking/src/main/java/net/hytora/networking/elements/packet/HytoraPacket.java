@@ -202,9 +202,9 @@ public abstract class HytoraPacket {
      * @param consumer the consumer to handle
      */
     public void reply(Consumer<Component> consumer) {
-        Component hytoraComponent = new Component();
-        consumer.accept(hytoraComponent);
-        this.reply(hytoraComponent);
+        Component component = new Component();
+        consumer.accept(component);
+        this.reply(component);
     }
 
     /**

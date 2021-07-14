@@ -77,8 +77,8 @@ public class ScreenCommand implements TabCompletable {
     @Override
     public List<String> onTabComplete(CloudDriver cloudDriver, String[] args) {
         List<String> list = new LinkedList<>();
-        for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
-            if (CloudDriver.getInstance().getServiceManager().getService(IService.getName()) == null) {
+        for (IService IService : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
+            if (CloudDriver.getInstance().getServiceManager().getCachedObject(IService.getName()) == null) {
                 continue;
             }
             list.add(IService.getName());

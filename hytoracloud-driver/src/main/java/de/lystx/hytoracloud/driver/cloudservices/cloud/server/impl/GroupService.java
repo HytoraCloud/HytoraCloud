@@ -1,6 +1,8 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -23,11 +25,13 @@ import java.util.Objects;
         description = {
                 "This class is used to manage all the ServiceGroups"
         },
-        version = 1.1
+        version = 1.3
 )
 public class GroupService implements ICloudService {
 
     private final List<IServiceGroup> groups;
+
+    private boolean first;
 
     public GroupService() {
         this.groups = new LinkedList<>();
@@ -44,6 +48,7 @@ public class GroupService implements ICloudService {
     /**
      * Loads all groups
      */
+    @Override
     public void reload() {
         this.groups.clear();
         if (getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
@@ -51,38 +56,43 @@ public class GroupService implements ICloudService {
                 if (file.getName().endsWith(".json")) {
                     JsonEntity jsonEntity = new JsonEntity(file);
                     this.groups.add(jsonEntity.getAs(ServiceGroupObject.class));
+
                 }
             }
+        }
+        if (!this.first) {
+            CloudDriver.getInstance().getParent().getConsole().sendMessage("GROUPS", "§7Loaded §b" + this.groups.size() + " §7ServiceGroups and their §bTemplates§8!");
+            this.first = true;
         }
     }
 
     /**
      * Creates a group
-     * @param IServiceGroup
+     * @param serviceGroup
      */
-    public void createGroup(IServiceGroup IServiceGroup) {
+    public void createGroup(IServiceGroup serviceGroup) {
         if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
-        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), IServiceGroup.getName() + ".json"));
-        jsonEntity.append(IServiceGroup);
+        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
+        jsonEntity.append(serviceGroup);
         jsonEntity.save();
-        this.groups.add(IServiceGroup);
-        this.getDriver().getInstance(TemplateService.class).createTemplate(IServiceGroup);
+        this.groups.add(serviceGroup);
+        this.getDriver().getInstance(TemplateService.class).createTemplate(serviceGroup);
     }
 
     /**
      * Deletes a group
-     * @param IServiceGroup
+     * @param serviceGroup
      */
-    public void deleteGroup(IServiceGroup IServiceGroup) {
+    public void deleteGroup(IServiceGroup serviceGroup) {
         if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
-        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), IServiceGroup.getName() + ".json"));
+        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
         jsonEntity.clear();
-        this.groups.remove(this.getGroup(IServiceGroup.getName()));
-        IServiceGroup.deleteAllTemplates();
+        this.groups.remove(this.getGroup(serviceGroup.getName()));
+        serviceGroup.deleteAllTemplates();
         this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> jsonEntity.getFile().delete(), 40L);
 
     }

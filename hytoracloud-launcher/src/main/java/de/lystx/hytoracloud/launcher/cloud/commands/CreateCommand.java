@@ -47,12 +47,6 @@ public class CreateCommand implements TabCompletable {
                         maxPlayers = setup.getMaxPlayers();
                     }
 
-                    PropertyObject document = new PropertyObject();
-                    if (setup.getType().equalsIgnoreCase("PROXY")) {
-                        ProxyConfig config = ProxyConfig.defaultConfig();
-                        config.setOnlineMode(!setup.isOnlineMode());
-                        document.append("proxyConfig", config);
-                    }
                     IServiceGroup IServiceGroup = new ServiceGroupObject(
                             UUID.randomUUID(),
                             setup.getServerName(),
@@ -67,7 +61,7 @@ public class CreateCommand implements TabCompletable {
                             false,
                             lobbyServer,
                             setup.isDynamic(),
-                            document
+                            new PropertyObject()
                     );
                     sender.sendMessage("INFO", "§2Created ServiceGroup §a" + IServiceGroup.getName() + " §7| §bMemory " + IServiceGroup.getMemory() + " §7| §bMinServer " + IServiceGroup.getMinServer() + " §7| §bMaxServer" + IServiceGroup.getMaxServer());
                     CloudSystem.getInstance().getInstance(GroupService.class).createGroup(IServiceGroup);
@@ -96,7 +90,7 @@ public class CreateCommand implements TabCompletable {
                     fallbackConfig.setFallbacks(fallbacks);
                     networkConfig.setFallbackConfig(fallbackConfig);
                     CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(networkConfig);
-                    CloudSystem.getInstance().getInstance(ConfigService.class).save();
+                    CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
                     CloudSystem.getInstance().getInstance(ConfigService.class).reload();
                     sender.sendMessage("INFO", "§2Created Fallback §a" + fallback.getGroupName() + " §7| §bID " + fallback.getPriority() + " §7| §bPermission " + fallback.getPermission());
                 });

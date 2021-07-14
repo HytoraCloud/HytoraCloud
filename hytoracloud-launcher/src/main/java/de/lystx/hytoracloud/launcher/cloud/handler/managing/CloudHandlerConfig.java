@@ -20,8 +20,9 @@ public class CloudHandlerConfig implements PacketHandler {
             NetworkConfig config = packetUpdateNetworkConfig.getNetworkConfig();
 
             configService.setNetworkConfig(config);
-            configService.saveAndReload();
-
+            configService.save();
+            configService.reload();
+            CloudDriver.getInstance().sendPacket(packet);
         }
     }
 }

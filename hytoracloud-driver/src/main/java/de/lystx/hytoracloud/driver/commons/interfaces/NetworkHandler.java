@@ -1,77 +1,77 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
+import java.util.function.Consumer;
 
 public interface NetworkHandler {
 
-    /**
-     * Called when a service is connected
-     *
-     * @param IService the started service
-     */
-    default void onServerStart(IService IService) {}
-
-
-    /**
-     * Called when a service is registered
-     *
-     * @param IService the registered service
-     */
-    default void onServerRegister(IService IService) {}
+    static void run(Consumer<NetworkHandler> serviceConsumer) {
+        for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
+            serviceConsumer.accept(networkHandler);
+        }
+    }
 
     /**
      * Called when service is queued
      *
-     * @param IService the queued service
+     * @param service the queued service
      */
-    default void onServerQueue(IService IService) {}
+    default void onServerQueue(IService service) {}
 
     /**
-     * Called when service stops
+     * Called when a service is connected
      *
-     * @param IService the stopped service
+     * @param service the started service
      */
-    default void onServerStop(IService IService) {}
+    default void onServerStarted(IService service) {}
+
+    /**
+     * Called when a service is registered
+     *
+     * @param service the registered service
+     */
+    default void onServerRegister(IService service) {}
 
     /**
      * Called when service updates
      *
-     * @param IService the updated service
+     * @param service the updated service
      */
-    default void onServerUpdate(IService IService) {}
+    default void onServerUpdate(IService service) {}
 
     /**
-     * Called when group updates
+     * Called when service stops
      *
-     * @param group the updated group
+     * @param service the stopped service
      */
-    default void onGroupUpdate(IServiceGroup group) {}
+    default void onServerStop(IService service) {}
 
     /**
      * Called when player joins network
      *
-     * @param ICloudPlayer the joined player
+     * @param cloudPlayer the joined player
      */
-    default void onPlayerJoin(ICloudPlayer ICloudPlayer) {}
+    default void onPlayerJoin(ICloudPlayer cloudPlayer) {}
 
     /**
      * Called when player switches server
      *
-     * @param ICloudPlayer the player
+     * @param cloudPlayer the player
      * @param server the server
      */
-    default void onServerChange(ICloudPlayer ICloudPlayer, String server) {}
+    default void onServerChange(ICloudPlayer cloudPlayer, IService server) {}
 
     /**
      * Called when player leaves network
      *
-     * @param ICloudPlayer the player
+     * @param cloudPlayer the player
      */
-    default void onPlayerQuit(ICloudPlayer ICloudPlayer) {}
+    default void onPlayerQuit(ICloudPlayer cloudPlayer) {}
 
     /**
      * Called when network is pinged (only works on bungeeCord)

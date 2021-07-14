@@ -12,6 +12,6 @@ import java.io.Serializable;
 public class DriverEventPlayerServerChange extends CloudEvent implements Serializable {
 
     private final ICloudPlayer player;
-    private final IService IService;
+    private final IService service;
 
 }

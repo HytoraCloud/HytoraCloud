@@ -1,11 +1,13 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
+import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import io.vson.elements.object.Objectable;
+import net.hytora.networking.elements.packet.response.Response;
 
 import java.io.Serializable;
 import java.util.List;
@@ -88,6 +90,23 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
     List<ICloudPlayer> getPlayers();
 
     /**
+     * Loads a list of {@link PluginInfo}s
+     * on this service
+     *
+     * @return list of plugins
+     */
+    //TODO: IF executed on bungee it will send plugins from bungee not from target service
+    PluginInfo[] getPlugins();
+
+    /**
+     * Gives you a property object
+     * full of information
+     *
+     * @return properties
+     */
+    PropertyObject requestInfo();
+
+    /**
      * Returns the Motd of this Service
      * might lag if the Service has not been
      * pinged before
@@ -124,7 +143,6 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      *
      * @return memory as long
      */
-    @Deprecated
     long getMemoryUsage();
 
     /**

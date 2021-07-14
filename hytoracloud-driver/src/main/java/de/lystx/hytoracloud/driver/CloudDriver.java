@@ -1,10 +1,7 @@
 package de.lystx.hytoracloud.driver;
 
 import ch.qos.logback.classic.LoggerContext;
-import de.lystx.hytoracloud.driver.commons.interfaces.BooleanRequest;
-import de.lystx.hytoracloud.driver.commons.interfaces.DriverParent;
-import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.interfaces.*;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketCallEvent;
@@ -38,7 +35,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.log.Loggers;
-import de.lystx.hytoracloud.driver.utils.minecraft.TicksPerSecond;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.TicksPerSecond;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
 import de.lystx.hytoracloud.driver.utils.utillity.CloudRunnable;
 import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
@@ -96,6 +93,12 @@ public class CloudDriver {
      */
     @Setter @Getter
     private ProxyBridge proxyBridge;
+
+    /**
+     * The bridge instance
+     */
+    @Setter @Getter
+    private BridgeInstance bridgeInstance;
 
     /**
      * Custom values to not create extra getters
@@ -164,7 +167,7 @@ public class CloudDriver {
      * To manage the players
      */
     @Getter
-    private ICloudPlayerManager cloudPlayerManager;
+    private ICloudPlayerManager playerManager;
 
     /**
      * To manage all the databases
@@ -483,7 +486,7 @@ public class CloudDriver {
     public IService getCurrentService() {
         JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
 
-        return this.serviceManager.getService(jsonEntity.getString("server"));
+        return this.serviceManager.getCachedObject(jsonEntity.getString("server"));
     }
 
     /**
@@ -491,7 +494,7 @@ public class CloudDriver {
      *
      * @return inetAddress
      */
-    public InetSocketAddress getHost() {
+    public InetSocketAddress getCurrentHost() {
         if (driverType == CloudType.BRIDGE) {
             JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
             return new InetSocketAddress(jsonEntity.getString("host"), jsonEntity.getInteger("port"));
@@ -504,17 +507,12 @@ public class CloudDriver {
         }
     }
 
-    /**
-     * Returns the {@link ProxyConfig}
-     * @return the proxyConfig
-     */
     public ProxyConfig getProxyConfig() {
-        if (driverType != CloudType.BRIDGE) {
-            throw new UnsupportedOperationException("Not available for " + driverType + "!");
-        }
-
-        return CloudDriver.getInstance().getCurrentService().getGroup().getProperties().get("proxyConfig", ProxyConfig.class);
+        NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
+        ProxyConfig proxyConfig = networkConfig.getProxyConfigs().get(CloudDriver.getInstance().getCurrentService().getGroup().getName());
+        return proxyConfig == null ? ProxyConfig.defaultConfig() : proxyConfig;
     }
+
 
     /*
      * ======================================
@@ -786,7 +784,7 @@ public class CloudDriver {
             try {
                 IService = CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
             } catch (Exception e){
-                IService = CloudDriver.getInstance().getServiceManager().getService(fallback.getGroupName() + "-1");
+                IService = CloudDriver.getInstance().getServiceManager().getCachedObject(fallback.getGroupName() + "-1");
             }
             return IService;
         } catch (NullPointerException e) {

@@ -431,6 +431,21 @@ public class JsonEntity implements Iterable<JsonElement> {
     }
 
     /**
+     * Returns a list full of strings
+     *
+     * @param key the key where the list is stored
+     * @return list
+     */
+    public List<String> getStringList(String key) {
+        List<String> list = new LinkedList<>();
+
+        for (JsonElement jsonElement : this.getArray(key)) {
+            list.add(jsonElement.getAsString());
+        }
+        return list;
+    }
+
+    /**
      * Saves it (only if file is set)
      */
     public void save() {

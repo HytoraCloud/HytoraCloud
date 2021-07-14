@@ -124,13 +124,13 @@ public class Reflections {
      * @param player
      * @param packet
      */
-    public static void sendPacket(Object player, Object packet) {
+    public static void sendPacket(Object to, Object packet) {
         try {
-            Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
-            Object playerConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
-            playerConnection.getClass().getMethod("sendPacket", getNmsClass("Packet")).invoke(playerConnection, packet);
-        } catch (Exception var5) {
-            var5.printStackTrace();
+            Object playerHandle = to.getClass().getMethod("getHandle", new Class[0]).invoke(to);
+            Object playerConnection = playerHandle.getClass().getField("playerConnection").get(playerHandle);
+            playerConnection.getClass().getMethod("sendPacket", new Class[] { Reflections.getNMSClass("Packet") }).invoke(playerConnection, packet);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player;
 
+import de.lystx.hytoracloud.driver.cloudservices.other.ObjectPool;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
@@ -9,21 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface ICloudPlayerManager extends Iterable<ICloudPlayer> {
-
-    /**
-     * Gets all {@link ICloudPlayer}s that are on the whole network
-     *
-     * @return list of players
-     */
-    List<ICloudPlayer> getOnlinePlayers();
-
-    /**
-     * Sets the onlinePlayers (cached list)
-     *
-     * @param ICloudPlayers the players
-     */
-    void setOnlinePlayers(List<ICloudPlayer> ICloudPlayers);
+public interface ICloudPlayerManager extends ObjectPool<ICloudPlayer> {
 
     /**
      * Gets a list of all {@link PlayerInformation}s from cache
@@ -49,90 +36,24 @@ public interface ICloudPlayerManager extends Iterable<ICloudPlayer> {
     PlayerInformation getOfflinePlayer(UUID uniqueId);
 
     /**
-     * Gets an {@link ICloudPlayer} by its name
-     *
-     * @param name the name of the player
-     * @return cached cloudPlayer
-     */
-    ICloudPlayer getCachedPlayer(String name);
-
-    /**
-     * Gets an {@link ICloudPlayer} by its uuid
-     *
-     * @param uniqueId the uuid of the player
-     * @return cached cloudPlayer
-     */
-    ICloudPlayer getCachedPlayer(UUID uniqueId);
-
-    /**
-     * Gets an {@link ICloudPlayer} by response
-     * This will be slower but 100% sync with the cloud
-     *
-     * @param name the name of the player
-     * @return cloudPlayer from cloud
-     */
-    ICloudPlayer getPlayer(String name);
-
-    /**
-     * Gets an {@link ICloudPlayer} by response
-     * This will be slower but 100% sync with the cloud
-     *
-     * @param uniqueId the uuid of the player
-     * @return cloudPlayer from cloud
-     */
-    ICloudPlayer getPlayer(UUID uniqueId);
-
-    /**
      * Updates a given {@link ICloudPlayer}
      *
-     * @param ICloudPlayer the player to update
+     * @param cloudPlayer the player to update
      */
-    void update(ICloudPlayer ICloudPlayer);
+    void update(ICloudPlayer cloudPlayer);
 
     /**
      * Registers a given {@link ICloudPlayer}
      *
-     * @param ICloudPlayer the player
+     * @param cloudPlayer the player
      */
-    void registerPlayer(ICloudPlayer ICloudPlayer);
+    void registerPlayer(ICloudPlayer cloudPlayer);
 
     /**
      * Unregisters a given {@link ICloudPlayer}
      *
-     * @param ICloudPlayer the player
+     * @param cloudPlayer the player
      */
-    void unregisterPlayer(ICloudPlayer ICloudPlayer);
-
-    /**
-     * Gets an {@link ICloudPlayer} with consumer and async
-     *
-     * @param name the name of the player
-     * @param consumer the consumer to accept the cloudPlayer
-     */
-    void getAsync(String name, Consumer<ICloudPlayer> consumer);
-
-    /**
-     * Gets an {@link ICloudPlayer} with consumer and async
-     *
-     * @param uniqueId the uuid of the player
-     * @param consumer the consumer to accept the cloudPlayer
-     */
-    void getAsync(UUID uniqueId, Consumer<ICloudPlayer> consumer);
-
-    /**
-     * Lists all {@link ICloudPlayer}s on a given {@link IService}
-     *
-     * @param IService the service
-     * @return list of players on this service
-     */
-    List<ICloudPlayer> getPlayersOnServer(IService IService);
-
-    /**
-     * Lists all {@link ICloudPlayer}s on a given {@link IServiceGroup}
-     *
-     * @param IServiceGroup the group
-     * @return list of players on this service
-     */
-    List<ICloudPlayer> getPlayersOnGroup(IServiceGroup IServiceGroup);
+    void unregisterPlayer(ICloudPlayer cloudPlayer);
 
 }

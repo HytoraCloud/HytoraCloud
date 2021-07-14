@@ -1,7 +1,6 @@
 
 package de.lystx.hytoracloud.driver.cloudservices.managing.event.base;
 
-import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
 import lombok.Getter;
 import lombok.Setter;
 

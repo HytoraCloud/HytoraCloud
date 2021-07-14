@@ -13,16 +13,16 @@ public class Fallback implements Serializable {
     /**
      * The priority
      */
-    private int priority;
+    private final int priority;
 
     /**
      * The group it belongs to
      */
-    private String groupName;
+    private final String groupName;
 
     /**
      * The permission to access it
      */
-    private String permission;
+    private final String permission;
 
 }

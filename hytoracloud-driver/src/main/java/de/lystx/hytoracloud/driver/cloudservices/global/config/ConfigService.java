@@ -75,10 +75,7 @@ public class ConfigService implements ICloudService {
         CloudDriver.getInstance().setNetworkConfig(this.networkConfig);
     }
 
-    /**
-     * saves config
-     */
-    public void save() {
+    public void shutdown() {
         if (this.getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             this.jsonEntity.append(this.networkConfig);
         } else {
@@ -87,5 +84,11 @@ public class ConfigService implements ICloudService {
         this.jsonEntity.save();
 
         CloudDriver.getInstance().setNetworkConfig(this.networkConfig);
+    }
+
+    /**
+     * saves config
+     */
+    public void save() {
     }
 }

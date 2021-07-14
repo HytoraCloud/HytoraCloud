@@ -1,9 +1,11 @@
 package de.lystx.hytoracloud.driver.commons.implementations;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfos;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
@@ -12,14 +14,13 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.utils.minecraft.ServerPinger;
-import de.lystx.hytoracloud.driver.utils.minecraft.ServiceInfo;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -70,7 +71,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     private boolean authenticated;
 
     public ServiceObject(IServiceGroup group, int id, int port) {
-        this(UUID.randomUUID(), id, port, CloudDriver.getInstance().getHost().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
+        this(UUID.randomUUID(), id, port, CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
     }
 
     @Override
@@ -94,7 +95,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     @Override
     public List<ICloudPlayer> getPlayers() {
         List<ICloudPlayer> list = new LinkedList<>();
-        for (ICloudPlayer globalOnlinePlayer : CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()) {
+        for (ICloudPlayer globalOnlinePlayer : CloudDriver.getInstance().getPlayerManager().getCachedObjects()) {
             if (globalOnlinePlayer == null || globalOnlinePlayer.getService() == null) {
                 continue;
             }
@@ -106,15 +107,57 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return list;
     }
 
-    //TODO: CHECK THIS
+    @Override
+    public PropertyObject requestInfo() {
+
+        if (CloudDriver.getInstance().isBridge()) {
+            return CloudDriver.getInstance().getBridgeInstance().requestProperties();
+        } else {
+            PacketServiceInfos packetServiceInfos = new PacketServiceInfos(this.getName());
+            Component component = packetServiceInfos.toReply(CloudDriver.getInstance().getConnection());
+            return new PropertyObject(component.get("properties"));
+        }
+    }
+
+    @Override
+    public PluginInfo[] getPlugins() {
+        List<PluginInfo> pluginInfos = new LinkedList<>();
+
+
+        JsonArray array = this.requestInfo().toDocument().getArray("plugins");
+
+
+        for (JsonElement jsonElement : array) {
+            JsonEntity jsonEntity = new JsonEntity(jsonElement.toString());
+
+
+            pluginInfos.add(new PluginInfo(
+                    jsonEntity.getString("name"),
+                    jsonEntity.getStringList("authors").toArray(new String[0]),
+                    jsonEntity.getString("version"),
+                    jsonEntity.getString("main-class"),
+                    jsonEntity.getString("website"),
+                    jsonEntity.getStringList("commands").toArray(new String[0]),
+                    jsonEntity.getString("description"),
+                    jsonEntity.getStringList("dependencies").toArray(new String[0]),
+                    jsonEntity.getStringList("soft-dependencies").toArray(new String[0])
+            ));
+        }
+        return pluginInfos.toArray(new PluginInfo[0]);
+    }
+
     @Override
     public long getMemoryUsage() {
-        PacketServiceMemoryUsage packet = new PacketServiceMemoryUsage(this.getName());
-        Component component = packet.toReply(CloudDriver.getInstance().getConnection());
-        if (component.reply().getMessage().equalsIgnoreCase("The request timed out")) {
-            return -1L;
+        if (CloudDriver.getInstance().isBridge()) {
+            return CloudDriver.getInstance().getBridgeInstance().loadMemoryUsage();
+        } else {
+            PacketServiceMemoryUsage packet = new PacketServiceMemoryUsage(this.getName());
+            Component component = packet.toReply(CloudDriver.getInstance().getConnection());
+            if (component.reply().getMessage().equalsIgnoreCase("The request timed out")) {
+                return -1L;
+            }
+            return Long.parseLong(component.reply().getMessage());
         }
-        return Long.parseLong(component.reply().getMessage());
     }
 
     @Override
@@ -135,12 +178,16 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public String getTPS() {
-        PacketRequestTPS packetRequestTPS = new PacketRequestTPS(this.getName());
+        if (CloudDriver.getInstance().isBridge()) {
+            return CloudDriver.getInstance().getBridgeInstance().loadTPS();
+        } else {
+            PacketRequestTPS packetRequestTPS = new PacketRequestTPS(this.getName());
 
-        Component component = packetRequestTPS.toReply(CloudDriver.getInstance().getConnection(), 3000);
-        String message = component.reply().getMessage();
+            Component component = packetRequestTPS.toReply(CloudDriver.getInstance().getConnection(), 3000);
+            String message = component.get("tps");
 
-        return message.equalsIgnoreCase("The request timed out") ? "§c???" : message;
+            return message.equalsIgnoreCase("The request timed out") ? "§c???" : message;
+        }
     }
 
     @Override
@@ -175,16 +222,6 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return serverPinger;
     }
 
-
-    /**
-     * Prepares a {@link ServiceInfo}
-     * to get values like motd and so on
-     *
-     * @return prepared info
-     */
-    public ServiceInfo prepare() {
-        return ServiceInfo.prepare(this.host, this.port);
-    }
 
     @Override
     public String toString() {

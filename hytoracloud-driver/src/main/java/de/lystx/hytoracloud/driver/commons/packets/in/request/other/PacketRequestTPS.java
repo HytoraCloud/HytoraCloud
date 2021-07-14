@@ -7,19 +7,17 @@ import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.packet.HytoraPacket;
 
 @Getter @AllArgsConstructor
-public class PacketRequestTPS extends PacketCommunication {
+public class PacketRequestTPS extends HytoraPacket {
 
     private String server;
 
     @Override
     public void write(Component component) {
-        super.write(component);
         component.put("server", server);
     }
 
     @Override
     public void read(Component component) {
-        super.read(component);
         server = component.get("server");
     }
 }

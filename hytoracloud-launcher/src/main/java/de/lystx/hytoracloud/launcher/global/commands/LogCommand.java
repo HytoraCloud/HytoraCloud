@@ -35,7 +35,7 @@ public class LogCommand implements TabCompletable {
             String finalText;
             if (args[0].equalsIgnoreCase("all")) {
                 StringBuilder sb = new StringBuilder();
-                for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
+                for (IService IService : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
                     sb.append("================ LOG OF " + IService.getName() + " ================").append("\n").append("\n").append("\n");
                     sb.append(this.getLog(IService, cloudInstance));
                     sb.append("================ END OF LOG FOR " + IService.getName() + " ================").append("\n").append("\n").append("\n");
@@ -44,7 +44,7 @@ public class LogCommand implements TabCompletable {
                 finalText = sb.toString();
             } else {
                 String s = args[0];
-                IService IService = CloudDriver.getInstance().getServiceManager().getService(s);
+                IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(s);
                 if (IService == null) {
                     sender.sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
                     return;
@@ -135,7 +135,7 @@ public class LogCommand implements TabCompletable {
     @Override
     public List<String> onTabComplete(CloudDriver cloudDriver, String[] args) {
         List<String> list = new java.util.ArrayList<>(Collections.singletonList("all"));
-        for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
+        for (IService IService : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
             list.add(IService.getName());
         }
         return list;

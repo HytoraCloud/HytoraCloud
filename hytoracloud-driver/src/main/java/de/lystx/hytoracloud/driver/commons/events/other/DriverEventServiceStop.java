@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter @AllArgsConstructor
 public class DriverEventServiceStop extends CloudEvent {
 
-    private final IService IService;
+    private final IService service;
 }

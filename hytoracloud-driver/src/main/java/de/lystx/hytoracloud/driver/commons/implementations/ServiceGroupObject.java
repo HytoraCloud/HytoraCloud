@@ -117,7 +117,7 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
     @Override
     public List<ICloudPlayer> getPlayers() {
-        return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()).find(cloudPlayer -> {
+        return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getPlayerManager().getCachedObjects()).find(cloudPlayer -> {
             if (cloudPlayer.getService() == null) {
                 return false;
             }
@@ -126,7 +126,7 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
     @Override
     public List<IService> getServices() {
-        return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getServiceManager().getAllServices()).find(service -> service.getGroup().getName().equalsIgnoreCase(this.name)).findAll());
+        return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getServiceManager().getCachedObjects()).find(service -> service.getGroup().getName().equalsIgnoreCase(this.name)).findAll());
     }
     @Override
     public void deleteAllTemplates() {

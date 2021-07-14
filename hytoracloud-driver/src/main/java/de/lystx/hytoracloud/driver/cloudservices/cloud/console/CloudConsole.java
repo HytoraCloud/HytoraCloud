@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.console;
 
 
-import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;

@@ -8,7 +8,6 @@ import net.hytora.networking.elements.packet.handler.PacketHandler;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -33,8 +32,8 @@ public class CloudHandlerLog implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInGetLog) {
             PacketInGetLog packetInGetLog = (PacketInGetLog)packet;
-            IService service = CloudDriver.getInstance().getServiceManager().getService(packetInGetLog.getService());
-            IService getSafe = CloudDriver.getInstance().getServiceManager().getService(service.getName());
+            IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(packetInGetLog.getService());
+            IService getSafe = CloudDriver.getInstance().getServiceManager().getCachedObject(service.getName());
             if (getSafe == null) {
                 return;
             }

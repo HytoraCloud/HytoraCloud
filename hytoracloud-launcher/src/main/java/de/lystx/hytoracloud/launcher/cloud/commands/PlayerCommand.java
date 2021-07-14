@@ -19,16 +19,16 @@ public class PlayerCommand {
 
     @Command(name = "player", description = "Manages players on the network", aliases = "players")
     public void execute(CloudCommandSender sender, String[] args) {
-        ICloudPlayerManager ps = CloudDriver.getInstance().getCloudPlayerManager();
+        ICloudPlayerManager ps = CloudDriver.getInstance().getPlayerManager();
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
-                if (ps.getOnlinePlayers().isEmpty()) {
+                if (ps.getCachedObjects().isEmpty()) {
                     sender.sendMessage("ERROR", "§cThere are no players online at the moment!");
                     return;
                 }
 
                 sender.sendMessage("INFO", "§7----------------------------------");
-                for (ICloudPlayer onlinePlayer : ps.getOnlinePlayers()) {
+                for (ICloudPlayer onlinePlayer : ps.getCachedObjects()) {
                     sender.sendMessage("INFO", "§9" + onlinePlayer.getName() + " §7| §bServer " + (onlinePlayer.getService() == null ? "Logging in..." : onlinePlayer.getService().getName()) + " §7| §aProxy " + onlinePlayer.getProxy());
                 }
                 sender.sendMessage("INFO", "§7----------------------------------");
@@ -40,7 +40,7 @@ public class PlayerCommand {
                 CloudDriver.getInstance().getParent().reload();
 
                 PermissionPool pool = CloudDriver.getInstance().getPermissionPool();
-                ICloudPlayer ICloudPlayer = ps.getCachedPlayer(player);
+                ICloudPlayer ICloudPlayer = ps.getCachedObject(player);
 
                 try {
                     UUID uniqueId = pool.getUUIDByName(player);
@@ -89,7 +89,7 @@ public class PlayerCommand {
             for (int i = 2; i < args.length; i++) {
                 sb.append(args[i]).append(" ");
             }
-            ICloudPlayer ICloudPlayer = ps.getCachedPlayer(player);
+            ICloudPlayer ICloudPlayer = ps.getCachedObject(player);
             if (ICloudPlayer == null) {
                 sender.sendMessage("ERROR", "§cThe player §e" + player + " §cseems not to be online!");
                 return;

@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.commons.packets.in.request.other;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
 
-import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
 import lombok.Getter;
 import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.elements.packet.EmptyPacket;

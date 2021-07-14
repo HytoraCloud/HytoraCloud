@@ -11,7 +11,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.utils.minecraft.NetworkInfo;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
 import lombok.AllArgsConstructor;
 
 import java.text.DecimalFormat;
@@ -53,18 +53,20 @@ public class InfoCommand implements TabCompletable {
                     return;
                 case "servers":
                     sender.sendMessage("INFO", "§7----------------------------------");
-                    for (IService IService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
-                        sender.sendMessage("§h> §a" + IService.getName() + " §h[§d" + IService.getUniqueId() + " §7| §6Authenticated: " + (IService.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
-                        sender.sendMessage("  §8> §bID: #" +  IService.getId() + " §7| §eState: " + IService.getState().getColor() + IService.getState().name());
-                        sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getHost().getAddress().getHostAddress() + ":" + IService.getPort() + " §7| §eReceiver: " + IService.getGroup().getReceiver());
-                        sender.sendMessage("  §8> §bType: " +  IService.getGroup().getType() + " §7| §eTemplate: " + IService.getGroup().getTemplate().getName());
-                        sender.sendMessage("  §8> §bHost: " +  IService.getHost() + " §7| §ePlayers: " + IService.getPlayers().size() + "/" + IService.getGroup().getMaxPlayers());
-                        if (IService.getProperties().keySet().isEmpty()) {
+                    for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
+                        sender.sendMessage("§h> §a" + service.getName() + " §h[§d" + service.getUniqueId() + " §7| §6Authenticated: " + (service.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
+                        sender.sendMessage("  §8> §bID: #" +  service.getId() + " §7| §eState: " + service.getState().getColor() + service.getState().name());
+                        sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
+                        sender.sendMessage("  §8> §bType: " +  service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getTemplate().getName());
+                        sender.sendMessage("  §8> §bHost: " +  service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
+                        sender.sendMessage("  §8> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage() : "-1") + "/" + service.getGroup().getMemory());
+                        sender.sendMessage("  §8> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
+                        if (service.getProperties().keySet().isEmpty()) {
                             sender.sendMessage("  §8> §bProperties: §cNone");
                         } else {
-                            sender.sendMessage("  §8> §bProperties: §a" + IService.getProperties().keySet().size());
-                            for (String s : IService.getProperties().keySet()) {
-                                sender.sendMessage("     §8> §e" + s + ": §6" + IService.getProperties().get(s));
+                            sender.sendMessage("  §8> §bProperties: §a" + service.getProperties().keySet().size());
+                            for (String s : service.getProperties().keySet()) {
+                                sender.sendMessage("     §8> §e" + s + ": §6" + service.getProperties().get(s));
                             }
                         }
                     }

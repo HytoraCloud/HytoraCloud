@@ -40,9 +40,9 @@ public class DeleteCommand implements TabCompletable {
                     ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(IService.getPort());
                 }
 
-                ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).stopServices(IServiceGroup, false);
+                ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).shutdownAll(IServiceGroup, false);
                 CloudSystem.getInstance().getInstance(GroupService.class).deleteGroup(IServiceGroup);
-                CloudDriver.getInstance().getServiceManager().getAllServices().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
+                CloudDriver.getInstance().getServiceManager().getCachedObjects().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
                 CloudSystem.getInstance().reload();
                 sender.sendMessage("INFO", "§9The ServiceGroup §b" + IServiceGroup.getName() + " §9was deleted!");
             } else if (args[0].equalsIgnoreCase("fallback")) {
@@ -62,7 +62,7 @@ public class DeleteCommand implements TabCompletable {
                 fallbackConfig.setFallbacks(fallbacks);
                 networkConfig.setFallbackConfig(fallbackConfig);
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(networkConfig);
-                CloudSystem.getInstance().getInstance(ConfigService.class).save();
+                CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
                 CloudSystem.getInstance().getInstance(ConfigService.class).reload();
                 sender.sendMessage("INFO", "§9The Fallback §b" + remove.getGroupName() + " §9was deleted!");
 

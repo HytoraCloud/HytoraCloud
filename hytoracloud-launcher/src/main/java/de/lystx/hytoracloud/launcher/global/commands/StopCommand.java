@@ -22,7 +22,7 @@ public class StopCommand implements TabCompletable {
     public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1) {
             String s = args[0];
-            IService IService = CloudDriver.getInstance().getServiceManager().getService(s);
+            IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(s);
             if (IService == null) {
                 sender.sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
                 return;
@@ -38,7 +38,7 @@ public class StopCommand implements TabCompletable {
                     return;
                 }
                 sender.sendMessage("COMMAND", "§7The group §a" + group.getName() + " §7was stopped§8!");
-                CloudDriver.getInstance().getServiceManager().stopServices(group);
+                CloudDriver.getInstance().getServiceManager().shutdownAll(group);
             } else {
                 sender.sendMessage("ERROR", "§cstop <group <groupname>/servicename>");
             }
@@ -52,15 +52,15 @@ public class StopCommand implements TabCompletable {
         List<String> list = new LinkedList<>();
         if (args.length == 2) {
             list.add("group");
-            for (IService globalIService : CloudDriver.getInstance().getServiceManager().getAllServices()) {
-                if (CloudDriver.getInstance().getServiceManager().getService(globalIService.getName()) == null) {
+            for (IService globalIService : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
+                if (CloudDriver.getInstance().getServiceManager().getCachedObject(globalIService.getName()) == null) {
                     continue;
                 }
                 list.add(globalIService.getName());
             }
         } else if (args.length == 3 && args[1].equalsIgnoreCase("group")) {
             for (IServiceGroup globalService : cloudDriver.getInstance(GroupService.class).getGroups()) {
-                if (CloudDriver.getInstance().getServiceManager().getService(globalService.getName()) == null) {
+                if (CloudDriver.getInstance().getServiceManager().getCachedObject(globalService.getName()) == null) {
                     continue;
                 }
                 list.add(globalService.getName());

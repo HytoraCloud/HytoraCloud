@@ -10,8 +10,19 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class TabList implements Serializable {
 
-    private boolean enabled;
-    private String header;
-    private String footer;
+    /**
+     * If the tablist is enabled
+     */
+    private final boolean enabled;
+
+    /**
+     * The header
+     */
+    private final String header;
+
+    /**
+     * The footer
+     */
+    private final String footer;
 
 }

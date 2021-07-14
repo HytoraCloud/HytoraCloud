@@ -1,20 +1,20 @@
 package de.lystx.hytoracloud.driver.cloudservices.global.config.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
 
+import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Getter @Setter @AllArgsConstructor
 public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
@@ -55,6 +55,11 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
     private boolean maintenance;
 
     /**
+     * Maxmimum players on the network
+     */
+    private int maxPlayers;
+
+    /**
      * The whitelisted players
      */
     private List<String> whitelistedPlayers;
@@ -70,6 +75,11 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
     private FallbackConfig fallbackConfig;
 
     /**
+     * The proxy configs for different groups
+     */
+    private Map<String, ProxyConfig> proxyConfigs;
+
+    /**
      * Create default Config for everything
      *
      * @return default config
@@ -82,6 +92,7 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
                 30000,
                 false,
                 true,
+                100,
                 new LinkedList<>(),
                 new MessageConfig(
                         "§8» §bCloud §8┃ §7",
@@ -99,7 +110,8 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
                 new FallbackConfig(
                         new Fallback(1, "Lobby", null),
                         new ArrayList<>()
-                )
+                ),
+                new CloudMap<String, ProxyConfig>().append("Bungee", ProxyConfig.defaultConfig())
         );
     }
 

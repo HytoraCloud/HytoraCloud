@@ -26,7 +26,7 @@ public class CloudHandlerStop implements PacketHandler {
                 if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getServiceName().equalsIgnoreCase(IService.getName())) {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }
-                CloudDriver.getInstance().getServiceManager().stopService(CloudDriver.getInstance().getServiceManager().getService(IService.getName()));
+                CloudDriver.getInstance().getServiceManager().stopService(CloudDriver.getInstance().getServiceManager().getCachedObject(IService.getName()));
                 this.cloudSystem.getInstance(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 2L);
             } catch (NullPointerException ignored) {
             }

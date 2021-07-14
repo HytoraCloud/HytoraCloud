@@ -59,7 +59,7 @@ public class ReceiverBootingSetupNotDone {
             map.put("serverStartPort", 30000);
             ReceiverInfo receiverInfo = new ReceiverInfo(setup.getName(), setup.getHost(), setup.getPort(), true, map);
             receiver.getInstance(ConfigService.class).setReceiverInfo(receiverInfo);
-            receiver.getInstance(ConfigService.class).save();
+            receiver.getInstance(ConfigService.class).shutdown();
             receiver.getParent().getConsole().getLogger().sendMessage("SETUP", "§2The setup is now §acomplete§2! The receiver will now stop and you will have to restart it...");
             System.exit(0);
         });

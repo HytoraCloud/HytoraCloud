@@ -1,8 +1,8 @@
 author: Lystx
-name: CloudBridge
-main: de.lystx.hytoracloud.bridge.bukkit.BukkitBridge
-version: 1.7.3
-description: ServerAPI for HytoraCloud
+name: Spigot-CloudBridge
+main: de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge
+version: STABLE-1.8
+description: CloudBridge for HytoraCloud
 load: STARTUP
 commands:
 

@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.player;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

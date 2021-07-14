@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Cloud
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
-import de.lystx.hytoracloud.driver.commons.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.*;
@@ -66,12 +66,12 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     }
     @Override
     public IService getService() {
-        return CloudDriver.getInstance().getServiceManager().getService(this.service);
+        return CloudDriver.getInstance().getServiceManager().getCachedObject(this.service);
     }
 
     @Override
     public IService getProxy() {
-        return CloudDriver.getInstance().getServiceManager().getService(this.proxy);
+        return CloudDriver.getInstance().getServiceManager().getCachedObject(this.proxy);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
             Component response = CloudDriver.getInstance().getResponse(new PacketRequestGetProperty(this.getUniqueId(), name));
             return PropertyObject.fromDocument(new JsonEntity(response.reply().getMessage()));
         } else {
-            return CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name);
+            return CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name);
         }
     }
 

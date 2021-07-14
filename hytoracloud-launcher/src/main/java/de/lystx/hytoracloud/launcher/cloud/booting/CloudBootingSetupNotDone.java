@@ -58,14 +58,12 @@ public class CloudBootingSetupNotDone {
             JsonEntity document = cloudSystem.getInstance(ConfigService.class).getJsonEntity();
             document.append("setupDone", true);
             document.append("host", setup.getHostname());
+            document.append("maxPlayers", setup.getMaxPlayers());
             document.append("port", setup.getPort());
             document.append("proxyProtocol", setup.isProxyProtocol());
             document.save();
             spigot.setValue(SpigotVersion.byKey(setup.getSpigotVersion()));
             proxy.setValue(ProxyVersion.byKey(setup.getBungeeCordType()));
-
-            ProxyConfig config = ProxyConfig.defaultConfig();
-            config.setMaxPlayers(setup.getMaxPlayers());
 
             cloudSystem.getInstance(GroupService.class).createGroup(new ServiceGroupObject(
                     UUID.randomUUID(),
@@ -81,7 +79,7 @@ public class CloudBootingSetupNotDone {
                     false,
                     false,
                     true,
-                    new PropertyObject().append("proxyConfig", config)
+                    new PropertyObject()
             ));
 
 

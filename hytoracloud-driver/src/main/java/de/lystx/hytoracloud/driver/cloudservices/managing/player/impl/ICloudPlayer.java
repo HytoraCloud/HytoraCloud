@@ -200,7 +200,7 @@ public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermiss
      * @return player or null if not cached
      */
     static ICloudPlayer fromName(String name) {
-        return CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(name);
+        return CloudDriver.getInstance().getPlayerManager().getCachedObject(name);
     }
 
     /**
@@ -211,7 +211,7 @@ public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermiss
      * @return player or null if not cached
      */
     static ICloudPlayer fromUUID(UUID uniqueId) {
-        return CloudDriver.getInstance().getCloudPlayerManager().getCachedPlayer(uniqueId);
+        return CloudDriver.getInstance().getPlayerManager().getCachedObject(uniqueId);
     }
 
     /**

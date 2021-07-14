@@ -1,7 +1,8 @@
 package de.lystx.hytoracloud.launcher.global;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -127,11 +128,14 @@ public class CloudProcess extends CloudDriver implements DriverParent {
      * Reloads all
      */
     public void reload() {
+        this.sendPacket(new PacketOutUpdateTabList());
 
         //Reloading all modules
         for (Module module : this.getInstance(ModuleService.class).getModules()) {
             module.onReload();
         }
+
+        CloudDriver.getInstance().getInstance(ConfigService.class).reload();
 
         try {
 
@@ -143,7 +147,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
             CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
                     CloudDriver.getInstance().getNetworkConfig(),
                     CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
-                    CloudDriver.getInstance().getServiceManager().getAllServices()
+                    CloudDriver.getInstance().getServiceManager().getCachedObjects()
             ));
 
         } catch (NullPointerException e) {
@@ -151,8 +155,8 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         }
 
         //Updating webserver
-        CloudDriver.getInstance().getParent().getWebServer().update("players", new JsonEntity().append("players", CloudDriver.getInstance().getCloudPlayerManager().getOnlinePlayers()));
-        CloudDriver.getInstance().getParent().getWebServer().update("services", new JsonEntity().append("services", CloudDriver.getInstance().getServiceManager().getAllServices()));
+        CloudDriver.getInstance().getParent().getWebServer().update("players", new JsonEntity().append("players", CloudDriver.getInstance().getPlayerManager().getCachedObjects()));
+        CloudDriver.getInstance().getParent().getWebServer().update("services", new JsonEntity().append("services", CloudDriver.getInstance().getServiceManager().getCachedObjects()));
 
     }
 
@@ -170,11 +174,11 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         this.console.interrupt();
 
         if (this.getServiceManager() != null) {
-            this.getServiceManager().stopServices();
+            this.getServiceManager().shutdownAll();
         }
 
         this.getInstance(LogService.class).save();
-        this.getInstance(ConfigService.class).save();
+        this.getInstance(ConfigService.class).shutdown();
 
         if (this.getInstance(ModuleService.class) != null) {
             this.getInstance(ModuleService.class).shutdown();

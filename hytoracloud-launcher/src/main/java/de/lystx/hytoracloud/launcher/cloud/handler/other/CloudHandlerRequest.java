@@ -46,7 +46,7 @@ public class CloudHandlerRequest implements PacketHandler {
             packet.reply(component -> component.put("group", permissionGroup));
 
         } else if (packet instanceof PacketOutPing) {
-            packet.reply(ResponseStatus.SUCCESS, System.currentTimeMillis());
+            packet.reply(component -> component.put("ms", System.currentTimeMillis()));
 
         } else if (packet instanceof PacketRequestPermissionGroupGet) {
 
@@ -65,7 +65,7 @@ public class CloudHandlerRequest implements PacketHandler {
         } else if (packet instanceof PacketRequestAddProperty) {
             try {
                 PacketRequestAddProperty packetRequestAddProperty = (PacketRequestAddProperty)packet;
-                PlayerInformation offlinePlayer = CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(packetRequestAddProperty.getPlayerUUID());
+                PlayerInformation offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestAddProperty.getPlayerUUID());
 
                 offlinePlayer.addProperty(packetRequestAddProperty.getName(), packetRequestAddProperty.getProperty());
                 offlinePlayer.update();
@@ -77,7 +77,7 @@ public class CloudHandlerRequest implements PacketHandler {
         } else if (packet instanceof PacketRequestGetProperty) {
             try {
                 PacketRequestGetProperty packetRequestGetProperty = (PacketRequestGetProperty)packet;
-                PlayerInformation offlinePlayer = CloudDriver.getInstance().getCloudPlayerManager().getOfflinePlayer(packetRequestGetProperty.getPlayerUUID());
+                PlayerInformation offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestGetProperty.getPlayerUUID());
 
                 packet.reply(ResponseStatus.SUCCESS, offlinePlayer.getProperty(packetRequestGetProperty.getName()).toString());
             } catch (Exception e) {

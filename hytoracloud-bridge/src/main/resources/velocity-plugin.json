@@ -1,11 +1,11 @@
 {
   "id": "hytoraCloud_bridge",
-  "name": "HytoraCloud-Bridge",
-  "version": "1.0",
-  "description": "Bridge between cloud and proxy",
+  "name": "Velocity-CloudBridge",
+  "version": "STABLE-1.8",
+  "description": "CloudBridge for HytoraCloud",
   "url": "https://hytora.cloud",
   "authors": [
     "Lystx"
   ],
-  "main": "de.lystx.hytoracloud.bridge.velocity.VelocityBridge"
+  "main": "de.lystx.hytoracloud.bridge.proxy.velocity.VelocityBridge"
 }

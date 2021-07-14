@@ -14,12 +14,34 @@ import java.util.List;
 @Getter @Setter @AllArgsConstructor @ToString
 public class ProxyConfig implements Serializable {
 
+    /**
+     * If enabled
+     */
     private boolean enabled;
+
+    /**
+     * If cracked users
+     */
     private boolean onlineMode;
-    private int maxPlayers;
+
+    /**
+     * Tablist update delay
+     */
     private long tabListDelay;
+
+    /**
+     * all tablists
+     */
     private List<TabList> tabList;
+
+    /**
+     * All motds for normal
+     */
     private List<Motd> motdNormal;
+
+    /**
+     * All motds for maintenance
+     */
     private List<Motd> motdMaintenance;
 
 
@@ -31,7 +53,6 @@ public class ProxyConfig implements Serializable {
         return new ProxyConfig(
                 true,
                 true,
-                100,
                      20L,
                      Collections.singletonList(
                         new TabList(

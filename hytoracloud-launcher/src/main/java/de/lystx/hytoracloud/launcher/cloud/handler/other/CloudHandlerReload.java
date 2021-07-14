@@ -19,7 +19,6 @@ public class CloudHandlerReload implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketReload) {
             this.cloudSystem.reload();
-            this.cloudSystem.sendPacket(new PacketOutUpdateTabList());
         }
     }
 }
