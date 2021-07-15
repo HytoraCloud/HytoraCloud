@@ -40,6 +40,7 @@ import java.util.UUID;
 @Getter @Setter
 public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> implements ICloudPlayer {
 
+    private static final long serialVersionUID = 7250454458770916643L;
     /**
      * The Service the Player is on
      */
@@ -276,8 +277,8 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     }
 
     @Override
-    public void connect(IService IService) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketConnectServer(this.getUniqueId(), IService.getName()));
+    public void connect(IService service) {
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketConnectServer(this.getUniqueId(), service.getName()));
     }
 
     @Override

@@ -19,6 +19,8 @@ import java.io.Serializable;
 @Getter @Setter
 public abstract class PacketCommunication extends HytoraPacket implements Serializable {
 
+    private static final long serialVersionUID = -6521933834681609598L;
+
     private boolean sendBack;
 
     public PacketCommunication() {

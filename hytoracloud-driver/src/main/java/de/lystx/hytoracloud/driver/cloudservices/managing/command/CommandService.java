@@ -186,9 +186,6 @@ public class CommandService implements ICloudService {
      * @param cloudConsole the console
      */
     public void execute(String line, CloudConsole cloudConsole) {
-        if (!active) {
-            return;
-        }
         if (this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             if (line.equalsIgnoreCase("sc leave") || line.equalsIgnoreCase("screen leave") || line.equalsIgnoreCase("leave") || line.equalsIgnoreCase("-l") || line.equalsIgnoreCase("quit")) {
                 for (int i = 0; i < 5; i++) {
@@ -197,6 +194,9 @@ public class CommandService implements ICloudService {
             } else {
                 this.getDriver().sendPacket(new PacketCommand(this.getDriver().getParent().getScreenPrinter().getScreen().getServiceName(), line));
             }
+        }
+        if (!active) {
+            return;
         }
         if (!this.execute(cloudConsole, false, line)) {
             cloudConsole.getLogger().sendMessage("ERROR", "§cThe command '§e" + line.split(" ")[0] + "§c' doesn't exist!");

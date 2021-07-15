@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.events.network.DriverEventGroupMaintenanceChange;
 import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
@@ -31,8 +32,6 @@ public class GroupService implements ICloudService {
 
     private final List<IServiceGroup> groups;
 
-    private boolean first;
-
     public GroupService() {
         this.groups = new LinkedList<>();
 
@@ -56,13 +55,8 @@ public class GroupService implements ICloudService {
                 if (file.getName().endsWith(".json")) {
                     JsonEntity jsonEntity = new JsonEntity(file);
                     this.groups.add(jsonEntity.getAs(ServiceGroupObject.class));
-
                 }
             }
-        }
-        if (!this.first) {
-            CloudDriver.getInstance().getParent().getConsole().sendMessage("GROUPS", "§7Loaded §b" + this.groups.size() + " §7ServiceGroups and their §bTemplates§8!");
-            this.first = true;
         }
     }
 
@@ -99,19 +93,25 @@ public class GroupService implements ICloudService {
 
     /**
      * Updates a group
-     * @param newIServiceGroup
+     * @param serviceGroup
      */
-    public void updateGroup(IServiceGroup newIServiceGroup) {
+    public void updateGroup(IServiceGroup serviceGroup) {
         if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
             return;
         }
-        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), newIServiceGroup.getName() + ".json"));
-        jsonEntity.clear();
-        jsonEntity.append(newIServiceGroup);
-        jsonEntity.save();
-        this.groups.remove(this.getGroup(newIServiceGroup.getName()));
-        this.groups.add(newIServiceGroup);
+        CloudDriver.getInstance().getServiceManager().updateGroup(serviceGroup);
 
+        IServiceGroup group = this.getGroup(serviceGroup.getName());
+
+        CloudDriver.getInstance().callEvent(new DriverEventGroupMaintenanceChange(serviceGroup, serviceGroup.isMaintenance()));
+
+        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
+        jsonEntity.append(serviceGroup);
+        jsonEntity.save();
+
+        this.groups.set(this.groups.indexOf(group), serviceGroup);
+
+        CloudDriver.getInstance().reload();
     }
 
     /**

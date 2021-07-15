@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.launcher.global.commands;
 
 
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -12,6 +13,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrint
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import lombok.AllArgsConstructor;
 
+import javax.activation.CommandMap;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +49,7 @@ public class ScreenCommand implements TabCompletable {
                         }
                         screen.setCloudConsole(cloudInstance.getParent().getConsole());
                         screen.setScreenPrinter(screenPrinter);
+                        CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
                         sender.sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
                         this.screenPrinter.create(screen);
                         try {

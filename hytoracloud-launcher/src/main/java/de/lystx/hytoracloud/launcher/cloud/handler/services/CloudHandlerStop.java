@@ -4,12 +4,14 @@ import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 
 @AllArgsConstructor @Getter
@@ -19,16 +21,17 @@ public class CloudHandlerStop implements PacketHandler {
 
     @Override
     public void handle(HytoraPacket packet) {
+        CloudSideServiceManager serviceManager = (CloudSideServiceManager) CloudDriver.getInstance().getServiceManager();
         if (packet instanceof PacketInStopServer) {
             PacketInStopServer packetInStopServer = (PacketInStopServer)packet;
             try {
-                IService IService = packetInStopServer.getIService();
-                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getServiceName().equalsIgnoreCase(IService.getName())) {
+                IService cachedObject = serviceManager.getCachedObject(packetInStopServer.getService());
+                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getServiceName().equalsIgnoreCase(cachedObject.getName())) {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }
-                CloudDriver.getInstance().getServiceManager().stopService(CloudDriver.getInstance().getServiceManager().getCachedObject(IService.getName()));
-                this.cloudSystem.getInstance(Scheduler.class).scheduleDelayedTask(this.cloudSystem::reload, 2L);
-            } catch (NullPointerException ignored) {
+                CloudDriver.getInstance().getServiceManager().stopService(cachedObject);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
         }
     }

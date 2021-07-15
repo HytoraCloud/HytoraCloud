@@ -5,9 +5,12 @@ import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.handler.EventListener;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.SignGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.commons.events.network.DriverEventGroupMaintenanceChange;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
@@ -50,7 +53,7 @@ public class SignUpdater {
      */
     private final Map<String , Map<Integer, CloudSign>> freeSigns;
 
-    private final Map<CloudSign, IService> serviceMap;
+    private final Map<CloudSign, String> serviceMap;
 
     /**
      * Scheduler stuff
@@ -130,7 +133,7 @@ public class SignUpdater {
 
         CloudSign cloudSign = signs.get(current.getId());
 
-        this.serviceMap.put(cloudSign, current);
+        this.serviceMap.put(cloudSign, current.getName());
 
         if (this.freeSigns.containsKey(current.getGroup().getName())) {
             Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(current.getGroup().getName());
@@ -151,6 +154,7 @@ public class SignUpdater {
                 if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
                     return;
                 }
+
                 try {
                     serverPinger.pingServer(CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress(), current.getPort(), 20);
                 } catch (IOException exception) {
@@ -279,16 +283,19 @@ public class SignUpdater {
     /**
      * Updates a Sign
      * @param sign
-     * @param IService
+     * @param service
      * @param serverPinger
      */
-    public void signUpdate(Sign sign, IService IService, ServerPinger serverPinger) {
+    public void signUpdate(Sign sign, IService service, ServerPinger serverPinger) {
+
+        service = CloudDriver.getInstance().getServiceManager().getCachedObject(service.getName());
+
         JsonEntity jsonObject;
         ServiceState state ;
-        if (IService.getState().equals(ServiceState.MAINTENANCE) || IService.getGroup().isMaintenance()) {
+        if (service.getState().equals(ServiceState.MAINTENANCE) || service.getSyncedGroup().orElse(service.getGroup()).isMaintenance()) {
             jsonObject = ServerSelector.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
             state = ServiceState.MAINTENANCE;
-        } else if (IService.getState().equals(ServiceState.FULL) || serverPinger.getPlayers() >= serverPinger.getMaxplayers()) {
+        } else if (service.getState().equals(ServiceState.FULL) || serverPinger.getPlayers() >= serverPinger.getMaxplayers()) {
             jsonObject = ServerSelector.getInstance().getSignManager().getSignLayOut().getFullLayOut();
             state = ServiceState.FULL;
         } else {
@@ -296,7 +303,7 @@ public class SignUpdater {
             state = ServiceState.LOBBY;
         }
         for (int i = 0; i != 4; i++) {
-            sign.setLine(i, this.replace(jsonObject.getString(String.valueOf(i)), IService, serverPinger));
+            sign.setLine(i, this.replace(jsonObject.getString(String.valueOf(i)), service, serverPinger));
         }
         sign.update(true);
         Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () ->  this.setBlock(sign.getLocation(), state));

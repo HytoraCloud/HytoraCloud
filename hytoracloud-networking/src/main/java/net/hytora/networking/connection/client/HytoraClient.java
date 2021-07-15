@@ -264,6 +264,9 @@ public class HytoraClient implements HytoraConnection {
                         future.complete(this);
 
                     } catch (IOException e) {
+                        if (e instanceof java.net.SocketException) {
+                            return;
+                        }
                         if (this.options.isDebug()) {
                             e.printStackTrace();
                         }

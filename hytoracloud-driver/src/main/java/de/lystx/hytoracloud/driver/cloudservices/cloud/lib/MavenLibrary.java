@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.lib;
 
+import de.lystx.hytoracloud.driver.commons.enums.other.Color;
 import lombok.Getter;
 
 import java.io.File;
@@ -32,7 +33,12 @@ public class MavenLibrary {
      */
     public void install(String url) {
         if (!new File(this.libraryService.getDirectory(), path()).exists()) {
-            System.out.println("[Libraries] Downloading " + groupId + ":" + artifactId + " Library (Version: " + this.version + ") from " + url);
+
+            String b = Color.BLACK_BRIGHT.toString();
+            String c = Color.CYAN_BRIGHT.toString();
+            String w = Color.RESET.toString();
+
+            System.out.println(b + "[" + c + "Libraries" + b + "] " + w + "Downloading " + groupId + b + ":" + w + artifactId + " " + b + "(" + c + "Version: " + w + this.version + b + ")" + w + " Dependency" + b + "..." + w);
             try {
                 if (!Files.exists(this.getPath())) {
                     Path parent = this.getPath().getParent();

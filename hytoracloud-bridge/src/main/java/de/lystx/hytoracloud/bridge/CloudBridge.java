@@ -90,14 +90,12 @@ public class CloudBridge {
                 new BridgeHandlerCommand(),
                 new BridgeHandlerCommunication(),
                 new BridgeHandlerPlayer(),
+                new BridgeHandlerServiceUpdate(),
                 new BridgeHandlerPerms(),
                 new BridgeHandlerEvent(),
                 new BridgeHandlerServiceRequests()
         );
         this.bootstrap();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> CloudDriver.getInstance().shutdownDriver(), "shutdown_hook"));
-
     }
 
     /**

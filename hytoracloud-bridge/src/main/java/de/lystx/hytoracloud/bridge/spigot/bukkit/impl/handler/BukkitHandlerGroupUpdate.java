@@ -17,7 +17,7 @@ public class BukkitHandlerGroupUpdate implements PacketHandler {
 
             PacketInUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketInUpdateServiceGroup) packet;
             IServiceGroup group = CloudDriver.getInstance().getCurrentService().getGroup();
-            IServiceGroup newGroup = packetPlayOutUpdateServiceGroup.getIServiceGroup();
+            IServiceGroup newGroup = packetPlayOutUpdateServiceGroup.getServiceGroup();
 
             if (newGroup.getName().equalsIgnoreCase(group.getName())) {
                 if (newGroup.isMaintenance()) {

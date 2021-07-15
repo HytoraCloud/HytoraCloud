@@ -30,11 +30,6 @@ public class ServerSelector {
      */
     private NPCManager npcManager;
 
-    /**
-     * The skinfetcher to fetch data
-     */
-    private NPC.SkinFetcher skinFetcher;
-
     @Getter
     private static ServerSelector instance;
 
@@ -48,21 +43,20 @@ public class ServerSelector {
         instance = this;
 
         this.signManager = new SignManager();
-        PluginManager pm = Bukkit.getPluginManager();
 
         if (!CloudDriver.getInstance().getBukkit().isNewVersion()) {
             this.npcManager = new NPCManager();
-            this.skinFetcher = new NPC.SkinFetcher();
-            pm.registerEvents(new PlayerNPCListener(), bridge);
+            bridge.getServer().getPluginManager().registerEvents(new PlayerNPCListener(), bridge);
         }
 
-        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerSign());
-        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerSignUpdate());
+        CloudDriver.getInstance().registerPacketHandler(
+                new BukkitHandlerSign(),
+                new BukkitHandlerSignUpdate()
+        );
 
-        pm.registerEvents(new PlayerSignListener(), bridge);
-        pm.registerEvents(new PlayerJoinPacketListener(), bridge);
-        pm.registerEvents(new PlayerQuitPacketListener(), bridge);
-        System.out.println("[CloudBridge-ServerSelector] SignSystem and NPCs are fully loaded and set up!");
+        bridge.getServer().getPluginManager().registerEvents(new PlayerSignListener(), bridge);
+        bridge.getServer().getPluginManager().registerEvents(new PlayerJoinPacketListener(), bridge);
+        bridge.getServer().getPluginManager().registerEvents(new PlayerQuitPacketListener(), bridge);
     }
 
     /**

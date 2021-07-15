@@ -51,7 +51,7 @@ public class SignManager {
             if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
                 return;
             }
-            CloudDriver.getInstance().execute(() -> this.signUpdater.run());
+            new Thread(() -> this.signUpdater.run(), "signThread").start();
         } catch (NullPointerException e) {
             Scheduler.getInstance().scheduleDelayedTask(this::run, 5L);
         }

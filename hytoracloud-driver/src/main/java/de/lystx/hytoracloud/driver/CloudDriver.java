@@ -53,6 +53,7 @@ import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.LoggerFactory;
 
@@ -255,6 +256,8 @@ public class CloudDriver {
 
         //Check for libraries and colored console
         if (driverType.equals(CloudType.RECEIVER) || driverType.equals(CloudType.CLOUDSYSTEM) || driverType.equals(CloudType.NONE)) {
+            System.out.println("");
+            System.out.println("---------------------------------");
             this.libraryService = new LibraryService(instance.getLibraryDirectory(), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
             this.libraryService.installDefaultLibraries();
             AnsiConsole.systemInstall();
@@ -780,13 +783,13 @@ public class CloudDriver {
     public IService getFallback(ICloudPlayer player) {
         try {
             Fallback fallback = this.getHighestFallback(player);
-            IService IService;
+            IService service;
             try {
-                IService = CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
+                service = CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
             } catch (Exception e){
-                IService = CloudDriver.getInstance().getServiceManager().getCachedObject(fallback.getGroupName() + "-1");
+                service = CloudDriver.getInstance().getServiceManager().getCachedObject(fallback.getGroupName() + "-1");
             }
-            return IService;
+            return service;
         } catch (NullPointerException e) {
             return null;
         }
@@ -832,12 +835,15 @@ public class CloudDriver {
      */
 
     public void shutdownDriver() {
-        CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getCurrentService()));
+
+        CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getCurrentService().getName()));
+
         try {
-            this.connection.close();
+            connection.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     /**

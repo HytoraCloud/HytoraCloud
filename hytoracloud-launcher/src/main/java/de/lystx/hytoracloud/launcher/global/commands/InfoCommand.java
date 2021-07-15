@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -79,18 +80,17 @@ public class InfoCommand implements TabCompletable {
                         return;
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
-                    for (IServiceGroup IServiceGroup : instance.getGroups()) {
+                    for (IServiceGroup serviceGroup : new LinkedList<>(instance.getGroups())) {
 
+                        int max = serviceGroup.getServices().size() * serviceGroup.getMaxPlayers();
 
-                        int max = IServiceGroup.getServices().size() * IServiceGroup.getMaxPlayers();
-
-                        sender.sendMessage("§h> §b" + IServiceGroup.getName() + " §h[" + IServiceGroup.getUniqueId() + "§h] §h:");
-                        sender.sendMessage("  §8> §bType: " + IServiceGroup.getType() + " §7| §eReceiver: " + IServiceGroup.getReceiver());
-                        sender.sendMessage("  §8> §bPlayers: " +  IServiceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + IServiceGroup.getTemplate().getName());
-                        sender.sendMessage("  §8> §bMemory: " + IServiceGroup.getMemory());
-                        sender.sendMessage("  §8> §bMinServer: " +  IServiceGroup.getMinServer() + " §7| §eMaxServer: " + IServiceGroup.getMaxServer());
-                        sender.sendMessage("  §8> §bNew-Server-At: " +  IServiceGroup.getNewServerPercent() + "% §7| §eProperties: " + IServiceGroup.getProperties().keySet().size());
-                        sender.sendMessage("  §8> §bLobby: " +  IServiceGroup.isLobby() + " §7| §eDynamic: " + IServiceGroup.isDynamic());
+                        sender.sendMessage("§h> §b" + serviceGroup.getName() + " §h[§f" + serviceGroup.getUniqueId() + "§h] §h:");
+                        sender.sendMessage("  §8> §bType: " + serviceGroup.getType() + " §7| §eReceiver: " + serviceGroup.getReceiver());
+                        sender.sendMessage("  §8> §bPlayers: " +  serviceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getTemplate().getName());
+                        sender.sendMessage("  §8> §bMemory: " + serviceGroup.getMemory());
+                        sender.sendMessage("  §8> §bMinServer: " +  serviceGroup.getMinServer() + " §7| §eMaxServer: " + serviceGroup.getMaxServer());
+                        sender.sendMessage("  §8> §bNew-Server-At: " +  serviceGroup.getNewServerPercent() + "% §7| §eProperties: " + serviceGroup.getProperties().keySet().size());
+                        sender.sendMessage("  §8> §bLobby: " +  serviceGroup.isLobby() + " §7| §eDynamic: " + serviceGroup.isDynamic() + " §7| §aMaintenance: " + serviceGroup.isMaintenance());
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
             }

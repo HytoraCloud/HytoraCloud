@@ -34,12 +34,12 @@ public class PlayerSignListener implements Listener {
 
         if (cloudPlayer != null && cloudSign != null && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-            IService service = ServerSelector.getInstance().getSignManager().getSignUpdater().getServiceMap().get(cloudSign);
+            IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(ServerSelector.getInstance().getSignManager().getSignUpdater().getServiceMap().get(cloudSign));
             if (service == null) {
                 return;
             }
 
-            if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
+            if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName()) && !service.getGroup().isMaintenance()) {
                 player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 return;
             }

@@ -205,6 +205,19 @@ public class CloudBridgeServiceManager implements IServiceManager {
         }
     }
 
+    @Override
+    public void unregisterService(IService service) {
+        IService service1 = this.getCachedObject(service.getName());
+
+        if (service1 != null) {
+            IServiceGroup serviceGroup = this.getServiceGroup(service.getGroup().getName());
+            List<IService> cachedServices = this.getCachedServices(serviceGroup);
+
+            cachedServices.remove(service1);
+            this.cachedServices.put(serviceGroup, cachedServices);
+        }
+
+    }
 
     @Override
     public void registerService(IService service) {
@@ -242,7 +255,7 @@ public class CloudBridgeServiceManager implements IServiceManager {
 
     @Override
     public void stopService(IService service) {
-        CloudDriver.getInstance().sendPacket(new PacketInStopServer(service));
+        CloudDriver.getInstance().sendPacket(new PacketInStopServer(service.getName()));
     }
 
     @Override

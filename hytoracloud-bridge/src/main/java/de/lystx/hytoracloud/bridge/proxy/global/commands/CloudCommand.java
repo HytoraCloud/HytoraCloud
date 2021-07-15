@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketGroupMaintenanceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
@@ -236,6 +237,7 @@ public class CloudCommand implements TabCompletable {
                         boolean maintenance = !serviceGroup.isMaintenance();
                         serviceGroup.setMaintenance(maintenance);
                         serviceGroup.update();
+
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The group §b" + serviceGroup.getName() + " §7is " + (maintenance ? "§anow in maintenance§8!" : "§cno longer in maintenance§8!"));
                     } else if (args[0].equalsIgnoreCase("copy")) {
                         String servername = args[1];

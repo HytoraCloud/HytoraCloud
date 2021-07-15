@@ -3,6 +3,9 @@ package de.lystx.hytoracloud.launcher.global;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -37,6 +40,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 public class CloudProcess extends CloudDriver implements DriverParent {
@@ -135,7 +141,12 @@ public class CloudProcess extends CloudDriver implements DriverParent {
             module.onReload();
         }
 
+        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
+            registeredService.reload();
+        }
+
         CloudDriver.getInstance().getInstance(ConfigService.class).reload();
+        CloudDriver.getInstance().getInstance(GroupService.class).reload();
 
         try {
 

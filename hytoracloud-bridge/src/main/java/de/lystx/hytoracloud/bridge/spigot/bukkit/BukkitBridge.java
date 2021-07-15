@@ -15,6 +15,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
@@ -24,6 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -202,33 +204,21 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
 
     @Override
     public void shutdown() {
+
         if (this.taskId != -1) {
             CloudDriver.getInstance().getScheduler().cancelTask(this.taskId);
         }
+
         String msg = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getBukkitShutdown().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix());
-        int size = Bukkit.getOnlinePlayers().size();
-        if (size <= 0) {
+
+        //Already no one online anymore
+        if (Bukkit.getOnlinePlayers().size() <= 0) {
             CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> CloudDriver.getInstance().shutdownDriver(), 5L);
             return;
         }
 
-        Utils.doUntilEmpty(new LinkedList<>(Bukkit.getOnlinePlayers()),
-            player -> {
-                ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName());
-                if (ICloudPlayer != null) {
-                    player.sendMessage(msg);
-                    if (CloudDriver.getInstance().getServiceManager().getLobbies().size() == 1) {
-                        Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> player.kickPlayer(msg));
-                    } else {
-                        ICloudPlayer.fallback();
-                    }
-                } else {
-                    player.kickPlayer(msg);
-                }
-            },
-            players -> CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> CloudDriver.getInstance().shutdownDriver(), 5L)
-        );
-
+        //TODO: Nach 2x /stop kommt man nd mehr drauf
+        Utils.doUntilEmpty(new LinkedList<>(Bukkit.getOnlinePlayers()), player -> player.kickPlayer(msg), players -> CloudDriver.getInstance().shutdownDriver());
     }
 
     /*
@@ -238,14 +228,18 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
      * player being online
      */
     public void startStopTimer() {
-        if (!CloudDriver.getInstance().getCurrentService().getProperties().has("waitingForPlayers")) {
-            return;
-        }
-        this.taskId = CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
-            if (Bukkit.getOnlinePlayers().size() <= 0) {
-                this.shutdown();
+        try {
+            if (!CloudDriver.getInstance().getCurrentService().getProperties().has("waitingForPlayers")) {
+                return;
             }
-        }, 6000L).getId();
+            this.taskId = CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
+                if (Bukkit.getOnlinePlayers().size() <= 0) {
+                    this.shutdown();
+                }
+            }, 6000L).getId();
+        } catch (NullPointerException e) {
+            //NullPointerException when executing '/stop'
+        }
     }
 
 }

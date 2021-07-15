@@ -2,28 +2,34 @@ package de.lystx.hytoracloud.driver.commons.packets.both.service;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;
 
-@Getter @AllArgsConstructor
-public class PacketServiceUpdate extends PacketCommunication {
+import java.io.Serializable;
 
-    private IService service;
+@Getter @AllArgsConstructor
+public class PacketGroupMaintenanceUpdate extends PacketCommunication implements Serializable {
+
+    private String group;
+
+    private boolean changeTo;
 
     @Override
     public void read(Component component) {
         super.read(component);
 
-        service = component.get("service");
+        group = component.get("group");
+        changeTo = component.get("changeTo");
     }
 
     @Override
     public void write(Component component) {
         super.write(component);
 
-        component.append(map -> map.put("service", service));
+        component.put("group", group);
+        component.put("changeTo", changeTo);
     }
 
 }

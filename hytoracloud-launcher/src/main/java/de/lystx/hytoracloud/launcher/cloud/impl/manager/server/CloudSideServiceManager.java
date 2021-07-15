@@ -104,23 +104,23 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     /**
      * Sends notify to console
-     * @param IService
+     * @param service
      */
-    public void notifyStart(IService IService) {
+    public void notifyStart(IService service) {
 
         if (!this.running) {
             return;
         }
-        List<IService> list = this.getCachedServices(IService.getGroup());
-        if (!list.contains(IService)) {
-            list.add(IService);
-            this.cachedServices.put(this.getServiceGroup(IService.getGroup().getName()), list);
+        List<IService> list = this.getCachedServices(service.getGroup());
+        if (!list.contains(service)) {
+            list.add(service);
+            this.cachedServices.put(this.getServiceGroup(service.getGroup().getName()), list);
         }
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
 
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + IService.getGroup().getReceiver() + " §7was told to queue §3" + IService.getName() + " §h[§7ID: §b" + IService.getId() + " §7| §7Port: §b" + IService.getPort() + " §7| §7Mode: §b" + IService.getGroup().getType() + " §7| §7Storage: §b" + (IService.getGroup().isDynamic() ? "DYNAMIC": "STATIC") + "§h]");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "§h'§9" + service.getGroup().getReceiver() + "§h' §7queued §b" + service.getName() + " §h[§7Port: §b" + service.getPort() + " §7| §7Mode: §b" + (service.getGroup().isDynamic() ? "DYNAMIC": "STATIC") + "_" + service.getGroup().getType() + "§h]");
 
     }
 
@@ -141,7 +141,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "The Wrapper §b" + service.getGroup().getReceiver() + " §7stopped §c" + service.getName() + "§f!");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "§h'§9" + service.getGroup().getReceiver() + "§h' §7stopped §b" + service.getName() + "§h!");
     }
 
 
@@ -153,7 +153,8 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
         List<IService> cachedServices = this.getCachedServices(service.getGroup());
 
-        cachedServices.set(cachedServices.indexOf(this.getCachedObject(service.getName())), service.deepCopy());
+        cachedServices.remove(this.getCachedObject(service.getName()));
+        cachedServices.add(service);
 
         IServiceGroup serviceGroup = this.getServiceGroup(service.getGroup().getName());
         if (serviceGroup == null) {
@@ -162,6 +163,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         this.cachedServices.put(serviceGroup, cachedServices);
 
         CloudDriver.getInstance().callEvent(new DriverEventServiceUpdate(service));
+
     }
 
     /**
@@ -174,15 +176,18 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     /**
      * Checks if {@link IServiceGroup} is allowed
      * to start on this receiver
-     * @param IServiceGroup
+     * @param serviceGroup
      * @return
      */
-    public boolean isRightReceiver(IServiceGroup IServiceGroup) {
+    public boolean isRightReceiver(IServiceGroup serviceGroup) {
+        if (serviceGroup.getReceiver() == null) {
+            return true;
+        }
         if (getDriver().getDriverType().equals(CloudType.RECEIVER)) {
             ReceiverInfo info = getDriver().getImplementedData().getObject("receiverInfo", ReceiverInfo.class);
-            return IServiceGroup.getReceiver().equalsIgnoreCase(info.getName());
+            return serviceGroup.getReceiver().equalsIgnoreCase(info.getName());
         } else if (getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            return IServiceGroup.getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER);
+            return serviceGroup.getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER);
         }
         return true;
     }
@@ -302,6 +307,11 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
 
     @Override
+    public void unregisterService(IService service) {
+
+    }
+
+    @Override
     public void startService(IServiceGroup serviceGroup, IService service, PropertyObject properties) {
         if (!this.running) {
             return;
@@ -401,30 +411,25 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         this.stopService(service, true);
     }
 
-    public void stopService(IService IService, boolean newServices) {
-        if (!this.isRightReceiver(IService.getGroup())) {
-            return;
-        }
+    public void stopService(IService service, boolean newServices) {
 
         try {
-            this.getDriver().sendPacket(new PacketOutStopServer(IService.getName()));
+            this.getDriver().sendPacket(new PacketOutStopServer(service.getName()));
             try {
-                this.idService.removeID(IService.getGroup().getName(), IService.getId());
-                this.portService.removeProxyPort(IService.getPort());
-                this.portService.removePort(IService.getPort());
+                this.idService.removeID(service.getGroup().getName(), service.getId());
+                this.portService.removeProxyPort(service.getPort());
+                this.portService.removePort(service.getPort());
             } catch (NullPointerException e) {
                 //Ignoring Ubuntu Error
             }
 
-            List<IService> IServices = this.cachedServices.get(this.getServiceGroup(IService.getGroup().getName()));
-            IService remove = this.getCachedObject(IService.getName());
-            if (IServices == null) IServices = new LinkedList<>();
-            IServices.remove(remove);
-            this.cachedServices.put(this.getServiceGroup(IService.getGroup().getName()), IServices);
+            List<IService> services = this.cachedServices.getOrDefault(this.getServiceGroup(service.getGroup().getName()), new LinkedList<>());
 
+            services.remove(this.getCachedObject(service.getName()));
+            this.cachedServices.put(this.getServiceGroup(service.getGroup().getName()), services);
 
-            ServiceStopper serviceStopper = new ServiceStopper(IService);
-            if (!CloudDriver.getInstance().callEvent(new DriverEventServiceStop(IService))) {
+            ServiceStopper serviceStopper = new ServiceStopper(service);
+            if (!CloudDriver.getInstance().callEvent(new DriverEventServiceStop(service))) {
                 serviceStopper.stop(new Consumer<IService>() {
                     @Override
                     public void accept(IService IService) {

@@ -57,28 +57,22 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
         }
     }
 
-    public PlayerInformation getPlayerData(UUID uuid) {
-        return this.database.getOfflinePlayer(uuid);
-    }
-
-    public void setPlayerData(UUID uuid, PlayerInformation data) {
-        this.database.saveOfflinePlayer(uuid, data);
-    }
-
     @Override
     public void unregisterPlayer(ICloudPlayer cloudPlayer) {
         try {
-            PlayerInformation data = this.getPlayerData(cloudPlayer.getUniqueId());
-            data.setLastLogin(new Date().getTime());
-            cloudPlayer.setInformation(data);
-            this.database.saveOfflinePlayer(cloudPlayer.getUniqueId(), data);
-            if (this.getDriver().getParent().getWebServer() == null) {
-                return;
-            }
+            PlayerInformation information = cloudPlayer.getInformation();
+            information.setLastLogin(new Date().getTime());
+            cloudPlayer.setInformation(information);
+
+            this.database.saveOfflinePlayer(cloudPlayer.getUniqueId(), information);
+
+            CloudDriver.getInstance().getPermissionPool().updatePlayer(information);
+            CloudDriver.getInstance().getPermissionPool().update();
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        this.cachedObjects.remove(cloudPlayer);
+
+        this.cachedObjects.removeIf(iCloudPlayer -> iCloudPlayer.getName().equalsIgnoreCase(cloudPlayer.getName()));
     }
 
 

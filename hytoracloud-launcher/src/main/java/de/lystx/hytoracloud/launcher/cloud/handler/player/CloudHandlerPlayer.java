@@ -51,6 +51,7 @@ public class CloudHandlerPlayer implements PacketHandler {
                 playerManager.unregisterPlayer(cachedPlayer);
             }
 
+            CloudDriver.getInstance().sendPacket(packet);
         }
 
         if (packet instanceof PacketRequestPlayerNamed) {

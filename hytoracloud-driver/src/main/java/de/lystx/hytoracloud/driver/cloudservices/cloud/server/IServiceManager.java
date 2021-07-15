@@ -12,6 +12,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface IServiceManager extends ObjectPool<IService> {
 
@@ -147,6 +148,13 @@ public interface IServiceManager extends ObjectPool<IService> {
      * @param service the service
      */
     void registerService(IService service);
+
+    /**
+     * Unregisters a {@link IService} from cache
+     *
+     * @param service the service
+     */
+    void unregisterService(IService service);
 
     /**
      * Gets a {@link IServiceGroup} by its name

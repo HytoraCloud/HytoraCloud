@@ -9,9 +9,12 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import io.vson.elements.object.Objectable;
 import net.hytora.networking.elements.packet.response.Response;
 
+import javax.swing.text.html.Option;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
 
 public interface IService extends Serializable, Identifiable, Objectable<IService> {
 
@@ -20,20 +23,21 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      */
     int getId();
 
-    void setId(int id);
-
     /**
      * The port of this service
      */
     int getPort();
-
-    void setPort(int port);
 
     /**
      * The host of the cloud to connect to
      */
     String getHost();
 
+    /**
+     * Sets the host of this service
+     *
+     * @param host the host
+     */
     void setHost(String host);
 
     /**
@@ -41,6 +45,11 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      */
     ServiceState getState();
 
+    /**
+     * Sets the state of this service
+     *
+     * @param state the state
+     */
     void setState(ServiceState state);
 
     /**
@@ -48,6 +57,11 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      */
     PropertyObject getProperties();
 
+    /**
+     * Sets the properties of this service
+     *
+     * @param properties the properties
+     */
     void setProperties(PropertyObject properties);
 
     /**
@@ -55,13 +69,31 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      */
     IServiceGroup getGroup();
 
-    void setGroup(IServiceGroup IServiceGroup);
+    /**
+     * The group of this service
+     * sync with the cloud cache
+     *
+     * @return optional
+     */
+    Optional<IServiceGroup> getSyncedGroup();
+
+    /**
+     * Sets the group of this service
+     *
+     * @param serviceGroup the group
+     */
+    void setGroup(IServiceGroup serviceGroup);
 
     /**
      * If the service is connected to the cloud
      */
     boolean isAuthenticated();
 
+    /**
+     * Marks this service as registered
+     *
+     * @param authenticated boolean
+     */
     void setAuthenticated(boolean authenticated);
 
     /**
@@ -104,6 +136,7 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      *
      * @return properties
      */
+    //TODO: SAme as pluginInfo
     PropertyObject requestInfo();
 
     /**
@@ -149,12 +182,6 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      * Stops this service
      */
     void shutdown();
-
-    /**
-     * Copies this service 1:1
-     * @return copied service
-     */
-    IService deepCopy();
 
     /**
      * Uploads the log of the server

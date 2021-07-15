@@ -33,10 +33,10 @@ public class BridgeHandlerPlayer implements PacketHandler {
 
             PacketUnregisterPlayer packetUnregisterPlayer = (PacketUnregisterPlayer)packet;
             String name = packetUnregisterPlayer.getName();
-            ICloudPlayer ICloudPlayer = playerManager.getCachedObject(name);
+            ICloudPlayer cloudPlayer = playerManager.getCachedObject(name);
 
-            if (ICloudPlayer != null) {
-                playerManager.unregisterPlayer(ICloudPlayer);
+            if (cloudPlayer != null) {
+                playerManager.unregisterPlayer(cloudPlayer);
             }
         }
     }

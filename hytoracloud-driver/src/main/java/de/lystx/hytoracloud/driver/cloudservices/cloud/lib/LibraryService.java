@@ -72,7 +72,6 @@ public class LibraryService {
      * Installs default maven libraries
      */
     public void installDefaultLibraries() {
-
         //APACHE
         this.install("org.apache.httpcomponents", "httpclient", "4.3.2", Repository.CENTRAL);
         this.install("org.apache.httpcomponents", "httpcore", "4.3.2", Repository.CENTRAL);

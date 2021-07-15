@@ -48,7 +48,6 @@ public class CloudSystem extends CloudProcess {
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "playerManager", new CloudSidePlayerManager());
 
 
-        this.getInstance(CommandService.class).registerCommand(new EditCommand());
         this.getInstance(CommandService.class).registerCommand(new ModulesCommand());
         this.getInstance(CommandService.class).registerCommand(new CreateCommand());
         this.getInstance(CommandService.class).registerCommand(new DeleteCommand());

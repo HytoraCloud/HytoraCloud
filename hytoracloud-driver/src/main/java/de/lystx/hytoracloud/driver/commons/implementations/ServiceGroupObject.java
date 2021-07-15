@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.driver.commons.implementations;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketGroupMaintenanceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -26,6 +27,7 @@ import java.util.UUID;
 @Getter @Setter @AllArgsConstructor
 public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGroupObject> implements IServiceGroup {
 
+    private static final long serialVersionUID = -7475573037482467285L;
     /**
      * The UUID of this group
      */
@@ -81,6 +83,13 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
      */
     private boolean maintenance;
 
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
+
+        CloudDriver.getInstance().sendPacket(new PacketGroupMaintenanceUpdate(this.name, maintenance));
+    }
+
+
     /**
      * If this group is a lobby group
      */
@@ -105,10 +114,14 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
         }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketInUpdateServiceGroup(this));
     }
+
+
+
     @Override
     public void startNewService() {
         CloudDriver.getInstance().getServiceManager().startService(this);
     }
+
     @Override
     public void startNewService(int amount) {
         for (int i = 0; i < amount; i++) {

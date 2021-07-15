@@ -8,21 +8,20 @@ import lombok.Getter;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.packet.HytoraPacket;
 
-import java.io.Serializable;
-
 
 @AllArgsConstructor @Getter
-public class PacketInStopServer extends HytoraPacket implements Serializable {
+public class PacketInStopServer extends HytoraPacket  {
 
-    private IService IService;
+
+    private String service;
 
     @Override
     public void write(Component component) {
-        component.put("s", IService);
+        component.put("service", service);
     }
 
     @Override
     public void read(Component component) {
-        IService = (IService) component.get("s");
+        service = component.get("service");
     }
 }

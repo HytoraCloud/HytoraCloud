@@ -18,11 +18,10 @@ public class CloudHandlerGroupUpdate implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketInUpdateServiceGroup) {
             PacketInUpdateServiceGroup packetInUpdateServiceGroup = (PacketInUpdateServiceGroup)packet;
-            IServiceGroup group = packetInUpdateServiceGroup.getIServiceGroup();
+            IServiceGroup group = packetInUpdateServiceGroup.getServiceGroup();
 
-            this.cloudSystem.getInstance(GroupService.class).updateGroup(group);
-            CloudDriver.getInstance().getServiceManager().updateGroup(group);
-            this.cloudSystem.reload();
+            CloudDriver.getInstance().getInstance(GroupService.class).updateGroup(group);
+            CloudDriver.getInstance().sendPacket(packet);
         }
     }
 }

@@ -3,6 +3,8 @@ package de.lystx.hytoracloud.driver.commons.implementations;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfos;
@@ -25,11 +27,13 @@ import net.hytora.networking.elements.component.Component;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter @Setter @AllArgsConstructor
 public class ServiceObject extends WrappedObject<IService, ServiceObject> implements IService {
 
+    private static final long serialVersionUID = -5070353652241482658L;
     /**
      * The uuid of this service
      */
@@ -72,6 +76,20 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     public ServiceObject(IServiceGroup group, int id, int port) {
         this(UUID.randomUUID(), id, port, CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
+    }
+
+    public IServiceGroup getGroup() {
+        try {
+            IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(group.getName());
+            return serviceGroup == null ? group : serviceGroup;
+        } catch (Exception e) {
+            return group;
+        }
+    }
+
+    @Override
+    public Optional<IServiceGroup> getSyncedGroup() {
+       return CloudDriver.getInstance().getServiceManager().getCachedGroups().stream().filter(iServiceGroup -> iServiceGroup.getName().equalsIgnoreCase(this.group.getName())).findFirst();
     }
 
     @Override
@@ -192,6 +210,10 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public void update() {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            CloudDriver.getInstance().getServiceManager().updateService(this);
+            return;
+        }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketServiceUpdate(this));
     }
 
@@ -226,21 +248,6 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     @Override
     public String toString() {
         return getName();
-    }
-
-
-    @Override
-    public IService deepCopy() {
-        IService service = new ServiceObject(this.group, this.id, this.port);
-        service.setId(this.id);
-        service.setUniqueId(this.uniqueId);
-        service.setState(this.state);
-        service.setHost(this.host);
-        service.setGroup(this.group);
-        service.setPort(this.port);
-        service.setProperties(this.properties);
-        service.setAuthenticated(this.authenticated);
-        return service;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class PlayerQuitListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         BukkitBridge.getInstance().startStopTimer();
-        CloudDriver.getInstance().getCurrentService().update();
+
     }
 
 }

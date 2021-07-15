@@ -4,6 +4,7 @@ import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import net.hytora.networking.elements.packet.response.Response;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -67,6 +68,25 @@ public interface ObjectPool<V extends Identifiable> extends Iterable<V> {
      */
     Response<V> getObjectSync(String name);
 
+    /**
+     * Loads an {@link Optional} for the object
+     *
+     * @param name the name of object
+     * @return optional
+     */
+    default Optional<V> getOptional(String name) {
+        return this.getCachedObjects().stream().filter(v -> v.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    /**
+     * Loads an {@link Optional} for the object
+     *
+     * @param uniqueId the uuid of object
+     * @return optional
+     */
+    default Optional<V> getOptional(UUID uniqueId) {
+        return this.getCachedObjects().stream().filter(v -> v.getUniqueId() == uniqueId).findFirst();
+    }
     /**
      * Gets an object synced from the cloud
      * via packet and response

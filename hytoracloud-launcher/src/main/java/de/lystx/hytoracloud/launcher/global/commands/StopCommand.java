@@ -22,13 +22,12 @@ public class StopCommand implements TabCompletable {
     public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1) {
             String s = args[0];
-            IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(s);
-            if (IService == null) {
+            IService iService = CloudDriver.getInstance().getServiceManager().getCachedObject(s);
+            if (iService == null) {
                 sender.sendMessage("ERROR", "§cThe service §e" + s + " §cseems not to be online!");
                 return;
             }
-            CloudDriver.getInstance().getServiceManager().stopService(IService);
-            //sender.sendMessage("COMMAND", "§7The service §a" + service.getName() + " §7| §bGroup " + service.getServiceGroup().getName() + " §7was stopped§8!");
+            CloudDriver.getInstance().getServiceManager().stopService(iService);
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String groupName = args[1];

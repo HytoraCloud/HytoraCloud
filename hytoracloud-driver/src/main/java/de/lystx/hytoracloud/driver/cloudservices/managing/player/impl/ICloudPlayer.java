@@ -173,9 +173,9 @@ public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermiss
     /**
      * Connects this player to a {@link IService}
      *
-     * @param IService the service to connect to
+     * @param service the service to connect to
      */
-    void connect(IService IService);
+    void connect(IService service);
 
     /**
      * Connects this player to a random service

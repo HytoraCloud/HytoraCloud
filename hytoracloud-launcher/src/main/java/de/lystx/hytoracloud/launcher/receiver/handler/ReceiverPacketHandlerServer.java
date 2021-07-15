@@ -30,7 +30,7 @@ public class ReceiverPacketHandlerServer implements PacketHandler {
 
             PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;
 
-            CloudDriver.getInstance().getServiceManager().updateService(packetServiceUpdate.getIService());
+            CloudDriver.getInstance().getServiceManager().updateService(packetServiceUpdate.getService());
 
         } else if (packet instanceof PacketInStartGroupWithProperties) {
 
@@ -55,7 +55,6 @@ public class ReceiverPacketHandlerServer implements PacketHandler {
         } else if (packet instanceof PacketInStopServer) {
 
             PacketInStopServer packetInStopServer = (PacketInStopServer)packet;
-            CloudDriver.getInstance().getServiceManager().stopService(packetInStopServer.getIService());
 
         } else if (packet instanceof PacketInStartService) {
 
