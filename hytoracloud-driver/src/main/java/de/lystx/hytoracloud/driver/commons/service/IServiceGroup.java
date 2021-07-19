@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.commons.service;
 
 import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import io.vson.elements.object.Objectable;

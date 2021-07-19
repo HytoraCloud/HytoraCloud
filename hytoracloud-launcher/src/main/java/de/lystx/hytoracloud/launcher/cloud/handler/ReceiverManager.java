@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.launcher.cloud.handler;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
+import utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.commons.packets.out.receiver.PacketReceiverLoginResult;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;

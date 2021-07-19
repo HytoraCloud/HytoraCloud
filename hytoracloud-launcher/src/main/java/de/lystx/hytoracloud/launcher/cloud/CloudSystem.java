@@ -1,9 +1,12 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
+import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignService;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutServerSelector;
+import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 import de.lystx.hytoracloud.launcher.cloud.booting.CloudBootingSetupDone;
 import de.lystx.hytoracloud.launcher.cloud.booting.CloudBootingSetupNotDone;
 import de.lystx.hytoracloud.launcher.cloud.commands.*;
@@ -19,9 +22,11 @@ import de.lystx.hytoracloud.launcher.cloud.impl.manager.CloudSidePlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.launcher.global.commands.DeleteCommand;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import utillity.JsonEntity;
 
 
 @Getter @Setter
@@ -38,7 +43,6 @@ public class CloudSystem extends CloudProcess {
         super(CloudType.CLOUDSYSTEM);
         instance = this;
 
-        CloudDriver.getInstance().getServiceRegistry().registerService(new GroupService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new PermissionService());
 
         CloudDriver.getInstance().getServiceRegistry().registerService(new SignService());
@@ -49,8 +53,6 @@ public class CloudSystem extends CloudProcess {
 
 
         this.getInstance(CommandService.class).registerCommand(new ModulesCommand());
-        this.getInstance(CommandService.class).registerCommand(new CreateCommand());
-        this.getInstance(CommandService.class).registerCommand(new DeleteCommand());
         this.getInstance(CommandService.class).registerCommand(new PermsCommand());
         this.getInstance(CommandService.class).registerCommand(new PlayerCommand());
         this.getInstance(CommandService.class).registerCommand(new MaintenanceCommand());
@@ -76,6 +78,27 @@ public class CloudSystem extends CloudProcess {
 
         CloudDriver.getInstance().sendPacket(new PacketOutServerSelector(service.getCloudSigns(), service.getSignLayOut().getDocument(), npcService.getNPCConfig(), npcService.toMetas()));
 
+        try {
+
+            //Sending config and permission pool
+            CloudDriver.getInstance().getNetworkConfig().update();
+            CloudDriver.getInstance().getPermissionPool().update();
+
+            //Sending network config and services and groups
+            CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
+                    CloudDriver.getInstance().getNetworkConfig(),
+                    CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
+                    CloudDriver.getInstance().getServiceManager().getCachedObjects()
+            ));
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        //Updating webserver
+        CloudDriver.getInstance().getParent().getWebServer().update("players", new JsonEntity().append("players", CloudDriver.getInstance().getPlayerManager().getCachedObjects()));
+        CloudDriver.getInstance().getParent().getWebServer().update("services", new JsonEntity().append("services", CloudDriver.getInstance().getServiceManager().getCachedObjects()));
+
     }
 
     @Override
@@ -91,6 +114,8 @@ public class CloudSystem extends CloudProcess {
     public void shutdown() {
         super.shutdown();
 
+        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).setRunning(false);
+        this.getInstance(Scheduler.class).scheduleDelayedTask(() -> this.getInstance(NetworkService.class).shutdown(), 60L);
     }
 
 }

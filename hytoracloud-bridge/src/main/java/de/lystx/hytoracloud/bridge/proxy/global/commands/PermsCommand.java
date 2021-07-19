@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
-import de.lystx.hytoracloud.driver.utils.utillity.Value;
+import utillity.Value;
 
 import java.util.Date;
 import java.util.UUID;

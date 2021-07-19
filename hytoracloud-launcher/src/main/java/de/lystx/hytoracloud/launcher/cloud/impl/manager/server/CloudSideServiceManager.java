@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.commons.events.other.*;
 import de.lystx.hytoracloud.driver.commons.interfaces.Acceptable;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.implementations.ServiceObject;
-import de.lystx.hytoracloud.driver.utils.utillity.*;
+import utillity.*;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -280,7 +280,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return iService;
         }
-        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§7Service §b" + iService.getName() + " §7has connected §h[§b" + iService.getGroup().getReceiver() + "@" + iService.getHost() + "§h] §7in §b" + action.getMS() + "s§f!");
+        this.getDriver().getParent().getConsole().getLogger().sendMessage("NETWORK", "§h'§9" + iService.getGroup().getReceiver() + "§h' §7registered §b" + iService.getName() + " §7in §3" + action.getMS() + "s§h!");
 
         return iService;
     }

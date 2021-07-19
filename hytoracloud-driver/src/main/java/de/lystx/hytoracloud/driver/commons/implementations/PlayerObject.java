@@ -21,8 +21,8 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.JsonEntity;
+import utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.utils.uuid.NameChange;
 import de.lystx.hytoracloud.driver.utils.uuid.UUIDService;
 import lombok.Getter;
@@ -41,6 +41,7 @@ import java.util.UUID;
 public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> implements ICloudPlayer {
 
     private static final long serialVersionUID = 7250454458770916643L;
+
     /**
      * The Service the Player is on
      */
@@ -228,7 +229,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
             if (CloudDriver.getInstance().getCurrentService().getGroup().getType() == ServiceType.PROXY) {
                 CloudDriver.getInstance().getProxyBridge().messagePlayer(this.getUniqueId(), message.toString());
             } else {
-                Object player = Reflections.getPlayer(this.getName());
+                Object player = Reflections.getBukkitPlayer(this.getName());
                 Reflections.callMethod(player, "sendMessage", message.toString());
             }
         } else {
@@ -273,25 +274,39 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
     @Override
     public void fallback() {
+
+        if (CloudDriver.getInstance().isBridge() && CloudDriver.getInstance().getProxyBridge() != null) {
+            CloudDriver.getInstance().getProxyBridge().fallbackPlayer(this.getUniqueId());
+            return;
+        }
+
         CloudDriver.getInstance().getConnection().sendPacket(new PacketFallback(this.getUniqueId()));
     }
 
     @Override
     public void connect(IService service) {
+        if (CloudDriver.getInstance().isBridge() && CloudDriver.getInstance().getProxyBridge() != null) {
+            CloudDriver.getInstance().getProxyBridge().connectPlayer(this.getUniqueId(), service.getName());
+            return;
+        }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketConnectServer(this.getUniqueId(), service.getName()));
     }
 
     @Override
     public void connectRandom(IServiceGroup serviceGroup) {
 
-        List<IService> IServices = CloudDriver.getInstance().getServiceManager().getServices(serviceGroup);
-        IService IService = IServices.get(new Random().nextInt(IServices.size()));
+        List<IService> services = CloudDriver.getInstance().getServiceManager().getServices(serviceGroup);
+        IService service = services.get(new Random().nextInt(services.size()));
 
-        this.connect(IService);
+        this.connect(service);
     }
 
     @Override
     public void kick(String reason) {
+        if (CloudDriver.getInstance().isBridge() && CloudDriver.getInstance().getProxyBridge() != null) {
+            CloudDriver.getInstance().getProxyBridge().kickPlayer(this.getUniqueId(), reason);
+            return;
+        }
         this.getConnection().disconnect(reason);
     }
 

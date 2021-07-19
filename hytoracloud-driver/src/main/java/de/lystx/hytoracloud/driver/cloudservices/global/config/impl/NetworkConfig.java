@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
 
-import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
+import utillity.CloudMap;
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

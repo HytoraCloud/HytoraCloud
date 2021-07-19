@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.driver.cloudservices.global.config;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
+import utillity.JsonEntity;
+import utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;

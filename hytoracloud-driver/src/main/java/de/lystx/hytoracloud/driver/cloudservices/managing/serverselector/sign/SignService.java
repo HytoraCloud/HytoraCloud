@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.SignLayOut;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.DefaultSignLayout;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.JsonEntity;
 import lombok.Getter;
 
 import java.io.File;

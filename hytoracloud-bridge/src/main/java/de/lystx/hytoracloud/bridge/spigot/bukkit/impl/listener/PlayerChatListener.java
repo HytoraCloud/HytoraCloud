@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import utillity.PlaceHolder;
 
 public class PlayerChatListener implements Listener {
 
@@ -38,14 +39,10 @@ public class PlayerChatListener implements Listener {
             PermissionGroup group = CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(event.getPlayer().getUniqueId());
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 String chatFormat = ChatColor.translateAlternateColorCodes('&', (group.getChatFormat().trim().isEmpty() ? CloudDriver.getInstance().getChatFormat() : group.getChatFormat()));
-                onlinePlayer.sendMessage(chatFormat
-                        .replace("%display%", group.getDisplay().replace("&", "§"))
-                        .replace("%group%", group.getName().replace("&", "§"))
-                        .replace("%message%", message)
-                        .replace("%prefix%", group.getPrefix().replace("&", "§"))
-                        .replace("%suffix%", group.getSuffix().replace("&", "§"))
-                        .replace("%player%", event.getPlayer().getName())
-                        .replace("%id%", group.getId() + ""));
+
+                String formatted = PlaceHolder.apply(chatFormat, group).replace("%message%", message).replace("%player%", event.getPlayer().getName());
+
+                onlinePlayer.sendMessage(formatted);
             }
         }
     }

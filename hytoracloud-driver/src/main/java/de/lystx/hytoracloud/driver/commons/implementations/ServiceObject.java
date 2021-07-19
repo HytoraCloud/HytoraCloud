@@ -3,7 +3,6 @@ package de.lystx.hytoracloud.driver.commons.implementations;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
@@ -17,8 +16,8 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.JsonEntity;
+import utillity.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -75,7 +74,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     private boolean authenticated;
 
     public ServiceObject(IServiceGroup group, int id, int port) {
-        this(UUID.randomUUID(), id, port, CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
+        this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
     }
 
     public IServiceGroup getGroup() {
@@ -113,21 +112,22 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     @Override
     public List<ICloudPlayer> getPlayers() {
         List<ICloudPlayer> list = new LinkedList<>();
-        for (ICloudPlayer globalOnlinePlayer : CloudDriver.getInstance().getPlayerManager().getCachedObjects()) {
-            if (globalOnlinePlayer == null || globalOnlinePlayer.getService() == null) {
-                continue;
+        if (CloudDriver.getInstance() != null) {
+            for (ICloudPlayer globalOnlinePlayer : CloudDriver.getInstance().getPlayerManager().getCachedObjects()) {
+                if (globalOnlinePlayer == null || globalOnlinePlayer.getService() == null) {
+                    continue;
+                }
+                if (!globalOnlinePlayer.getService().getName().equalsIgnoreCase(this.getName())) {
+                    continue;
+                }
+                list.add(globalOnlinePlayer);
             }
-            if (!globalOnlinePlayer.getService().getName().equalsIgnoreCase(this.getName())) {
-                continue;
-            }
-            list.add(globalOnlinePlayer);
         }
         return list;
     }
 
     @Override
     public PropertyObject requestInfo() {
-
         if (CloudDriver.getInstance().isBridge()) {
             return CloudDriver.getInstance().getBridgeInstance().requestProperties();
         } else {
@@ -180,8 +180,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public String getMotd() {
+        if (CloudDriver.getInstance() == null) {
+            return "Empty_MOTD";
+        }
         if (group.getType().equals(ServiceType.PROXY)) {
-            throw new UnsupportedOperationException("Not available for Proxy!");
+            return CloudDriver.getInstance().getProxyConfig().getMotdNormal().get(0).getFirstLine();
         }
         return this.ping().getMotd();
     }
@@ -189,7 +192,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     @Override
     public int getMaxPlayers() {
         if (group.getType().equals(ServiceType.PROXY)) {
-            throw new UnsupportedOperationException("Not available for Proxy!");
+            return group.getMaxPlayers();
         }
         return this.ping().getMaxplayers();
     }

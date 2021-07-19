@@ -1,6 +1,6 @@
-package de.lystx.hytoracloud.launcher.cloud.commands;
+package de.lystx.hytoracloud.launcher.global.commands;
 
-import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -28,27 +28,30 @@ public class DeleteCommand implements TabCompletable {
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String group = args[1];
-                IServiceGroup IServiceGroup = CloudSystem.getInstance().getInstance(GroupService.class).getGroup(group);
+                IServiceGroup IServiceGroup = CloudDriver.getInstance().getInstance(GroupService.class).getGroup(group);
                 if (IServiceGroup == null) {
                     sender.sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
 
-                for (IService IService : CloudDriver.getInstance().getServiceManager().getServices(IServiceGroup)) {
-                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getIdService().removeID(IService.getGroup().getName(), IService.getId());
-                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removePort(IService.getPort());
-                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(IService.getPort());
+                if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+                    for (IService service : CloudDriver.getInstance().getServiceManager().getServices(IServiceGroup)) {
+                        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getIdService().removeID(service.getGroup().getName(), service.getId());
+                        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removePort(service.getPort());
+                        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(service.getPort());
+                    }
+                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).shutdownAll(IServiceGroup, false);
+                    CloudDriver.getInstance().getServiceManager().getCachedObjects().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
+
                 }
 
-                ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).shutdownAll(IServiceGroup, false);
-                CloudSystem.getInstance().getInstance(GroupService.class).deleteGroup(IServiceGroup);
-                CloudDriver.getInstance().getServiceManager().getCachedObjects().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
-                CloudSystem.getInstance().reload();
+                CloudDriver.getInstance().getInstance(GroupService.class).deleteGroup(IServiceGroup);
+                CloudDriver.getInstance().reload();
                 sender.sendMessage("INFO", "§9The ServiceGroup §b" + IServiceGroup.getName() + " §9was deleted!");
             } else if (args[0].equalsIgnoreCase("fallback")) {
                 String fallback = args[1];
 
-                NetworkConfig networkConfig = CloudSystem.getInstance().getInstance(ConfigService.class).getNetworkConfig();
+                NetworkConfig networkConfig = CloudDriver.getInstance().getInstance(ConfigService.class).getNetworkConfig();
                 FallbackConfig fallbackConfig = networkConfig.getFallbackConfig();
 
                 Fallback remove = fallbackConfig.getFallback(fallback);
@@ -61,9 +64,9 @@ public class DeleteCommand implements TabCompletable {
                 fallbacks.remove(remove);
                 fallbackConfig.setFallbacks(fallbacks);
                 networkConfig.setFallbackConfig(fallbackConfig);
-                CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(networkConfig);
-                CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
-                CloudSystem.getInstance().getInstance(ConfigService.class).reload();
+                CloudDriver.getInstance().getInstance(ConfigService.class).setNetworkConfig(networkConfig);
+                CloudDriver.getInstance().getInstance(ConfigService.class).shutdown();
+                CloudDriver.getInstance().getInstance(ConfigService.class).reload();
                 sender.sendMessage("INFO", "§9The Fallback §b" + remove.getGroupName() + " §9was deleted!");
 
             } else if (args[0].equalsIgnoreCase("perms")) {
@@ -76,8 +79,8 @@ public class DeleteCommand implements TabCompletable {
                 }
                 pool.getCachedPermissionGroups().remove(permissionGroup);
                 CloudDriver.getInstance().setPermissionPool(pool);
-                CloudSystem.getInstance().getInstance(PermissionService.class).save();
-                CloudSystem.getInstance().reload();
+                CloudDriver.getInstance().getInstance(PermissionService.class).save();
+                CloudDriver.getInstance().reload();
                 sender.sendMessage("INFO", "§9The PermissionGroup §b" + permissionGroup.getName() + " §9was deleted!");
             } else {
                 correctSyntax(sender);

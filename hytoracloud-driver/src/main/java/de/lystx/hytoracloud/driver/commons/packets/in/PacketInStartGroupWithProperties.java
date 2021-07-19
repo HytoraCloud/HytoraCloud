@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.PropertyObject;
+import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 

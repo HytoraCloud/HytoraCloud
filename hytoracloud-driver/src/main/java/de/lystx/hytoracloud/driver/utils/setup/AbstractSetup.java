@@ -87,22 +87,7 @@ public abstract class AbstractSetup<T> {
         }
         this.cloudConsole.setCurrentSetup(null);
         this.consumer.accept((T) this);
-        if (printHeader) {
-            Utils.clearConsole();
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§7\n" +
-                    "    __  __      __                   ________                __\n" +
-                    "   / / / /_  __/ /_____  _________ _/ ____/ /___  __  ______/ /\n" +
-                    "  / /_/ / / / / __/ __ \\/ ___/ __ `/ /   / / __ \\/ / / / __  / \n" +
-                    " / __  / /_/ / /_/ /_/ / /  / /_/ / /___/ / /_/ / /_/ / /_/ /  \n" +
-                    "/_/ /_/\\__, /\\__/\\____/_/   \\__,_/\\____/_/\\____/\\__,_/\\__,_/   \n" +
-                    "      /____/                                                   \n" +
-                    "\n");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Version §7: §b" + CloudDriver.getInstance().getVersion());
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Developer §7: §bLystx");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Switched back to §bCloudSystem§f...");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
-        }
+
     }
 
     /**
@@ -135,7 +120,7 @@ public abstract class AbstractSetup<T> {
             }
             GoTo goTo = isAnswerGoto(this.currentPart.getValue(), lastAnswer);
             if (goTo != null) {
-                if (lastAnswer.equalsIgnoreCase(goTo.value())) {
+                if (lastAnswer.equalsIgnoreCase(goTo.value()) || goTo.value().trim().isEmpty()) {
                     this.current = goTo.id() - 1;
                 } else {
                     this.current = goTo.elseID() - 1;

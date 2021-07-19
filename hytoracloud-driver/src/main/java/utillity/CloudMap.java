@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.driver.utils.utillity;
+package utillity;
 
 import java.util.HashMap;
 import java.util.List;

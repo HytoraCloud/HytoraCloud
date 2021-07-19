@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.driver.utils.utillity;
+package utillity;
 
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;

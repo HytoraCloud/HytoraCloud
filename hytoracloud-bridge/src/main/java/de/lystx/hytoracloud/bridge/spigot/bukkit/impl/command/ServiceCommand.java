@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;

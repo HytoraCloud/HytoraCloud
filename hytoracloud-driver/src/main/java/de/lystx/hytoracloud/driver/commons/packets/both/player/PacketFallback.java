@@ -9,10 +9,9 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Getter  @AllArgsConstructor
-public class PacketFallback extends PacketCommunication implements Serializable {
+public class PacketFallback extends PacketCommunication {
 
     private UUID uuid;
-
 
     @Override
     public void read(Component component) {

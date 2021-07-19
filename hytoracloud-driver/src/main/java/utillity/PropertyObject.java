@@ -1,7 +1,6 @@
-package de.lystx.hytoracloud.driver.utils.utillity;
+package utillity;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 

@@ -27,11 +27,13 @@ public class InstanceChooser extends AbstractSetup<InstanceChooser> {
             question = "Do you want to start the Cloud or the Receiver?",
             message = {
                     "Setup%%§f[§b1§f] §eCloudSystem",
-                    "Setup%%§f[§b2§f] §6Receiver"
+                    "Setup%%§f[§b2§f] §6Receiver",
+                    "Setup%%§f[§b3§f] §aManager"
             },
             onlyAnswers = {
                     "1",
-                    "2"
+                    "2",
+                    "3"
             }
             )
     private String instance;

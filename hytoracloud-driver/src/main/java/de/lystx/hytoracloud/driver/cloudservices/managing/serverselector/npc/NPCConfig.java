@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudItem;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

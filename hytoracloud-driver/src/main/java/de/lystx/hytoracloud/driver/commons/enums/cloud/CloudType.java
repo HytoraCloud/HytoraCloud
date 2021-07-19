@@ -28,6 +28,11 @@ public enum CloudType {
     BRIDGE,
 
     /**
+     * The manager to manage
+     */
+    MANAGER,
+
+    /**
      * None of the above
      */
     NONE;

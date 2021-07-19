@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.database.impl;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 

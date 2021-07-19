@@ -10,8 +10,9 @@ import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.service.Template;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.list.Filter;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -130,6 +131,9 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
     @Override
     public List<ICloudPlayer> getPlayers() {
+        if (CloudDriver.getInstance() == null) {
+            return new LinkedList<>();
+        }
         return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getPlayerManager().getCachedObjects()).find(cloudPlayer -> {
             if (cloudPlayer.getService() == null) {
                 return false;
@@ -139,19 +143,15 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
     @Override
     public List<IService> getServices() {
+        if (CloudDriver.getInstance() == null) {
+            return new LinkedList<>();
+        }
         return new LinkedList<>(new Filter<>(CloudDriver.getInstance().getServiceManager().getCachedObjects()).find(service -> service.getGroup().getName().equalsIgnoreCase(this.name)).findAll());
     }
     @Override
     public void deleteAllTemplates() {
-        File dir = this.template.getDirectory();
-        for (File file : Objects.requireNonNull(dir.listFiles())) {
-            try {
-                FileUtils.deleteDirectory(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        dir.delete();
+        Utils.deleteFolder(this.template.getDirectory());
+        this.template.getDirectory().delete();
     }
 
     @Override

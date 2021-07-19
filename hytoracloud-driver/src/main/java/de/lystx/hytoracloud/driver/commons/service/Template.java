@@ -13,6 +13,8 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class Template implements Serializable {
 
+    private static final long serialVersionUID = -7208858487907507144L;
+
     /**
      * The name of the template (e.g. "Lobby")
      */

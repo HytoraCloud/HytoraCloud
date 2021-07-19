@@ -1,6 +1,6 @@
 package net.hytora.discordbot.commands;
 
-import de.lystx.hytoracloud.driver.utils.utillity.StringCreator;
+import utillity.StringCreator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;

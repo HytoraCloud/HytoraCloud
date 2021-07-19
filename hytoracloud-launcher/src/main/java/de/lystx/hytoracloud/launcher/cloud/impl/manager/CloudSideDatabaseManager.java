@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;

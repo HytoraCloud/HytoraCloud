@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.permission;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;

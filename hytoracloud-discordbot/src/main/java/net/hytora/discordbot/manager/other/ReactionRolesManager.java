@@ -1,7 +1,7 @@
 package net.hytora.discordbot.manager.other;
 
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.utils.utillity.StringCreator;
+import utillity.JsonEntity;
+import utillity.StringCreator;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;

@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.implementations.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;

@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.driver.utils.utillity;
+package utillity;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;

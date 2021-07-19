@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.PropertyObject;
+import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;

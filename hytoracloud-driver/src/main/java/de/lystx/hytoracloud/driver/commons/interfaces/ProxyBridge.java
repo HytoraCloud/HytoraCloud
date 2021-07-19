@@ -43,6 +43,12 @@ public interface ProxyBridge {
             cachedPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
             cachedPlayer.update();
 
+            if (CloudDriver.getInstance().getFallbacks(cachedPlayer).isEmpty()) {
+                event.setCancelled(true);
+                event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getNoLobbyFound().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                return event;
+            }
+
             DriverEventPlayerJoin playerJoin = new DriverEventPlayerJoin(cachedPlayer);
             if (CloudDriver.getInstance().callEvent(playerJoin)) {
                 event.setCancelled(true);
@@ -150,14 +156,14 @@ public interface ProxyBridge {
     /**
      * If a player gets kicked of a service
      *
-     * @param ICloudPlayer the player
+     * @param cloudPlayer the player
      * @param service the service
      * @return boolean if cancel
      */
-    default boolean onServerKick(ICloudPlayer ICloudPlayer, IService service) {
+    default boolean onServerKick(ICloudPlayer cloudPlayer, IService service) {
         try {
-            IService fallback = CloudDriver.getInstance().getFallback(ICloudPlayer);
-            ICloudPlayer.connect(fallback);
+            IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+            cloudPlayer.connect(fallback);
             return true;
         } catch (NullPointerException e) {
             return false;

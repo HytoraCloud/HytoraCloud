@@ -3,8 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.events.network.DriverEventGroupMaintenanceChange;
 import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
@@ -50,12 +49,10 @@ public class GroupService implements ICloudService {
     @Override
     public void reload() {
         this.groups.clear();
-        if (getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            for (File file : Objects.requireNonNull(this.getDriver().getInstance(FileService.class).getGroupsDirectory().listFiles())) {
-                if (file.getName().endsWith(".json")) {
-                    JsonEntity jsonEntity = new JsonEntity(file);
-                    this.groups.add(jsonEntity.getAs(ServiceGroupObject.class));
-                }
+        for (File file : Objects.requireNonNull(this.getDriver().getInstance(FileService.class).getGroupsDirectory().listFiles())) {
+            if (file.getName().endsWith(".json")) {
+                JsonEntity jsonEntity = new JsonEntity(file);
+                this.groups.add(jsonEntity.getAs(ServiceGroupObject.class));
             }
         }
     }
@@ -65,9 +62,6 @@ public class GroupService implements ICloudService {
      * @param serviceGroup
      */
     public void createGroup(IServiceGroup serviceGroup) {
-        if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            return;
-        }
         JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
         jsonEntity.append(serviceGroup);
         jsonEntity.save();
@@ -80,9 +74,6 @@ public class GroupService implements ICloudService {
      * @param serviceGroup
      */
     public void deleteGroup(IServiceGroup serviceGroup) {
-        if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            return;
-        }
         JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
         jsonEntity.clear();
         this.groups.remove(this.getGroup(serviceGroup.getName()));
@@ -96,9 +87,6 @@ public class GroupService implements ICloudService {
      * @param serviceGroup
      */
     public void updateGroup(IServiceGroup serviceGroup) {
-        if (!getDriver().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
-            return;
-        }
         CloudDriver.getInstance().getServiceManager().updateGroup(serviceGroup);
 
         IServiceGroup group = this.getGroup(serviceGroup.getName());

@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.global.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.Acceptable;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartService;

@@ -4,13 +4,12 @@ import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.JsonEntity;
+import utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.service.Template;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
@@ -23,8 +22,8 @@ import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.CloudSetup;
 import de.lystx.hytoracloud.launcher.global.setups.DatabaseSetup;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.driver.utils.utillity.Action;
-import de.lystx.hytoracloud.driver.utils.utillity.Value;
+import utillity.Action;
+import utillity.Value;
 
 import java.io.File;
 import java.util.UUID;

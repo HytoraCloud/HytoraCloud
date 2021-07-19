@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.launcher.receiver.booting;
 
 import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
+import utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.launcher.receiver.impl.ReceiverSetup;
-import de.lystx.hytoracloud.driver.utils.utillity.Value;
+import utillity.Value;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import lombok.Getter;
 

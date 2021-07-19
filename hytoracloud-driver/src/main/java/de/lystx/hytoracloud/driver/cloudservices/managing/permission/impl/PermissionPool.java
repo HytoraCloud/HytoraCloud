@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupReceive;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupRemove;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;

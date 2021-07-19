@@ -1,6 +1,5 @@
 package de.lystx.hytoracloud.bridge.proxy.bungeecord;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
@@ -21,9 +20,9 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 
 
 
-import de.lystx.hytoracloud.driver.utils.utillity.Action;
+import utillity.Action;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import utillity.PropertyObject;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -166,7 +165,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
                 @Override
                 public void stopServer(IService service) {
-                    ProxyServer.getInstance().getServers().remove(service.getName());
+                    this.removeServer(service.getName());
                 }
 
                 @Override
@@ -189,12 +188,18 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
                 @Override
                 public void registerService(IService service) {
+                    if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
+                        System.out.println("[" + service.getName() + "] <-> ServerRegister [" + (CloudDriver.getInstance().getCurrentService() == null ? "GlobalProxy" : CloudDriver.getInstance().getCurrentService().getName()) + "] has connected");
+                    }
                     ServerInfo info = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()), "CloudService", false);
                     ProxyServer.getInstance().getServers().put(service.getName(), info);
                 }
 
                 @Override
                 public void removeServer(String server) {
+                    if (ProxyServer.getInstance().getServerInfo(server) != null) {
+                        System.out.println("[" + server + "] <-> ServerRegister [" + CloudDriver.getInstance().getCurrentService().getName() + "] has disconnected");
+                    }
                     ProxyServer.getInstance().getServers().remove(server);
                 }
 

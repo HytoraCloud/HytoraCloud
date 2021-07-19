@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout;
 
 import com.google.gson.JsonArray;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import utillity.JsonEntity;
 
 /**
  * This is the {@link DefaultSignLayout}

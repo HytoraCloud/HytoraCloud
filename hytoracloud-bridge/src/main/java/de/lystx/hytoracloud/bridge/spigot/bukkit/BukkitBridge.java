@@ -13,19 +13,17 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerJoinListene
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerQuitListener;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import org.bukkit.entity.Player;
+import utillity.PropertyObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -217,8 +215,19 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
             return;
         }
 
-        //TODO: Nach 2x /stop kommt man nd mehr drauf
-        Utils.doUntilEmpty(new LinkedList<>(Bukkit.getOnlinePlayers()), player -> player.kickPlayer(msg), players -> CloudDriver.getInstance().shutdownDriver());
+        int count = Bukkit.getOnlinePlayers().size();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+
+            player.kickPlayer(msg);
+            count--;
+
+            if (count <= 0) {
+                CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
+                    CloudDriver.getInstance().shutdownDriver();
+                }, 6L);
+            }
+        }
+
     }
 
     /*

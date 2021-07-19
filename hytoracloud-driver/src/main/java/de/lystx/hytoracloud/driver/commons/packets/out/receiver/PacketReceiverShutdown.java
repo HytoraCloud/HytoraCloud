@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.out.receiver;
 
-import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
+import utillity.ReceiverInfo;
 
 
 import lombok.AllArgsConstructor;

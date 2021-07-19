@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.receiver.booting;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.ReceiverInfo;
+import utillity.ReceiverInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import lombok.Getter;

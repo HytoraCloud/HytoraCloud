@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 public class GroupSetup extends AbstractSetup<GroupSetup> {
 
+
     @Setup(id = 1, question = "How should this group be named?")
     private String serverName;
 
@@ -31,7 +32,7 @@ public class GroupSetup extends AbstractSetup<GroupSetup> {
     @Setup(goTo = @GoTo(id = 8, value = "PROXY", elseID = 9), id = 7, question = "What type is this group (SPIGOT / PROXY)", onlyAnswers = {"spigot", "proxy"}, changeAnswers = {"PROXY->proxy"})
     private String type;
 
-    @Setup(id = 8, question = "Should cracked users be able to join the network? (Less safe)", exitAfterAnswer = {"true", "false"})
+    @Setup(id = 8, goTo = @GoTo(id = 11, value = "", elseID = -1), question = "Should cracked users be able to join the network? (Less safe)")
     private boolean onlineMode;
 
     @Setup(id = 9, question = "Is this is a lobbyServer?", onlyAnswers = {"true", "false"}, changeAnswers = {"yes->true", "no->false"})
