@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.launcher.global.commands;
+package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
@@ -115,7 +115,7 @@ public class CreateCommand implements TabCompletable {
                             Arrays.asList(setup.getInheritances().trim().split(",")),
                             new HashMap<>()
                     );
-                    CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups().add(permissionGroup);
+                    CloudDriver.getInstance().getPermissionPool().getPermissionGroups().add(permissionGroup);
                     CloudDriver.getInstance().getPermissionPool().update();
 
                     sender.sendMessage("INFO", "§9The permissionGroup §a" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId() + " §9was created!");

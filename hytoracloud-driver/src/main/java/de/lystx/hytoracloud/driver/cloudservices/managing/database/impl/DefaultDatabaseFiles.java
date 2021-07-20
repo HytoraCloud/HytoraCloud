@@ -1,11 +1,12 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.database.impl;
 
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
@@ -34,43 +35,46 @@ public class DefaultDatabaseFiles implements IDatabase {
     }
 
     @Override
-    public void registerPlayer(ICloudPlayer ICloudPlayer) {
-        if (!this.isRegistered(ICloudPlayer.getUniqueId())) {
-            PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), ICloudPlayer.getIpAddress());
-            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), data);
+    public void createEntry(ICloudPlayer cloudPlayer) {
+        if (!this.isRegistered(cloudPlayer.getUniqueId())) {
+
+
+            OfflinePlayer data = new OfflinePlayer(cloudPlayer.getUniqueId(), cloudPlayer.getName(), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), cloudPlayer.getIpAddress(), true, true, new Date().getTime(), 0L, new HashMap<>());
+
+            this.saveEntry(cloudPlayer.getUniqueId(), data);
         } else {
-            PlayerInformation playerInformation = this.getOfflinePlayer(ICloudPlayer.getUniqueId());
-            PlayerInformation newData = new PlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), playerInformation.getPermissionEntries(), playerInformation.getExclusivePermissions(), ICloudPlayer.getIpAddress(), playerInformation.isNotifyServerStart(), playerInformation.getFirstLogin(), playerInformation.getLastLogin());
-            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), newData);
+            OfflinePlayer offlinePlayer = this.getEntry(cloudPlayer.getUniqueId());
+            OfflinePlayer newData = new OfflinePlayer(cloudPlayer.getUniqueId(), cloudPlayer.getName(), offlinePlayer.getPermissionEntries(), offlinePlayer.getExclusivePermissions(), cloudPlayer.getIpAddress(), offlinePlayer.isNotifyServerStart(), offlinePlayer.getFirstLogin(), offlinePlayer.getLastLogin());
+            this.saveEntry(cloudPlayer.getUniqueId(), newData);
         }
     }
 
     @Override
-    public PlayerInformation getOfflinePlayer(UUID uuid) {
+    public OfflinePlayer getEntry(UUID uuid) {
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         File file = new File(dir, uuid + ".json");
         JsonEntity jsonEntity = new JsonEntity(file);
-        return jsonEntity.getAs(PlayerInformation.class);
+        return jsonEntity.getAs(OfflinePlayer.class);
     }
 
     @Override
-    public void saveOfflinePlayer(UUID uuid, PlayerInformation playerInformation) {
-        playerInformation.setDefault(false);
+    public void saveEntry(UUID uuid, OfflinePlayer offlinePlayer) {
+        offlinePlayer.setDefault(false);
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         File file = new File(dir, uuid + ".json");
         JsonEntity jsonEntity = new JsonEntity(file);
         jsonEntity.clear();
-        jsonEntity.append(playerInformation);
+        jsonEntity.append(offlinePlayer);
         jsonEntity.save();
     }
 
     @Override
-    public List<PlayerInformation> loadEntries() {
-        List<PlayerInformation> list = new LinkedList<>();
+    public List<OfflinePlayer> loadEntries() {
+        List<OfflinePlayer> list = new LinkedList<>();
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         for (File listFile : Objects.requireNonNull(dir.listFiles())) {
             JsonEntity jsonEntity = new JsonEntity(listFile);
-            PlayerInformation playerData = jsonEntity.getAs(PlayerInformation.class);
+            OfflinePlayer playerData = jsonEntity.getAs(OfflinePlayer.class);
             if (playerData == null) {
                 continue;
             }

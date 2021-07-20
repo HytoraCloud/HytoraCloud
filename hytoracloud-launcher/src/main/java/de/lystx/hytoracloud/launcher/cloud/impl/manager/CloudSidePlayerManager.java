@@ -1,9 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
@@ -13,8 +10,6 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.*;
 import lombok.Getter;
 import lombok.Setter;
 import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
 import net.hytora.networking.elements.packet.response.Response;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +45,9 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
         }
         this.cachedObjects.add(cloudPlayer);
         boolean registered = this.database.isRegistered(cloudPlayer.getUniqueId());
-        this.database.registerPlayer(cloudPlayer);
+        if (!registered) {
+            this.database.createEntry(cloudPlayer);
+        }
         this.clearDoubles();
         if (!registered) {
             CloudDriver.getInstance().getPermissionPool().update();
@@ -60,11 +57,11 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
     @Override
     public void unregisterPlayer(ICloudPlayer cloudPlayer) {
         try {
-            PlayerInformation information = cloudPlayer.getInformation();
+            OfflinePlayer information = cloudPlayer.getOfflinePlayer();
             information.setLastLogin(new Date().getTime());
-            cloudPlayer.setInformation(information);
+            cloudPlayer.setOfflinePlayer(information);
 
-            this.database.saveOfflinePlayer(cloudPlayer.getUniqueId(), information);
+            this.database.saveEntry(cloudPlayer.getUniqueId(), information);
 
             CloudDriver.getInstance().getPermissionPool().updatePlayer(information);
             CloudDriver.getInstance().getPermissionPool().update();
@@ -105,17 +102,17 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
     }
 
     @Override
-    public List<PlayerInformation> getOfflinePlayers() {
-        return CloudDriver.getInstance().getPermissionPool().getCachedCloudPlayers();
+    public List<OfflinePlayer> getOfflinePlayers() {
+        return CloudDriver.getInstance().getPermissionPool().getCachedObjects();
     }
 
     @Override
-    public PlayerInformation getOfflinePlayer(String name) {
+    public OfflinePlayer getOfflinePlayer(String name) {
         return getOfflinePlayers().stream().filter(cloudPlayerData -> cloudPlayerData.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     @Override
-    public PlayerInformation getOfflinePlayer(UUID uniqueId) {
+    public OfflinePlayer getOfflinePlayer(UUID uniqueId) {
         return getOfflinePlayers().stream().filter(cloudPlayerData -> cloudPlayerData.getUniqueId().equals(uniqueId)).findFirst().orElse(null);
     }
 

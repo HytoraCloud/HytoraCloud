@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketOpenInventory;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUpdate;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudInventory;
+import de.lystx.hytoracloud.driver.commons.implementations.InventoryObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import net.hytora.networking.elements.packet.HytoraPacket;
@@ -20,11 +20,11 @@ public class BukkitHandlerInventory implements PacketHandler {
     public void handle(HytoraPacket rawPacket) {
         if (rawPacket instanceof PacketOpenInventory) {
             PacketOpenInventory packet = (PacketOpenInventory)rawPacket;
-            CloudInventory inventory = packet.getCloudInventory();
+            InventoryObject inventory = packet.getInventoryObject();
             ICloudPlayer player = CloudDriver.getInstance().getPlayerManager().getCachedObject(packet.getICloudPlayer().getName());
             Player bukkitPlayer = Bukkit.getPlayer(player.getName());
 
-            Inventory inv = Bukkit.createInventory(bukkitPlayer, inventory.getRows() * 9, inventory.getName());
+            Inventory inv = Bukkit.createInventory(bukkitPlayer, inventory.getRows() * 9, inventory.getTitle());
             inventory.getItems().forEach((slot, item) -> inv.setItem(slot, BukkitItem.fromCloudItem(item)));
             bukkitPlayer.openInventory(inv);
         } else if (rawPacket instanceof PacketInventoryUpdate) {

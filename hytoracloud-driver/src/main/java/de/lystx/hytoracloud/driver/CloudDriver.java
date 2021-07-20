@@ -849,6 +849,9 @@ public class CloudDriver {
      * Raw method to reload
      */
     public void reload() {
+        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
+            registeredService.reload();
+        }
     }
 
     /**
@@ -861,6 +864,9 @@ public class CloudDriver {
      * Raw method to shutdown
      */
     public void shutdown() {
+        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
+            registeredService.save();
+        }
     }
 
 }

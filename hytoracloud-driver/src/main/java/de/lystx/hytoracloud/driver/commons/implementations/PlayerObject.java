@@ -1,13 +1,14 @@
 package de.lystx.hytoracloud.driver.commons.implementations;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerUpdate;
@@ -32,10 +33,7 @@ import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 @Getter @Setter
 public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> implements ICloudPlayer {
@@ -60,11 +58,11 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     /**
      * The information of the player
      */
-    private PlayerInformation information;
+    private OfflinePlayer offlinePlayer;
 
     public PlayerObject(PlayerConnection connection) {
         this.connection = connection;
-        this.setInformation(CloudDriver.getInstance().getPermissionPool().getPlayerInformation(connection.getUniqueId()));
+        this.setOfflinePlayer(CloudDriver.getInstance().getPermissionPool().getCachedObject(connection.getUniqueId()));
     }
     @Override
     public IService getService() {
@@ -152,12 +150,15 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
     @Override
     public boolean hasPlayedBefore() {
-        return this.information.getFirstLogin() == 0L || this.information.getFirstLogin() == System.currentTimeMillis();
+        return this.offlinePlayer.getFirstLogin() == 0L || this.offlinePlayer.getFirstLogin() == System.currentTimeMillis();
     }
 
     @Override
-    public PlayerInformation getData() {
-        return this.information == null ? CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(this.getUniqueId(), this.getName(), this.getIpAddress()) : this.information;
+    public OfflinePlayer getOfflinePlayer() {
+        if (this.offlinePlayer == null) {
+            this.offlinePlayer = new OfflinePlayer(this.getUniqueId(), this.getName(), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), this.getIpAddress(), true, true, new Date().getTime(), 0L, new HashMap<>());
+        }
+        return this.offlinePlayer;
     }
 
     @Override
@@ -182,15 +183,15 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
     @Override
     public void addPermission(String permission) {
-        if (this.information != null) {
-            this.information.getExclusivePermissions().add(permission);
+        if (this.offlinePlayer != null) {
+            this.offlinePlayer.getExclusivePermissions().add(permission);
         }
     }
 
     @Override
     public void removePermission(String permission) {
-        if (this.information != null) {
-            this.information.getExclusivePermissions().remove(permission);
+        if (this.offlinePlayer != null) {
+            this.offlinePlayer.getExclusivePermissions().remove(permission);
         }
     }
 
@@ -203,12 +204,12 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
     @Override
     public List<String> getExclusivePermissions() {
-        return this.information.getPermissions();
+        return this.offlinePlayer.getPermissions();
     }
 
     @Override
     public List<PermissionGroup> getAllPermissionGroups() {
-        return CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups(this.getUniqueId());
+        return CloudDriver.getInstance().getPermissionPool().getPermissionGroups(this.getUniqueId());
     }
 
     @Override
@@ -248,8 +249,8 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     }
 
     @Override
-    public void openInventory(CloudInventory cloudInventory) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketOpenInventory(this, cloudInventory));
+    public void openInventory(Inventory inventory) {
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketOpenInventory(this, (InventoryObject) inventory));
     }
 
     @SneakyThrows @Override
@@ -267,8 +268,8 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             return CloudDriver.getInstance().getResponse(new PacketRequestAddProperty(this.getUniqueId(), name, jsonObject)).reply().getStatus();
         }
-        information.addProperty(name, jsonObject);
-        information.update();
+        offlinePlayer.addProperty(name, jsonObject);
+        offlinePlayer.update();
         return ResponseStatus.SUCCESS;
     }
 

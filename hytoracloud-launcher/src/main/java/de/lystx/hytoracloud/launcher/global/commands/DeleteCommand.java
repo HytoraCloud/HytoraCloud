@@ -77,7 +77,7 @@ public class DeleteCommand implements TabCompletable {
                     sender.sendMessage("ERROR", "§cThe PermissionGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
-                pool.getCachedPermissionGroups().remove(permissionGroup);
+                pool.getPermissionGroups().remove(permissionGroup);
                 CloudDriver.getInstance().setPermissionPool(pool);
                 CloudDriver.getInstance().getInstance(PermissionService.class).save();
                 CloudDriver.getInstance().reload();
@@ -103,7 +103,7 @@ public class DeleteCommand implements TabCompletable {
         } else if (args.length == 3) {
             List<String> list = new LinkedList<>();
             if (args[1].equalsIgnoreCase("perms")) {
-                for (PermissionGroup permissionGroup : CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups()) {
+                for (PermissionGroup permissionGroup : CloudDriver.getInstance().getPermissionPool().getPermissionGroups()) {
                     list.add(permissionGroup.getName());
                 }
             } else if (args[1].equalsIgnoreCase("group")) {

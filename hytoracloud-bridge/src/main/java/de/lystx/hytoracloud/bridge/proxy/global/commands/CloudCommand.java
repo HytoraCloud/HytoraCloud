@@ -2,8 +2,6 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketGroupMaintenanceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
@@ -11,13 +9,12 @@ import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import net.hytora.networking.elements.component.Component;
 
@@ -132,7 +129,7 @@ public class CloudCommand implements TabCompletable {
                             networkConfig.update();
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + (maintenance ? "§7The Network is now in §amaintenance§8!" : "§7The Network is §cno longer §7in maintenance§8!"));
                         } else if (args[1].equalsIgnoreCase("notify")) {
-                            PlayerInformation playerData = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(player.getUniqueId());
+                            OfflinePlayer playerData = CloudDriver.getInstance().getPermissionPool().getCachedObject(player.getUniqueId());
                             if (playerData == null) {
                                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYour §eCloudPlayerData §ccouldn't be found!");
                                 return;

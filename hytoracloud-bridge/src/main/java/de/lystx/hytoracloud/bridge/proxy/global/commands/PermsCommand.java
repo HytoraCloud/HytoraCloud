@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import utillity.Value;
 
 import java.util.Date;
@@ -27,7 +27,7 @@ public class PermsCommand {
 							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 							return;
 						}
-						PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(uniqueId);
+						OfflinePlayer data = CloudDriver.getInstance().getPermissionPool().getCachedObject(uniqueId);
 						ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(args[1]);
 						player.sendMessage("§bInfo for §7" + args[1] + "§8:");
 						player.sendMessage("§8§m--------------------------------------");
@@ -47,14 +47,14 @@ public class PermsCommand {
 					}
 				} else if (args[0].equalsIgnoreCase("group")) {
 					if (args[1].equalsIgnoreCase("list")) {
-						if (CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups().isEmpty()) {
+						if (CloudDriver.getInstance().getPermissionPool().getPermissionGroups().isEmpty()) {
 							player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere aren't any groups created!");
 							return;
 						}
 						player.sendMessage("§bGroups§8:");
 						player.sendMessage("§8§m--------------------------------------");
 						player.sendMessage("§8");
-						CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups().forEach(group -> {
+						CloudDriver.getInstance().getPermissionPool().getPermissionGroups().forEach(group -> {
 							player.sendMessage("§8» §b" + group.getName() + " §8┃ §bID§8: §7" + group.getId() + "§8┃ §bPrefix§8: §7" + group.getPrefix() + "§8┃ §bSuffix§8: §7" + group.getSuffix() + "§8┃ §bDisplay§8: §7" + group.getDisplay());
 
 						});
@@ -184,7 +184,7 @@ public class PermsCommand {
 								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 								return;
 							}
-							if (!CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups(uuid).contains(group)) {
+							if (!CloudDriver.getInstance().getPermissionPool().getPermissionGroups(uuid).contains(group)) {
 								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cdoesn't have this rank!");
 								return;
 							}
@@ -225,7 +225,7 @@ public class PermsCommand {
 								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §cis unknown to the database!");
 								return;
 							}
-							if (CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups(uuid).contains(CloudDriver.getInstance().getPermissionPool().getPermissionGroupByName(rang))) {
+							if (CloudDriver.getInstance().getPermissionPool().getPermissionGroups(uuid).contains(CloudDriver.getInstance().getPermissionPool().getPermissionGroupByName(rang))) {
 								player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + args[1] + " §calready has this rank!");
 								return;
 							}

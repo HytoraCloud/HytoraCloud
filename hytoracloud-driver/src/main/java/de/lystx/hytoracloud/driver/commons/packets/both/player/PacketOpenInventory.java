@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.player;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudInventory;
+import de.lystx.hytoracloud.driver.commons.implementations.InventoryObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import lombok.AllArgsConstructor;
@@ -14,14 +14,14 @@ import java.io.Serializable;
 public class PacketOpenInventory extends PacketCommunication implements Serializable {
 
     private ICloudPlayer ICloudPlayer;
-    private CloudInventory cloudInventory;
+    private InventoryObject inventoryObject;
 
     @Override
     public void read(Component component) {
         super.read(component);
 
         ICloudPlayer = (ICloudPlayer) component.get("cloudPlayer");
-        cloudInventory = (CloudInventory) component.get("inv");
+        inventoryObject = (InventoryObject) component.get("inv");
     }
 
     @Override
@@ -30,7 +30,7 @@ public class PacketOpenInventory extends PacketCommunication implements Serializ
 
         component.append(map -> {
             map.put("cloudPlayer", ICloudPlayer);
-            map.put("inv", cloudInventory);
+            map.put("inv", inventoryObject);
         });
     }
 

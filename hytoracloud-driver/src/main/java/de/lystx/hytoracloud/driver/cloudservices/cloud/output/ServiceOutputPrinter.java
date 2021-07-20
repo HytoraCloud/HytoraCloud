@@ -12,20 +12,17 @@ import java.util.*;
 @Getter
 public class ServiceOutputPrinter {
 
-    private final CloudConsole colouredConsoleProvider;
-    private final CloudDriver hytoraLibrary;
-    private final Map<String, List<String>> cachedLines;
 
+    /**
+     * The current screen
+     */
     private ServiceOutput screen;
-    private InputStream inputStream;
-    private Scanner reader;
+
+    /**
+     * If currently in screen
+     */
     private boolean inScreen;
 
-    public ServiceOutputPrinter(CloudConsole colouredConsoleProvider, CloudDriver hytoraLibrary) {
-        this.colouredConsoleProvider = colouredConsoleProvider;
-        this.hytoraLibrary = hytoraLibrary;
-        this.cachedLines = new LinkedHashMap<>();
-    }
 
     /**
      * Sets current screen
@@ -34,8 +31,6 @@ public class ServiceOutputPrinter {
      */
     public void create(ServiceOutput serviceOutput) {
         this.screen = serviceOutput;
-        this.inputStream = null;
-        this.reader = null;
         this.inScreen = true;
     }
 
@@ -44,15 +39,13 @@ public class ServiceOutputPrinter {
      */
     public void quitCurrentScreen() {
         this.inScreen = false;
-        this.hytoraLibrary.getParent().getConsole().getLogger().sendMessage("INFO", "§cYou left the §esession §cof the service §e" + this.screen.getServiceName() + "§c!");
+        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§cYou left the §esession §cof the service §e" + this.screen.getServiceName() + "§c!");
 
         if (this.screen == null) {
             return;
         }
         this.screen = null;
-        this.inputStream = null;
-        this.reader = null;
-        this.hytoraLibrary.getInstance(CommandService.class).setActive(true);
+        CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
         this.screen.stop();
     }
 }

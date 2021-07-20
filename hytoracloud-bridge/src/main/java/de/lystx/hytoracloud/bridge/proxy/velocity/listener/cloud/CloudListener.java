@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.bridge.proxy.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import net.kyori.adventure.text.Component;
 
 public class CloudListener implements NetworkHandler {
@@ -19,7 +19,7 @@ public class CloudListener implements NetworkHandler {
             if (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.notify")) {
                 return;
             }
-            PlayerInformation playerData = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(player.getUniqueId());
+            OfflinePlayer playerData = CloudDriver.getInstance().getPermissionPool().getCachedObject(player.getUniqueId());
             if (playerData != null && !playerData.isNotifyServerStart()) {
                 return;
             }

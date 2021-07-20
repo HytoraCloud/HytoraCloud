@@ -133,11 +133,11 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (!this.running) {
             return;
         }
-        List<IService> IServices = this.cachedServices.get(service.getGroup());
+        List<IService> services = this.cachedServices.get(service.getGroup());
         IService remove = this.getCachedObject(service.getName());
-        if (IServices == null) IServices = new LinkedList<>();
-        IServices.remove(remove);
-        this.cachedServices.put(this.getServiceGroup(service.getGroup().getName()), IServices);
+        if (services == null) services = new LinkedList<>();
+        services.remove(remove);
+        this.cachedServices.put(this.getServiceGroup(service.getGroup().getName()), services);
         if (this.getDriver().getParent().getScreenPrinter().getScreen() != null && this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             return;
         }
@@ -469,6 +469,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     @Override
     public void shutdownAll() {
+        this.running = false;
         List<String> already = new LinkedList<>();
         for (IServiceGroup IServiceGroup : new LinkedList<>(this.cachedServices.keySet())) {
             if (this.getDriver().getInstance(GroupService.class) != null && this.getDriver().getInstance(GroupService.class).getGroup(IServiceGroup.getName(), this.serviceGroups) == null) {

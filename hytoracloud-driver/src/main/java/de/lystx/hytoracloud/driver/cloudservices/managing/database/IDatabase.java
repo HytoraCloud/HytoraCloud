@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.database;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,42 +20,48 @@ public interface IDatabase {
 
     /**
      * Inserts player to database
-     * @param ICloudPlayer
+     *
+     * @param cloudPlayer the player
      */
-    void registerPlayer(ICloudPlayer ICloudPlayer);
+    void createEntry(ICloudPlayer cloudPlayer);
 
     /**
+     * Checks if a player is already in database
      *
-     * @param uuid
+     * @param uuid the uuid of the player
      * @return if player is registered
      */
     boolean isRegistered(UUID uuid);
 
     /**
      * Checks connection
-     * @return
+     *
+     * @return boolean
      */
     boolean isConnected();
 
     /**
-     * PlayerData
-     * @param uuid
+     * Gets the data of a player
+     *
+     * @param uuid the uuid
      * @return CloudPlayerData
      */
-    PlayerInformation getOfflinePlayer(UUID uuid);
+    OfflinePlayer getEntry(UUID uuid);
 
     /**
      * Updates Data of player
-     * @param uuid
-     * @param data
+     *
+     * @param uuid the uuid
+     * @param data the data
      */
-    void saveOfflinePlayer(UUID uuid, PlayerInformation data);
+    void saveEntry(UUID uuid, OfflinePlayer data);
 
     /**
      * Loads entries of database
-     * @return
+     *
+     * @return list of entries
      */
-    List<PlayerInformation> loadEntries();
+    List<OfflinePlayer> loadEntries();
 
     /**
      * Returns the Type of this database

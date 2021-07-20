@@ -1,23 +1,25 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.other.ObjectPool;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupReceive;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupRemove;
-import utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import de.lystx.hytoracloud.driver.utils.uuid.UUIDService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.hytora.networking.elements.packet.response.Response;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.text.ParseException;
@@ -27,17 +29,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Getter @Setter
-public class PermissionPool implements Serializable {
+public class PermissionPool implements Serializable, ObjectPool<OfflinePlayer> {
+
+    private static final long serialVersionUID = -501568977137292070L;
 
     /**
      * All cached {@link PermissionGroup}s
      */
-    private List<PermissionGroup> cachedPermissionGroups;
+    private List<PermissionGroup> permissionGroups;
 
     /**
-     * All cached (from {@link IDatabase}) {@link PlayerInformation}s
+     * All cached (from {@link IDatabase}) {@link OfflinePlayer}s
      */
-    private List<PlayerInformation> cachedCloudPlayers;
+    private List<OfflinePlayer> cachedObjects;
 
     /**
      * If the pool is enabled (perms.json)
@@ -50,8 +54,8 @@ public class PermissionPool implements Serializable {
      */
     public PermissionPool() {
         this.enabled = true;
-        this.cachedPermissionGroups = new LinkedList<>();
-        this.cachedCloudPlayers = new LinkedList<>();
+        this.permissionGroups = new LinkedList<>();
+        this.cachedObjects = new LinkedList<>();
     }
 
     /*
@@ -65,13 +69,13 @@ public class PermissionPool implements Serializable {
      * Checks for lowest ID if none is found returns DefaultPermissionGroup.class
      * @return default permissionGroup
      */
-    public PermissionGroup getLowestPermissionGroupOrDefault() {
-        if (this.cachedPermissionGroups != null) {
-            this.cachedPermissionGroups = new LinkedList<>(this.cachedPermissionGroups);
-            this.cachedPermissionGroups.sort(Comparator.comparingInt(PermissionGroup::getId));
+    public PermissionGroup getDefaultPermissionGroup() {
+        if (this.permissionGroups != null) {
+            this.permissionGroups = new LinkedList<>(this.permissionGroups);
+            this.permissionGroups.sort(Comparator.comparingInt(PermissionGroup::getId));
             try {
-                if (!this.cachedPermissionGroups.isEmpty()) {
-                    return this.cachedPermissionGroups.get(this.cachedPermissionGroups.size() - 1);
+                if (!this.permissionGroups.isEmpty()) {
+                    return this.permissionGroups.get(this.permissionGroups.size() - 1);
                 }
             } catch (Exception e) {
                 //Ignoring
@@ -88,7 +92,7 @@ public class PermissionPool implements Serializable {
      * @return valid
      */
     public boolean isRankValid(UUID uniqueId, PermissionGroup permissionGroup) {
-        PlayerInformation data = this.getPlayerInformation(uniqueId);
+        OfflinePlayer data = this.getCachedObject(uniqueId);
         if (data == null) {
             return false;
         }
@@ -119,9 +123,9 @@ public class PermissionPool implements Serializable {
      * @param group group to remove
      */
     public void removePermissionGroupFromUser(UUID uniqueId, PermissionGroup group) {
-        PlayerInformation offlinePlayer = this.getPlayerInformationOrDefault(uniqueId);
-        if (offlinePlayer == null) {
-            return;
+        OfflinePlayer offlinePlayer = this.getCachedObject(uniqueId);
+        if (offlinePlayer == null) {OfflinePlayer pre = this.getCachedObject(uniqueId);
+            offlinePlayer = new OfflinePlayer(uniqueId, this.getNameByUUID(uniqueId), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), "0", true, true, new Date().getTime(), 0L, new HashMap<>());
         }
 
         List<PermissionEntry> permissionEntries = offlinePlayer.getPermissionEntries(); //The entries
@@ -143,8 +147,14 @@ public class PermissionPool implements Serializable {
     @SneakyThrows
     public void addPermissionGroupToUser(UUID uniqueId, PermissionGroup group, Integer time, PermissionValidity validity) {
 
-        PlayerInformation playerInformation = this.getPlayerInformationOrDefault(uniqueId);
-        List<PermissionEntry> permissionEntries = new LinkedList<>(playerInformation.getPermissionEntries()); //Safely defining list value
+        OfflinePlayer offlinePlayer = this.getCachedObject(uniqueId);
+
+        if (offlinePlayer == null) {
+            offlinePlayer = new OfflinePlayer(uniqueId, this.getNameByUUID(uniqueId), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), "0", true, true, new Date().getTime(), 0L, new HashMap<>());
+        }
+
+
+        List<PermissionEntry> permissionEntries = new LinkedList<>(offlinePlayer.getPermissionEntries()); //Safely defining list value
         PermissionEntry entry = new PermissionEntry(group.getName(), "");
         permissionEntries.removeIf(permissionEntry -> permissionEntry.getPermissionGroup().equalsIgnoreCase(group.getName()));//Removing old group
 
@@ -156,10 +166,10 @@ public class PermissionPool implements Serializable {
             calendarInstance.add(validity.toCalendar(), time);
             entry.setValidTime(this.getFormat().format(calendarInstance.getTime()));
         }
-        playerInformation.setPermissionEntries(permissionEntries); //Set entries again
+        offlinePlayer.setPermissionEntries(permissionEntries); //Set entries again
 
         //Adding data back to cache and calling event
-        this.updatePlayer(playerInformation);
+        this.updatePlayer(offlinePlayer);
         CloudDriver.getInstance().callEvent(new DriverEventPlayerGroupReceive(getNameByUUID(uniqueId), group, time, validity));
     }
 
@@ -170,14 +180,13 @@ public class PermissionPool implements Serializable {
      * @return list of groups
      */
     @SneakyThrows
-    public List<PermissionGroup> getCachedPermissionGroups(UUID uniqueId) {
+    public List<PermissionGroup> getPermissionGroups(UUID uniqueId) {
 
-        PlayerInformation data = this.getPlayerInformation(uniqueId);
+        OfflinePlayer data = this.getCachedObject(uniqueId);
 
         if (data == null) { //Player has no rank yet returning lowest rank or default rank
-            data = this.getDefaultPlayerInformation(uniqueId, getNameByUUID(uniqueId), "-1"); //Setting ip to default
+            data = new OfflinePlayer(uniqueId, getNameByUUID(uniqueId), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), "0", true, true, new Date().getTime(), 0L, new HashMap<>());
         }
-
         return new LinkedList<>(data.getPermissionGroups());
     }
 
@@ -189,10 +198,10 @@ public class PermissionPool implements Serializable {
      */
     public PermissionGroup getHighestPermissionGroup(UUID uniqueId) {
         try {
-            List<PermissionGroup> list = this.getCachedPermissionGroups(uniqueId);
+            List<PermissionGroup> list = this.getPermissionGroups(uniqueId);
             list.sort(Comparator.comparingInt(PermissionGroup::getId)); //Sorting by id
 
-            return list.isEmpty() ? this.getLowestPermissionGroupOrDefault() : list.get(0); //Getting with the lowest id or the highest
+            return list.isEmpty() ? this.getDefaultPermissionGroup() : list.get(0); //Getting with the lowest id or the highest
         } catch (NullPointerException e) {
             return null;
         }
@@ -205,7 +214,7 @@ public class PermissionPool implements Serializable {
      * @return group from Name
      */
     public PermissionGroup getPermissionGroupByName(String name) {
-        return this.cachedPermissionGroups.stream().filter(permissionGroup -> permissionGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return this.permissionGroups.stream().filter(permissionGroup -> permissionGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     /**
@@ -221,7 +230,7 @@ public class PermissionPool implements Serializable {
         }
 
         boolean hasPermission = false;
-        PlayerInformation offlinePlayer = this.getPlayerInformation(uniqueId);  //Gets offline data
+        OfflinePlayer offlinePlayer = this.getCachedObject(uniqueId);  //Gets offline data
 
         if (offlinePlayer != null) {
             //Not null go on checking
@@ -267,9 +276,9 @@ public class PermissionPool implements Serializable {
     public UUID getUUIDByName(String name) {
         UUID uniqueId = null;
 
-        PlayerInformation playerInformation = this.cachedCloudPlayers.stream().filter(offlineCloudPlayer1 -> offlineCloudPlayer1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        if (playerInformation != null) {
-            uniqueId = playerInformation.getUniqueId();
+        OfflinePlayer offlinePlayer = this.cachedObjects.stream().filter(offlineCloudPlayer1 -> offlineCloudPlayer1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        if (offlinePlayer != null) {
+            uniqueId = offlinePlayer.getUniqueId();
         }
 
         return uniqueId == null ? UUIDService.getInstance().getUUID(name) : uniqueId;
@@ -283,7 +292,7 @@ public class PermissionPool implements Serializable {
      * @return uuid or null (if not found)
      */
     public UUID getUniqueIdFromIpAddress(InetSocketAddress socketAddress) {
-        PlayerInformation offlinePlayer = this.cachedCloudPlayers.stream().filter(cloudPlayerData -> cloudPlayerData.getIpAddress().equalsIgnoreCase(socketAddress.getAddress().getHostAddress())).findFirst().orElse(null);
+        OfflinePlayer offlinePlayer = this.cachedObjects.stream().filter(cloudPlayerData -> cloudPlayerData.getIpAddress().equalsIgnoreCase(socketAddress.getAddress().getHostAddress())).findFirst().orElse(null);
         return offlinePlayer == null ? null : offlinePlayer.getUniqueId();
     }
 
@@ -296,9 +305,9 @@ public class PermissionPool implements Serializable {
      */
     public String getNameByUUID(UUID uuid) {
         String name = null;
-        PlayerInformation playerInformation = this.cachedCloudPlayers.stream().filter(offlineCloudPlayer1 -> offlineCloudPlayer1.getUniqueId() == uuid).findFirst().orElse(null);
-        if (playerInformation != null) {
-            name = playerInformation.getName();
+        OfflinePlayer offlinePlayer = this.cachedObjects.stream().filter(offlineCloudPlayer1 -> offlineCloudPlayer1.getUniqueId() == uuid).findFirst().orElse(null);
+        if (offlinePlayer != null) {
+            name = offlinePlayer.getName();
         }
         return name == null ? UUIDService.getInstance().getName(uuid) : name;
     }
@@ -318,21 +327,27 @@ public class PermissionPool implements Serializable {
      */
     public void updatePermissions(UUID uniqueId, String ipAddress, Consumer<String> accept) {
         if (!this.isAvailable() ) {
-            System.out.println("[CloudAPI] Couldn't update Permissions for " + uniqueId + " because PermissionPool is not available!");
+            System.out.println("[CloudDriver] Couldn't update Permissions for " + uniqueId + " because PermissionPool is not available!");
             return;
         }
-        PlayerInformation offlinePlayer = this.getPlayerInformation(uniqueId);
+        OfflinePlayer offlinePlayer = this.getCachedObject(uniqueId);
         if (offlinePlayer != null) {
             if (offlinePlayer.getPermissionEntries().isEmpty()) {
-                offlinePlayer.getPermissionEntries().add(new PermissionEntry(this.getLowestPermissionGroupOrDefault().getName(), ""));
+                offlinePlayer.getPermissionEntries().add(new PermissionEntry(this.getDefaultPermissionGroup().getName(), ""));
                 this.updatePlayer(offlinePlayer);
                 this.update();
             }
         } else {
-            this.cachedCloudPlayers.add(this.getDefaultPlayerInformation(uniqueId, getNameByUUID(uniqueId), "-1"));
+            this.cachedObjects.add(new OfflinePlayer(uniqueId, this.getNameByUUID(uniqueId), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), "0", true, true, new Date().getTime(), 0L, new HashMap<>()));
         }
 
-        PlayerInformation orDefault = this.getPlayerInformationOrDefault(uniqueId); //Getting player or default
+        OfflinePlayer orDefault = this.getCachedObject(uniqueId); //Getting player or default
+
+
+        if (orDefault == null) {
+            orDefault = new OfflinePlayer(uniqueId, this.getNameByUUID(uniqueId), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), "0", true, true, new Date().getTime(), 0L, new HashMap<>());
+        }
+
         boolean changedSomething = false;
 
         //Safely iterating through all groups
@@ -376,7 +391,7 @@ public class PermissionPool implements Serializable {
      * @return if player is registered
      */
     public boolean isRegistered(UUID uniqueId) {
-        return (this.getPlayerInformation(uniqueId) != null);
+        return (this.getCachedObject(uniqueId) != null);
     }
 
     /**
@@ -393,7 +408,7 @@ public class PermissionPool implements Serializable {
      * @return boolean
      */
     public boolean isAvailable() {
-        return (!this.cachedPermissionGroups.isEmpty() || !this.cachedCloudPlayers.isEmpty());
+        return (!this.permissionGroups.isEmpty() || !this.cachedObjects.isEmpty());
     }
 
     /**
@@ -415,24 +430,6 @@ public class PermissionPool implements Serializable {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketUpdatePermissionPool(this));
     }
 
-    /**
-     * Loads {@link PermissionGroup}s from the perms.json (or any other file)
-     *
-     * @param file the file to load it from
-     */
-    public void loadGroupsFromFile(File file) {
-        this.cachedPermissionGroups.clear();
-        JsonEntity jsonEntity = new JsonEntity(file);
-        for (String key : jsonEntity.keys()) {
-            if (!key.equalsIgnoreCase("enabled")) {
-                PermissionGroup permissionGroup = jsonEntity.getObject(key, PermissionGroup.class);
-                this.cachedPermissionGroups.add(permissionGroup);
-            } else {
-                this.enabled = jsonEntity.getBoolean(key);
-            }
-        }
-    }
-
     /*
     ======================================
       (Offline-)Player managing
@@ -447,11 +444,11 @@ public class PermissionPool implements Serializable {
      * @param add if it should be added or removed
      */
     public void setPermissionToUser(UUID uniqueId, String permission, boolean add) {
-        PlayerInformation data = this.getPlayerInformation(uniqueId);
+        OfflinePlayer data = this.getCachedObject(uniqueId);
         if (data == null) {
             return;
         }
-        this.cachedCloudPlayers.remove(data);
+        this.cachedObjects.remove(data);
         List<String> permissions = data.getExclusivePermissions();
         if (add) {
             permissions.add(permission);
@@ -459,7 +456,7 @@ public class PermissionPool implements Serializable {
             permissions.remove(permission);
         }
         data.setPermissions(permissions);
-        this.cachedCloudPlayers.add(data);
+        this.cachedObjects.add(data);
     }
 
     /**
@@ -487,84 +484,67 @@ public class PermissionPool implements Serializable {
      *
      * @param offlinePlayer the player
      */
-    public void updatePlayer(PlayerInformation offlinePlayer) {
+    public void updatePlayer(OfflinePlayer offlinePlayer) {
         if (offlinePlayer == null) {
             return;
         }
-        PlayerInformation oldPlayerInformation = this.getPlayerInformation(offlinePlayer.getUniqueId());
-        if (oldPlayerInformation == null) {
-            this.cachedCloudPlayers.add(offlinePlayer);
+        OfflinePlayer oldOfflinePlayer = this.getCachedObject(offlinePlayer.getUniqueId());
+        if (oldOfflinePlayer == null) {
+            this.cachedObjects.add(offlinePlayer);
             return;
         }
         try {
-            this.cachedCloudPlayers.set(this.cachedCloudPlayers.indexOf(oldPlayerInformation), offlinePlayer);
+            this.cachedObjects.set(this.cachedObjects.indexOf(oldOfflinePlayer), offlinePlayer);
         } catch (IndexOutOfBoundsException e) {
-            this.cachedCloudPlayers.remove(oldPlayerInformation);
-            this.cachedCloudPlayers.add(offlinePlayer);
+            this.cachedObjects.remove(oldOfflinePlayer);
+            this.cachedObjects.add(offlinePlayer);
         }
     }
 
     /**
-     * Creates a default {@link PlayerInformation}
+     * Gets the {@link OfflinePlayer} by name
      *
-     * @param uuid the uuid of the player
      * @param name the name
-     * @param ip the ip
-     * @return created player
-     */
-    public PlayerInformation getDefaultPlayerInformation(UUID uuid, String name, String ip) {
-        PlayerInformation playerInformation = new PlayerInformation(uuid, name, Collections.singletonList(new PermissionEntry(this.getLowestPermissionGroupOrDefault().getName(), "")), new LinkedList<>(), ip, true, new Date().getTime(), 0L);
-        playerInformation.setDefault(true);
-        return playerInformation;
-    }
-
-    /**
-     * Gets the {@link PlayerInformation} by name
-     *
-     * @param playerName the name
      * @return offlinePlayer
      */
-    public PlayerInformation getPlayerInformation(String playerName) {
-        return this.cachedCloudPlayers.stream()
-                .filter(offlineCloudPlayer ->
-                        offlineCloudPlayer.getName().equalsIgnoreCase(playerName)
-                ).findFirst()
-                .orElse(this.getDefaultPlayerInformation(this.getUUIDByName(playerName), playerName, "-1"));
+    public OfflinePlayer getCachedObject(String name) {
+        if (name == null) {
+            return null;
+        }
+        return this.cachedObjects.stream().filter(cp -> cp.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     /**
-     * Gets the {@link PlayerInformation} by name
+     * Gets the {@link OfflinePlayer} by name
      *
      * @param uniqueId the uuid of the player
      * @return offlinePlayer
      */
-    public PlayerInformation getPlayerInformation(UUID uniqueId) {
+    public OfflinePlayer getCachedObject(UUID uniqueId) {
         if (uniqueId == null) {
             return null;
         }
-
-        return this.cachedCloudPlayers
-                .stream()
-                .filter(
-                        cp ->
-                                cp
-                                        .getUniqueId()
-                                        .equals(
-                                                uniqueId
-                                        )
-                ).findFirst()
-                .orElse(null);
+        return this.cachedObjects.stream().filter(cp -> cp.getUniqueId().equals(uniqueId)).findFirst().orElse(null);
     }
 
-    /**
-     * Gets a default {@link PlayerInformation}
-     *
-     * @param uniqueId the uuid of the player
-     * @return its data or the default
-     */
-    public PlayerInformation getPlayerInformationOrDefault(UUID uniqueId) {
-        PlayerInformation pre = this.getPlayerInformation(uniqueId);
-        return pre == null ? this.getDefaultPlayerInformation(uniqueId, getNameByUUID(uniqueId), "-1") : pre;
+    @Override @ScheduledForVersion("STABLE-1.9")
+    public void getObjectAsync(String name, Consumer<OfflinePlayer> consumer) {
+
+    }
+
+    @Override @ScheduledForVersion("STABLE-1.9")
+    public void getObjectAsync(UUID uniqueId, Consumer<OfflinePlayer> consumer) {
+
+    }
+
+    @Override @ScheduledForVersion("STABLE-1.9")
+    public Response<OfflinePlayer> getObjectSync(String name) {
+        return null;
+    }
+
+    @Override @ScheduledForVersion("STABLE-1.9")
+    public Response<OfflinePlayer> getObjectSync(UUID uniqueId) {
+        return null;
     }
 
     /**
@@ -574,7 +554,7 @@ public class PermissionPool implements Serializable {
      * @return permissionPlayer
      */
     public IPermissionUser getPermissionPlayer(UUID uniqueId) {
-        return this.getPlayerInformation(uniqueId);
+        return this.getCachedObject(uniqueId);
     }
 
     /**
@@ -584,7 +564,7 @@ public class PermissionPool implements Serializable {
      * @return permissionPlayer
      */
     public IPermissionUser getPermissionPlayer(String name) {
-        return this.getPlayerInformation(name);
+        return this.getCachedObject(name);
     }
 
     /**
@@ -595,8 +575,8 @@ public class PermissionPool implements Serializable {
      */
     public void modifyPlayer(UUID uniqueId, Consumer<IPermissionUser> consumer) {
         CloudDriver.getInstance().execute(() -> {
-            IPermissionUser IPermissionPlayer = getPermissionPlayer(uniqueId);
-            consumer.accept(IPermissionPlayer);
+            IPermissionUser permissionPlayer = getPermissionPlayer(uniqueId);
+            consumer.accept(permissionPlayer);
         });
     }
 
@@ -608,10 +588,15 @@ public class PermissionPool implements Serializable {
      */
     public void modifyPlayer(String name, Consumer<IPermissionUser> consumer) {
         CloudDriver.getInstance().execute(() -> {
-            IPermissionUser IPermissionPlayer = getPermissionPlayer(name);
-            consumer.accept(IPermissionPlayer);
+            IPermissionUser permissionPlayer = getPermissionPlayer(name);
+            consumer.accept(permissionPlayer);
         });
     }
 
 
+    @NotNull
+    @Override
+    public Iterator<OfflinePlayer> iterator() {
+        return null;
+    }
 }

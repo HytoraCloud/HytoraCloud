@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -54,18 +54,18 @@ public class CloudHandlerRequest implements PacketHandler {
 
             UUID playerUUID = packetRequestPermissionGroupGet.getUuid();
 
-            PlayerInformation playerInformation = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(playerUUID);
+            OfflinePlayer offlinePlayer = CloudDriver.getInstance().getPermissionPool().getCachedObject(playerUUID);
 
-            if (playerInformation == null) {
+            if (offlinePlayer == null) {
                 packet.reply(ResponseStatus.FAILED);
                 return;
             }
-            packet.reply(component -> component.put("group", playerInformation.getHighestPermissionGroup()));
+            packet.reply(component -> component.put("group", offlinePlayer.getHighestPermissionGroup()));
 
         } else if (packet instanceof PacketRequestAddProperty) {
             try {
                 PacketRequestAddProperty packetRequestAddProperty = (PacketRequestAddProperty)packet;
-                PlayerInformation offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestAddProperty.getPlayerUUID());
+                OfflinePlayer offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestAddProperty.getPlayerUUID());
 
                 offlinePlayer.addProperty(packetRequestAddProperty.getName(), packetRequestAddProperty.getProperty());
                 offlinePlayer.update();
@@ -77,7 +77,7 @@ public class CloudHandlerRequest implements PacketHandler {
         } else if (packet instanceof PacketRequestGetProperty) {
             try {
                 PacketRequestGetProperty packetRequestGetProperty = (PacketRequestGetProperty)packet;
-                PlayerInformation offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestGetProperty.getPlayerUUID());
+                OfflinePlayer offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestGetProperty.getPlayerUUID());
 
                 packet.reply(ResponseStatus.SUCCESS, offlinePlayer.getProperty(packetRequestGetProperty.getName()).toString());
             } catch (Exception e) {

@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCom
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -22,7 +22,7 @@ public class PermsCommand implements TabCompletable {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("§9PermissionGroups:");
-                for (PermissionGroup permissionGroup : CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups()) {
+                for (PermissionGroup permissionGroup : CloudDriver.getInstance().getPermissionPool().getPermissionGroups()) {
                     sender.sendMessage("INFO", "§7> §b" + permissionGroup.getName() + " §7| §bID " + permissionGroup.getId());
                 }
             } else {
@@ -169,12 +169,12 @@ public class PermsCommand implements TabCompletable {
             list.addAll(Arrays.asList("list", "add", "remove", "info"));
         } else if (args.length == 3) {
             if (args[1].equalsIgnoreCase("info") || args[1].equalsIgnoreCase("remove")|| args[1].equalsIgnoreCase("add")) {
-                for (PlayerInformation data : cloudDriver.getPermissionPool().getCachedCloudPlayers()) {
+                for (OfflinePlayer data : cloudDriver.getPermissionPool().getCachedObjects()) {
                     list.add(data.getName());
                 }
             }
         } else if (args.length == 4) {
-            for (PermissionGroup permissionGroup : cloudDriver.getPermissionPool().getCachedPermissionGroups()) {
+            for (PermissionGroup permissionGroup : cloudDriver.getPermissionPool().getPermissionGroups()) {
                 list.add(permissionGroup.getName());
             }
         }

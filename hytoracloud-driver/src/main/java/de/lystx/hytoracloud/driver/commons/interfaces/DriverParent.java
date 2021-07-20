@@ -39,4 +39,9 @@ public interface DriverParent {
      * Reloads the instance
      */
     void reload();
+
+    /**
+     * Stops the instance
+     */
+    void shutdown();
 }

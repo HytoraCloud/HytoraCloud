@@ -14,13 +14,13 @@ public class ShutdownCommand {
 
     @Command(
             name = "shutdown",
-            description = "Stops the cloudsystem",
+            description = "Stops the current instance",
             aliases = {"exit", "destroy"},
 
            usage = @CommandUsage(notArgs = 0, usage = {"ERROR%%§cPlease do not provide any arguments after §e<shutdown>§c!"})
     )
     public void execute(CloudCommandSender sender, String[] args) {
         sender.sendMessage("COMMAND", "§7The System §h[§7Type: §b" + CloudDriver.getInstance().getDriverType() + "§h] §7will shut down§7...");
-        cloudProcess.shutdown();
+        CloudDriver.getInstance().getParent().shutdown();
     }
 }

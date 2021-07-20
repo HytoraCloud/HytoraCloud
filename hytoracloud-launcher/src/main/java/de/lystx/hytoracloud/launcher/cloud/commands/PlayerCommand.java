@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import java.util.Date;
 import java.util.UUID;
@@ -44,7 +44,7 @@ public class PlayerCommand {
 
                 try {
                     UUID uniqueId = pool.getUUIDByName(player);
-                    PlayerInformation playerData = pool.getPlayerInformation(uniqueId);
+                    OfflinePlayer playerData = pool.getCachedObject(uniqueId);
                     if (playerData == null) {
                         sender.sendMessage("ERROR", "§cThe player §e" + player + " §cseems not to ever joined the network!");
                         return;
@@ -52,7 +52,7 @@ public class PlayerCommand {
                     if (cloudPlayer == null) {
                         sender.sendMessage("ERROR", "§cOffline §bInformation §7on " + player + "§7:");
                     } else {
-                        playerData = pool.getPlayerInformation(cloudPlayer.getUniqueId());
+                        playerData = pool.getCachedObject(cloudPlayer.getUniqueId());
                         sender.sendMessage("ERROR", "§aOnline §bInformation §7on " + cloudPlayer.getName() + "§7:");
                     }
                     try {

@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.global.manager;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerNamed;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerUniqueId;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -100,17 +100,17 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     }
 
     @Override
-    public List<PlayerInformation> getOfflinePlayers() {
-        return CloudDriver.getInstance().getPermissionPool().getCachedCloudPlayers();
+    public List<OfflinePlayer> getOfflinePlayers() {
+        return CloudDriver.getInstance().getPermissionPool().getCachedObjects();
     }
 
     @Override
-    public PlayerInformation getOfflinePlayer(String name) {
+    public OfflinePlayer getOfflinePlayer(String name) {
         return getOfflinePlayers().stream().filter(cloudPlayerData -> cloudPlayerData.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     @Override
-    public PlayerInformation getOfflinePlayer(UUID uniqueId) {
+    public OfflinePlayer getOfflinePlayer(UUID uniqueId) {
         return getOfflinePlayers().stream().filter(cloudPlayerData -> cloudPlayerData.getUniqueId().equals(uniqueId)).findFirst().orElse(null);
     }
 

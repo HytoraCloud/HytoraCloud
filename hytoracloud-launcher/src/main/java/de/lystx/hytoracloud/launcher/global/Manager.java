@@ -1,9 +1,14 @@
 package de.lystx.hytoracloud.launcher.global;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.launcher.cloud.commands.CreateCommand;
+import de.lystx.hytoracloud.launcher.global.commands.DeleteCommand;
+import de.lystx.hytoracloud.launcher.global.commands.DownloadCommand;
 import net.hytora.networking.connection.server.HytoraServer;
 
 public class Manager extends CloudProcess {
@@ -11,6 +16,13 @@ public class Manager extends CloudProcess {
 
     public Manager() {
         super(CloudType.MANAGER);
+
+        CloudDriver.getInstance().getServiceRegistry().registerService(new GroupService());
+        CloudDriver.getInstance().getServiceRegistry().registerService(new TemplateService());
+
+        this.getInstance(CommandService.class).registerCommand(new DownloadCommand());
+        this.getInstance(CommandService.class).registerCommand(new CreateCommand());
+        this.getInstance(CommandService.class).registerCommand(new DeleteCommand());
 
         CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
         CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§f\n" +

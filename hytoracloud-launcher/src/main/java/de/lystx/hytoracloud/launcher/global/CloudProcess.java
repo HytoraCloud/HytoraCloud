@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.launcher.global;
 
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
+import lombok.Setter;
 import utillity.JsonEntity;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -40,9 +41,20 @@ import java.io.IOException;
 @Getter
 public class CloudProcess extends CloudDriver implements DriverParent {
 
+    /**
+     * The webserver
+     */
+    @Setter
     protected WebServer webServer;
+
+    /**
+     * The console
+     */
     protected CloudConsole console;
-    protected ServiceOutputPrinter screenPrinter;
+
+    /**
+     * The authmanager for keys
+     */
     protected AuthManager authManager;
 
 
@@ -52,12 +64,18 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         Utils.clearConsole();
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "parent", this);
 
+        //Services for every instance
         CloudDriver.getInstance().getServiceRegistry().registerService(new CommandService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new LoggerService());
+        CloudDriver.getInstance().getServiceRegistry().registerService(new LogService());
+        CloudDriver.getInstance().getServiceRegistry().registerService(new DefaultEventService());
 
+        //The console
         this.console = new CloudConsole(this.getInstance(LoggerService.class), this.getInstance(CommandService.class), System.getProperty("user.name"));
         this.authManager = new AuthManager(new File("auth.json"));
 
+
+        //CHoosing instance
         if (cloudType == CloudType.NONE) {
             this.console.getCommandManager().setActive(false);
             new InstanceChooser().start(this.console, instanceChooser -> {
@@ -92,108 +110,24 @@ public class CloudProcess extends CloudDriver implements DriverParent {
             });
         }
 
-        CloudDriver.getInstance().getServiceRegistry().registerService(new LogService());
-
-        this.screenPrinter = new ServiceOutputPrinter(this.console, this);
-
-        if (cloudType.equals(CloudType.CLOUDSYSTEM)) {
-            this.webServer = new WebServer(this);
-            this.webServer.update("", new JsonEntity().append("info", "There's nothing to see here").append("routes", this.webServer.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
-            this.webServer.start();
-        }
-        if (cloudType == CloudType.CLOUDSYSTEM || cloudType == CloudType.MANAGER) {
-            CloudDriver.getInstance().getServiceRegistry().registerService(new GroupService());
-            CloudDriver.getInstance().getServiceRegistry().registerService(new TemplateService());
-
-            this.getInstance(CommandService.class).registerCommand(new DownloadCommand());
-            this.getInstance(CommandService.class).registerCommand(new CreateCommand());
-            this.getInstance(CommandService.class).registerCommand(new DeleteCommand());
-        }
-
-        if (cloudType != CloudType.MANAGER) {
-            CloudDriver.getInstance().getServiceRegistry().registerService(new ConfigService());
-            CloudDriver.getInstance().getServiceRegistry().registerService(new ServiceOutputService());
-        }
-
-        CloudDriver.getInstance().getServiceRegistry().registerService(new DefaultEventService());
-
+        //Registering commands for every instance
         this.getInstance(CommandService.class).registerCommand(new ShutdownCommand(this));
         this.getInstance(CommandService.class).registerCommand(new HelpCommand(this));
         this.getInstance(CommandService.class).registerCommand(new ReloadCommand(this));
         this.getInstance(CommandService.class).registerCommand(new ClearCommand(this));
 
-        if (cloudType == CloudType.CLOUDSYSTEM) {
-            this.getInstance(CommandService.class).registerCommand(new TpsCommand(this));
-            this.getInstance(CommandService.class).registerCommand(new InfoCommand(this));
-            this.getInstance(CommandService.class).registerCommand(new StopCommand(this));
-            this.getInstance(CommandService.class).registerCommand(new ScreenCommand(this.screenPrinter, this));
-            this.getInstance(CommandService.class).registerCommand(new RunCommand(this));
-            this.getInstance(CommandService.class).registerCommand(new LogCommand(this));
-        }
-
-
     }
 
-    /**
-     * Reloads all
-     */
-    public void reload() {
-        this.sendPacket(new PacketOutUpdateTabList());
-
-        //Reloading all modules
-        if (this.getInstance(ModuleService.class) != null) {
-            for (Module module : this.getInstance(ModuleService.class).getModules()) {
-                module.onReload();
-            }
-        }
-
-        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
-            registeredService.reload();
-        }
-
-        if (CloudDriver.getInstance().getInstance(GroupService.class) != null) {
-            CloudDriver.getInstance().getInstance(GroupService.class).reload();
-        }
-        if (CloudDriver.getInstance().getInstance(ConfigService.class) != null) {
-            CloudDriver.getInstance().getInstance(ConfigService.class).reload();
-        }
-
+    @Override
+    public ServiceOutputPrinter getScreenPrinter() {
+        return new ServiceOutputPrinter();
     }
 
     /**
      * Shuts down the Cloud
      */
     public void shutdown() {
-
-        for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
-            registeredService.save();
-        }
-
-        this.sendPacket(new PacketShutdown());
-
+        super.shutdown();
         this.console.interrupt();
-
-        if (this.getServiceManager() != null) {
-            this.getServiceManager().shutdownAll();
-        }
-
-        if (this.getInstance(LogService.class) != null) {
-            this.getInstance(LogService.class).save();
-        }
-        if (this.getInstance(ConfigService.class) != null) {
-            this.getInstance(ConfigService.class).shutdown();
-        }
-
-        if (this.getInstance(ModuleService.class) != null) {
-            this.getInstance(ModuleService.class).shutdown();
-        }
-
-        this.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-            try {
-                FileUtils.deleteDirectory(this.getInstance(FileService.class).getDynamicServerDirectory());
-            } catch (IOException ignored) {}
-        }, 20L);
-
-        this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 80L);
     }
 }

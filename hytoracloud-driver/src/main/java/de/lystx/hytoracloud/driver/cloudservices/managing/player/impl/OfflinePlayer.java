@@ -19,7 +19,9 @@ import java.io.Serializable;
 import java.util.*;
 
 @Getter @Setter @AllArgsConstructor
-public class PlayerInformation implements Serializable, IPermissionUser, Objectable<PlayerInformation> {
+public class OfflinePlayer implements Serializable, IPermissionUser, Objectable<OfflinePlayer> {
+
+    private static final long serialVersionUID = 4187696359635163423L;
 
     /**
      * The uuid of this player
@@ -71,12 +73,13 @@ public class PlayerInformation implements Serializable, IPermissionUser, Objecta
      */
     private Map<String, PropertyObject> properties;
 
-    public PlayerInformation(UUID uniqueId, String name, List<PermissionEntry> permissionEntries, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
+    public OfflinePlayer(UUID uniqueId, String name, List<PermissionEntry> permissionEntries, List<String> permissions, String ipAddress, boolean notifyServerStart, long firstLogin, long lastLogin) {
         this(uniqueId, name, permissionEntries, permissions, ipAddress, notifyServerStart, false, firstLogin, lastLogin, new HashMap<>());
     }
 
     /**
-     * Adds a property to this data
+     * Adds a property to this player
+     *
      * @param name the name (e.g "global")
      * @param data the data (e.g. coins or something)
      */
@@ -173,7 +176,7 @@ public class PlayerInformation implements Serializable, IPermissionUser, Objecta
 
     @Override
     public List<PermissionGroup> getAllPermissionGroups() {
-        return CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups(this.getUniqueId());
+        return CloudDriver.getInstance().getPermissionPool().getPermissionGroups(this.getUniqueId());
     }
 
     @Override

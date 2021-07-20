@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.launcher.global.commands;
+package de.lystx.hytoracloud.launcher.cloud.commands;
 
 
 import de.lystx.hytoracloud.launcher.global.CloudProcess;

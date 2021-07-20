@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
 import de.lystx.hytoracloud.driver.commons.implementations.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import utillity.PropertyObject;
@@ -9,7 +10,6 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.utils.uuid.NameChange;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
@@ -64,14 +64,14 @@ public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermiss
     /**
      * The information of the player
      */
-    PlayerInformation getInformation();
+    OfflinePlayer getOfflinePlayer();
 
     /**
      * Sets the information of this player
      *
-     * @param playerInformation the information
+     * @param offlinePlayer the information
      */
-    void setInformation(PlayerInformation playerInformation);
+    void setOfflinePlayer(OfflinePlayer offlinePlayer);
 
     /**
      * Gets the IP Address of this player
@@ -112,13 +112,6 @@ public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermiss
     boolean hasPlayedBefore();
 
     /**
-     * Gets the {@link PlayerInformation} of this player
-     *
-     * @return information or default if not set
-     */
-    PlayerInformation getData();
-
-    /**
      * Returns a CloudPlayer Inventory to manage stuff
      *
      * @return inventory if cached or new one
@@ -134,11 +127,11 @@ public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermiss
     void sendActionbar(Object message);
 
     /**
-     * Opens a {@link CloudInventory} to this player
+     * Opens a {@link Inventory} to this player
      *
-     * @param cloudInventory the inventory to open
+     * @param inventory the inventory to open
      */
-    void openInventory(CloudInventory cloudInventory);
+    void openInventory(Inventory inventory);
 
     /**
      * Plays a sound for this player

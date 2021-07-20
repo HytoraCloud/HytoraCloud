@@ -131,7 +131,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     @Override
     public void flushCommand(String command) {
         if (command.equalsIgnoreCase("stop") || command.equalsIgnoreCase("bukkit:stop")) {
-            this.shutdown();
+            CloudDriver.getInstance().execute(this::shutdown);
         } else {
             Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
         }

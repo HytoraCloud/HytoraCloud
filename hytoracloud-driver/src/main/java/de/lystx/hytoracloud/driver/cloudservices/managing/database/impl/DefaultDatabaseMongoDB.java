@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 import org.bson.Document;
@@ -34,19 +34,19 @@ public class DefaultDatabaseMongoDB implements IDatabase {
     }
 
     @Override
-    public void registerPlayer(ICloudPlayer ICloudPlayer) {
-        if (!this.isRegistered(ICloudPlayer.getUniqueId())) {
-            PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), ICloudPlayer.getIpAddress());
-            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), data);
+    public void createEntry(ICloudPlayer cloudPlayer) {
+        if (!this.isRegistered(cloudPlayer.getUniqueId())) {
+            OfflinePlayer data = new OfflinePlayer(cloudPlayer.getUniqueId(), cloudPlayer.getName(), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), cloudPlayer.getIpAddress(), true, true, new Date().getTime(), 0L, new HashMap<>());
+            this.saveEntry(cloudPlayer.getUniqueId(), data);
         } else {
-            PlayerInformation playerInformation = this.getOfflinePlayer(ICloudPlayer.getUniqueId());
-            PlayerInformation newData = new PlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), playerInformation.getPermissionEntries(), playerInformation.getExclusivePermissions(), ICloudPlayer.getIpAddress(), playerInformation.isNotifyServerStart(), playerInformation.getFirstLogin(), playerInformation.getLastLogin());
-            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), newData);
+            OfflinePlayer offlinePlayer = this.getEntry(cloudPlayer.getUniqueId());
+            OfflinePlayer newData = new OfflinePlayer(cloudPlayer.getUniqueId(), cloudPlayer.getName(), offlinePlayer.getPermissionEntries(), offlinePlayer.getExclusivePermissions(), cloudPlayer.getIpAddress(), offlinePlayer.isNotifyServerStart(), offlinePlayer.getFirstLogin(), offlinePlayer.getLastLogin());
+            this.saveEntry(cloudPlayer.getUniqueId(), newData);
         }
     }
 
     @Override
-    public PlayerInformation getOfflinePlayer(UUID uuid) {
+    public OfflinePlayer getEntry(UUID uuid) {
         try {
             Document document = this.getDocument("uuid", uuid);
             Document entries = document.get("permissionEntries", Document.class);
@@ -55,7 +55,7 @@ public class DefaultDatabaseMongoDB implements IDatabase {
                 Document sub = entries.get(s, Document.class);
                 permissionEntries.add(new PermissionEntry(sub.getString("group"), sub.getString("validTime")));
             }
-            return new PlayerInformation(
+            return new OfflinePlayer(
                     uuid,
                     document.getString("name"),
                     permissionEntries,
@@ -70,7 +70,7 @@ public class DefaultDatabaseMongoDB implements IDatabase {
     }
 
     @Override
-    public void saveOfflinePlayer(UUID uuid, PlayerInformation data) {
+    public void saveEntry(UUID uuid, OfflinePlayer data) {
         Document entries = new Document();
         for (PermissionEntry permissionEntry : data.getPermissionEntries()) {
             entries.append(UUID.randomUUID().toString(), new Document().append("group", permissionEntry.getPermissionGroup()).append("validTime", permissionEntry.getValidTime()));
@@ -93,10 +93,10 @@ public class DefaultDatabaseMongoDB implements IDatabase {
     }
 
     @Override
-    public List<PlayerInformation> loadEntries() {
-        List<PlayerInformation> list = new LinkedList<>();
+    public List<OfflinePlayer> loadEntries() {
+        List<OfflinePlayer> list = new LinkedList<>();
         for (Document document : this.getDocuments()) {
-            PlayerInformation data = this.getOfflinePlayer(document.get("uuid", UUID.class));
+            OfflinePlayer data = this.getEntry(document.get("uuid", UUID.class));
             list.add(data);
         }
         return list;

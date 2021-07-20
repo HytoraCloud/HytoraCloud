@@ -1,18 +1,20 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.database.impl;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 public class DefaultDatabaseMysQL implements IDatabase {
 
@@ -63,19 +65,19 @@ public class DefaultDatabaseMysQL implements IDatabase {
 
 
     @Override
-    public void registerPlayer(ICloudPlayer ICloudPlayer) {
-        if (!this.isRegistered(ICloudPlayer.getUniqueId())) {
-            PlayerInformation data = CloudDriver.getInstance().getPermissionPool().getDefaultPlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), ICloudPlayer.getIpAddress());
-            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), data);
+    public void createEntry(ICloudPlayer cloudPlayer) {
+        if (!this.isRegistered(cloudPlayer.getUniqueId())) {
+            OfflinePlayer data = new OfflinePlayer(cloudPlayer.getUniqueId(), cloudPlayer.getName(), Collections.singletonList(new PermissionEntry(CloudDriver.getInstance().getPermissionPool().getDefaultPermissionGroup().getName(), "")), new LinkedList<>(), cloudPlayer.getIpAddress(), true, true, new Date().getTime(), 0L, new HashMap<>());
+            this.saveEntry(cloudPlayer.getUniqueId(), data);
         } else {
-            PlayerInformation playerInformation = this.getOfflinePlayer(ICloudPlayer.getUniqueId());
-            PlayerInformation newData = new PlayerInformation(ICloudPlayer.getUniqueId(), ICloudPlayer.getName(), playerInformation.getPermissionEntries(), playerInformation.getExclusivePermissions(), ICloudPlayer.getIpAddress(), playerInformation.isNotifyServerStart(), playerInformation.getFirstLogin(), playerInformation.getLastLogin());
-            this.saveOfflinePlayer(ICloudPlayer.getUniqueId(), newData);
+            OfflinePlayer offlinePlayer = this.getEntry(cloudPlayer.getUniqueId());
+            OfflinePlayer newData = new OfflinePlayer(cloudPlayer.getUniqueId(), cloudPlayer.getName(), offlinePlayer.getPermissionEntries(), offlinePlayer.getExclusivePermissions(), cloudPlayer.getIpAddress(), offlinePlayer.isNotifyServerStart(), offlinePlayer.getFirstLogin(), offlinePlayer.getLastLogin());
+            this.saveEntry(cloudPlayer.getUniqueId(), newData);
         }
     }
 
     @Override
-    public PlayerInformation getOfflinePlayer(UUID uuid) {
+    public OfflinePlayer getEntry(UUID uuid) {
         String data = null;
         try {
             PreparedStatement ps = this.mySQLConnection.getCon().prepareStatement("SELECT * FROM " + CloudDriver.getInstance().getDatabaseManager().getCollectionOrTable() + " WHERE uuid = ?");
@@ -90,14 +92,14 @@ public class DefaultDatabaseMysQL implements IDatabase {
         }
         try {
             JsonEntity jsonEntity = new JsonEntity(data);
-            return jsonEntity.getObject(jsonEntity.getJsonObject(), PlayerInformation.class);
+            return jsonEntity.getObject(jsonEntity.getJsonObject(), OfflinePlayer.class);
         } catch (NullPointerException e) {
             return null;
         }
     }
 
     @Override
-    public void saveOfflinePlayer(UUID uuid, PlayerInformation data) {
+    public void saveEntry(UUID uuid, OfflinePlayer data) {
         try {
             if (this.isRegistered(uuid)) {
                 PreparedStatement statement = this.mySQLConnection.getCon().prepareStatement("UPDATE " + CloudDriver.getInstance().getDatabaseManager().getCollectionOrTable() + " SET jsonData = ? WHERE uuid = '" + uuid.toString() + "';");
@@ -118,16 +120,16 @@ public class DefaultDatabaseMysQL implements IDatabase {
     }
 
     @Override
-    public List<PlayerInformation> loadEntries() {
-        List<PlayerInformation> list = new LinkedList<>();
+    public List<OfflinePlayer> loadEntries() {
+        List<OfflinePlayer> list = new LinkedList<>();
         try {
             PreparedStatement statement = this.mySQLConnection.getCon().prepareStatement("SELECT * FROM " + CloudDriver.getInstance().getDatabaseManager().getCollectionOrTable());
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 String data = result.getString(2);
                 JsonEntity jsonEntity = new JsonEntity(data);
-                PlayerInformation playerInformation = jsonEntity.getAs(PlayerInformation.class);
-                list.add(playerInformation);
+                OfflinePlayer offlinePlayer = jsonEntity.getAs(OfflinePlayer.class);
+                list.add(offlinePlayer);
             }
         } catch (SQLException e) {}
         return list;

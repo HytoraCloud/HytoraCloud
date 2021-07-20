@@ -19,7 +19,16 @@ import java.util.UUID;
 @Getter @Setter @AllArgsConstructor @ToString
 public class PermissionEntry implements Serializable {
 
+    private static final long serialVersionUID = 7716950517479203380L;
+
+    /**
+     * The given group
+     */
     private String permissionGroup;
+
+    /**
+     * The time it expires
+     */
     private String validTime;
 
 }

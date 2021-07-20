@@ -131,7 +131,7 @@ public class PermissionGroup implements Serializable {
 
         //Replacing old group with updated
         PermissionGroup group = CloudDriver.getInstance().getPermissionPool().getPermissionGroupByName(this.name);
-        CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups().set(CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups().indexOf(group), this);
+        CloudDriver.getInstance().getPermissionPool().getPermissionGroups().set(CloudDriver.getInstance().getPermissionPool().getPermissionGroups().indexOf(group), this);
         CloudDriver.getInstance().getPermissionPool().update();
     }
 

@@ -23,7 +23,7 @@ public interface IPermissionUser extends Identifiable {
      *
      * @return permissionGroup or null
      */
-    @Nullable PermissionGroup getCachedPermissionGroup();
+    PermissionGroup getCachedPermissionGroup();
 
     /**
      * Gets the {@link PermissionGroup} directly from the Cloud itsself

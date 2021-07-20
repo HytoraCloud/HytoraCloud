@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.cloud;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -23,7 +23,7 @@ public class CloudListener implements NetworkHandler {
             if (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.notify")) {
                 return;
             }
-            PlayerInformation playerData = CloudDriver.getInstance().getPermissionPool().getPlayerInformation(player.getUniqueId());
+            OfflinePlayer playerData = CloudDriver.getInstance().getPermissionPool().getCachedObject(player.getUniqueId());
             if (playerData != null && !playerData.isNotifyServerStart()) {
                 return;
             }

@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerInformation;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,13 +49,13 @@ public class PermissionService implements ICloudService {
         if (CloudDriver.getInstance().getDatabaseManager() == null) {
             return;
         }
-        CloudDriver.getInstance().getPermissionPool().setCachedCloudPlayers(CloudDriver.getInstance().getDatabaseManager().getDatabase().loadEntries());
+        CloudDriver.getInstance().getPermissionPool().setCachedObjects(CloudDriver.getInstance().getDatabaseManager().getDatabase().loadEntries());
         if (!loaded) {
             loaded = true;
             if (!CloudDriver.getInstance().getNetworkConfig().isSetupDone()) {
                 return;
             }
-            CloudDriver.getInstance().getParent().getConsole().sendMessage("DATABASE", "§7Loaded §b" + CloudDriver.getInstance().getPermissionPool().getCachedCloudPlayers().size() + " PlayerEntries §ffrom Database §h[§7Type: §b" + CloudDriver.getInstance().getDatabaseManager().getDatabase().getType().name() + "§h]!");
+            CloudDriver.getInstance().getParent().getConsole().sendMessage("DATABASE", "§7Loaded §b" + CloudDriver.getInstance().getPermissionPool().getCachedObjects().size() + " Players §ffrom Database §h[§7Type: §b" + CloudDriver.getInstance().getDatabaseManager().getDatabase().getType().name() + "§h]!");
         }
     }
 
@@ -151,7 +151,7 @@ public class PermissionService implements ICloudService {
             groups.add(group);
         }
 
-        CloudDriver.getInstance().getPermissionPool().setCachedPermissionGroups(groups);
+        CloudDriver.getInstance().getPermissionPool().setPermissionGroups(groups);
 
         if (!ignore) {
             CloudDriver.getInstance().getPermissionPool().update();
@@ -166,12 +166,12 @@ public class PermissionService implements ICloudService {
      *
      * @param file the file (perms.json)
      * @param directory the directory (player/)
-     * @param database the databsae to save data (Files, MySQL, MongoDB)
+     * @param database the database to save data (Files, MySQL, MongoDB)
      */
     public void save(File file, File directory, IDatabase database) {
 
         try {
-            if (CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups().isEmpty()) {
+            if (CloudDriver.getInstance().getPermissionPool().getPermissionGroups().isEmpty()) {
                 this.ignore = true;
                 this.loadGroups();
             }
@@ -179,18 +179,18 @@ public class PermissionService implements ICloudService {
             jsonEntity.append("enabled", CloudDriver.getInstance().getPermissionPool().isEnabled()); //If Enabled
 
             //Saves PermissionGroups
-            for (PermissionGroup permissionGroup : new LinkedList<>(CloudDriver.getInstance().getPermissionPool().getCachedPermissionGroups())) {
+            for (PermissionGroup permissionGroup : new LinkedList<>(CloudDriver.getInstance().getPermissionPool().getPermissionGroups())) {
                 jsonEntity.append(permissionGroup.getName(), permissionGroup);
             }
             jsonEntity.save(); //Saves all the perms.json
 
             //Saves PlayerData
             if (database != null) {
-                for (PlayerInformation playerInformation : new LinkedList<>(CloudDriver.getInstance().getPermissionPool().getCachedCloudPlayers())) {
-                    if (playerInformation == null) {
+                for (OfflinePlayer offlinePlayer : new LinkedList<>(CloudDriver.getInstance().getPermissionPool().getCachedObjects())) {
+                    if (offlinePlayer == null) {
                         continue;
                     }
-                    database.saveOfflinePlayer(playerInformation.getUniqueId(), playerInformation);
+                    database.saveEntry(offlinePlayer.getUniqueId(), offlinePlayer);
                 }
             }
             this.clearInvalidUUIDs(directory);

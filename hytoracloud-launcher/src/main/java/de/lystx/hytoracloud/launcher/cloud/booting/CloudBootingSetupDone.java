@@ -1,6 +1,10 @@
 package de.lystx.hytoracloud.launcher.cloud.booting;
 
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.webserver.WebServer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
+import de.lystx.hytoracloud.launcher.cloud.commands.*;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerTemplateCopy;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerTemplateCreate;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerGroupUpdate;
@@ -17,6 +21,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.launcher.global.commands.*;
+import utillity.JsonEntity;
 
 public class CloudBootingSetupDone {
 
@@ -45,6 +51,18 @@ public class CloudBootingSetupDone {
         CloudDriver.getInstance().getServiceRegistry().registerService(new NetworkService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new ModuleService());
 
+        cloudSystem.setScreenPrinter(new ServiceOutputPrinter());
+        cloudSystem.setWebServer(new WebServer(cloudSystem));
+        cloudSystem.getWebServer().update("", new JsonEntity().append("info", "There's nothing to see here").append("routes", cloudSystem.getWebServer().getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
+        cloudSystem.getWebServer().start();
+
+
+        CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new TpsCommand(cloudSystem));
+        CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new InfoCommand(cloudSystem));
+        CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new StopCommand(cloudSystem));
+        CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new ScreenCommand(cloudSystem.getScreenPrinter(), cloudSystem));
+        CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new RunCommand(cloudSystem));
+        CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new LogCommand(cloudSystem));
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", CloudDriver.getInstance().getInstance(NetworkService.class).getHytoraServer());
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "serviceManager", new CloudSideServiceManager(CloudDriver.getInstance().getInstance(GroupService.class).getGroups()));
