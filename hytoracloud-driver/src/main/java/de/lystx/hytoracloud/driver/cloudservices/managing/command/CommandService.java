@@ -192,7 +192,7 @@ public class CommandService implements ICloudService {
                     this.getDriver().getParent().getScreenPrinter().quitCurrentScreen();
                 }
             } else {
-                this.getDriver().sendPacket(new PacketCommand(this.getDriver().getParent().getScreenPrinter().getScreen().getServiceName(), line));
+                CloudDriver.getInstance().sendPacket(new PacketCommand(this.getDriver().getParent().getScreenPrinter().getScreen().getServiceName(), line));
             }
         }
         if (!active) {

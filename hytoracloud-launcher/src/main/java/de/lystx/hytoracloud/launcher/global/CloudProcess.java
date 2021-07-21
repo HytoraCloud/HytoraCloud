@@ -1,39 +1,25 @@
 package de.lystx.hytoracloud.launcher.global;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
+import de.lystx.hytoracloud.launcher.manager.Manager;
 import lombok.Setter;
-import utillity.JsonEntity;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.DriverParent;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import utillity.AuthManager;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
+import de.lystx.hytoracloud.driver.utils.utillity.AuthManager;
 import de.lystx.hytoracloud.launcher.global.setups.InstanceChooser;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventService;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.utils.log.LogService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.webserver.WebServer;
 import de.lystx.hytoracloud.launcher.global.commands.*;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +59,6 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         //The console
         this.console = new CloudConsole(this.getInstance(LoggerService.class), this.getInstance(CommandService.class), System.getProperty("user.name"));
         this.authManager = new AuthManager(new File("auth.json"));
-
 
         //CHoosing instance
         if (cloudType == CloudType.NONE) {

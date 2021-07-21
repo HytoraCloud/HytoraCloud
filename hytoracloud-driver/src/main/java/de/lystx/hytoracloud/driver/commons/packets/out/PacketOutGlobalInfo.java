@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.out;
 
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
@@ -15,17 +16,19 @@ import java.io.Serializable;
 import java.util.*;
 
 @Getter @AllArgsConstructor
-public class PacketOutGlobalInfo extends HytoraPacket implements Serializable {
+public class PacketOutGlobalInfo extends HytoraPacket {
 
     private NetworkConfig networkConfig;
     private List<IServiceGroup> groups;
     private List<IService> services;
+    private List<IReceiver> receivers;
 
     @Override
     public void write(Component component) {
         component.put("config", networkConfig);
         component.put("groups", groups);
         component.put("services", services);
+        component.put("receivers", receivers);
     }
 
     @Override
@@ -34,7 +37,7 @@ public class PacketOutGlobalInfo extends HytoraPacket implements Serializable {
         networkConfig = component.get("config");
         services = component.get("services");
         groups = component.get("groups");
-
+        receivers = component.get("receivers");
     }
 
 

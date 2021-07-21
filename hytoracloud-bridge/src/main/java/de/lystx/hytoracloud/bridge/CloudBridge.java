@@ -16,7 +16,7 @@ import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
 import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterService;

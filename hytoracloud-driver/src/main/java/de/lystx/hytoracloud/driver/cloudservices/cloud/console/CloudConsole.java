@@ -51,7 +51,9 @@ public class CloudConsole extends Thread implements CloudCommandSender {
                             if (currentSetup != null) {
                                 currentSetup.next(line);
                             } else {
-                                this.commandManager.execute(line, this);
+                                if (this.commandManager != null) {
+                                    this.commandManager.execute(line, this);
+                                }
                             }
                         }
                     }

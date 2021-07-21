@@ -8,6 +8,7 @@ import lombok.Getter;
 @Getter @AllArgsConstructor
 public class DriverEventServiceStarted extends CloudEvent {
 
+    private static final long serialVersionUID = -4528963146163136026L;
     private final IService service;
 
 }

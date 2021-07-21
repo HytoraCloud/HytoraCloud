@@ -38,6 +38,10 @@ public abstract class PacketCommunication extends HytoraPacket {
 
     @Override
     public void read(Component component) {
+        if (component == null) {
+            sendBack = false;
+            return;
+        }
         sendBack = component.get("b");
     }
 

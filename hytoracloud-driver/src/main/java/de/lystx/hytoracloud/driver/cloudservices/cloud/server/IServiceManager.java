@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.cloud.server;
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.cloudservices.other.ObjectPool;
 import de.lystx.hytoracloud.driver.commons.interfaces.Acceptable;
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;

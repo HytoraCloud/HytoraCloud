@@ -1,8 +1,10 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
@@ -19,6 +21,15 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      * The ID of this service
      */
     int getId();
+
+    /**
+     * Gets the {@link IReceiver} of this service
+     *
+     * @return receiver or null
+     */
+    default IReceiver getReceiver() {
+        return CloudDriver.getInstance().getReceiverManager().getReceiver(this.getGroup().getReceiver());
+    }
 
     /**
      * The port of this service

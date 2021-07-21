@@ -12,7 +12,7 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
-import utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

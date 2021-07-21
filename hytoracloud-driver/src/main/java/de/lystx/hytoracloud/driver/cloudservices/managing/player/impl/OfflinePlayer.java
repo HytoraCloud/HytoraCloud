@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;

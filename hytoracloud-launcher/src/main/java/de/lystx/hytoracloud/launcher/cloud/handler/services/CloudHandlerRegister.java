@@ -15,7 +15,7 @@ public class CloudHandlerRegister implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketRegisterService) {
             PacketRegisterService packetRegisterService = (PacketRegisterService)packet;
-            IService service = ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).registerService(packetRegisterService.getService());
+            IService service = ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).registerService(packetRegisterService.getService(), packet);
             packet.reply(component -> component.put("service", service));
 
             CloudDriver.getInstance().sendPacket(new PacketOutRegisterServer(service));

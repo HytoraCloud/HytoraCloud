@@ -28,7 +28,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabLis
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;

@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.l
 
 import com.google.gson.JsonArray;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 

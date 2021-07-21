@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfos;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import lombok.Getter;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;

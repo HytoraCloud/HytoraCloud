@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 
 import java.lang.management.ManagementFactory;
 

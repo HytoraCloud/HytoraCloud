@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.database.impl;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
-import utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 import de.lystx.hytoracloud.driver.cloudservices.other.FileService;

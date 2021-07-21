@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import net.hytora.networking.connection.server.HytoraServer;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.component.ComponentSender;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 
 import java.io.*;
@@ -177,6 +178,28 @@ public class HytoraConnectionBridge implements ComponentSender {
     }
 
     /**
+     * Processes a {@link Component} into the bridge
+     *
+     * @param component the component
+     */
+    @SneakyThrows
+    public void processIn(Component component) {
+        synchronized (this.syncOut) {
+            this.objectOutputStream.writeObject(component);
+            this.objectOutputStream.flush();
+        }
+    }
+
+    /**
+     * Processes a {@link HytoraPacket} into the bridge
+     *
+     * @param packet the packet
+     */
+    public void processIn(HytoraPacket packet) {
+        Component component = packetToComponent(packet);
+        this.processIn(component);
+    }
+    /**
      * Sends an object which is {@link Serializable}
      *
      * @param object the object
@@ -329,7 +352,6 @@ public class HytoraConnectionBridge implements ComponentSender {
      * Disconnects from the server
      */
     public void disconnect() {
-        System.out.println("[Client] '" + this.getName() + "' has disconnected!");
         this.enabled = false;
         this.server.getUserManager().unregisterUser(this);
         try {

@@ -7,25 +7,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.io.Serializable;
 
 @Getter @Setter @AllArgsConstructor
-public class PacketRegisterService extends PacketCommunication implements Serializable {
+public class PacketRegisterService extends HytoraPacket {
 
     private String service;
 
     @Override
     public void read(Component component) {
-        super.read(component);
 
         service = component.get("s");
     }
 
     @Override
     public void write(Component component) {
-        super.write(component);
-
         component.append(map -> map.put("s", service));
     }
 

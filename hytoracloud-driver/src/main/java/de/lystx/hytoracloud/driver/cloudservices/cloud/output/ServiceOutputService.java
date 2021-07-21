@@ -1,9 +1,12 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.output;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverScreenRequest;
 import lombok.Getter;
+import net.hytora.networking.elements.component.Component;
 
 import java.util.*;
 
@@ -26,6 +29,19 @@ public class ServiceOutputService implements ICloudService {
     public ServiceOutputService() {
         this.map = new HashMap<>();
         this.cachedLines = new HashMap<>();
+    }
+
+    public ServiceOutput getOrRequest(String name) {
+        if (this.map.containsKey(name)) {
+            return this.map.get(name);
+        } else {
+            PacketReceiverScreenRequest screenRequest = new PacketReceiverScreenRequest(name);
+            Component component = screenRequest.toReply(CloudDriver.getInstance().getConnection());
+            List<String> cachedLines = component.get("lines");
+            ServiceOutput serviceOutput = new ServiceOutput(null, null, null, name);
+            serviceOutput.setCachedLines(cachedLines);
+            return serviceOutput;
+        }
     }
 
     @Override

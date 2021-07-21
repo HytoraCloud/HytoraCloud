@@ -1,8 +1,9 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import utillity.PropertyObject;
-import utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.ServiceType;
@@ -28,8 +29,8 @@ import java.util.function.Consumer;
 public class ServiceStarter {
 
 
-    private final IService IService;
-    private final IServiceGroup IServiceGroup;
+    private final IService service;
+    private final IServiceGroup serviceGroup;
     private final Template template;
     private final PropertyObject properties;
 
@@ -42,12 +43,12 @@ public class ServiceStarter {
     private final File pluginsDirectory;
 
 
-    public ServiceStarter(IService IService, PropertyObject properties) {
+    public ServiceStarter(IService service, PropertyObject properties) {
         FileService instance = CloudDriver.getInstance().getInstance(FileService.class);
 
-        this.IService = IService;
-        this.IServiceGroup = IService.getGroup();
-        this.template = this.IServiceGroup.getTemplate();
+        this.service = service;
+        this.serviceGroup = service.getGroup();
+        this.template = this.serviceGroup.getTemplate();
         this.properties = properties;
 
         this.templateDirectory = instance.getTemplatesDirectory();
@@ -59,13 +60,13 @@ public class ServiceStarter {
 
 
         this.serverLocation = new File(
-                IService.getGroup().isDynamic() ?
-                        (IService.getGroup().getType().equals(ServiceType.PROXY) ?
+                service.getGroup().isDynamic() ?
+                        (service.getGroup().getType().equals(ServiceType.PROXY) ?
                                 CloudDriver.getInstance().getInstance(FileService.class).getDynamicProxyDirectory() :
                                 CloudDriver.getInstance().getInstance(FileService.class).getDynamicBukkitDirectory()) :
-                        (IService.getGroup().getType().equals(ServiceType.PROXY) ?
+                        (service.getGroup().getType().equals(ServiceType.PROXY) ?
                                 CloudDriver.getInstance().getInstance(FileService.class).getStaticProxyDirectory() :
-                                CloudDriver.getInstance().getInstance(FileService.class).getStaticBukkitDirectory()), IService.getGroup().getName() + "/" + IService.getName() + "/");
+                                CloudDriver.getInstance().getInstance(FileService.class).getStaticBukkitDirectory()), service.getGroup().getName() + "/" + service.getName() + "/");
         this.pluginsDirectory = new File(serverLocation, "plugins/");
 
         this.serverLocation.mkdirs();
@@ -79,12 +80,11 @@ public class ServiceStarter {
      */
     public boolean checkForSpigot() {
         if (!new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "spigot.jar").exists() || !new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "proxy.jar").exists()) {
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("ERROR", "§cCouldn't start Service §e" + IService.getName() + " §cbecause either §espigot.jar §cor §ebungeeCord.jar §cwas found!");
-            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Downloading §7default §9BungeeCord §7and default §eSpigot-1.8.8§h...");
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Downloading §7default §bProxy-Version §7and §3SpigotVersion §7and then retrying to start §9" + service.getName() + "§h!");
 
             CloudDriver.getInstance().getInstance(FileService.class).download(ProxyVersion.BUNGEECORD.getUrl(), new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "proxy.jar"));
             CloudDriver.getInstance().getInstance(FileService.class).download(SpigotVersion.V1_8_8.getUrl(), new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), "spigot.jar"));
-            return false;
+            return true;
         }
         return true;
     }
@@ -100,7 +100,7 @@ public class ServiceStarter {
         }
 
         FileUtils.copyDirectory(template.getDirectory(), serverLocation);
-        File folder = IService.getGroup().getType().equals(ServiceType.PROXY) ? bungeePlugins : spigotPlugins;
+        File folder = service.getGroup().getType().equals(ServiceType.PROXY) ? bungeePlugins : spigotPlugins;
         for (File file : Objects.requireNonNull(folder.listFiles())) {
             if (file.isDirectory()) {
                 FileUtils.copyDirectory(file, new File(this.pluginsDirectory, file.getName()));
@@ -123,12 +123,12 @@ public class ServiceStarter {
                     FileUtils.copyFile(module.getFile(), new File(this.pluginsDirectory, module.getFile().getName()));
                     break;
                 case COPY_BUNGEE:
-                    if (IService.getGroup().getType().equals(ServiceType.PROXY)) {
+                    if (service.getGroup().getType().equals(ServiceType.PROXY)) {
                         FileUtils.copyFile(module.getFile(), new File(this.pluginsDirectory, module.getFile().getName()));
                     }
                     break;
                 case COPY_SPIGOT:
-                    if (IService.getGroup().getType().equals(ServiceType.SPIGOT)) {
+                    if (service.getGroup().getType().equals(ServiceType.SPIGOT)) {
                         FileUtils.copyFile(module.getFile(), new File(this.pluginsDirectory, module.getFile().getName()));
                     }
                 case COPY_NOT:
@@ -162,15 +162,15 @@ public class ServiceStarter {
             bungeecord = false;
         }
 
-        IService.setProperties((this.properties == null ? new PropertyObject() : this.properties));
-        if (IService.getGroup().getType().isProxy()) {
+        service.setProperties((this.properties == null ? new PropertyObject() : this.properties));
+        if (service.getGroup().getType().isProxy()) {
             File serverIcon = new File(global, "server-icon.png");
             if (serverIcon.exists()) {
                 FileUtils.copyFile(serverIcon, new File(serverLocation, "server-icon.png"));
             }
 
 
-            ProxyConfig config = IService.getGroup().getProperties().has("proxyConfig") ? IService.getGroup().getProperties().get("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
+            ProxyConfig config = service.getGroup().getProperties().has("proxyConfig") ? service.getGroup().getProperties().get("proxyConfig", ProxyConfig.class) : ProxyConfig.defaultConfig();
 
             FileWriter writer;
             if (!bungeecord) {
@@ -183,7 +183,7 @@ public class ServiceStarter {
                         "config-version = \"1.0\"\n" +
                         "\n" +
                         "# What port should the proxy be bound to? By default, we'll bind to all addresses on port 25577.\n" +
-                        "bind = \"0.0.0.0:" + IService.getPort() + "\"\n" +
+                        "bind = \"0.0.0.0:" + service.getPort() + "\"\n" +
                         "\n" +
                         "# What should be the MOTD? This gets displayed when the player adds your server to\n" +
                         "# their server list. Legacy color codes and JSON are accepted.\n" +
@@ -303,7 +303,7 @@ public class ServiceStarter {
                         "    bind_local_address: true\n" +
                         "    tab_list: GLOBAL_PING\n" +
                         "    query_enabled: false\n" +
-                        "    host: 0.0.0.0:" + IService.getPort() + "\n" +
+                        "    host: 0.0.0.0:" + service.getPort() + "\n" +
                         "    forced_hosts:\n" +
                         "      pvp.md-5.net: pvp\n" +
                         "    max_players: 0\n" +
@@ -349,10 +349,10 @@ public class ServiceStarter {
                 FileInputStream stream = new FileInputStream(serverLocation + "/server.properties");
                 Properties properties = new Properties();
                 properties.load(stream);
-                properties.setProperty("server-port", IService.getPort() + "");
+                properties.setProperty("server-port", service.getPort() + "");
                 properties.setProperty("server-ip", "0");
-                properties.setProperty("max-players", String.valueOf(IService.getGroup().getMaxPlayers()));
-                properties.setProperty("server-name", IService.getName());
+                properties.setProperty("max-players", String.valueOf(service.getGroup().getMaxPlayers()));
+                properties.setProperty("server-name", service.getName());
                 properties.setProperty("online-mode", "false");
                 FileOutputStream fileOutputStream = new FileOutputStream(serverLocation + "/server.properties");
                 properties.save(fileOutputStream, "Edit by Cloud");
@@ -387,7 +387,7 @@ public class ServiceStarter {
         jsonEntity.append("@logType", CloudDriver.getInstance().getCurrentHost().getClass().getName());
         jsonEntity.append("host", CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress());
         jsonEntity.append("port", CloudDriver.getInstance().getCurrentHost().getPort());
-        jsonEntity.append("server", IService.getName());
+        jsonEntity.append("server", service.getName());
         jsonEntity.save();
     }
 
@@ -398,7 +398,7 @@ public class ServiceStarter {
      * @return string file name
      */
     public String getJarFile() {
-        return this.IServiceGroup.getType() == ServiceType.PROXY ? "proxy.jar" : "spigot.jar";
+        return this.serviceGroup.getType() == ServiceType.PROXY ? "proxy.jar" : "spigot.jar";
     }
 
     /**
@@ -419,18 +419,18 @@ public class ServiceStarter {
                         "-Dio.netty.recycler.maxCapacity=0",
                         "-Dio.netty.recycler.maxCapacity.default=0",
                         "-Djline.terminal=jline.UnsupportedTerminal",
-                        "-Xmx" + IService.getGroup().getMemory() + "M",
+                        "-Xmx" + service.getGroup().getMemory() + "M",
                         "-jar",
                         getJarFile(),
-                        IService.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : ""
+                        service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : ""
         };
         Consumer<Process> consumer2 = new Consumer<Process>() {
             @Override
             public void accept(Process process) {
-                ServiceOutput serviceOutput = new ServiceOutput(Thread.currentThread(), process, serverLocation, IService.getName());
+                ServiceOutput serviceOutput = new ServiceOutput(Thread.currentThread(), process, serverLocation, service.getName());
                 CloudDriver.getInstance().getInstance(ServiceOutputService.class).getMap().put(serviceOutput.getServiceName(), serviceOutput);
                 serviceOutput.start();
-                consumer.accept(IService);
+                consumer.accept(service);
             }
         };
 

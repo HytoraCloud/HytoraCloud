@@ -15,11 +15,10 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
 import org.bukkit.entity.Player;
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;

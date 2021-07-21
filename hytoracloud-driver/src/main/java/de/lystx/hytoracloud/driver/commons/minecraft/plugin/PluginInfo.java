@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.minecraft.plugin;
 
-import utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

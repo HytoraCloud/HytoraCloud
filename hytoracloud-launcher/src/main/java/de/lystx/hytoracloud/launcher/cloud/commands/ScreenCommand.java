@@ -35,31 +35,24 @@ public class ScreenCommand implements TabCompletable {
                 } else {
                     sender.sendMessage("ERROR", "§cYou are not in a screen Session!");
                 }
-            } else if (subject.equalsIgnoreCase("list")) {
-                sender.sendMessage("§9CloudScreens§7:");
-                cloudInstance.getInstance(ServiceOutputService.class).getMap().forEach((s, screen) -> sender.sendMessage("INFO", s));
             } else {
                 String serverName = args[0];
-                ServiceOutput screen = cloudInstance.getInstance(ServiceOutputService.class).getMap().get(serverName);
+                ServiceOutput screen = cloudInstance.getInstance(ServiceOutputService.class).getOrRequest(serverName);
                 if (screen != null) {
-                    if (screen.isRunningOnThisCloudInstance()) {
-                        if (screen.getCachedLines().isEmpty()) {
-                            sender.sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
-                            return;
+                    if (screen.getCachedLines().isEmpty()) {
+                        sender.sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
+                        return;
+                    }
+                    screen.setCloudConsole(cloudInstance.getParent().getConsole());
+                    screen.setScreenPrinter(screenPrinter);
+                    CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
+                    sender.sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
+                    this.screenPrinter.create(screen);
+                    try {
+                        for (String cachedLine : screen.getCachedLines()) {
+                            sender.sendMessage(screen.getServiceName(), cachedLine);
                         }
-                        screen.setCloudConsole(cloudInstance.getParent().getConsole());
-                        screen.setScreenPrinter(screenPrinter);
-                        CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
-                        sender.sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
-                        this.screenPrinter.create(screen);
-                        try {
-                            for (String cachedLine : screen.getCachedLines()) {
-                                sender.sendMessage(screen.getServiceName(), cachedLine);
-                            }
-                        } catch (ConcurrentModificationException ignored) {
-                        }
-                    } else {
-                        cloudInstance.getParent().getConsole().getLogger().sendMessage("ERROR", "§cCan not display Screen from other §eCloudInstance§c! Will be added in next update!");
+                    } catch (ConcurrentModificationException ignored) {
                     }
                 } else {
                     sender.sendMessage("ERROR", "§cThe service §e" + serverName + " §cis not online!");
@@ -74,7 +67,6 @@ public class ScreenCommand implements TabCompletable {
     private void sendUsage(CloudCommandSender sender) {
         sender.sendMessage("INFO", "§9screen <server> §7| §bJoins screen session");
         sender.sendMessage("INFO", "§9screen <leave> §7| §bLeaves screen session");
-        sender.sendMessage("INFO", "§9screen <list> §7| §bLists screen sessions");
     }
 
     @Override

@@ -1,8 +1,11 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
-import utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import io.vson.elements.object.Objectable;
@@ -137,7 +140,6 @@ public interface IServiceGroup extends Serializable, Identifiable, Objectable<IS
      * Deletes all the templates of this group
      */
     void deleteAllTemplates();
-
 
     @Override
     default IServiceGroup read(Component component) {

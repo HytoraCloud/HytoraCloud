@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleCopyType;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleInfo;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
-import utillity.HytoraClassLoader;
+import de.lystx.hytoracloud.driver.utils.utillity.HytoraClassLoader;
 import io.vson.elements.object.VsonObject;
 import io.vson.enums.VsonSettings;
 import lombok.Getter;

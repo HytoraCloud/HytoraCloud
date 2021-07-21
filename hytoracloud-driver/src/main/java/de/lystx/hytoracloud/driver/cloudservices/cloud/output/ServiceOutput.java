@@ -1,6 +1,9 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.output;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverScreenCache;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +40,7 @@ public class ServiceOutput extends Thread {
     /**
      * The already cached lines
      */
-    private final List<String> cachedLines;
+    private List<String> cachedLines;
 
     /**
      * The input stream
@@ -65,12 +68,6 @@ public class ServiceOutput extends Thread {
     private CloudConsole cloudConsole;
 
     /**
-     * If the screen is running on this instance
-     * or on another to send lines via packets
-     */
-    private boolean runningOnThisCloudInstance;
-
-    /**
      * Constructs a {@link ServiceOutput}
      *
      * @param thread the thread
@@ -85,16 +82,6 @@ public class ServiceOutput extends Thread {
         this.serviceName = serviceName;
         this.cachedLines = new LinkedList<>();
         this.running = false;
-        this.runningOnThisCloudInstance = true;
-    }
-
-    /**
-     * Declares that this screen is running
-     * on another CloudInstance for example
-     * another Receiver
-     */
-    public void notRunningOnThisInstance() {
-        this.runningOnThisCloudInstance = false;
     }
 
     /**
@@ -112,6 +99,9 @@ public class ServiceOutput extends Thread {
                 String line = reader.nextLine();
                 if (line == null) {
                     continue;
+                }
+                if (CloudDriver.getInstance().getDriverType() == CloudType.RECEIVER) {
+                    CloudDriver.getInstance().sendPacket(new PacketReceiverScreenCache(this.serviceName, line));
                 }
                 this.cachedLines.add(line);
                 if (screenPrinter != null && cloudConsole != null && screenPrinter.getScreen() != null) {

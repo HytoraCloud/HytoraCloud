@@ -2,8 +2,10 @@ package de.lystx.hytoracloud.driver;
 
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.hytoracloud.driver.commons.interfaces.*;
-import utillity.JsonEntity;
-import utillity.ReceiverInfo;
+import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
+import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketCallEvent;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCopyTemplate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCreateTemplate;
@@ -37,8 +39,8 @@ import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.utils.log.Loggers;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.TicksPerSecond;
 import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
-import utillity.CloudRunnable;
-import utillity.CloudMap;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudRunnable;
+import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.MessageConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventService;
 import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
@@ -53,14 +55,14 @@ import net.hytora.networking.connection.HytoraConnection;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
+import org.apache.http.conn.util.InetAddressUtils;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.InetSocketAddress;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -170,6 +172,12 @@ public class CloudDriver {
     private ICloudPlayerManager playerManager;
 
     /**
+     * To manage the receivers (Wrappers)
+     */
+    @Getter
+    private final IReceiverManager receiverManager;
+
+    /**
      * To manage all the databases
      * that are default provided by HytoraCloud
      */
@@ -240,6 +248,7 @@ public class CloudDriver {
 
         this.serviceRegistry = new DefaultServiceRegistry();
         this.eventService = new DefaultEventService();
+        this.receiverManager = new DefaultReceiverManager();
         this.driverType = driverType;
 
 
@@ -500,12 +509,12 @@ public class CloudDriver {
         if (driverType == CloudType.BRIDGE) {
             JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
             return new InetSocketAddress(jsonEntity.getString("host"), jsonEntity.getInteger("port"));
-        } else if (driverType == CloudType.CLOUDSYSTEM) {
+        } else if (driverType == CloudType.RECEIVER) {
+            IReceiver receiver = (IReceiver) implementedData.get("receiver");
+            return new InetSocketAddress(receiver.getHost(), receiver.getPort());
+        } else {
             NetworkConfig networkConfig = getInstance(ConfigService.class).getNetworkConfig();
             return new InetSocketAddress(networkConfig.getHost(), networkConfig.getPort());
-        } else {
-            ReceiverInfo receiverInfo = this.implementedData.getObject("receiverInfo", ReceiverInfo.class);
-            return new InetSocketAddress(receiverInfo.getIpAddress(), receiverInfo.getPort());
         }
     }
 
@@ -832,6 +841,16 @@ public class CloudDriver {
      *         Raw extentions Methods
      * ======================================
      */
+
+    /**
+     * Logs a message to the console
+     *
+     * @param prefix the prefix between brackets
+     * @param message the message behind brackets
+     */
+    public void log(String prefix, String message) {
+        this.parent.getConsole().getLogger().sendMessage(prefix, message);
+    }
 
     public void shutdownDriver() {
 
