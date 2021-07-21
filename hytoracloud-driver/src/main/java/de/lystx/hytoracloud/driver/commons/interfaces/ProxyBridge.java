@@ -1,10 +1,9 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
-import de.lystx.hytoracloud.driver.commons.implementations.PlayerObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
@@ -43,7 +42,7 @@ public interface ProxyBridge {
             cachedPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
             cachedPlayer.update();
 
-            if (CloudDriver.getInstance().getFallbacks(cachedPlayer).isEmpty()) {
+            if (CloudDriver.getInstance().getFallbackManager().getFallback(cachedPlayer) == null) {
                 event.setCancelled(true);
                 event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getNoLobbyFound().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 return event;
@@ -162,7 +161,7 @@ public interface ProxyBridge {
      */
     default boolean onServerKick(ICloudPlayer cloudPlayer, IService service) {
         try {
-            IService fallback = CloudDriver.getInstance().getFallback(cloudPlayer);
+            IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(cloudPlayer);
             cloudPlayer.connect(fallback);
             return true;
         } catch (NullPointerException e) {

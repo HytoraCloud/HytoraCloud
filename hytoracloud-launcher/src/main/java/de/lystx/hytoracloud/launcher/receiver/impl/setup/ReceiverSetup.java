@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.launcher.receiver.impl.setup;
 
-import de.lystx.hytoracloud.driver.utils.setup.AbstractSetup;
-import de.lystx.hytoracloud.driver.utils.setup.Setup;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.SetupExecutor;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.Setup;
 import lombok.Getter;
 
 @Getter
-public class ReceiverSetup extends AbstractSetup<ReceiverSetup> {
+public class ReceiverSetup extends SetupExecutor<ReceiverSetup> {
 
     public ReceiverSetup() {
         this.cancellable = false;

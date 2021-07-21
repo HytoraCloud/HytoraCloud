@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 
 public class ModulesCommand {
 
@@ -14,13 +14,13 @@ public class ModulesCommand {
     public void execute(CloudCommandSender sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
-                if (CloudSystem.getInstance().getInstance(ModuleService.class).getModules().isEmpty()) {
+                if (CloudSystem.getInstance().getInstance(ModuleService.class).getCloudModules().isEmpty()) {
                     sender.sendMessage("ERROR", "§cThere are no modules at the moment!");
                     return;
                 }
                 sender.sendMessage("INFO", "§bModules§7:");
-                for (Module module : CloudSystem.getInstance().getInstance(ModuleService.class).getModules()) {
-                    sender.sendMessage("INFO", "§9" + module.getInfo().getName() + " §7| §bVersion " + module.getInfo().getVersion() + " §7| §bAuthor " + module.getInfo().getAuthor());
+                for (CloudModule cloudModule : CloudSystem.getInstance().getInstance(ModuleService.class).getCloudModules()) {
+                    sender.sendMessage("INFO", "§9" + cloudModule.getBase().getName() + " §7| §bVersion " + cloudModule.getBase().getVersion() + " §7| §bAuthor " + cloudModule.getBase().getAuthor());
                 }
             } else if (args[0].equalsIgnoreCase("rl")) {
                 CloudSystem.getInstance().getInstance(ModuleService.class).shutdown();
@@ -32,14 +32,14 @@ public class ModulesCommand {
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("rl")) {
                 String module = args[1];
-                Module finalModule = CloudSystem.getInstance().getInstance(ModuleService.class).getModule(module);
-                if (finalModule == null) {
+                CloudModule finalCloudModule = CloudSystem.getInstance().getInstance(ModuleService.class).getModule(module);
+                if (finalCloudModule == null) {
                     sender.sendMessage("ERROR", "§cThe module §e" + module + " §cseems not to exist!");
                     return;
                 }
-                finalModule.onDisable();
-                CloudSystem.getInstance().getInstance(Scheduler.class).scheduleDelayedTask(finalModule::onEnable, 5L);
-                sender.sendMessage("INFO", "§aThe module §2" + finalModule.getInfo().getName() + " §awas §2reloaded§a!");
+                finalCloudModule.onDisable();
+                CloudSystem.getInstance().getInstance(Scheduler.class).scheduleDelayedTask(finalCloudModule::onEnable, 5L);
+                sender.sendMessage("INFO", "§aThe module §2" + finalCloudModule.getBase().getName() + " §awas §2reloaded§a!");
             } else {
                 this.correctSyntax(sender);
             }

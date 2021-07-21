@@ -37,6 +37,21 @@ public interface HytoraConnection extends ComponentSender, Closeable {
     void registerChannelHandler(String channel, Consumer<RepliableComponent> consumer);
 
     /**
+     * Unregisters all channel handlers
+     *
+     * @param channel the channel
+     */
+    void unregisterChannelHandlers(String channel);
+
+    /**
+     * Unregisters a channel handler
+     *
+     * @param channel the channel
+     * @param consumer the consumer
+     */
+    void unregisterChannelHandler(String channel, Consumer<RepliableComponent> consumer);
+
+    /**
      * Sends a {@link Component} to the server
      *
      * In this method the reply is also included and will be accepted in the given consumer

@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
+import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +10,10 @@ import net.hytora.networking.elements.packet.HytoraPacket;
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class PacketInCopyTemplate extends HytoraPacket implements Serializable {
+public class PacketInCopyTemplate extends HytoraPacket {
 
     private IService IService;
-    private String template;
+    private ITemplate template;
     private String specificDirectory;
 
 

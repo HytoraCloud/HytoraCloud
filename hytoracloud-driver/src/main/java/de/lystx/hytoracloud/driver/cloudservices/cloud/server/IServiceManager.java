@@ -1,18 +1,18 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server;
 
 import com.google.gson.JsonObject;
-import de.lystx.hytoracloud.driver.cloudservices.other.ObjectPool;
-import de.lystx.hytoracloud.driver.commons.interfaces.Acceptable;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.interfaces.IPool;
+import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 
 import java.util.List;
 import java.util.Map;
 
-public interface IServiceManager extends ObjectPool<IService> {
+public interface IServiceManager extends IPool<IService> {
 
     /**
      * Updates a {@link IServiceGroup}
@@ -122,7 +122,7 @@ public interface IServiceManager extends ObjectPool<IService> {
      * @param request the request
      * @return list of services
      */
-    List<IService> getCachedObjects(Acceptable<IService> request);
+    List<IService> getCachedObjects(Requestable<IService> request);
 
     /**
      * Gets a list of all online {@link IService}s that match a given {@link ServiceState}

@@ -487,16 +487,20 @@ public class HytoraClient implements HytoraConnection {
 
     }
 
-    /**
-     * Registers a channel handler to receive components
-     *
-     * @param channel the channel to listen for
-     * @param consumer the consumer
-     */
+    @Override
     public void registerChannelHandler(String channel, Consumer<RepliableComponent> consumer) {
         this.catcher.registerChannelHandler(channel, consumer);
     }
 
+    @Override
+    public void unregisterChannelHandlers(String channel) {
+        this.catcher.unregisterChannelHandler(channel);
+    }
+
+    @Override
+    public void unregisterChannelHandler(String channel, Consumer<RepliableComponent> consumer) {
+        this.catcher.unregisterChannelHandler(channel, consumer);
+    }
 
     /**
      * Closes the connection

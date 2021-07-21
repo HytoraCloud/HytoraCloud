@@ -1,18 +1,18 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IFileModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModule;
+import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
-import de.lystx.hytoracloud.driver.commons.service.Template;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleInfo;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class ServiceStarter {
 
     private final IService service;
     private final IServiceGroup serviceGroup;
-    private final Template template;
+    private final ITemplate template;
     private final PropertyObject properties;
 
     private final File templateDirectory;
@@ -48,7 +48,7 @@ public class ServiceStarter {
 
         this.service = service;
         this.serviceGroup = service.getGroup();
-        this.template = this.serviceGroup.getTemplate();
+        this.template = service.getGroup().getCurrentTemplate();
         this.properties = properties;
 
         this.templateDirectory = instance.getTemplatesDirectory();
@@ -93,13 +93,15 @@ public class ServiceStarter {
      * Copies all files from the template
      * to the temp directory
      */
-    public void copyFiles() throws Exception{
-
-        if (!template.getDirectory().exists()) {
-            template.getDirectory().mkdirs();
+    public void copyFiles() throws Exception {
+        File directory = template.getDirectory();
+        if (directory.exists()) {
+            FileUtils.copyDirectory(directory, serverLocation);
+        } else {
+            directory.mkdirs();
         }
 
-        FileUtils.copyDirectory(template.getDirectory(), serverLocation);
+        //Copying proxy or spigot plugins
         File folder = service.getGroup().getType().equals(ServiceType.PROXY) ? bungeePlugins : spigotPlugins;
         for (File file : Objects.requireNonNull(folder.listFiles())) {
             if (file.isDirectory()) {
@@ -109,6 +111,7 @@ public class ServiceStarter {
             }
         }
 
+        //Copying global plugins
         folder = CloudDriver.getInstance().getInstance(FileService.class).getGlobalPluginsDirectory();
         for (File file : Objects.requireNonNull(folder.listFiles())) {
             if (file.isDirectory()) {
@@ -117,19 +120,25 @@ public class ServiceStarter {
                 FileUtils.copyFile(file, new File(this.pluginsDirectory, file.getName()));
             }
         }
-        for (ModuleInfo module : CloudDriver.getInstance().getModules()) {
+
+        //Copying modules
+        for (IModule module : CloudDriver.getInstance().getModuleManager().getModules()) {
+            if (!(module instanceof IFileModule)) {
+                return;
+            }
+            IFileModule fileModule = (IFileModule)module;
             switch (module.getCopyType()) {
                 case COPY_ALL:
-                    FileUtils.copyFile(module.getFile(), new File(this.pluginsDirectory, module.getFile().getName()));
+                    FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
                     break;
                 case COPY_BUNGEE:
                     if (service.getGroup().getType().equals(ServiceType.PROXY)) {
-                        FileUtils.copyFile(module.getFile(), new File(this.pluginsDirectory, module.getFile().getName()));
+                        FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
                     }
                     break;
                 case COPY_SPIGOT:
                     if (service.getGroup().getType().equals(ServiceType.SPIGOT)) {
-                        FileUtils.copyFile(module.getFile(), new File(this.pluginsDirectory, module.getFile().getName()));
+                        FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
                     }
                 case COPY_NOT:
                     break;
@@ -383,12 +392,12 @@ public class ServiceStarter {
             hytoraCloud.createNewFile();
         }
 
-        JsonEntity jsonEntity = new JsonEntity(hytoraCloud);
-        jsonEntity.append("@logType", CloudDriver.getInstance().getCurrentHost().getClass().getName());
-        jsonEntity.append("host", CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress());
-        jsonEntity.append("port", CloudDriver.getInstance().getCurrentHost().getPort());
-        jsonEntity.append("server", service.getName());
-        jsonEntity.save();
+        JsonDocument jsonDocument = new JsonDocument(hytoraCloud);
+        jsonDocument.append("@logType", CloudDriver.getInstance().getCloudAddress().getClass().getName());
+        jsonDocument.append("host", CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress());
+        jsonDocument.append("port", CloudDriver.getInstance().getCloudAddress().getPort());
+        jsonDocument.append("server", service.getName());
+        jsonDocument.save();
     }
 
     /**
@@ -424,27 +433,20 @@ public class ServiceStarter {
                         getJarFile(),
                         service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : ""
         };
-        Consumer<Process> consumer2 = new Consumer<Process>() {
-            @Override
-            public void accept(Process process) {
-                ServiceOutput serviceOutput = new ServiceOutput(Thread.currentThread(), process, serverLocation, service.getName());
-                CloudDriver.getInstance().getInstance(ServiceOutputService.class).getMap().put(serviceOutput.getServiceName(), serviceOutput);
-                serviceOutput.start();
-                consumer.accept(service);
-            }
+        Consumer<Process> consumer2 = process -> {
+            ServiceOutput serviceOutput = new ServiceOutput(Thread.currentThread(), process, serverLocation, service.getName());
+            CloudDriver.getInstance().getInstance(ServiceOutputService.class).getMap().put(serviceOutput.getServiceName(), serviceOutput);
+            serviceOutput.start();
+            consumer.accept(service);
         };
-
-        Consumer<Throwable> consumer1 = new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) {
-                if (throwable == null) {
-                    return;
-                }
-                try {
-                    throw throwable;
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
+        Consumer<Throwable> consumer1 = throwable -> {
+            if (throwable == null) {
+                return;
+            }
+            try {
+                throw throwable;
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         };
 

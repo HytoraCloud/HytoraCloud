@@ -1,19 +1,18 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.other.ObjectPool;
+import de.lystx.hytoracloud.driver.commons.interfaces.IPool;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupReceive;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupRemove;
 import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
-import de.lystx.hytoracloud.driver.utils.uuid.UUIDService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -29,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Getter @Setter
-public class PermissionPool implements Serializable, ObjectPool<OfflinePlayer> {
+public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
 
     private static final long serialVersionUID = -501568977137292070L;
 
@@ -281,7 +280,7 @@ public class PermissionPool implements Serializable, ObjectPool<OfflinePlayer> {
             uniqueId = offlinePlayer.getUniqueId();
         }
 
-        return uniqueId == null ? UUIDService.getInstance().getUUID(name) : uniqueId;
+        return uniqueId == null ? CloudDriver.getInstance().getUuidPool().getUniqueId(name) : uniqueId;
     }
 
     /**
@@ -309,7 +308,7 @@ public class PermissionPool implements Serializable, ObjectPool<OfflinePlayer> {
         if (offlinePlayer != null) {
             name = offlinePlayer.getName();
         }
-        return name == null ? UUIDService.getInstance().getName(uuid) : name;
+        return name == null ? CloudDriver.getInstance().getUuidPool().getName(uuid) : name;
     }
 
     /*
@@ -574,7 +573,7 @@ public class PermissionPool implements Serializable, ObjectPool<OfflinePlayer> {
      * @param consumer the consumer to work with
      */
     public void modifyPlayer(UUID uniqueId, Consumer<IPermissionUser> consumer) {
-        CloudDriver.getInstance().execute(() -> {
+        CloudDriver.getInstance().getExecutorService().execute(() -> {
             IPermissionUser permissionPlayer = getPermissionPlayer(uniqueId);
             consumer.accept(permissionPlayer);
         });
@@ -587,7 +586,7 @@ public class PermissionPool implements Serializable, ObjectPool<OfflinePlayer> {
      * @param consumer the consumer to work with
      */
     public void modifyPlayer(String name, Consumer<IPermissionUser> consumer) {
-        CloudDriver.getInstance().execute(() -> {
+        CloudDriver.getInstance().getExecutorService().execute(() -> {
             IPermissionUser permissionPlayer = getPermissionPlayer(name);
             consumer.accept(permissionPlayer);
         });

@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.services;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfo;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,11 @@ public class CloudHandlerMemoryUsage implements PacketHandler {
             Component component = packet.toReply(CloudDriver.getInstance().getConnection());
 
             packet.reply(component.reply().getStatus(), component.reply().getMessage());
+        } else if (packet instanceof PacketServiceInfo) {
+
+            Component component = packet.toReply(CloudDriver.getInstance().getConnection());
+
+            packet.reply(component);
         }
     }
 }

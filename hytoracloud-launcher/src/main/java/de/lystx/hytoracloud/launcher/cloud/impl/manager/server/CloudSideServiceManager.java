@@ -1,31 +1,27 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
-import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.commons.events.other.*;
-import de.lystx.hytoracloud.driver.commons.interfaces.Acceptable;
+import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.implementations.ServiceObject;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterService;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverNotifyStart;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverNotifyStop;
-import de.lystx.hytoracloud.driver.utils.utillity.*;
+import de.lystx.hytoracloud.driver.utils.Action;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.ServiceStarter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.ServiceStopper;
 import de.lystx.hytoracloud.driver.utils.Utils;
@@ -39,8 +35,8 @@ import net.hytora.networking.elements.packet.response.Response;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Getter @Setter
@@ -201,7 +197,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
             if (!this.isRightReceiver(group)) {
                 continue;
             }
-            this.getDriver().getInstance(TemplateService.class).createTemplate(group);
+            CloudDriver.getInstance().getTemplateManager().createTemplate(group);
             for (int i = 0; i < group.getMinServer(); i++) {
                 int id = this.idService.getFreeID(group.getName());
                 int port = group.getType().equals(ServiceType.SPIGOT) ? this.portService.getFreePort() : this.portService.getFreeProxyPort();
@@ -468,10 +464,10 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     }
 
     @Override
-    public List<IService> getCachedObjects(Acceptable<IService> request) {
+    public List<IService> getCachedObjects(Requestable<IService> request) {
         List<IService> list = new LinkedList<>();
         for (IService service : this.getCachedObjects()) {
-            if (request.isAccepted(service)) {
+            if (request.isRequested(service)) {
                 list.add(service);
             }
         }
@@ -533,11 +529,11 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (!this.isRightReceiver(IServiceGroup)) {
             return;
         }
-        Value<Integer> count = new Value<>(this.getCachedServices(IServiceGroup).size());
+        AtomicInteger count = new AtomicInteger(this.getCachedServices(IServiceGroup).size());
         try {
             for (IService IService : new LinkedList<>(this.getCachedServices(IServiceGroup))) {
                 this.stopService(IService, false);
-                count.setValue(count.get() - 1);
+                count.set(count.get() - 1);
 
                 if (count.get() == 0 && newOnes) {
                     this.needServices(IServiceGroup);

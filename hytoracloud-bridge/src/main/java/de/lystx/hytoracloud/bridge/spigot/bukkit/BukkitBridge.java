@@ -14,11 +14,12 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerQuitListene
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
-import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
+import de.lystx.hytoracloud.driver.utils.Reflections;
 import org.bukkit.entity.Player;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -130,7 +131,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     @Override
     public void flushCommand(String command) {
         if (command.equalsIgnoreCase("stop") || command.equalsIgnoreCase("bukkit:stop")) {
-            CloudDriver.getInstance().execute(this::shutdown);
+            CloudDriver.getInstance().getExecutorService().execute(this::shutdown);
         } else {
             Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
         }
@@ -210,7 +211,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
 
         //Already no one online anymore
         if (Bukkit.getOnlinePlayers().size() <= 0) {
-            CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> CloudDriver.getInstance().shutdownDriver(), 5L);
+            CloudDriver.getInstance().getScheduler().scheduleDelayedTask(this::shutdownDriver, 5L);
             return;
         }
 
@@ -221,10 +222,22 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
             count--;
 
             if (count <= 0) {
-                CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
-                    CloudDriver.getInstance().shutdownDriver();
-                }, 6L);
+                CloudDriver.getInstance().getScheduler().scheduleDelayedTask(this::shutdownDriver, 6L);
             }
+        }
+
+    }
+
+    /**
+     * Shuts down the driver connection
+     */
+    public void shutdownDriver() {
+        CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getCurrentService().getName()));
+
+        try {
+            CloudDriver.getInstance().getConnection().close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketOpenInventory;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUpdate;
 
-import de.lystx.hytoracloud.driver.commons.implementations.InventoryObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.InventoryObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import net.hytora.networking.elements.packet.HytoraPacket;

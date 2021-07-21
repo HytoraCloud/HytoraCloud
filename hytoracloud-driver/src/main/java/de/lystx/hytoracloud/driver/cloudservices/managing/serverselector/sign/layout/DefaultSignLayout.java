@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout;
 
 import com.google.gson.JsonArray;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 
 /**
  * This is the {@link DefaultSignLayout}
  * if no LayOut was defined or found in the config
  * this LayOut will be saved and used afterwards
  */
-public class DefaultSignLayout extends JsonEntity {
+public class DefaultSignLayout extends JsonDocument {
 
     /**
      * Returns new Default SignLayOut
@@ -17,10 +17,10 @@ public class DefaultSignLayout extends JsonEntity {
 
 
         JsonArray loadingLayouts = new JsonArray();
-        JsonEntity loading1 = new JsonEntity();
-        JsonEntity loading2 = new JsonEntity();
-        JsonEntity loading3 = new JsonEntity();
-        JsonEntity loading4 = new JsonEntity();
+        JsonDocument loading1 = new JsonDocument();
+        JsonDocument loading2 = new JsonDocument();
+        JsonDocument loading3 = new JsonDocument();
+        JsonDocument loading4 = new JsonDocument();
 
         loading1.append("0", "&a");
         loading1.append("1", "&8│ &bLoading... &8│");
@@ -48,20 +48,20 @@ public class DefaultSignLayout extends JsonEntity {
         loadingLayouts.add(loading4.getJsonObject());
         this.append("repeatTick", 20);
         this.append("loadingLayout", loadingLayouts);
-        this.append("otherLayouts", new JsonEntity()
-                .append("ONLINE", new JsonEntity()
+        this.append("otherLayouts", new JsonDocument()
+                .append("ONLINE", new JsonDocument()
                         .append("0", "&8│ &b%server% &8│")
                         .append("1", "&aLobby")
                         .append("2", "%motd%")
                         .append("3", "&8× &7%online%&8/&7%max% &8×")
                 )
-                .append("FULL", new JsonEntity()
+                .append("FULL", new JsonDocument()
                         .append("0", "&8│ &b%server% &8│")
                         .append("1", "&6VIP")
                         .append("2", "%motd%")
                         .append("3", "&8× &7%online%&8/&7%max% &8×")
                 )
-                .append("MAINTENANCE", new JsonEntity()
+                .append("MAINTENANCE", new JsonDocument()
                         .append("0", "")
                         .append("1", "&8│ &b%group% &8│")
                         .append("2", "&8× &cMaintenance &8×")

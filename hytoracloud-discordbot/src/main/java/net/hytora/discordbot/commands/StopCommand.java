@@ -1,6 +1,6 @@
 package net.hytora.discordbot.commands;
 
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

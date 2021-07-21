@@ -11,7 +11,5 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScheduledForVersion {
 
-    //TODO: CHECK THIS ONES
-
     String value();
 }

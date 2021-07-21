@@ -17,17 +17,11 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @Getter
-@ICloudServiceInfo(
-        name = "EventService",
-        type = CloudServiceType.MANAGING,
-        description = {
-                "This class is used to call Events all over a process",
-                "You can cancel events and register Events all in this Service"
-        },
-        version = 1.3
-)
-public class DefaultEventService implements ICloudService, IEventService {
+public class DefaultEventService implements IEventService {
 
+    /**
+     * All cached registered classes
+     */
     private final Map<Object, List<EventMethod<EventMarker>>> registeredClasses;
 
     public DefaultEventService() {
@@ -35,11 +29,7 @@ public class DefaultEventService implements ICloudService, IEventService {
         this.registerEvent(new DefaultListener());
     }
 
-    /**
-     * Registers an EventClass
-     *
-     * @param listener the listener to be registered
-     */
+    @Override
     public void registerEvent(EventListener listener) {
         List<EventMethod<EventMarker>> eventMethods = new ArrayList<>();
 
@@ -58,21 +48,12 @@ public class DefaultEventService implements ICloudService, IEventService {
         registeredClasses.put(listener, eventMethods);
     }
 
-    /**
-     * Unregisters a class
-     *
-     * @param listener the listener
-     */
     @Override
     public void unregister(EventListener listener) {
         registeredClasses.remove(listener);
     }
 
-    /**
-     * Calls an event
-     * @param cloudEvent
-     * @return if cancelled
-     */
+    @Override
     public boolean callEvent(CloudEvent cloudEvent) {
         try {
             registeredClasses.forEach((object, methodList) -> {
@@ -92,13 +73,4 @@ public class DefaultEventService implements ICloudService, IEventService {
         }
     }
 
-    @Override
-    public void reload() {
-
-    }
-
-    @Override
-    public void save() {
-
-    }
 }

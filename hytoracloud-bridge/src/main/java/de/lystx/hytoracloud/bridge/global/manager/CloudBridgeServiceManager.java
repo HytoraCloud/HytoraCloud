@@ -1,15 +1,15 @@
 package de.lystx.hytoracloud.bridge.global.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.interfaces.Acceptable;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartService;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import lombok.Getter;
@@ -112,10 +112,10 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
     @Override
-    public List<IService> getCachedObjects(Acceptable<IService> request) {
+    public List<IService> getCachedObjects(Requestable<IService> request) {
         List<IService> list = new LinkedList<>();
         for (IService service : this.getCachedObjects()) {
-            if (request.isAccepted(service)) {
+            if (request.isRequested(service)) {
                 list.add(service);
             }
         };

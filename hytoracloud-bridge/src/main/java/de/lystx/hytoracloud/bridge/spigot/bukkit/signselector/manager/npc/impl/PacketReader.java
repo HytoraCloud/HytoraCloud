@@ -97,7 +97,7 @@ public class PacketReader {
                     if (npc == null) {
                         return;
                     }
-                    if (CloudDriver.getInstance().getImplementedData().getList("uuidList", UUID.class).contains(player.getUniqueId())) {
+                    if (CloudDriver.getInstance().getImplementedData().getList("uuidList").contains(player.getUniqueId())) {
                         NPC getSafe = ServerSelector.getInstance().getNpcManager().getNPC(npc.getLocation());
                         if (getSafe != null) {
 
@@ -105,7 +105,7 @@ public class PacketReader {
 
                             CloudDriver.getInstance().sendPacket(new PacketInNPCDelete(meta));
 
-                            List<UUID> uuidList = CloudDriver.getInstance().getImplementedData().getList("uuidList", UUID.class);
+                            List<UUID> uuidList = CloudDriver.getInstance().getImplementedData().getList("uuidList");
                             uuidList.remove(player.getUniqueId());
                             CloudDriver.getInstance().getImplementedData().put("uuidList", uuidList);
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Removed NPC for group §b" + meta.getGroup() + "§8!");

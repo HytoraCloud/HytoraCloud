@@ -1,8 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
-import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

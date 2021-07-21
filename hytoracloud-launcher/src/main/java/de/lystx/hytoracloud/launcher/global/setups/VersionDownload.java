@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.launcher.global.setups;
 
-import de.lystx.hytoracloud.driver.utils.setup.AbstractSetup;
-import de.lystx.hytoracloud.driver.utils.setup.GoTo;
-import de.lystx.hytoracloud.driver.utils.setup.Setup;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.SetupExecutor;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.QuestionSkip;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.Setup;
 import lombok.Getter;
 
 @Getter
-public class VersionDownload extends AbstractSetup<VersionDownload> {
+public class VersionDownload extends SetupExecutor<VersionDownload> {
 
 
     public VersionDownload() {
@@ -20,7 +20,7 @@ public class VersionDownload extends AbstractSetup<VersionDownload> {
                     "PROXY"
             },
             question = "What type are you trying to download? §h(§eSPIGOT §7or §bPROXY§h)",
-            goTo = @GoTo(
+            skip = @QuestionSkip(
                     id = 2,
                     elseID = 3,
                     value = "SPIGOT"

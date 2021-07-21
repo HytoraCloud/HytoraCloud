@@ -124,18 +124,16 @@ public class HytoraConnectionBridge implements ComponentSender {
 
                                //Checking for forwarding or receiver
                                 if (component.getReceiver().equalsIgnoreCase("SERVER")) { // to the server
-
                                     if (component.isReply()) {
                                         this.server.getCatcher().handleReply(component);
                                     } else {
                                         this.server.getCatcher().handleComponent(component, this);
                                     }
-
                                 } else {
                                     if (component.isReply()) {
                                         this.server.getCatcher().handleReply(component);
                                     } else {
-                                        if ((!component.getReceiver().equalsIgnoreCase("ALL"))) {
+                                        if (!component.getReceiver().equalsIgnoreCase("ALL")) {
                                             this.server.sendComponent(component);
                                         }
                                     }

@@ -257,6 +257,16 @@ public class HytoraServer implements HytoraConnection {
         this.catcher.registerChannelHandler(channel, consumer);
     }
 
+    @Override
+    public void unregisterChannelHandlers(String channel) {
+        this.catcher.unregisterChannelHandler(channel);
+    }
+
+    @Override
+    public void unregisterChannelHandler(String channel, Consumer<RepliableComponent> consumer) {
+        this.catcher.unregisterChannelHandler(channel, consumer);
+    }
+
     /**
      * Registers a handler for whenever a client connects
      *

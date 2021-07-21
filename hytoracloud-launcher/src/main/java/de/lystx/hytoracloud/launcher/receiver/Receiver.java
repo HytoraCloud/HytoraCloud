@@ -1,19 +1,16 @@
 package de.lystx.hytoracloud.launcher.receiver;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
-import de.lystx.hytoracloud.driver.commons.implementations.ReceiverObject;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.commons.wrapped.ReceiverObject;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverLogin;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverShutdown;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
@@ -26,7 +23,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.hytora.networking.connection.client.ClientListener;
 import net.hytora.networking.connection.client.HytoraClient;
-import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.component.ComponentSender;
 import net.hytora.networking.elements.other.HytoraLogin;
 import net.hytora.networking.elements.packet.HytoraPacket;
@@ -56,7 +52,6 @@ public class Receiver extends CloudProcess {
         instance = this;
 
         CloudDriver.getInstance().getServiceRegistry().registerService(new ConfigService());
-        CloudDriver.getInstance().getServiceRegistry().registerService(new TemplateService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new ServiceOutputService());
 
         this.bootstrap();
@@ -74,7 +69,7 @@ public class Receiver extends CloudProcess {
         ConfigService configService = getInstance(ConfigService.class);
         if (configService.getReceiver().getName().equalsIgnoreCase("DefaultReceiver")) {
             //Setup not done yet
-            new ReceiverSetup().start(this.console, receiverSetup -> {
+            new ReceiverSetup().start(receiverSetup -> {
                 String name = receiverSetup.getName();
                 Integer port = receiverSetup.getPort();
                 String host = receiverSetup.getHost();

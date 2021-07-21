@@ -1,12 +1,11 @@
 package de.lystx.hytoracloud.driver.cloudservices.global.config;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +22,7 @@ public class ConfigService implements ICloudService {
 
 
     private NetworkConfig networkConfig;
-    private JsonEntity jsonEntity;
+    private JsonDocument jsonDocument;
     int tries = 0;
 
     public void setNetworkConfig(NetworkConfig networkConfig) {
@@ -40,10 +39,10 @@ public class ConfigService implements ICloudService {
      */
     public void reload() {
         tries += 1;
-        this.jsonEntity = new JsonEntity(getDriver().getInstance(FileService.class).getConfigFile());
+        this.jsonDocument = new JsonDocument(getDriver().getInstance(FileService.class).getConfigFile());
         if (!getDriver().getInstance(FileService.class).getConfigFile().exists()) {
-            this.jsonEntity.append(NetworkConfig.defaultConfig());
-            this.jsonEntity.save();
+            this.jsonDocument.append(NetworkConfig.defaultConfig());
+            this.jsonDocument.save();
             if (tries <= 10) {
                 this.reload();
             } else {
@@ -51,13 +50,13 @@ public class ConfigService implements ICloudService {
             }
             return;
         }
-        this.networkConfig = jsonEntity.getAs(NetworkConfig.class);
+        this.networkConfig = jsonDocument.getAs(NetworkConfig.class);
         CloudDriver.getInstance().setNetworkConfig(this.networkConfig);
     }
 
     public void shutdown() {
-        this.jsonEntity.append(this.networkConfig);
-        this.jsonEntity.save();
+        this.jsonDocument.append(this.networkConfig);
+        this.jsonDocument.save();
 
         CloudDriver.getInstance().setNetworkConfig(this.networkConfig);
     }

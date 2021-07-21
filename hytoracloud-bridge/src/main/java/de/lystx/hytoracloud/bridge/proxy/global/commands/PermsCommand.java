@@ -8,10 +8,10 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
-import de.lystx.hytoracloud.driver.utils.utillity.Value;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PermsCommand {
 
@@ -74,9 +74,9 @@ public class PermsCommand {
 						player.sendMessage("§8» §bId §8● §7" + group.getId() +" §8«");
 						player.sendMessage("§8» §bPermissions §8● §7" + group.getPermissions() +" §8«");
 						StringBuilder message = new StringBuilder("§7");
-						Value<Integer> integerValue = new Value<>();
+						AtomicInteger integerValue = new AtomicInteger();
 						group.getInheritances().forEach(inheritance -> {
-							integerValue.increase();
+							integerValue.incrementAndGet();
 							if (group.getInheritances().size() > integerValue.get()) {
 								message.append(inheritance).append("§8, §7");
 							} else {

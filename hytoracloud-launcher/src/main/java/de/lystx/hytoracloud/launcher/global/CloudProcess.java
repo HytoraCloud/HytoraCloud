@@ -7,22 +7,20 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.DriverParent;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.driver.utils.utillity.AuthManager;
+import de.lystx.hytoracloud.driver.cloudservices.global.AuthManager;
 import de.lystx.hytoracloud.launcher.global.setups.InstanceChooser;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventService;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
-import de.lystx.hytoracloud.driver.utils.log.LogService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.webserver.WebServer;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.log.LogService;
+import de.lystx.hytoracloud.launcher.global.webserver.WebServer;
 import de.lystx.hytoracloud.launcher.global.commands.*;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 import lombok.Getter;
 
 import java.io.File;
-import java.io.IOException;
 
 @Getter
 public class CloudProcess extends CloudDriver implements DriverParent {
@@ -51,10 +49,8 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "parent", this);
 
         //Services for every instance
-        CloudDriver.getInstance().getServiceRegistry().registerService(new CommandService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new LoggerService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new LogService());
-        CloudDriver.getInstance().getServiceRegistry().registerService(new DefaultEventService());
 
         //The console
         this.console = new CloudConsole(this.getInstance(LoggerService.class), this.getInstance(CommandService.class), System.getProperty("user.name"));
@@ -63,7 +59,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         //CHoosing instance
         if (cloudType == CloudType.NONE) {
             this.console.getCommandManager().setActive(false);
-            new InstanceChooser().start(this.console, instanceChooser -> {
+            new InstanceChooser().start(instanceChooser -> {
                 if (instanceChooser.isCancelled()) {
                     console.getLogger().sendMessage("ERROR", "§cWish you a good day anyways :(");
                     System.exit(1);
@@ -100,6 +96,10 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         this.getInstance(CommandService.class).registerCommand(new HelpCommand(this));
         this.getInstance(CommandService.class).registerCommand(new ReloadCommand(this));
         this.getInstance(CommandService.class).registerCommand(new ClearCommand(this));
+
+    }
+
+    public void bootstrap() {
 
     }
 

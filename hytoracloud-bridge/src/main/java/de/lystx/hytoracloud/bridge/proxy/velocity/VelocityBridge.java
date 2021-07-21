@@ -28,7 +28,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabLis
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -64,7 +64,7 @@ public class VelocityBridge implements BridgeInstance {
 
         CloudBridge.load(this);
 
-        CloudDriver.getInstance().execute(() -> {
+        CloudDriver.getInstance().getExecutorService().execute(() -> {
             instance = this;
 
 
@@ -142,7 +142,7 @@ public class VelocityBridge implements BridgeInstance {
                     }
 
                     ICloudPlayer iCloudPlayer = ICloudPlayer.dummy(player.getUsername(), player.getUniqueId());
-                    IService fallback = CloudDriver.getInstance().getFallback(iCloudPlayer);
+                    IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(iCloudPlayer);
 
                     server.getServer(fallback.getName()).ifPresent(registeredServer -> player.createConnectionRequest(registeredServer).connect());
 

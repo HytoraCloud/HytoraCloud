@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;

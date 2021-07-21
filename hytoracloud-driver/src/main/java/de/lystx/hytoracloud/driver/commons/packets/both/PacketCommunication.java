@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 /**
  * This packet will be sent from
- * Server to CLient and from
+ * Server to Client and from
  * Client to Server
  * > It communicates through the whole
  * Network...
@@ -28,7 +28,8 @@ public abstract class PacketCommunication extends HytoraPacket {
 
     /**
      * Declares that the packet will be sent back
-     * @param sendBack
+     *
+     * @param sendBack the value
      * @return current Packet
      */
     public PacketCommunication setSendBack(boolean sendBack) {

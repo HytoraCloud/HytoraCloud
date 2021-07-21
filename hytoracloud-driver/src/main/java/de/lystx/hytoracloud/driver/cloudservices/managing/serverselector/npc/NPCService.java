@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudItem;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
@@ -34,8 +34,8 @@ import java.util.List;
 )
 public class NPCService implements ICloudService {
 
-    private JsonEntity jsonEntity;
-    private JsonEntity config;
+    private JsonDocument jsonDocument;
+    private JsonDocument config;
 
     private final File npcDirectory;
     private final File npcFile;
@@ -57,8 +57,8 @@ public class NPCService implements ICloudService {
      */
     public void reload() {
         try {
-            this.jsonEntity = new JsonEntity(npcFile);
-            this.config = new JsonEntity(npcLayout);
+            this.jsonDocument = new JsonDocument(npcFile);
+            this.config = new JsonDocument(npcLayout);
 
             if (this.npcFile.exists()) {
                 this.npcFile.createNewFile();
@@ -101,7 +101,7 @@ public class NPCService implements ICloudService {
 
 
     public List<NPCMeta> toMetas() {
-        return this.jsonEntity.keys(NPCMeta.class);
+        return this.jsonDocument.keys(NPCMeta.class);
     }
 
     /**
@@ -120,7 +120,7 @@ public class NPCService implements ICloudService {
      * @param meta the meta
      */
     public void registerNPC(NPCMeta meta) {
-        this.jsonEntity.append(meta.getUniqueId().toString(), meta);
+        this.jsonDocument.append(meta.getUniqueId().toString(), meta);
     }
 
     /**
@@ -129,7 +129,7 @@ public class NPCService implements ICloudService {
      * @param key the uuid
      */
     public void unregisterNPC(String key) {
-        this.jsonEntity.remove(key);
+        this.jsonDocument.remove(key);
     }
 
     /**
@@ -137,7 +137,7 @@ public class NPCService implements ICloudService {
      */
     public void save() {
         try {
-            this.jsonEntity.save(this.npcFile);
+            this.jsonDocument.save(this.npcFile);
             this.config.save(this.npcLayout);
         } catch (Exception e) {
             // Not saved because of Receiver!

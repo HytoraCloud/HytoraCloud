@@ -8,10 +8,12 @@ public class ConsoleColor {
 
 
     /**
-     * Constructs color
-     * @param color
-     * @param b
-     * @return
+     * Constructs a formatted console color
+     * using {@link Ansi}
+     *
+     * @param color the color
+     * @param b if it should be bold or not
+     * @return string ansi
      */
     public static String construct(Ansi.Color color, boolean b) {
         Ansi ansi = Ansi.ansi().a(Ansi.Attribute.RESET).fg(color);
@@ -23,10 +25,12 @@ public class ConsoleColor {
         return ansi.toString();
     }
 
+
     /**
-     * Formats color
-     * @param input
-     * @return
+     * Formats a string to color code
+     *
+     * @param input the input
+     * @return colored string
      */
     public static String formatColorString(String input) {
         try {
@@ -66,9 +70,10 @@ public class ConsoleColor {
     }
 
     /**
-     * Removes color
-     * @param input
-     * @return
+     * Removes color from a colored string
+     *
+     * @param input the colored input
+     * @return uncolored string
      */
     public static String stripColor(String input) {
         return input.replaceAll("\033\\[[;\\d]*m", "");

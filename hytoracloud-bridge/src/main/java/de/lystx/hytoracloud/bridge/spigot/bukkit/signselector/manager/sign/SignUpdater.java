@@ -10,9 +10,9 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.ba
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -153,7 +153,7 @@ public class SignUpdater {
                 }
 
                 try {
-                    serverPinger.pingServer(CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress(), current.getPort(), 20);
+                    serverPinger.pingServer(CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), current.getPort(), 20);
                 } catch (IOException exception) {
                     //IGNORING IT WORKS FINE
                 }
@@ -287,7 +287,7 @@ public class SignUpdater {
 
         service = CloudDriver.getInstance().getServiceManager().getCachedObject(service.getName());
 
-        JsonEntity jsonObject;
+        JsonDocument jsonObject;
         ServiceState state ;
         if (service.getState().equals(ServiceState.MAINTENANCE) || service.getSyncedGroup().orElse(service.getGroup()).isMaintenance()) {
             jsonObject = ServerSelector.getInstance().getSignManager().getSignLayOut().getMaintenanceLayOut();
@@ -362,7 +362,7 @@ public class SignUpdater {
         line = ChatColor.translateAlternateColorCodes('&', line);
         line = line.replace("%server%", IService.getName());
         line = line.replace("%group%", group.getName());
-        line = line.replace("%template%", group.getTemplate().getName());
+        line = line.replace("%template%", group.getCurrentTemplate().getName());
         line = line.replace("%type%", group.getType().name());
         line = line.replace("%state%", IService.getState().getColor() + IService.getState().name());
         try {

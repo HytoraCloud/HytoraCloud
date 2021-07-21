@@ -3,15 +3,15 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
-import de.lystx.hytoracloud.driver.commons.implementations.PlayerObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
-import de.lystx.hytoracloud.driver.utils.uuid.NameChange;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.uuid.NameChange;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 import java.io.Serializable;

@@ -1,6 +1,6 @@
 package net.hytora.discordbot.manager.suggestion;
 
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -31,14 +31,14 @@ public class SuggestionManager extends ListenerAdapter {
     private final String channel;
 
     /**
-     * The file for the {@link JsonEntity}
+     * The file for the {@link JsonDocument}
      */
     private final File file;
 
     /**
      * The stored {@link Suggestion}s
      */
-    private final JsonEntity jsonEntity;
+    private final JsonDocument jsonDocument;
 
     public SuggestionManager(String channel) {
         this.pendingSuggestions = new LinkedList<>();
@@ -53,11 +53,11 @@ public class SuggestionManager extends ListenerAdapter {
             e.printStackTrace();
         }
 
-        this.jsonEntity = new JsonEntity(this.file);
-        this.jsonEntity.save();
+        this.jsonDocument = new JsonDocument(this.file);
+        this.jsonDocument.save();
 
         //Load saved suggestions
-        this.jsonEntity.forEach(Suggestion.class, this.pendingSuggestions::add);
+        this.jsonDocument.forEach(Suggestion.class, this.pendingSuggestions::add);
         Hytora.getHytora().getLogManager().log("SUGGESTIONS", "§7Loaded §b" + this.pendingSuggestions.size() + " §7Pending §3Suggestions§8!");
 
         Hytora.getHytora().getDiscord().addEventListener(this);
@@ -68,11 +68,11 @@ public class SuggestionManager extends ListenerAdapter {
      * Saves all {@link Suggestion}s
      */
     public void save() {
-        this.jsonEntity.clear();
+        this.jsonDocument.clear();
         for (Suggestion pendingSuggestion : this.pendingSuggestions) {
-            this.jsonEntity.append(pendingSuggestion.getUniqueId().toString(), pendingSuggestion);
+            this.jsonDocument.append(pendingSuggestion.getUniqueId().toString(), pendingSuggestion);
         }
-        this.jsonEntity.save(this.file);
+        this.jsonDocument.save(this.file);
     }
 
     /**
@@ -276,7 +276,7 @@ public class SuggestionManager extends ListenerAdapter {
         return file;
     }
 
-    public JsonEntity getJsonBuilder() {
-        return jsonEntity;
+    public JsonDocument getJsonBuilder() {
+        return jsonDocument;
     }
 }

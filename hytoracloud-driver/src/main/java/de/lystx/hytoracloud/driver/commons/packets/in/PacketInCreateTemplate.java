@@ -1,5 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
+import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
+import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplateManager;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +11,10 @@ import net.hytora.networking.elements.packet.HytoraPacket;
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class PacketInCreateTemplate extends HytoraPacket implements Serializable {
+public class PacketInCreateTemplate extends HytoraPacket {
 
     private IServiceGroup IServiceGroup;
-    private String template;
+    private ITemplate template;
 
 
     @Override
@@ -26,7 +28,7 @@ public class PacketInCreateTemplate extends HytoraPacket implements Serializable
     @Override
     public void read(Component component) {
 
-        IServiceGroup = (IServiceGroup) component.get("g");
+        IServiceGroup = component.get("g");
         template = component.get("t");
     }
 }

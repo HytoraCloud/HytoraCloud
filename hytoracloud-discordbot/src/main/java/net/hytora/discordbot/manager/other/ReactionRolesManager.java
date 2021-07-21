@@ -1,7 +1,7 @@
 package net.hytora.discordbot.manager.other;
 
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.utils.utillity.StringCreator;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.utils.StringCreator;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -25,16 +25,16 @@ public class ReactionRolesManager extends ListenerAdapter {
      */
     private final Map<String, String> rolesAndEmotes;
 
-    public ReactionRolesManager(String channel, JsonEntity jsonEntity) {
+    public ReactionRolesManager(String channel, JsonDocument jsonDocument) {
 
         this.rolesAndEmotes = new HashMap<>();
         this.textChannel = Hytora.getHytora().getDiscord().getTextChannelById(channel);
 
-        for (String role : jsonEntity.keysExclude("channel")) {
+        for (String role : jsonDocument.keysExclude("channel")) {
 
 
             Hytora.getHytora().createRole(
-                    new JsonEntity()
+                    new JsonDocument()
                             .append("color", "GRAY")
                             .append("name", role)
                             .append("mentionable", true)
@@ -43,7 +43,7 @@ public class ReactionRolesManager extends ListenerAdapter {
                         Hytora.getHytora().getLogManager().log("REACTION", "§7ReactionRoles created §b" + newRole.getName() + "§8!");
                     });
 
-            this.rolesAndEmotes.put(role, jsonEntity.getString(role));
+            this.rolesAndEmotes.put(role, jsonDocument.getString(role));
         }
         this.checkForChannel();
         Hytora.getHytora().getDiscord().addEventListener(this);

@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory;
 
-import de.lystx.hytoracloud.driver.commons.implementations.InventoryObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.InventoryObject;
 
 import java.io.Serializable;
 import java.util.Map;

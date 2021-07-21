@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.database.impl;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
@@ -53,8 +53,8 @@ public class DefaultDatabaseFiles implements IDatabase {
     public OfflinePlayer getEntry(UUID uuid) {
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         File file = new File(dir, uuid + ".json");
-        JsonEntity jsonEntity = new JsonEntity(file);
-        return jsonEntity.getAs(OfflinePlayer.class);
+        JsonDocument jsonDocument = new JsonDocument(file);
+        return jsonDocument.getAs(OfflinePlayer.class);
     }
 
     @Override
@@ -62,10 +62,10 @@ public class DefaultDatabaseFiles implements IDatabase {
         offlinePlayer.setDefault(false);
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         File file = new File(dir, uuid + ".json");
-        JsonEntity jsonEntity = new JsonEntity(file);
-        jsonEntity.clear();
-        jsonEntity.append(offlinePlayer);
-        jsonEntity.save();
+        JsonDocument jsonDocument = new JsonDocument(file);
+        jsonDocument.clear();
+        jsonDocument.append(offlinePlayer);
+        jsonDocument.save();
     }
 
     @Override
@@ -73,8 +73,8 @@ public class DefaultDatabaseFiles implements IDatabase {
         List<OfflinePlayer> list = new LinkedList<>();
         File dir = CloudDriver.getInstance().getInstance(FileService.class).getCloudPlayerDirectory();
         for (File listFile : Objects.requireNonNull(dir.listFiles())) {
-            JsonEntity jsonEntity = new JsonEntity(listFile);
-            OfflinePlayer playerData = jsonEntity.getAs(OfflinePlayer.class);
+            JsonDocument jsonDocument = new JsonDocument(listFile);
+            OfflinePlayer playerData = jsonDocument.getAs(OfflinePlayer.class);
             if (playerData == null) {
                 continue;
             }

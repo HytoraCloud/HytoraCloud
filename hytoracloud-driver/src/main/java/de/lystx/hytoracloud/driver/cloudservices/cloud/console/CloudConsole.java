@@ -6,8 +6,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudComm
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
-import de.lystx.hytoracloud.driver.utils.setup.AbstractSetup;
-import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.SetupExecutor;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +21,7 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     private LoggerService logger;
     private CommandService commandManager;
     private final String buffer;
-    private AbstractSetup<?> currentSetup;
+    private SetupExecutor<?> currentSetup;
     private boolean active;
 
     public CloudConsole(LoggerService logger, CommandService commandManager, String buffer) {
@@ -43,23 +42,21 @@ public class CloudConsole extends Thread implements CloudCommandSender {
         while (!this.isInterrupted() && this.isAlive()) {
             String s = ConsoleColor.formatColorString(this.getPrefix());
             String line;
-            if (!CloudDriver.getInstance().isNeedsDependencies()) {
-                try {
-                    if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
-                        if (!line.trim().isEmpty()) {
-                            this.logger.getConsoleReader().setPrompt("");
-                            if (currentSetup != null) {
-                                currentSetup.next(line);
-                            } else {
-                                if (this.commandManager != null) {
-                                    this.commandManager.execute(line, this);
-                                }
+            try {
+                if ((line = this.logger.getConsoleReader().readLine(s)) != null) {
+                    if (!line.trim().isEmpty()) {
+                        this.logger.getConsoleReader().setPrompt("");
+                        if (currentSetup != null) {
+                            currentSetup.handleQuestion(line);
+                        } else {
+                            if (this.commandManager != null) {
+                                this.commandManager.execute(line, this);
                             }
                         }
                     }
-                } catch (Exception e) {
-                    //
                 }
+            } catch (Exception e) {
+                //
             }
         }
     }

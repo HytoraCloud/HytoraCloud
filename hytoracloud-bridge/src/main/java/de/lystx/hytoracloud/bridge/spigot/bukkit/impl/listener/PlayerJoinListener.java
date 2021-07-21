@@ -4,7 +4,8 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.CloudPermissibleBase;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.Reflections;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import org.bukkit.Bukkit;
@@ -12,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+
+import java.lang.reflect.Field;
 
 public class PlayerJoinListener implements Listener {
 
@@ -43,7 +46,7 @@ public class PlayerJoinListener implements Listener {
             CloudDriver.getInstance().getServiceManager().startService(service.getGroup(), propertyObject);
         }
 
-        if (CloudDriver.getInstance().isNametags() && CloudDriver.getInstance().getPermissionPool().isAvailable()) {
+        if (CloudDriver.getInstance().getBukkit().shouldUseNameTags() && CloudDriver.getInstance().getPermissionPool().isAvailable()) {
 
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 PermissionGroup group = CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(onlinePlayer.getUniqueId());
@@ -55,7 +58,25 @@ public class PlayerJoinListener implements Listener {
             }
         }
 
-        CloudDriver.getInstance().updatePermissions(event.getPlayer(), new CloudPermissibleBase(event.getPlayer()));
+        updatePermissions(event.getPlayer(), new CloudPermissibleBase(event.getPlayer()));
 
+    }
+    /**
+     * Injects the CloudPermissibleBase to the Player
+     *
+     * @param player the player
+     */
+    public void updatePermissions(Object player, Object cloudPermissible) {
+        if (!CloudDriver.getInstance().getPermissionPool().isEnabled()) {
+            return;
+        }
+        try {
+            Class<?> clazz = Reflections.getCraftBukkitClass("entity.CraftHumanEntity");
+            Field field = clazz.getDeclaredField("perm");
+            field.setAccessible(true);
+            field.set(player, cloudPermissible);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

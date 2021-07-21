@@ -4,11 +4,10 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
-import de.lystx.hytoracloud.driver.commons.implementations.ReceiverObject;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.commons.wrapped.ReceiverObject;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.launcher.receiver.Receiver;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +37,7 @@ public class ConfigService implements ICloudService {
     @Override
     public void reload() {
 
-        JsonEntity json = new JsonEntity(configFile);
+        JsonDocument json = new JsonDocument(configFile);
         if (!this.configFile.exists()) {
             json.append("host", "127.0.0.1");
             json.append("port", 1401);
@@ -53,7 +52,7 @@ public class ConfigService implements ICloudService {
     @Override
     public void save() {
 
-        JsonEntity json = new JsonEntity(configFile);
+        JsonDocument json = new JsonDocument(configFile);
         json.append("host", this.receiver.getHost());
         json.append("port", this.receiver.getPort());
         json.append("name", this.receiver.getName());

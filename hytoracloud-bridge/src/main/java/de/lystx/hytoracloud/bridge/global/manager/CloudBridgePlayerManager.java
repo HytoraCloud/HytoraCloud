@@ -91,12 +91,12 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
 
     @Override
     public void getObjectAsync(String name, Consumer<ICloudPlayer> consumer) {
-        CloudDriver.getInstance().execute(() -> consumer.accept(this.getObjectSync(name).get()));
+        CloudDriver.getInstance().getExecutorService().execute(() -> consumer.accept(this.getObjectSync(name).get()));
     }
 
     @Override
     public void getObjectAsync(UUID uniqueId, Consumer<ICloudPlayer> consumer) {
-        CloudDriver.getInstance().execute(() -> consumer.accept(this.getObjectSync(uniqueId).get()));
+        CloudDriver.getInstance().getExecutorService().execute(() -> consumer.accept(this.getObjectSync(uniqueId).get()));
     }
 
     @Override

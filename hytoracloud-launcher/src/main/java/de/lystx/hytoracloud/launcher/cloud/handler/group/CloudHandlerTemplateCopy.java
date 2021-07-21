@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.group;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCreateTemplate;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import lombok.AllArgsConstructor;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
@@ -24,7 +24,7 @@ public class CloudHandlerTemplateCopy implements PacketHandler {
             if (get == null) {
                 return;
             }
-            this.cloudSystem.getInstance(TemplateService.class).createTemplate(get, packetInCreateTemplate.getTemplate());
+            CloudDriver.getInstance().getTemplateManager().createTemplate(get, packetInCreateTemplate.getTemplate());
         }
     }
 }

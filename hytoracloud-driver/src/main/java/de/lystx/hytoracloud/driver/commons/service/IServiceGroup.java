@@ -1,28 +1,32 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
-import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
+import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
-import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 import io.vson.elements.object.Objectable;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.component.ComponentObject;
 
 import java.io.Serializable;
 import java.util.List;
 
-public interface IServiceGroup extends Serializable, Identifiable, Objectable<IServiceGroup>, ComponentObject<IServiceGroup> {
+public interface IServiceGroup extends Serializable, Identifiable, Objectable<IServiceGroup>{
 
     /**
      * The template of this group
      */
-    Template getTemplate();
+    ITemplate getCurrentTemplate();
 
-    void setTemplate(Template template);
+    void setCurrentTemplate(ITemplate currentTemplate);
+
+    /**
+     * A list of all templates
+     *
+     * @return templates
+     */
+    List<ITemplate> getTemplates();
+
+    void setTemplates(List<ITemplate> templateObjects);
 
     /**
      * The type of this group (PROXY, SPIGOT)
@@ -141,41 +145,4 @@ public interface IServiceGroup extends Serializable, Identifiable, Objectable<IS
      */
     void deleteAllTemplates();
 
-    @Override
-    default IServiceGroup read(Component component) {
-        return new ServiceGroupObject(
-                component.get("uuid"),
-                component.get("name"),
-                component.get("template"),
-                component.get("type"),
-                component.get("receiver"),
-                component.get("maxServer"),
-                component.get("minServer"),
-                component.get("memory"),
-                component.get("maxPlayers"),
-                component.get("newServerPercent"),
-                component.get("maintenance"),
-                component.get("lobby"),
-                component.get("dynamic"),
-                new PropertyObject(component.get("properties"))
-        );
-    }
-
-    @Override
-    default void write(Component component) {
-        component.put("uuid", this.getUniqueId());
-        component.put("name", this.getName());
-        component.put("template", this.getTemplate());
-        component.put("type", this.getType());
-        component.put("receiver", this.getReceiver());
-        component.put("maxServer", this.getMaxServer());
-        component.put("minServer", this.getMinServer());
-        component.put("memory", this.getMemory());
-        component.put("maxPlayers", this.getMaxPlayers());
-        component.put("newServerPercent", this.getNewServerPercent());
-        component.put("maintenance", this.isMaintenance());
-        component.put("lobby", this.isLobby());
-        component.put("dynamic", this.isDynamic());
-        component.put("properties", this.getProperties().toString());
-    }
 }

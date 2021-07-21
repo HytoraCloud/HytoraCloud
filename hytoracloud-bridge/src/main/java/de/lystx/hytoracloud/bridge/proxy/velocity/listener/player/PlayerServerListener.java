@@ -39,7 +39,7 @@ public class PlayerServerListener {
             ServerConnection serverConnection = player.getCurrentServer().orElse(null);
             if (serverConnection == null) {
 
-                IService fallback = CloudDriver.getInstance().getFallback(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUsername()));
+                IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUsername()));
 
                 if (fallback == null) {
                     player.disconnect(Component.text(CloudDriver.getInstance().getPrefix() + "§cNo fallback-server was found!"));

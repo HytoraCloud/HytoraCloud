@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.other.IBukkit;
-import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
+import de.lystx.hytoracloud.driver.commons.interfaces.IBukkit;
+import de.lystx.hytoracloud.driver.utils.Reflections;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -32,6 +32,52 @@ public class DefaultBukkit implements IBukkit {
      * The version
      */
     private String version;
+
+    /**
+     * if chat is enabled
+     */
+    private boolean chatSystem;
+
+    /**
+     * if nametags is enabled
+     */
+    private boolean nametags;
+
+    /**
+     *  Minecraft Chat format
+     */
+    private String chatFormat;
+
+
+    @Override
+    public boolean shouldUseChat() {
+        return chatSystem;
+    }
+
+    @Override
+    public void disableChatSystem() {
+        chatSystem = false;
+    }
+
+    @Override
+    public void enableChatSystem() {
+        chatSystem = true;
+    }
+
+    @Override
+    public boolean shouldUseNameTags() {
+        return nametags;
+    }
+
+    @Override
+    public void enableNameTags() {
+        nametags = true;
+    }
+
+    @Override
+    public void disableNameTags() {
+        nametags = false;
+    }
 
     /**
      * Checks for higher Versions
@@ -68,7 +114,7 @@ public class DefaultBukkit implements IBukkit {
      */
     public void update() {
         try {
-            Object playerlist = de.lystx.hytoracloud.driver.utils.reflection.Reflections.getCraftBukkitClass("CraftServer").getDeclaredMethod("getHandle", null).invoke(Bukkit.getServer(), null);
+            Object playerlist = Reflections.getCraftBukkitClass("CraftServer").getDeclaredMethod("getHandle", null).invoke(Bukkit.getServer(), null);
             Field maxplayers = playerlist.getClass().getSuperclass().getDeclaredField("maxPlayers");
             maxplayers.setAccessible(true);
             maxplayers.set(playerlist, this.maxPlayers);

@@ -10,6 +10,11 @@ import java.util.function.Consumer;
 
 public interface NetworkHandler {
 
+    /**
+     * Handles all registered {@link NetworkHandler}s
+     *
+     * @param serviceConsumer the consumer to handle
+     */
     static void run(Consumer<NetworkHandler> serviceConsumer) {
         for (NetworkHandler networkHandler : CloudDriver.getInstance().getNetworkHandlers()) {
             serviceConsumer.accept(networkHandler);

@@ -1,9 +1,8 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
-import de.lystx.hytoracloud.driver.utils.utillity.AuthManager;
+import de.lystx.hytoracloud.driver.cloudservices.global.AuthManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.webserver.WebServer;
 
 public interface DriverParent {
 
@@ -27,13 +26,6 @@ public interface DriverParent {
      * @return authManager
      */
     AuthManager getAuthManager();
-
-    /**
-     * Returns the WebServer
-     *
-     * @return web
-     */
-    WebServer getWebServer();
 
     /**
      * Reloads the instance

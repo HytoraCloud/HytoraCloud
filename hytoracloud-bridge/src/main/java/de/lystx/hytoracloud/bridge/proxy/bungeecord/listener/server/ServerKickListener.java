@@ -18,7 +18,7 @@ public class ServerKickListener implements Listener {
         PendingConnection connection = event.getConnection();
 
 
-        IService fallback = CloudDriver.getInstance().getFallback(ICloudPlayer.dummy(connection.getName(), connection.getUniqueId()));
+        IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(ICloudPlayer.dummy(connection.getName(), connection.getUniqueId()));
         ServerInfo serverInfo = fallback == null ? null : ProxyServer.getInstance().getServerInfo(fallback.getName());
 
         if (fallback == null || serverInfo == null) {

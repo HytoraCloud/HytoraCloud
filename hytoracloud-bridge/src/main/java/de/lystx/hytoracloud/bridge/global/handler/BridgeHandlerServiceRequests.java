@@ -3,9 +3,9 @@ package de.lystx.hytoracloud.bridge.global.handler;
 import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfos;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfo;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import lombok.Getter;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
@@ -28,10 +28,10 @@ public class BridgeHandlerServiceRequests implements PacketHandler {
 
             long used = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
             packet.reply(ResponseStatus.SUCCESS, used);
-        } else if (packet instanceof PacketServiceInfos) {
+        } else if (packet instanceof PacketServiceInfo) {
 
-            PacketServiceInfos packetServiceInfos = (PacketServiceInfos)packet;
-            if (!packetServiceInfos.getService().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
+            PacketServiceInfo packetServiceInfo = (PacketServiceInfo)packet;
+            if (!packetServiceInfo.getService().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
                 return;
             }
 

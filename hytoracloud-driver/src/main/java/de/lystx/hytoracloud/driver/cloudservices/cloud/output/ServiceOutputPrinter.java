@@ -44,8 +44,8 @@ public class ServiceOutputPrinter {
         if (this.screen == null) {
             return;
         }
+        this.screen.stop();
         this.screen = null;
         CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
-        this.screen.stop();
     }
 }

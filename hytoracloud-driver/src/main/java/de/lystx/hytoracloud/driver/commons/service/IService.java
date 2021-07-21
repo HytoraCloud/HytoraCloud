@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
@@ -135,7 +135,6 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      *
      * @return list of plugins
      */
-    //TODO: IF executed on bungee it will send plugins from bungee not from target service
     PluginInfo[] getPlugins();
 
     /**
@@ -144,7 +143,6 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      *
      * @return properties
      */
-    //TODO: SAme as pluginInfo
     PropertyObject requestInfo();
 
     /**

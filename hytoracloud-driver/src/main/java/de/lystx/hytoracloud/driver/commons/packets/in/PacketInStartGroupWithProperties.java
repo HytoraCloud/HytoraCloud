@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 
@@ -27,6 +27,6 @@ public class PacketInStartGroupWithProperties extends HytoraPacket implements Se
     @Override
     public void read(Component component) {
         IServiceGroup = component.get("group");
-        properties = PropertyObject.fromDocument(new JsonEntity((String) component.get("json")));
+        properties = PropertyObject.fromDocument(new JsonDocument((String) component.get("json")));
     }
 }

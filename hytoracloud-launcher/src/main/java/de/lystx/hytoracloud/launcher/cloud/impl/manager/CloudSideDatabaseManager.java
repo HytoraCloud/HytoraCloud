@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabaseManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.impl.DefaultDatabaseFiles;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import lombok.Getter;
 
 import java.io.File;
@@ -27,7 +27,7 @@ import java.io.IOException;
 public class CloudSideDatabaseManager implements ICloudService, IDatabaseManager {
 
     private IDatabase database;
-    private JsonEntity jsonEntity;
+    private JsonDocument jsonDocument;
     private DatabaseType databaseType;
     private String host;
     private String username;
@@ -40,36 +40,36 @@ public class CloudSideDatabaseManager implements ICloudService, IDatabaseManager
         this.database = new DefaultDatabaseFiles();
         File file = new File(CloudDriver.getInstance().getInstance(FileService.class).getDatabaseDirectory(), "database.json");
         if (file.exists()) {
-            this.jsonEntity = new JsonEntity(file);
+            this.jsonDocument = new JsonDocument(file);
         } else {
             try {
                 file.createNewFile();
-                this.jsonEntity = new JsonEntity(file);
+                this.jsonDocument = new JsonDocument(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        this.reload(jsonEntity);
+        this.reload(jsonDocument);
     }
 
     /**
      * Saves settings
-     * @param jsonEntity
+     * @param jsonDocument
      */
-    public void reload(JsonEntity jsonEntity) {
+    public void reload(JsonDocument jsonDocument) {
 
         this.load(
-                jsonEntity.getString("host", "127.0.0.1"),
-                jsonEntity.getInteger("port", 3306),
-                jsonEntity.getString("username", "root"),
-                jsonEntity.getString("password", "pw"),
-                jsonEntity.getString("collectionOrTable", "value"),
-                jsonEntity.getString("defaultDatabase", "database"),
-                DatabaseType.valueOf(jsonEntity.getString("type", "FILES"))
+                jsonDocument.getString("host", "127.0.0.1"),
+                jsonDocument.getInteger("port", 3306),
+                jsonDocument.getString("username", "root"),
+                jsonDocument.getString("password", "pw"),
+                jsonDocument.getString("collectionOrTable", "value"),
+                jsonDocument.getString("defaultDatabase", "database"),
+                DatabaseType.valueOf(jsonDocument.getString("type", "FILES"))
         );
 
-        this.jsonEntity = jsonEntity;
-        jsonEntity.save();
+        this.jsonDocument = jsonDocument;
+        jsonDocument.save();
     }
 
     @Override

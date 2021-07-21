@@ -8,7 +8,6 @@ import net.hytora.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCopyTemplate;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 
 @AllArgsConstructor
 public class CloudHandlerTemplateCreate implements PacketHandler {
@@ -23,7 +22,7 @@ public class CloudHandlerTemplateCreate implements PacketHandler {
             if (get == null) {
                 return;
             }
-            this.cloudSystem.getInstance(TemplateService.class).copy(get, packetInCopyTemplate.getTemplate(), packetInCopyTemplate.getSpecificDirectory());
+            CloudDriver.getInstance().getTemplateManager().copyTemplate(get, packetInCopyTemplate.getTemplate(), packetInCopyTemplate.getSpecificDirectory());
         }
     }
 }

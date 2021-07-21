@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.setup;
 
-import de.lystx.hytoracloud.driver.utils.setup.AbstractSetup;
-import de.lystx.hytoracloud.driver.utils.setup.Setup;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.SetupExecutor;
+import de.lystx.hytoracloud.driver.cloudservices.global.setup.Setup;
 import lombok.Getter;
 
 @Getter
-public class FallbackSetup extends AbstractSetup<FallbackSetup> {
+public class FallbackSetup extends SetupExecutor<FallbackSetup> {
 
     @Setup(id = 1, question = "For which group is this fallback?")
     private String name;

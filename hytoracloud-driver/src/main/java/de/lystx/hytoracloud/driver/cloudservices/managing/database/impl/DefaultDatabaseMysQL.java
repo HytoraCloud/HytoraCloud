@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.database.impl;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 
@@ -91,8 +91,8 @@ public class DefaultDatabaseMysQL implements IDatabase {
             throwables.printStackTrace();
         }
         try {
-            JsonEntity jsonEntity = new JsonEntity(data);
-            return jsonEntity.getObject(jsonEntity.getJsonObject(), OfflinePlayer.class);
+            JsonDocument jsonDocument = new JsonDocument(data);
+            return jsonDocument.getObject(jsonDocument.getJsonObject(), OfflinePlayer.class);
         } catch (NullPointerException e) {
             return null;
         }
@@ -103,13 +103,13 @@ public class DefaultDatabaseMysQL implements IDatabase {
         try {
             if (this.isRegistered(uuid)) {
                 PreparedStatement statement = this.mySQLConnection.getCon().prepareStatement("UPDATE " + CloudDriver.getInstance().getDatabaseManager().getCollectionOrTable() + " SET jsonData = ? WHERE uuid = '" + uuid.toString() + "';");
-                statement.setString(1, new JsonEntity().append(data).toString());
+                statement.setString(1, new JsonDocument().append(data).toString());
                 statement.executeUpdate();
                 statement.close();
             } else {
                 PreparedStatement statement = this.mySQLConnection.getCon().prepareStatement("INSERT INTO " + CloudDriver.getInstance().getDatabaseManager().getCollectionOrTable() + " (uuid, jsonData) VALUES(?, ?)");
                 statement.setString(1, uuid.toString());
-                statement.setString(2, new JsonEntity().append(data).toString());
+                statement.setString(2, new JsonDocument().append(data).toString());
                 statement.executeUpdate();
                 statement.close();
             }
@@ -127,8 +127,8 @@ public class DefaultDatabaseMysQL implements IDatabase {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 String data = result.getString(2);
-                JsonEntity jsonEntity = new JsonEntity(data);
-                OfflinePlayer offlinePlayer = jsonEntity.getAs(OfflinePlayer.class);
+                JsonDocument jsonDocument = new JsonDocument(data);
+                OfflinePlayer offlinePlayer = jsonDocument.getAs(OfflinePlayer.class);
                 list.add(offlinePlayer);
             }
         } catch (SQLException e) {}

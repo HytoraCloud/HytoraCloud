@@ -82,7 +82,7 @@ public class ProgressBarBuilder {
                 processed,
                 elapsed,
                 new DefaultProgressBarRenderer(style, unitName, unitSize, showSpeed, speedFormat,speedUnit),
-                consumer == null ? Util.createConsoleConsumer() : consumer
+                consumer == null ? ProgressbarUtils.createConsoleConsumer() : consumer
         );
     }
 }

@@ -45,7 +45,7 @@ public class DefaultProgressBarRenderer implements ProgressBarRenderer {
     protected String eta(ProgressState progress, Duration elapsed) {
         if (progress.max <= 0 || progress.indefinite) return "?";
         else if (progress.current - progress.start == 0) return "?";
-        else return Util.formatDuration(
+        else return ProgressbarUtils.formatDuration(
                     elapsed.dividedBy(progress.current - progress.start).multipliedBy(progress.max - progress.current)
             );
     }
@@ -54,13 +54,13 @@ public class DefaultProgressBarRenderer implements ProgressBarRenderer {
         String res;
         if (progress.max <= 0 || progress.indefinite) res = "? %";
         else res = (int) Math.floor(100.0 * progress.current / progress.max) + "%";
-        return Util.repeat(' ', 4 - res.length()) + res;
+        return ProgressbarUtils.repeat(' ', 4 - res.length()) + res;
     }
 
     protected String ratio(ProgressState progress) {
         String m = progress.indefinite ? "?" : String.valueOf(progress.max / unitSize);
         String c = String.valueOf(progress.current / unitSize);
-        return Util.repeat(' ', m.length() - c.length()) + c + "/" + m + unitName;
+        return ProgressbarUtils.repeat(' ', m.length() - c.length()) + c + "/" + m + unitName;
     }
 
     protected String speed(ProgressState progress, Duration elapsed) {
@@ -104,7 +104,7 @@ public class DefaultProgressBarRenderer implements ProgressBarRenderer {
 
         String speedString = isSpeedShown ? speed(progress, elapsed) : "";
         String suffix = style.rightBracket + " " + ratio(progress) + " ("
-                + Util.formatDuration(elapsed) + " / " + eta(progress, elapsed) + ") "
+                + ProgressbarUtils.formatDuration(elapsed) + " / " + eta(progress, elapsed) + ") "
                 + speedString + progress.extraMessage;
         if (suffix.length() > maxSuffixLength)
             suffix = suffix.substring(0, maxSuffixLength);
@@ -116,15 +116,15 @@ public class DefaultProgressBarRenderer implements ProgressBarRenderer {
 
         if (progress.indefinite) {
             int pos = (int)(progress.current % length);
-            sb.append(Util.repeat(style.space, pos));
+            sb.append(ProgressbarUtils.repeat(style.space, pos));
             sb.append(style.block);
-            sb.append(Util.repeat(style.space, length - pos - 1));
+            sb.append(ProgressbarUtils.repeat(style.space, length - pos - 1));
         }
         else {
-            sb.append(Util.repeat(style.block, progressIntegralPart(progress, length)));
+            sb.append(ProgressbarUtils.repeat(style.block, progressIntegralPart(progress, length)));
             if (progress.current < progress.max) {
                 sb.append(style.fractionSymbols.charAt(progressFractionalPart(progress, length)));
-                sb.append(Util.repeat(style.space, length - progressIntegralPart(progress, length) - 1));
+                sb.append(ProgressbarUtils.repeat(style.space, length - progressIntegralPart(progress, length) - 1));
             }
         }
 

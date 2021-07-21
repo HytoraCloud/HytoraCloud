@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.minecraft.plugin;
 
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -55,6 +55,6 @@ public class PluginInfo {
 
     @Override
     public String toString() {
-        return JsonEntity.toString(this);
+        return JsonDocument.toString(this);
     }
 }

@@ -2,14 +2,14 @@ package de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.events.network.DriverEventGroupMaintenanceChange;
-import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import lombok.Getter;
 
 import java.io.File;
@@ -50,8 +50,8 @@ public class GroupService implements ICloudService {
         this.groups.clear();
         for (File file : Objects.requireNonNull(this.getDriver().getInstance(FileService.class).getGroupsDirectory().listFiles())) {
             if (file.getName().endsWith(".json")) {
-                JsonEntity jsonEntity = new JsonEntity(file);
-                this.groups.add(jsonEntity.getAs(ServiceGroupObject.class));
+                JsonDocument jsonDocument = new JsonDocument(file);
+                this.groups.add(jsonDocument.getAs(ServiceGroupObject.class));
             }
         }
     }
@@ -61,11 +61,11 @@ public class GroupService implements ICloudService {
      * @param serviceGroup
      */
     public void createGroup(IServiceGroup serviceGroup) {
-        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        jsonEntity.append(serviceGroup);
-        jsonEntity.save();
+        JsonDocument jsonDocument = new JsonDocument(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
+        jsonDocument.append(serviceGroup);
+        jsonDocument.save();
         this.groups.add(serviceGroup);
-        this.getDriver().getInstance(TemplateService.class).createTemplate(serviceGroup);
+        CloudDriver.getInstance().getTemplateManager().createTemplate(serviceGroup);
     }
 
     /**
@@ -73,11 +73,11 @@ public class GroupService implements ICloudService {
      * @param serviceGroup
      */
     public void deleteGroup(IServiceGroup serviceGroup) {
-        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        jsonEntity.clear();
+        JsonDocument jsonDocument = new JsonDocument(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
+        jsonDocument.clear();
         this.groups.remove(this.getGroup(serviceGroup.getName()));
         serviceGroup.deleteAllTemplates();
-        this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> jsonEntity.getFile().delete(), 40L);
+        this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> jsonDocument.getFile().delete(), 40L);
 
     }
 
@@ -92,9 +92,9 @@ public class GroupService implements ICloudService {
 
         CloudDriver.getInstance().callEvent(new DriverEventGroupMaintenanceChange(serviceGroup, serviceGroup.isMaintenance()));
 
-        JsonEntity jsonEntity = new JsonEntity(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
-        jsonEntity.append(serviceGroup);
-        jsonEntity.save();
+        JsonDocument jsonDocument = new JsonDocument(new File(this.getDriver().getInstance(FileService.class).getGroupsDirectory(), serviceGroup.getName() + ".json"));
+        jsonDocument.append(serviceGroup);
+        jsonDocument.save();
 
         this.groups.set(this.groups.indexOf(group), serviceGroup);
 

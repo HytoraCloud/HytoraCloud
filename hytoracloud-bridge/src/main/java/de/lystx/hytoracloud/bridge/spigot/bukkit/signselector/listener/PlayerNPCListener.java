@@ -42,7 +42,7 @@ public class PlayerNPCListener implements Listener {
             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cCan't handle NPC because group was not found!");
             return;
         }
-        CloudDriver.getInstance().execute(() -> player.openInventory(this.getInventory(player, group)));
+        CloudDriver.getInstance().getExecutorService().execute(() -> player.openInventory(this.getInventory(player, group)));
     }
 
     @EventHandler
@@ -199,7 +199,7 @@ public class PlayerNPCListener implements Listener {
             if (IServiceGroup != null) {
                 IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName());
                 input = input.replace("%group%", group.getName());
-                input = input.replace("%template%", IServiceGroup.getTemplate().getName());
+                input = input.replace("%template%", IServiceGroup.getCurrentTemplate().getName());
                 input = input.replace("%type%", IServiceGroup.getType().name());
                 input = input.replace("%newServer%", "" + IServiceGroup.getNewServerPercent());
                 input = input.replace("%online_services%", group.getServices().size() + "");

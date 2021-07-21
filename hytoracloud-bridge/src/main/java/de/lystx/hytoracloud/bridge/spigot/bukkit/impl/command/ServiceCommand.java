@@ -3,21 +3,24 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command;
 import com.sun.management.OperatingSystemMXBean;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.NPC;
+import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
+import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -31,8 +34,22 @@ public class ServiceCommand {
 
     private boolean executed = false;
 
-    @Command(name = "service", description = "Bukkit server command", aliases = {"hs", "cloudserver"})
+    @Command(
+            name = "service",
+            description = "Bukkit server command",
+            aliases = {
+                    "hs",
+                    "cloudServer",
+                    "hytoraServer"}
+    )
     public void execute(CloudCommandSender sender, String[] args) {
+        if (sender instanceof ConsoleSender) {
+            IService service = CloudDriver.getInstance().getServiceManager().getCachedObject("Bungee-1");
+
+            sender.sendMessage(service.getMemoryUsage() + "/" + service.getGroup().getMemory());
+
+            return;
+        }
         if (sender instanceof ICloudPlayer) {
             ICloudPlayer player = (ICloudPlayer) sender;
 
@@ -54,8 +71,8 @@ public class ServiceCommand {
                         player.sendMessage("  §8» §bUUID §8┃ §7" + CloudDriver.getInstance().getCurrentService().getUniqueId());
                         player.sendMessage("  §8» §bPort §8┃ §7" + CloudDriver.getInstance().getCurrentService().getPort());
                         player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudDriver.getInstance().getConnection().remoteAddress().toString());
-                        player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudDriver.getInstance().getCurrentHost());
-                        player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getCurrentService().getGroup().getTemplate().getName());
+                        player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudDriver.getInstance().getCloudAddress());
+                        player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getCurrentService().getGroup().getCurrentTemplate().getName());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
                         player.sendMessage("  §8» §bInternal CPU Usage §8┃ §7" + format);
                         PropertyObject properties = CloudDriver.getInstance().getCurrentService().getProperties();
@@ -107,7 +124,7 @@ public class ServiceCommand {
                             return;
                         }
 
-                        List<UUID> uuidList = CloudDriver.getInstance().getImplementedData().getList("uuidList", UUID.class);
+                        List<UUID> uuidList = CloudDriver.getInstance().getImplementedData().getList("uuidList");
                         if (!uuidList.contains(player.getUniqueId())) {
                             uuidList.add(player.getUniqueId());
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Leftclick the §bNPC §7you want to remove§8! §cTo cancel type this command §eagain§c!");
@@ -193,7 +210,7 @@ public class ServiceCommand {
                             return;
                         }
                         if (CloudDriver.getInstance().getBukkit().isNewVersion()) {
-                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + Reflections.getVersion() + "§c!");
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cNPCs are not supported on version §e" + CloudDriver.getInstance().getBukkit().getVersion() + "§c!");
                             return;
                         }
                         String groupName = args[1];

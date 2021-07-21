@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.SignLayOut;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import lombok.Getter;
 import lombok.Setter;
 

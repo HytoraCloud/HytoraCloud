@@ -57,8 +57,8 @@ public class InfoCommand implements TabCompletable {
                     for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
                         sender.sendMessage("§h> §a" + service.getName() + " §h[§d" + service.getUniqueId() + " §7| §6Authenticated: " + (service.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
                         sender.sendMessage("  §8> §bID: #" +  service.getId() + " §7| §eState: " + service.getState().getColor() + service.getState().name());
-                        sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getCurrentHost().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
-                        sender.sendMessage("  §8> §bType: " +  service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getTemplate().getName());
+                        sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
+                        sender.sendMessage("  §8> §bType: " +  service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getCurrentTemplate().getName());
                         sender.sendMessage("  §8> §bHost: " +  service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
                         sender.sendMessage("  §8> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage() : "-1") + "/" + service.getGroup().getMemory());
                         sender.sendMessage("  §8> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
@@ -86,7 +86,7 @@ public class InfoCommand implements TabCompletable {
 
                         sender.sendMessage("§h> §b" + serviceGroup.getName() + " §h[§f" + serviceGroup.getUniqueId() + "§h] §h:");
                         sender.sendMessage("  §8> §bType: " + serviceGroup.getType() + " §7| §eReceiver: " + serviceGroup.getReceiver());
-                        sender.sendMessage("  §8> §bPlayers: " +  serviceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getTemplate().getName());
+                        sender.sendMessage("  §8> §bPlayers: " +  serviceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getCurrentTemplate().getName());
                         sender.sendMessage("  §8> §bMemory: " + serviceGroup.getMemory());
                         sender.sendMessage("  §8> §bMinServer: " +  serviceGroup.getMinServer() + " §7| §eMaxServer: " + serviceGroup.getMaxServer());
                         sender.sendMessage("  §8> §bNew-Server-At: " +  serviceGroup.getNewServerPercent() + "% §7| §eProperties: " + serviceGroup.getProperties().keySet().size());

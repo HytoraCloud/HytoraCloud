@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver.commons.packets.in.request.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleInfo;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,12 +27,12 @@ public class PacketRequestModules extends EmptyPacket {
     @Override
     public void handle(HytoraConnection connection) {
 
-        List<ModuleInfo> moduleInfos = new LinkedList<>();
+        List<IModule> modules = new LinkedList<>();
 
-        for (Module module : CloudDriver.getInstance().getInstance(ModuleService.class).getModules()) {
-            moduleInfos.add(module.getInfo());
+        for (CloudModule cloudModule : CloudDriver.getInstance().getInstance(ModuleService.class).getCloudModules()) {
+            modules.add(cloudModule.getBase());
         }
 
-        this.reply(component -> component.put("modules", moduleInfos));
+        this.reply(component -> component.put("modules", modules));
     }
 }

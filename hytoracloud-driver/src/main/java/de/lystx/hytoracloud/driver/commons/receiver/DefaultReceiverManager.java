@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.driver.commons.receiver;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
+import de.lystx.hytoracloud.driver.commons.wrapped.ReceiverObject;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import net.hytora.networking.connection.HytoraConnectionBridge;
@@ -22,7 +22,13 @@ public class DefaultReceiverManager implements IReceiverManager {
     private List<IReceiver> availableReceivers;
 
     public DefaultReceiverManager() {
-        this.availableReceivers = new LinkedList<>();
+        this.setAvailableReceivers(new LinkedList<>());
+    }
+
+    public void setAvailableReceivers(List<IReceiver> availableReceivers) {
+        this.availableReceivers = availableReceivers;
+
+        this.availableReceivers.add(new ReceiverObject("127.0.0.1", 1401, Utils.INTERNAL_RECEIVER, UUID.randomUUID()));
     }
 
     @Override
@@ -54,6 +60,9 @@ public class DefaultReceiverManager implements IReceiverManager {
 
     @Override
     public void sendPacket(IReceiver receiver, HytoraPacket packet) {
+        if (receiver.getName().equalsIgnoreCase(Utils.INTERNAL_RECEIVER)) {
+            return;
+        }
         UserManager userManager = CloudDriver.getInstance().getConnection().getUserManager();
         HytoraConnectionBridge user = userManager.getUser(receiver.getName());
         user.processIn(packet);

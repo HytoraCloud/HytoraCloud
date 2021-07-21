@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
@@ -239,13 +240,17 @@ public class CloudCommand implements TabCompletable {
                     } else if (args[0].equalsIgnoreCase("copy")) {
                         String servername = args[1];
                         String templatename = args[2];
-                        IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(servername);
-                        if (IService == null) {
+                        IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(servername);
+                        if (service == null) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe service §e" + servername + " §cdoesn't exist!");
                             return;
                         }
-
-                        CloudDriver.getInstance().copyTemplate(IService, templatename);
+                        ITemplate template = CloudDriver.getInstance().getTemplateManager().getTemplate(service.getSyncedGroup().orElse(service.getGroup()), templatename);
+                        if (template == null) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + service.getGroup().getName() + " §chas no template with name §e" + templatename + "§c!");
+                            return;
+                        }
+                        CloudDriver.getInstance().getTemplateManager().copyTemplate(service, template);
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Copied §b" + servername + " §7into template §b" + templatename);
                     } else {
                         this.help(player);
@@ -255,13 +260,19 @@ public class CloudCommand implements TabCompletable {
                         String servername = args[1];
                         String templatename = args[2];
                         String directory = args[3];
-                        IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(servername);
-                        if (IService == null) {
+                        IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(servername);
+                        if (service == null) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe service §e" + servername + " §cdoesn't exist!");
                             return;
                         }
 
-                        CloudDriver.getInstance().copyTemplate(IService, templatename, directory);
+                        ITemplate template = CloudDriver.getInstance().getTemplateManager().getTemplate(service.getSyncedGroup().orElse(service.getGroup()), templatename);
+                        if (template == null) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + service.getGroup().getName() + " §chas no template with name §e" + templatename + "§c!");
+                            return;
+                        }
+
+                        CloudDriver.getInstance().getTemplateManager().copyTemplate(service, template, directory);
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Copied folder §e" + directory + " §7from Service §b" + servername + " §7into template §b" + templatename);
                     } else {
                         this.help(player);

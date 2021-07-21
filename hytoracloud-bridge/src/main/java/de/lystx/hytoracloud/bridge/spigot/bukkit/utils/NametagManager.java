@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 import java.lang.reflect.*;
 import java.util.*;
 
-import de.lystx.hytoracloud.driver.utils.reflection.Reflections;
+import de.lystx.hytoracloud.driver.utils.Reflections;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -48,26 +48,26 @@ public class NametagManager {
         prefix = ChatColor.translateAlternateColorCodes('&', prefix);
         suffix = ChatColor.translateAlternateColorCodes('&', suffix);
         try {
-            Constructor<?> constructor = de.lystx.hytoracloud.driver.utils.reflection.Reflections.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor();
+            Constructor<?> constructor = Reflections.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor();
             Object packet = constructor.newInstance();
             List<String> contents = new ArrayList<>();
             contents.add(Bukkit.getPlayer(user).getName());
             try {
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "a", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "b", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "c", prefix);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "d", suffix);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "e", "ALWAYS");
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "h", 0);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "g", contents);
+                Reflections.setField(packet, "a", team_name);
+                Reflections.setField(packet, "b", team_name);
+                Reflections.setField(packet, "c", prefix);
+                Reflections.setField(packet, "d", suffix);
+                Reflections.setField(packet, "e", "ALWAYS");
+                Reflections.setField(packet, "h", 0);
+                Reflections.setField(packet, "g", contents);
             } catch (Exception ex) {
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "a", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "b", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "c", prefix);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "d", suffix);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "e", "ALWAYS");
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "i", 0);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "h", contents);
+                Reflections.setField(packet, "a", team_name);
+                Reflections.setField(packet, "b", team_name);
+                Reflections.setField(packet, "c", prefix);
+                Reflections.setField(packet, "d", suffix);
+                Reflections.setField(packet, "e", "ALWAYS");
+                Reflections.setField(packet, "i", 0);
+                Reflections.setField(packet, "h", contents);
             }
             if (players == null) {
                 Bukkit.getOnlinePlayers().forEach(t -> Reflections.sendPacket(t, packet));
@@ -92,23 +92,23 @@ public class NametagManager {
             if (team_name.length() > 16)
                 team_name = team_name.substring(0, 16);
 
-            Constructor<?> constructor = de.lystx.hytoracloud.driver.utils.reflection.Reflections.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor();
+            Constructor<?> constructor = Reflections.getNMSClass("PacketPlayOutScoreboardTeam").getConstructor();
             Object packet = constructor.newInstance();
 
             List<String> contents = new ArrayList<>();
             contents.add(priority + user.getName());
             try {
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "a", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "b", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "e", "ALWAYS");
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "h", 1);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "g", contents);
+                Reflections.setField(packet, "a", team_name);
+                Reflections.setField(packet, "b", team_name);
+                Reflections.setField(packet, "e", "ALWAYS");
+                Reflections.setField(packet, "h", 1);
+                Reflections.setField(packet, "g", contents);
             } catch (Exception ex) {
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "a", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "b", team_name);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "e", "ALWAYS");
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "i", 1);
-                de.lystx.hytoracloud.driver.utils.reflection.Reflections.setField(packet, "h", contents);
+                Reflections.setField(packet, "a", team_name);
+                Reflections.setField(packet, "b", team_name);
+                Reflections.setField(packet, "e", "ALWAYS");
+                Reflections.setField(packet, "i", 1);
+                Reflections.setField(packet, "h", contents);
             }
             if (players == null) {
                 Bukkit.getOnlinePlayers().forEach(t -> Reflections.sendPacket(t, packet));

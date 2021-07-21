@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.l
 
 import com.google.gson.JsonArray;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import io.vson.elements.object.VsonObject;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ import lombok.Getter;
 @Getter
 public class SignLayOut {
 
-    private final JsonEntity document;
+    private final JsonDocument document;
     private final int repeatTick;
 
     public SignLayOut() {
@@ -28,7 +28,7 @@ public class SignLayOut {
      * the repeatTick to default 20 (1 Seconds)
      * @param document
      */
-    public SignLayOut(JsonEntity document) {
+    public SignLayOut(JsonDocument document) {
         this.document = document;
         this.repeatTick = 20;
     }
@@ -48,7 +48,7 @@ public class SignLayOut {
      * then uses {@link DefaultSignLayout}
      * @return SignLayout parsed as {@link VsonObject}
      */
-    public JsonEntity check() {
+    public JsonDocument check() {
         return this.document == null ? new DefaultSignLayout() : this.document;
     }
 
@@ -66,7 +66,7 @@ public class SignLayOut {
      * Services which are ONLINE
      * @return SignLayout as VsonObject
      */
-    public JsonEntity getOnlineLayOut() {
+    public JsonDocument getOnlineLayOut() {
         return this.check().getJson("otherLayouts").getJson("ONLINE");
     }
 
@@ -75,7 +75,7 @@ public class SignLayOut {
      * Services which are in MAINTENANCE
      * @return SignLayout as VsonObject
      */
-    public JsonEntity getMaintenanceLayOut() {
+    public JsonDocument getMaintenanceLayOut() {
         return this.check().getJson("otherLayouts").getJson("MAINTENANCE");
     }
 
@@ -84,7 +84,7 @@ public class SignLayOut {
      * Services which are FULL
      * @return SignLayout as VsonObject
      */
-    public JsonEntity getFullLayOut() {
+    public JsonDocument getFullLayOut() {
         return this.check().getJson("otherLayouts").getJson("FULL");
     }
 
@@ -93,7 +93,7 @@ public class SignLayOut {
      * by name from the config
      * @return SignLayout as VsonObject
      */
-    public JsonEntity getCustom(String name) {
+    public JsonDocument getCustom(String name) {
         return this.check().getJson("otherLayouts").getJson(name);
     }
 

@@ -1,33 +1,31 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
-import de.lystx.hytoracloud.driver.cloudservices.cloud.NetworkService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.Module;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.NetworkService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.webserver.WebServer;
+import de.lystx.hytoracloud.launcher.global.webserver.WebServer;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignService;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
-import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutServerSelector;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
-import de.lystx.hytoracloud.driver.commons.service.Template;
-import de.lystx.hytoracloud.driver.utils.log.LogService;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.utils.utillity.Action;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
-import de.lystx.hytoracloud.driver.utils.utillity.Value;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
+import de.lystx.hytoracloud.driver.commons.wrapped.TemplateObject;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.log.LogService;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.utils.Action;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.launcher.cloud.commands.*;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerGroupUpdate;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerTemplateCopy;
@@ -40,7 +38,7 @@ import de.lystx.hytoracloud.launcher.cloud.handler.receiver.CloudHandlerReceiver
 import de.lystx.hytoracloud.launcher.cloud.handler.receiver.CloudHandlerReceiverLogout;
 import de.lystx.hytoracloud.launcher.cloud.handler.receiver.CloudHandlerReceiverNotify;
 import de.lystx.hytoracloud.launcher.cloud.handler.services.*;
-import de.lystx.hytoracloud.launcher.cloud.impl.setup.CloudSetup;
+import de.lystx.hytoracloud.launcher.cloud.impl.setup.CloudSystemSetup;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
@@ -56,16 +54,18 @@ import de.lystx.hytoracloud.launcher.cloud.commands.CreateCommand;
 import de.lystx.hytoracloud.launcher.global.commands.DeleteCommand;
 import de.lystx.hytoracloud.launcher.global.commands.DownloadCommand;
 import de.lystx.hytoracloud.launcher.global.commands.StopCommand;
-import de.lystx.hytoracloud.launcher.global.setups.DatabaseSetup;
+import de.lystx.hytoracloud.launcher.global.setups.DatabaseSetupExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 @Getter @Setter
@@ -92,7 +92,6 @@ public class CloudSystem extends CloudProcess {
         CloudDriver.getInstance().getServiceRegistry().registerService(new ConfigService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new ServiceOutputService());
 
-        CloudDriver.getInstance().getServiceRegistry().registerService(new TemplateService());
         CloudDriver.getInstance().getServiceRegistry().registerService(new GroupService());
 
         CloudDriver.getInstance().getServiceRegistry().registerService(new PermissionService());
@@ -116,10 +115,6 @@ public class CloudSystem extends CloudProcess {
         
     }
 
-    public ServiceOutputPrinter getScreenPrinter() {
-        return screenPrinter;
-    }
-
     @Override
     public void reload() {
         super.reload();
@@ -129,11 +124,9 @@ public class CloudSystem extends CloudProcess {
         CloudDriver.getInstance().getInstance(ConfigService.class).reload();
 
         //Reloading all modules
-        for (Module module : this.getInstance(ModuleService.class).getModules()) {
-            module.onReload();
+        for (CloudModule cloudModule : this.getInstance(ModuleService.class).getCloudModules()) {
+            cloudModule.onReload();
         }
-
-
 
         SignService service = CloudDriver.getInstance().getInstance(SignService.class);
         NPCService npcService = CloudDriver.getInstance().getInstance(NPCService.class);
@@ -163,8 +156,8 @@ public class CloudSystem extends CloudProcess {
         }
 
         //Updating webserver
-        CloudDriver.getInstance().getParent().getWebServer().update("players", new JsonEntity().append("players", CloudDriver.getInstance().getPlayerManager().getCachedObjects()));
-        CloudDriver.getInstance().getParent().getWebServer().update("services", new JsonEntity().append("services", CloudDriver.getInstance().getServiceManager().getCachedObjects()));
+        webServer.update("players", new JsonDocument().append("players", CloudDriver.getInstance().getPlayerManager().getCachedObjects()));
+        webServer.update("services", new JsonDocument().append("services", CloudDriver.getInstance().getServiceManager().getCachedObjects()));
 
     }
 
@@ -192,7 +185,7 @@ public class CloudSystem extends CloudProcess {
             this.screenPrinter = new ServiceOutputPrinter();
             this.webServer = new WebServer(this);
             
-            this.webServer.update("", new JsonEntity().append("info", "There's nothing to see here").append("routes", this.getWebServer().getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
+            this.webServer.update("", new JsonDocument().append("info", "There's nothing to see here").append("routes", this.webServer.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
             this.webServer.start();
 
 
@@ -240,14 +233,17 @@ public class CloudSystem extends CloudProcess {
 
             this.getInstance(CommandService.class).setActive(false);
 
-            Value<SpigotVersion> spigot = new Value<>();
-            Value<ProxyVersion> proxy = new Value<>();
-            new CloudSetup().start(this.getParent().getConsole(), setup -> {
+            AtomicReference<SpigotVersion> spigot = new AtomicReference<>();
+            AtomicReference<ProxyVersion> proxy = new AtomicReference<>();
+            new CloudSystemSetup().start(setup -> {
                 if (setup.isCancelled()) {
                     this.getParent().getConsole().getLogger().sendMessage("ERROR", "§cYou are §enot §callowed to §4cancel §cthis setup! Restart the cloud!");
                     System.exit(0);
                     return;
                 }
+
+                spigot.set(SpigotVersion.valueOf(setup.getSpigotVersion()));
+                proxy.set(ProxyVersion.valueOf(setup.getBungeeCordType()));
 
                 if (spigot.get() == null) {
                     this.getParent().getConsole().getLogger().sendMessage("ERROR", "§cPlease redo the setup and provide a §evalid spigot version§c!");
@@ -267,29 +263,27 @@ public class CloudSystem extends CloudProcess {
                     return;
                 }
 
-                JsonEntity document = this.getInstance(ConfigService.class).getJsonEntity();
+                JsonDocument document = this.getInstance(ConfigService.class).getJsonDocument();
                 document.append("setupDone", true);
-                document.append("host", setup.getHostname());
+                document.append("host", "127.0.0.1");
                 document.append("maxPlayers", setup.getMaxPlayers());
                 document.append("port", setup.getPort());
                 document.append("proxyProtocol", setup.isProxyProtocol());
                 document.save();
-                spigot.setValue(SpigotVersion.byKey(setup.getSpigotVersion()));
-                proxy.setValue(ProxyVersion.byKey(setup.getBungeeCordType()));
 
                 //Creating Bungee-Group
-                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Bungee", new Template("Bungee", "default", true), ServiceType.PROXY, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, false, true, new PropertyObject()));
+                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Bungee", new TemplateObject("Bungee", "default", true), ServiceType.PROXY, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, false, true, new PropertyObject(), new LinkedList<>()));
 
                 //Creating Lobby-Group
-                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Lobby", new Template("Lobby", "default", true), ServiceType.SPIGOT, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, true, true, new PropertyObject()));
+                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Lobby", new TemplateObject("Lobby", "default", true), ServiceType.SPIGOT, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, true, true, new PropertyObject(), new LinkedList<>()));
 
                 if (!setup.getDatabase().equalsIgnoreCase("FILES")) {
                     this.getParent().getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");
                     this.getParent().getConsole().getLogger().sendMessage("§9");
                     this.getParent().getConsole().getLogger().sendMessage("§9");
-                    DatabaseSetup databaseSetup = new DatabaseSetup();
-                    databaseSetup.start(this.getParent().getConsole(), ds -> {
-                        JsonEntity jsonEntity1 = new JsonEntity()
+                    DatabaseSetupExecutor databaseSetup = new DatabaseSetupExecutor();
+                    databaseSetup.start( ds -> {
+                        JsonDocument jsonDocument1 = new JsonDocument()
                                 .append("type", setup.getDatabase().toUpperCase())
                                 .append("host", ds.getHost())
                                 .append("port", ds.getPort())
@@ -297,7 +291,7 @@ public class CloudSystem extends CloudProcess {
                                 .append("defaultDatabase", ds.getDefaultDatabase())
                                 .append("collectionOrTable", ds.getCollectionOrTable())
                                 .append("password", ds.getPassword());
-                        jsonEntity1.save(new File(this.getInstance(FileService.class).getDatabaseDirectory(), "database.json"));
+                        jsonDocument1.save(new File(this.getInstance(FileService.class).getDatabaseDirectory(), "database.json"));
 
                         //Loading database
                         this.getDatabaseManager().load(ds.getHost(), ds.getPort(), ds.getUsername(), ds.getPassword(), ds.getCollectionOrTable(), ds.getDefaultDatabase(), DatabaseType.valueOf(setup.getDatabase().toUpperCase()));

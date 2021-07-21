@@ -12,18 +12,18 @@ import de.lystx.hytoracloud.bridge.global.manager.CloudBridgeServiceManager;
 import de.lystx.hytoracloud.bridge.global.manager.CloudBridgePlayerManager;
 import de.lystx.hytoracloud.bridge.global.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
 import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 
@@ -65,10 +65,10 @@ public class CloudBridge {
         this.bridgeInstance = bridgeInstance;
         this.cloudDriver = new CloudDriver(CloudType.BRIDGE);
 
-        CloudDriver.getInstance().setBridgeInstance(bridgeInstance);
+        CloudDriver.getInstance().setInstance("bridgeInstance", bridgeInstance);
 
-        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
-        this.client = new HytoraClient(jsonEntity.getString("host"), jsonEntity.getInteger("port"));
+        JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
+        this.client = new HytoraClient(jsonDocument.getString("host"), jsonDocument.getInteger("port"));
 
         CloudDriver.getInstance().setInstance("connection", this.client);
         CloudDriver.getInstance().setInstance("driverType", CloudType.BRIDGE);
@@ -77,7 +77,6 @@ public class CloudBridge {
         CloudDriver.getInstance().getServiceRegistry().denyService(PermissionService.class);
         CloudDriver.getInstance().getServiceRegistry().denyService(ServiceOutputService.class);
         CloudDriver.getInstance().getServiceRegistry().denyService(ModuleService.class);
-        CloudDriver.getInstance().getServiceRegistry().denyService(ConfigService.class);
 
         CloudDriver.getInstance().setInstance("playerManager", new CloudBridgePlayerManager());
         CloudDriver.getInstance().setInstance("serviceManager", new CloudBridgeServiceManager());
@@ -105,7 +104,7 @@ public class CloudBridge {
     public void setProxyBridge(ProxyBridge proxyBridge) {
         this.proxyBridge = proxyBridge;
 
-        CloudDriver.getInstance().setProxyBridge(proxyBridge);
+        CloudDriver.getInstance().setInstance("proxyBridge", proxyBridge);
 
         //NetworkHandler
         CloudDriver.getInstance().registerNetworkHandler(proxyBridge.getNetworkHandler());
@@ -157,9 +156,9 @@ public class CloudBridge {
      */
     private void bootstrap() {
 
-        JsonEntity jsonEntity = new JsonEntity(new File("./CLOUD/HYTORA-CLOUD.json"));
+        JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
 
-        System.out.println("[CloudBridge] Trying to connect to Cloud@" + jsonEntity.getString("host") + ":" + jsonEntity.getInteger("port") + " via user '" + jsonEntity.getString("server") + "' ...");
+        System.out.println("[CloudBridge] Trying to connect to Cloud@" + jsonDocument.getString("host") + ":" + jsonDocument.getInteger("port") + " via user '" + jsonDocument.getString("server") + "' ...");
         this.client.listener(new ClientListener() {
 
             @Override
@@ -179,7 +178,7 @@ public class CloudBridge {
                 System.out.println("[CloudBridge] Bridge has connected to cloud at [" + socketAddress.toString() + "]");
                 System.out.println("[CloudBridge] But this Service has not received a Handshake-Component yet!");
 
-                PacketRegisterService packetRegisterService = new PacketRegisterService(jsonEntity.getString("server"));
+                PacketRegisterService packetRegisterService = new PacketRegisterService(jsonDocument.getString("server"));
 
                 packetRegisterService.toReply(client, new Consumer<Component>() {
 
@@ -233,7 +232,7 @@ public class CloudBridge {
             public void packetOut(HytoraPacket packet) {
 
             }
-        }).login(new HytoraLogin(jsonEntity.getString("server"))).options(new HytoraClientOptions().setDebug(true)).createConnection();
+        }).login(new HytoraLogin(jsonDocument.getString("server"))).options(new HytoraClientOptions().setDebug(true)).createConnection();
 
 
     }

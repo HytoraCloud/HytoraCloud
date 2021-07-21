@@ -107,7 +107,7 @@ public class PlayerListener implements Listener {
         }
 
         if (playerServer == null) {
-            IService fallback = CloudDriver.getInstance().getFallback(iCloudPlayer);
+            IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(iCloudPlayer);
             ServerInfo fallbackInfo = ProxyServer.getInstance().getServerInfo(fallback.getName());
 
             if (fallbackInfo == null) {

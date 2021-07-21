@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.receiver;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.implementations.ReceiverObject;
 import net.hytora.networking.elements.packet.HytoraPacket;
 
 import java.util.List;

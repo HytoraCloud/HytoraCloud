@@ -2,7 +2,6 @@ package de.lystx.hytoracloud.launcher.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.TemplateService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.Utils;
@@ -19,7 +18,6 @@ public class Manager extends CloudProcess {
         super(CloudType.MANAGER);
 
         CloudDriver.getInstance().getServiceRegistry().registerService(new GroupService());
-        CloudDriver.getInstance().getServiceRegistry().registerService(new TemplateService());
 
         this.getInstance(CommandService.class).registerCommand(new DownloadCommand());
         this.getInstance(CommandService.class).registerCommand(new CreateCommand());

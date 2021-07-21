@@ -4,11 +4,11 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.other.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.SignLayOut;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.DefaultSignLayout;
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.Getter;
 
 import java.io.File;
@@ -59,12 +59,12 @@ public class SignService implements ICloudService {
 
             this.signLayOut.getDocument().save(this.layOutFile);
         } else {
-            this.signLayOut = new SignLayOut(new JsonEntity(this.layOutFile));
+            this.signLayOut = new SignLayOut(new JsonDocument(this.layOutFile));
         }
         if (!this.signFile.exists()) {
-            new JsonEntity(this.signFile).save(this.signFile);
+            new JsonDocument(this.signFile).save(this.signFile);
         }
-        JsonEntity config = new JsonEntity(this.signFile);
+        JsonDocument config = new JsonDocument(this.signFile);
         this.cloudSigns = new LinkedList<>(config.keys(CloudSign.class));
     }
 
@@ -73,7 +73,7 @@ public class SignService implements ICloudService {
      */
     public void save() {
         try {
-            JsonEntity config = new JsonEntity(this.signFile);
+            JsonDocument config = new JsonDocument(this.signFile);
             config.clear();
             for (CloudSign cloudSign : this.cloudSigns) {
                 config.append(cloudSign.getUuid().toString(), cloudSign);

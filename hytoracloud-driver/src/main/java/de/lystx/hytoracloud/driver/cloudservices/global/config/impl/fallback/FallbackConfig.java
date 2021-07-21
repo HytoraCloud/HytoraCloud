@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback;
 
 
 
+import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.Fallback;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

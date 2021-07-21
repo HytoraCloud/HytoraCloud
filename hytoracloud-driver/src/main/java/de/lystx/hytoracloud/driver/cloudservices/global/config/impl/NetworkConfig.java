@@ -4,10 +4,10 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
 
-import de.lystx.hytoracloud.driver.utils.utillity.CloudMap;
+import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +19,7 @@ import java.util.*;
 @Getter @Setter @AllArgsConstructor
 public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
 
+    private static final long serialVersionUID = 2412230558827763090L;
     /**
      * The host of the cloud
      */

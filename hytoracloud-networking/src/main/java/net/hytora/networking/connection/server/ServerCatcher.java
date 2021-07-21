@@ -64,6 +64,30 @@ public class ServerCatcher {
     }
 
     /**
+     * UnRegisters a handler for an incoming channel
+     *
+     * @param channel the channel
+     */
+    public void unregisterChannelHandler(String channel) {
+        channelHandlers.remove(channel);
+    }
+
+    /**
+     * UnRegisters a handler for an incoming channel
+     *
+     * @param channel the channel
+     */
+    public void unregisterChannelHandler(String channel, Consumer<RepliableComponent> consumer) {
+        Set<Consumer<RepliableComponent>> candidate = channelHandlers.get(channel);
+        if (candidate != null) {
+            candidate.remove(consumer);
+        } else {
+            candidate = new HashSet<>();
+            candidate.add(consumer);
+            channelHandlers.put(channel, candidate);
+        }
+    }
+    /**
      * Registers a handler for a reply to reply to some query
      *
      * @param id the id of the query

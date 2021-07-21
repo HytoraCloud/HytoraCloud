@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
-import static de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.Util.createConsoleConsumer;
+import static de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressbarUtils.createConsoleConsumer;
 
 public class ProgressBar implements AutoCloseable {
 
@@ -51,7 +51,7 @@ public class ProgressBar implements AutoCloseable {
     ) {
         this(task, initialMax, updateIntervalMillis, processed, elapsed,
                 new DefaultProgressBarRenderer(style, unitName, unitSize, showSpeed, speedFormat, speedUnit),
-                Util.createConsoleConsumer(os)
+                ProgressbarUtils.createConsoleConsumer(os)
         );
     }
 
@@ -68,7 +68,7 @@ public class ProgressBar implements AutoCloseable {
     ) {
         this.progress = new ProgressState(task, initialMax, processed, elapsed);
         this.action = new ProgressUpdateAction(progress, renderer, consumer);
-        scheduledTask = (ScheduledFuture<Void>) Util.executor.scheduleAtFixedRate(
+        scheduledTask = (ScheduledFuture<Void>) ProgressbarUtils.executor.scheduleAtFixedRate(
                 action, 0, updateIntervalMillis, TimeUnit.MILLISECONDS
         );
     }
@@ -119,7 +119,7 @@ public class ProgressBar implements AutoCloseable {
         scheduledTask.cancel(false);
         progress.kill();
         try {
-            Util.executor.schedule(action, 0, TimeUnit.NANOSECONDS).get();
+            ProgressbarUtils.executor.schedule(action, 0, TimeUnit.NANOSECONDS).get();
         } catch (InterruptedException | ExecutionException e) { }
     }
 
@@ -172,12 +172,12 @@ public class ProgressBar implements AutoCloseable {
 
 
     public static InputStream wrap(InputStream is, String task) {
-        ProgressBarBuilder pbb = new ProgressBarBuilder().setTaskName(task).setInitialMax(Util.getInputStreamSize(is));
+        ProgressBarBuilder pbb = new ProgressBarBuilder().setTaskName(task).setInitialMax(ProgressbarUtils.getInputStreamSize(is));
         return wrap(is, pbb);
     }
 
     public static InputStream wrap(InputStream is, ProgressBarBuilder pbb) {
-        long size = Util.getInputStreamSize(is);
+        long size = ProgressbarUtils.getInputStreamSize(is);
         if (size != -1)
             pbb.setInitialMax(size);
         return new ProgressBarWrappedInputStream(is, pbb.build());

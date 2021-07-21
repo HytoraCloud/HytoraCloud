@@ -50,7 +50,6 @@ public class CloudPlayerInventory implements Serializable {
      *               values to null and clear the items
      */
     public void update(boolean clearAfter) {
-        CloudDriver.getInstance().getCloudInventories().put(this.ICloudPlayer.getUniqueId(), this);
         CloudDriver.getInstance().getConnection().sendPacket(new PacketInventoryUpdate(this.ICloudPlayer, this));
         if (clearAfter) {
             this.slots = new HashMap<>();

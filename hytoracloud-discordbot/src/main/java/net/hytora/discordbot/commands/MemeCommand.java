@@ -1,7 +1,7 @@
 package net.hytora.discordbot.commands;
 
-import de.lystx.hytoracloud.driver.utils.utillity.JsonEntity;
-import de.lystx.hytoracloud.driver.utils.utillity.StringCreator;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.utils.StringCreator;
 import jdk.nashorn.api.scripting.URLReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class MemeCommand extends CommandHandler {
 
-    public static JsonEntity CURRENT_SUB_REDDIT = new JsonEntity();
+    public static JsonDocument CURRENT_SUB_REDDIT = new JsonDocument();
 
     public MemeCommand(String name, String description, CommandCategory category, String... aliases) {
         super(name, description, category, aliases);
@@ -45,7 +45,7 @@ public class MemeCommand extends CommandHandler {
                 stringCreator.append(line);
             }
 
-            JsonEntity vsonObject = new JsonEntity(stringCreator.toString());
+            JsonDocument vsonObject = new JsonDocument(stringCreator.toString());
             CURRENT_SUB_REDDIT = vsonObject;
             if (vsonObject.getBoolean("nsfw") && !channel.isNSFW()) {
                 channel.sendMessage(

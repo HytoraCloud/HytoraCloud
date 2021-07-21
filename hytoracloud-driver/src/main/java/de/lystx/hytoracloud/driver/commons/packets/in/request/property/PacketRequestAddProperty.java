@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.in.request.property;
 
 
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;

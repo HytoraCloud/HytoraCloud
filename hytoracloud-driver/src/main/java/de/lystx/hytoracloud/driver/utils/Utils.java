@@ -2,9 +2,11 @@ package de.lystx.hytoracloud.driver.utils;
 
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBar;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBarStyle;
+import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
-import de.lystx.hytoracloud.driver.utils.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import lombok.SneakyThrows;
 
 import java.io.*;
@@ -24,78 +26,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-/**
- * Class for utiliities
- * made static because it's
- * easier to call the methods
- */
-public class Utils {
 
+public class Utils {
 
     public static final String INTERNAL_RECEIVER = "InternalReceiver";
     public static final String PASTE_SERVER_URL_DOCUMENTS = "https://paste.labymod.net/documents";
     public static final String PASTE_SERVER_URL = "https://paste.labymod.net/";
     public static final String PASTE_SERVER_URL_RAW = "https://paste.labymod.net/raw/";
-
-    public static final byte PACKET_HANDSHAKE = 0x00, PACKET_STATUSREQUEST = 0x00, PACKET_PING = 0x01;
-    public static final int PROTOCOL_VERSION = 4;
-    public static final int STATUS_HANDSHAKE = 1;
-    public static final char COLOR_CHAR = '\u00A7';
-    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR) + "[0-9A-FK-OR]");
-
-
-    /**
-     * Strips the given message of all color codes
-     *
-     * @param input String to strip of color
-     * @return A copy of the input string, without any coloring
-     */
-    public static String stripColors(String input) {
-        return input == null ? null : STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
-    }
-
-    public static void io(boolean b, final String m) throws IOException {
-        if (b) {
-            throw new IOException(m);
-        }
-    }
-
-    /**
-     */
-    public static int readVarInt(DataInputStream in) throws IOException {
-        int i = 0;
-        int j = 0;
-        while (true) {
-            int k = in.readByte();
-
-            i |= (k & 0x7F) << j++ * 7;
-
-            if (j > 5) {
-                throw new RuntimeException("VarInt too big");
-            }
-
-            if ((k & 0x80) != 128) {
-                break;
-            }
-        }
-
-        return i;
-    }
-
-    /**
-     * @throws IOException
-     */
-    public static void writeVarInt(DataOutputStream out, int paramInt) throws IOException {
-        while (true) {
-            if ((paramInt & 0xFFFFFF80) == 0) {
-                out.writeByte(paramInt);
-                return;
-            }
-
-            out.writeByte(paramInt & 0x7F | 0x80);
-            paramInt >>>= 7;
-        }
-    }
 
 
     /**
@@ -137,6 +74,9 @@ public class Utils {
         return (2 * intersection.size()) / (nx.size() + ny.size());
     }
 
+    /**
+     * Clears the console screen
+     */
     public static void clearConsole() {
         try {
             String os = System.getProperty("os.name");
@@ -151,6 +91,11 @@ public class Utils {
         }
     }
 
+    /**
+     * Gets the dateformat for console
+     *
+     * @return format
+     */
     public static SimpleDateFormat getSimpleDateFormat() {
         return new SimpleDateFormat("hh:mm:ss");
     }
@@ -180,6 +125,7 @@ public class Utils {
 
     /**
      * Downloads a file from a website
+     *
      * @param search > URL
      * @param location > File to download to
      */
@@ -236,6 +182,12 @@ public class Utils {
 
         return list;
     }
+
+    /**
+     * Deletes a folder with content
+     *
+     * @param folder the folder
+     */
     public static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
         if(files!=null) { //some JVMs return null for empty dirs
@@ -250,6 +202,15 @@ public class Utils {
         folder.delete();
     }
 
+    /**
+     * Does an operation until the list is empty and
+     * then does another operation with the emptyConsumer
+     *
+     * @param list the list
+     * @param listConsumer the consumer for every list item
+     * @param emptyConsumer the consumer when list is empty
+     * @param <T> the generic
+     */
     public static <T> void doUntilEmpty(List<T> list, Consumer<T> listConsumer, Consumer<List<T>> emptyConsumer) {
         int i = list.size();
         for (T t : list) {
@@ -261,11 +222,27 @@ public class Utils {
         }
     }
 
+    /**
+     * Copies a resource from the resource folder to a location
+     *
+     * @param res the resource name
+     * @param dest the location name
+     * @param c the class
+     * @throws IOException if something goes wrong
+     */
     public static void copyResource(String res, String dest, Class<?> c) throws IOException {
         InputStream src = c.getResourceAsStream(res);
         Files.copy(src, Paths.get(dest), StandardCopyOption.REPLACE_EXISTING);
     }
 
+    /**
+     * Sets a field inside a class
+     *
+     * @param _class the class
+     * @param instance the object
+     * @param name the field name
+     * @param value the value
+     */
     @SneakyThrows
     public static void setField(Class<?> _class, Object instance, String name, Object value) {
         try {
@@ -277,22 +254,11 @@ public class Utils {
         }
     }
 
-    public static List<String> exceptionToList(Exception e) {
-        List<String> list = new LinkedList<>();
-
-        list.add(e.getMessage() == null ? "No message" : e.getMessage());
-
-        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-            list.add(stackTraceElement.toString());
-        }
-
-        return list;
-    }
-
     /**
      * Checks if a class exists
-     * @param name
-     * @return
+     *
+     * @param name the name
+     * @return boolean
      */
     public static boolean existsClass(String name) {
         try {
@@ -303,9 +269,4 @@ public class Utils {
         }
     }
 
-    @SneakyThrows
-    public static void createFile(File file) {
-        file.createNewFile();
-
-    }
 }

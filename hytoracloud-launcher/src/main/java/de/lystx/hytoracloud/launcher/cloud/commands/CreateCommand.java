@@ -3,24 +3,24 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.utillity.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.ServiceType;
-import de.lystx.hytoracloud.driver.commons.service.Template;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
+import de.lystx.hytoracloud.driver.commons.wrapped.TemplateObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.Fallback;
+import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.commons.implementations.ServiceGroupObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.FallbackSetup;
 import de.lystx.hytoracloud.launcher.cloud.impl.setup.GroupSetup;
-import de.lystx.hytoracloud.launcher.cloud.impl.setup.PermissionGroupSetup;
+import de.lystx.hytoracloud.launcher.cloud.impl.setup.PermsGroupSetup;
 
 import java.util.*;
 
@@ -31,14 +31,14 @@ public class CreateCommand implements TabCompletable {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("group")) {
                 CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
-                new GroupSetup().start(CloudDriver.getInstance().getParent().getConsole(), setup -> {
+                new GroupSetup().start(setup -> {
                     CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
                     if (setup.isCancelled()) {
                         return;
                     }
                     boolean lobbyServer;
                     int maxPlayers;
-                    if (setup.isSkipped()) {
+                    if (setup.isExitAfterAnswer()) {
                         lobbyServer = false;
                         maxPlayers = -1;
                     } else {
@@ -49,7 +49,7 @@ public class CreateCommand implements TabCompletable {
                     IServiceGroup group = new ServiceGroupObject(
                             UUID.randomUUID(),
                             setup.getServerName(),
-                            new Template(setup.getServerName(), "default", true),
+                            new TemplateObject(setup.getServerName(), "default", true),
                             ServiceType.valueOf(setup.getType().toUpperCase()),
                             setup.getReceiver(),
                             setup.getMaxyServer(),
@@ -60,7 +60,8 @@ public class CreateCommand implements TabCompletable {
                             false,
                             lobbyServer,
                             setup.isDynamic(),
-                            new PropertyObject()
+                            new PropertyObject(),
+                            new LinkedList<>()
                     );
                     sender.sendMessage("INFO", "§2Created ServiceGroup §a" + group.getName() + " §7| §bMemory " + group.getMemory() + " §7| §bMinServer " + group.getMinServer() + " §7| §bMaxServer" + group.getMaxServer());
                     CloudDriver.getInstance().getInstance(GroupService.class).createGroup(group);
@@ -72,13 +73,13 @@ public class CreateCommand implements TabCompletable {
                 });
             } else if (args[0].equalsIgnoreCase("fallback")) {
                 CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
-                new FallbackSetup().start(CloudDriver.getInstance().getParent().getConsole(), setup -> {
+                new FallbackSetup().start(setup -> {
                     CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
                     if (setup.isCancelled()) {
                         return;
                     }
                     String permission;
-                    if (setup.isSkipped()) {
+                    if (setup.isExitAfterAnswer()) {
                         permission = null;
                     } else {
                         permission = setup.getPermission();
@@ -97,11 +98,10 @@ public class CreateCommand implements TabCompletable {
                     sender.sendMessage("INFO", "§2Created Fallback §a" + fallback.getGroupName() + " §7| §bID " + fallback.getPriority() + " §7| §bPermission " + fallback.getPermission());
                 });
             } else if (args[0].equalsIgnoreCase("perms")) {
-                PermissionGroupSetup setup = new PermissionGroupSetup();
                 CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
-                setup.start(CloudDriver.getInstance().getParent().getConsole(), setup1 -> {
+                new PermsGroupSetup().start(setup -> {
                     CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
-                    if (setup1.isCancelled()) {
+                    if (setup.isCancelled()) {
                         return;
                     }
                     PermissionGroup permissionGroup = new PermissionGroup(
