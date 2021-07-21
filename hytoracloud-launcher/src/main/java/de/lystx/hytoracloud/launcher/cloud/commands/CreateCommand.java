@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.wrapped.TemplateObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
@@ -27,7 +27,7 @@ import java.util.*;
 public class CreateCommand implements TabCompletable {
 
     @Command(name = "create", description = "Creates cloudstuff", aliases = "add")
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("group")) {
                 CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
@@ -129,7 +129,7 @@ public class CreateCommand implements TabCompletable {
         }
 
 
-    public void correctSyntax(CloudCommandSender sender) {
+    public void correctSyntax(CommandExecutor sender) {
         sender.sendMessage("INFO", "§9create <group> §7| §bCreates a ServiceGroup");
         sender.sendMessage("INFO", "§9create <perms> §7| §bCreates a PermissionGroup");
         sender.sendMessage("INFO", "§9create <fallback> §7| §bCreates a Fallback");

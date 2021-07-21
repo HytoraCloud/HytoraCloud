@@ -1,8 +1,10 @@
-package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc;
+package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudItem;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCConfig;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;

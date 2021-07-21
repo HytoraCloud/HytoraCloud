@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.listener;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;

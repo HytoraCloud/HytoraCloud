@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
@@ -18,7 +18,7 @@ public class PlayerCommand {
 
 
     @Command(name = "player", description = "Manages players on the network", aliases = "players")
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         ICloudPlayerManager ps = CloudDriver.getInstance().getPlayerManager();
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
@@ -102,7 +102,7 @@ public class PlayerCommand {
         }
     }
 
-    public void correctSyntax(CloudCommandSender sender) {
+    public void correctSyntax(CommandExecutor sender) {
         sender.sendMessage("INFO", "§9Help for §bPlayers§7:");
         sender.sendMessage("INFO", "§9players <list> §7| Lists all players");
         sender.sendMessage("INFO", "§9players <info> <player> §7| Gives info on a player");

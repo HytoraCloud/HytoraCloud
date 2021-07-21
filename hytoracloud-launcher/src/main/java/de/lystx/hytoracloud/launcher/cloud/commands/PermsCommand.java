@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
@@ -18,7 +18,7 @@ public class PermsCommand implements TabCompletable {
 
 
     @Command(name = "perms", description = "Manages permissions", aliases = {"cperms", "permissions"})
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("§9PermissionGroups:");
@@ -154,7 +154,7 @@ public class PermsCommand implements TabCompletable {
     }
 
 
-    public void help(CloudCommandSender sender) {
+    public void help(CommandExecutor sender) {
         sender.sendMessage("INFO", "§9Help for §bPermsService§7:");
         sender.sendMessage("INFO", "§9perms list §7| Lists all groups");
         sender.sendMessage("INFO", "§9perms add <player> <group> <lifetime/timeSpan> §7| Adds player to a group");

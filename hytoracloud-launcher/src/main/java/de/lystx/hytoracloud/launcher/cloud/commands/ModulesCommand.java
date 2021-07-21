@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
@@ -11,7 +11,7 @@ public class ModulesCommand {
 
 
     @Command(name = "modules", description = "Manages modules", aliases = {"pl", "plugins"})
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
                 if (CloudSystem.getInstance().getInstance(ModuleService.class).getCloudModules().isEmpty()) {
@@ -48,7 +48,7 @@ public class ModulesCommand {
         }
     }
 
-    public void correctSyntax(CloudCommandSender sender) {
+    public void correctSyntax(CommandExecutor sender) {
         sender.sendMessage("INFO", "§9Help for §bModules§7:");
         sender.sendMessage("INFO", "§9modules <list> §7| Lists all modules");
         sender.sendMessage("INFO", "§9players rl (module) §7| Reloads all modules");

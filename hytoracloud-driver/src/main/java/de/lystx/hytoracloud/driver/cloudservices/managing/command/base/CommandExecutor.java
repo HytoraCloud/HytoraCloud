@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.command.base;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 
-public interface CloudCommandSender extends Identifiable {
+public interface CommandExecutor extends Identifiable {
 
     /**
      * Checks if has permission

@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.cloudservices.global.AuthManager;
 import de.lystx.hytoracloud.launcher.global.setups.InstanceChooser;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
@@ -34,7 +34,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
     /**
      * The console
      */
-    protected CloudConsole console;
+    protected Console console;
 
     /**
      * The authmanager for keys
@@ -53,7 +53,7 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         CloudDriver.getInstance().getServiceRegistry().registerService(new LogService());
 
         //The console
-        this.console = new CloudConsole(this.getInstance(LoggerService.class), this.getInstance(CommandService.class), System.getProperty("user.name"));
+        this.console = new Console(this.getInstance(LoggerService.class), this.getInstance(CommandService.class), System.getProperty("user.name"));
         this.authManager = new AuthManager(new File("auth.json"));
 
         //CHoosing instance

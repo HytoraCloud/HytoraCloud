@@ -4,7 +4,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +15,7 @@ import java.util.*;
 
 /**
  * This class logs all contents
- * of the {@link CloudConsole} to
+ * of the {@link Console} to
  * the given file for the current log
  * it will cache the log and writes it on shutdown.
  */

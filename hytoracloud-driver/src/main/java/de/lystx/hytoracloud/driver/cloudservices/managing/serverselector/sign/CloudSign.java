@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base;
+package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign;
 
 
 
@@ -15,6 +15,8 @@ import java.util.UUID;
  */
 @Getter @AllArgsConstructor
 public class CloudSign implements Serializable, Objectable<CloudSign> {
+
+    private static final long serialVersionUID = -2627011017230396868L;
 
     /**
      * The uuid of this sign

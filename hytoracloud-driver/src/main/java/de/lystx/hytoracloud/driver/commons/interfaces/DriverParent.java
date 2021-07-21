@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
 import de.lystx.hytoracloud.driver.cloudservices.global.AuthManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
 
@@ -11,7 +11,7 @@ public interface DriverParent {
      *
      * @return console
      */
-    CloudConsole getConsole();
+    Console getConsole();
 
     /**
      * Returns the ScreenPrinter

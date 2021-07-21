@@ -12,7 +12,6 @@ import de.lystx.hytoracloud.bridge.global.manager.CloudBridgeServiceManager;
 import de.lystx.hytoracloud.bridge.global.manager.CloudBridgePlayerManager;
 import de.lystx.hytoracloud.bridge.global.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
 import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;

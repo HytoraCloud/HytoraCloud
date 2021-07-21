@@ -11,28 +11,29 @@ public enum ServiceState implements Serializable {
     /**
      * This service is full
      */
-    FULL("§6"),
+    FULL("§6", 1),
 
     /**
      * The group of it is in maintenance
      */
-    MAINTENANCE("§b"),
+    MAINTENANCE("§b", 3),
 
     /**
      * The service is offline
      */
-    OFFLINE("§4"),
+    OFFLINE("§4", 14),
 
     /**
      * The service is ingame
      */
-    INGAME("§c"),
+    INGAME("§c", 14),
 
     /**
      * The service is in lobby phase
      */
-    LOBBY("§a");
+    LOBBY("§a", 5);
 
     private final String color;
 
+    private final int blockId;
 }

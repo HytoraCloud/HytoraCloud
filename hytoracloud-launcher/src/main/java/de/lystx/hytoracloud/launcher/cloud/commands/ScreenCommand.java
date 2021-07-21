@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
@@ -13,7 +13,6 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrint
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import lombok.AllArgsConstructor;
 
-import javax.activation.CommandMap;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class ScreenCommand implements TabCompletable {
     private final CloudProcess cloudInstance;
 
     @Command(name = "screen", description = "Shows output of services", aliases = "sc")
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             String subject = args[0];
             if (subject.equalsIgnoreCase("leave")) {
@@ -64,7 +63,7 @@ public class ScreenCommand implements TabCompletable {
 
     }
 
-    private void sendUsage(CloudCommandSender sender) {
+    private void sendUsage(CommandExecutor sender) {
         sender.sendMessage("INFO", "§9screen <server> §7| §bJoins screen session");
         sender.sendMessage("INFO", "§9screen <leave> §7| §bLeaves screen session");
     }

@@ -5,6 +5,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.DefaultModule
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.DefaultChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessenger;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.DefaultFallbackManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.IFallbackManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.DefaultTemplateManager;
@@ -181,7 +182,7 @@ public class CloudDriver {
 
     /**
      * This method registere a CloudCommand class object
-     * And all Methods in this class that have the {@link de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender}
+     * And all Methods in this class that have the {@link CommandExecutor}
      * and the {@link String[]} parameter will be cached to be executed after
      * And the method should have a {@link de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command}-Annotation
      * to declare its really a command that executed

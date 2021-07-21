@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Getter @Setter
-public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> implements ICloudPlayer {
+public class CloudPlayerObject extends WrappedObject<ICloudPlayer, CloudPlayerObject> implements ICloudPlayer {
 
     private static final long serialVersionUID = 7250454458770916643L;
 
@@ -59,7 +59,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
      */
     private OfflinePlayer offlinePlayer;
 
-    public PlayerObject(PlayerConnection connection) {
+    public CloudPlayerObject(PlayerConnection connection) {
         this.connection = connection;
         this.setOfflinePlayer(CloudDriver.getInstance().getPermissionPool().getCachedObject(connection.getUniqueId()));
     }
@@ -327,8 +327,8 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     }
 
     @Override
-    public Class<PlayerObject> getWrapperClass() {
-        return PlayerObject.class;
+    public Class<CloudPlayerObject> getWrapperClass() {
+        return CloudPlayerObject.class;
     }
 
     @Override

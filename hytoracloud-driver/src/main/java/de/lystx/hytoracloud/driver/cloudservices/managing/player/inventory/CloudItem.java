@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 public class CloudItem implements Serializable {
 
+    private static final long serialVersionUID = -2678114340484151627L;
     /**
      * The lore of this item
      */

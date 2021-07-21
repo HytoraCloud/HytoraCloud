@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.sign;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.SignLayOut;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignConfiguration;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import lombok.Getter;
@@ -16,14 +16,14 @@ import java.util.List;
 public class SignManager {
 
     /**
-     * All cloudsigns (updated by packet)
+     * All cloudSigns (updated by packet)
      */
     private List<CloudSign> cloudSigns;
 
     /**
-     * The signlayout (update by packet)
+     * The configuration (update by packet)
      */
-    private SignLayOut signLayOut;
+    private SignConfiguration configuration;
 
     /**
      * The server pinger
@@ -37,7 +37,7 @@ public class SignManager {
 
     public SignManager() {
         this.cloudSigns = new LinkedList<>();
-        this.signLayOut = new SignLayOut();
+        this.configuration = SignConfiguration.createDefault();
         this.serverPinger = new ServerPinger();
         this.signUpdater = new SignUpdater(this);
         this.run();

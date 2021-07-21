@@ -3,12 +3,12 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.CloudPlayerObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.uuid.NameChange;
@@ -17,7 +17,7 @@ import net.hytora.networking.elements.packet.response.ResponseStatus;
 import java.io.Serializable;
 import java.util.UUID;
 
-public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermissionUser, Identifiable {
+public interface ICloudPlayer extends Serializable, CommandExecutor, IPermissionUser, Identifiable {
 
     /**
      * Gets the {@link IService} of this player
@@ -215,7 +215,7 @@ public interface ICloudPlayer extends Serializable, CloudCommandSender, IPermiss
      * @return dummy player
      */
     static ICloudPlayer dummy(String name, UUID uniqueId) {
-        return new PlayerObject(new PlayerConnection(uniqueId, name, "", -1, true, true));
+        return new CloudPlayerObject(new PlayerConnection(uniqueId, name, "", -1, true, true));
     }
 
 }

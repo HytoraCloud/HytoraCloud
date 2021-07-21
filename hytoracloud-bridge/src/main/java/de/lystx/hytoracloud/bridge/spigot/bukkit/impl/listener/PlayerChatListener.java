@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener;
 
-import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.ConsoleCommandSenderSender;
+import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.ConsoleCommandSenderExecutor;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
@@ -37,7 +37,7 @@ public class PlayerChatListener implements Listener {
     public void handle(RemoteServerCommandEvent event) {
         CommandSender sender = event.getSender();
 
-        ConsoleCommandSenderSender consoleCommandSender = new ConsoleCommandSenderSender(sender);
+        ConsoleCommandSenderExecutor consoleCommandSender = new ConsoleCommandSenderExecutor(sender);
 
         String command = event.getCommand().split(" ")[0];
 

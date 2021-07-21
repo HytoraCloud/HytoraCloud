@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
@@ -24,7 +24,7 @@ import java.util.List;
 public class CloudCommand implements TabCompletable {
 
     @Command(name = "cloud", description = "Cloud Proxyy Command", aliases = {"hytoracloud", "hcloud", "cloudsystem", "klaud"})
-    public void execute(CloudCommandSender commandSender, String[] args) {
+    public void execute(CommandExecutor commandSender, String[] args) {
         if (commandSender instanceof ICloudPlayer) {
             ICloudPlayer player = (ICloudPlayer)commandSender;
             if (player.hasPermission("cloudsystem.command")) {

@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
@@ -16,7 +16,7 @@ import java.util.List;
 public class MaintenanceCommand implements TabCompletable {
 
     @Command(name = "maintenance", description = "Manages maintenance of network", aliases = "mc")
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         NetworkConfig config = CloudSystem.getInstance().getInstance(ConfigService.class).getNetworkConfig();
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("switch")) {
@@ -74,7 +74,7 @@ public class MaintenanceCommand implements TabCompletable {
         }
     }
 
-    private void sendUsage(CloudCommandSender sender) {
+    private void sendUsage(CommandExecutor sender) {
         sender.sendMessage("INFO", "§9maintenance <add> <player> §7| §bAdds player to maintenance");
         sender.sendMessage("INFO", "§9maintenance <remove> <player> §7| §bRemoves player from maintenance");
         sender.sendMessage("INFO", "§9maintenance <switch> §7| §bToggles maintenance");

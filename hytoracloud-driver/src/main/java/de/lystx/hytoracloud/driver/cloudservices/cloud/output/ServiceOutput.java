@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.output;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverScreenCache;
 import lombok.Getter;
@@ -65,7 +65,7 @@ public class ServiceOutput extends Thread {
     /**
      * The console to display
      */
-    private CloudConsole cloudConsole;
+    private Console cloudConsole;
 
     /**
      * Constructs a {@link ServiceOutput}

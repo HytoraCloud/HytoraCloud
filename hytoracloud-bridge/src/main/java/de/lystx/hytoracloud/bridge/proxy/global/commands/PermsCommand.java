@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PermsCommand {
 
 	@Command(name = "perms", description = "Manages permissions", aliases = {"cloudperms", "hperms"})
-	public void execute(CloudCommandSender sender, String[] args) {
+	public void execute(CommandExecutor sender, String[] args) {
 		ICloudPlayer player = (ICloudPlayer)sender;
 		if (player.hasPermission("cloudsystem.perms.command")) {
 			if (args.length == 2) {

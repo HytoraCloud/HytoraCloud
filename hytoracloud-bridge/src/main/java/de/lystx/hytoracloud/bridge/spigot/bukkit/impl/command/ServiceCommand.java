@@ -3,10 +3,9 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command;
 import com.sun.management.OperatingSystemMXBean;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.NPC;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
@@ -16,11 +15,10 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -42,8 +40,8 @@ public class ServiceCommand {
                     "cloudServer",
                     "hytoraServer"}
     )
-    public void execute(CloudCommandSender sender, String[] args) {
-        if (sender instanceof ConsoleSender) {
+    public void execute(CommandExecutor sender, String[] args) {
+        if (sender instanceof ConsoleExecutor) {
             IService service = CloudDriver.getInstance().getServiceManager().getCachedObject("Bungee-1");
 
             sender.sendMessage(service.getMemoryUsage() + "/" + service.getGroup().getMemory());

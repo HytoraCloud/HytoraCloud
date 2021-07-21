@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
@@ -18,7 +18,7 @@ public class RunCommand implements TabCompletable {
     private final CloudProcess cloudInstance;
 
     @Command(name = "run", description = "Starts new services", aliases = "start")
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             String group = args[0];
             IServiceGroup IServiceGroup = cloudInstance.getInstance(GroupService.class).getGroup(group);

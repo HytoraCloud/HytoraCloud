@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.cloudservices.cloud.console;
 
 
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Getter @Setter
-public class CloudConsole extends Thread implements CloudCommandSender {
+public class Console extends Thread implements CommandExecutor {
 
     private LoggerService logger;
     private CommandService commandManager;
@@ -24,7 +24,7 @@ public class CloudConsole extends Thread implements CloudCommandSender {
     private SetupExecutor<?> currentSetup;
     private boolean active;
 
-    public CloudConsole(LoggerService logger, CommandService commandManager, String buffer) {
+    public Console(LoggerService logger, CommandService commandManager, String buffer) {
         this.logger = logger;
         this.buffer = buffer;
         this.commandManager = commandManager;

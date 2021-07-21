@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
@@ -25,6 +26,8 @@ public interface PlaceHolder<V> {
                     input = input.replace("%port%", service.getPort() + "");
                     input = input.replace("%max_players%", service.getMaxPlayers() + "");
                     input = input.replace("%online_players%", service.getPlayers().size() + "");
+                    input = input.replace("%max%", service.getMaxPlayers() + "");
+                    input = input.replace("%online%", service.getPlayers().size() + "");
                     input = input.replace("%motd%", service.getMotd());
                     input = input.replace("%group%", service.getGroup().getName());
 
@@ -54,6 +57,21 @@ public interface PlaceHolder<V> {
                 @Override
                 public Class<?>[] getAcceptedClasses() {
                     return new Class[]{IServiceGroup.class, ServiceGroupObject.class};
+                }
+            },
+
+            //For network config,
+            new PlaceHolder<NetworkConfig>() {
+                @Override
+                public String apply(NetworkConfig networkConfig, String input) {
+                    input = input.replace("%prefix%", networkConfig.getMessageConfig().getPrefix());
+
+                    return input;
+                }
+
+                @Override
+                public Class<?>[] getAcceptedClasses() {
+                    return new Class[]{NetworkConfig.class};
                 }
             },
 
@@ -99,7 +117,7 @@ public interface PlaceHolder<V> {
                 }
             }
         }
-        return input;
+        return input.replace("&", "§");
     }
 
     /**

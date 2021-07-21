@@ -18,6 +18,7 @@ import java.util.UUID;
 @Getter @AllArgsConstructor
 public class PlayerConnection implements Serializable {
 
+    private static final long serialVersionUID = -391781264872301460L;
     /**
      * The UUId of this connection
      */
@@ -47,7 +48,6 @@ public class PlayerConnection implements Serializable {
      * If its legacy or not
      */
     private final boolean legacyMode;
-
 
     /**
      * Closes connection

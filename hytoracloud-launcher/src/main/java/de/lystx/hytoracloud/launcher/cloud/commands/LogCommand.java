@@ -4,7 +4,7 @@ package de.lystx.hytoracloud.launcher.cloud.commands;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
@@ -27,7 +27,7 @@ public class LogCommand implements TabCompletable {
     private final CloudProcess cloudInstance;
 
     @Command(name = "log", description = "Logs a server or all")
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 2) {
             String cloudType = args[1];
             String fileName = args[0].equals("all") ? "log_all" : "log_" + args[0];

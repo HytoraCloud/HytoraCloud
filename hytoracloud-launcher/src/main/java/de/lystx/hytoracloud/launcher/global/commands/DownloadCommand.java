@@ -3,9 +3,9 @@ package de.lystx.hytoracloud.launcher.global.commands;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.utils.Utils;
@@ -24,7 +24,7 @@ public class DownloadCommand {
                     "install"
             }
     )
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         new VersionDownload().start(download -> {
 
             if (download.isCancelled()) {
@@ -44,7 +44,7 @@ public class DownloadCommand {
                 return;
             }
 
-            CloudConsole cloudConsole = (CloudConsole)sender;
+            Console cloudConsole = (Console)sender;
             File versionsFile;
 
             if (type.isProxy()) {

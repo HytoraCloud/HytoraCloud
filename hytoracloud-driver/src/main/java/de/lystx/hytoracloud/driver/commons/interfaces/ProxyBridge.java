@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.commons.interfaces;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.CloudPlayerObject;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
@@ -38,7 +38,7 @@ public interface ProxyBridge {
             event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
 
         } else {
-            cachedPlayer = new PlayerObject(connection);
+            cachedPlayer = new CloudPlayerObject(connection);
             cachedPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
             cachedPlayer.update();
 

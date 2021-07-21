@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 public class HubCommand {
 
     @Command(name = "hub", description = "Sends you to hub", aliases = {"lobby", "l", "leave"})
-    public void execute(CloudCommandSender commandSender, String[] args) {
+    public void execute(CommandExecutor commandSender, String[] args) {
         try {
             ICloudPlayer player = (ICloudPlayer) commandSender;
 

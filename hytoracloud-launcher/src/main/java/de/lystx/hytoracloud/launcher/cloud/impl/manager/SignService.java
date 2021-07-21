@@ -1,13 +1,12 @@
-package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign;
+package de.lystx.hytoracloud.launcher.cloud.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.SignLayOut;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.layout.DefaultSignLayout;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignConfiguration;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.Getter;
 
@@ -37,7 +36,7 @@ public class SignService implements ICloudService {
     private final File signFile;
     private List<CloudSign> cloudSigns;
 
-    private SignLayOut signLayOut;
+    private SignConfiguration configuration;
     private final File signDirectory;
 
     public SignService() {
@@ -55,11 +54,11 @@ public class SignService implements ICloudService {
     public void reload() {
         this.cloudSigns = new LinkedList<>();
         if (!this.layOutFile.exists()) {
-            this.signLayOut = new SignLayOut(new DefaultSignLayout());
+            this.configuration = SignConfiguration.createDefault();
 
-            this.signLayOut.getDocument().save(this.layOutFile);
+            new JsonDocument(this.layOutFile).append(this.configuration).save();
         } else {
-            this.signLayOut = new SignLayOut(new JsonDocument(this.layOutFile));
+            this.configuration = new JsonDocument(this.layOutFile).getAs(SignConfiguration.class);
         }
         if (!this.signFile.exists()) {
             new JsonDocument(this.signFile).save(this.signFile);

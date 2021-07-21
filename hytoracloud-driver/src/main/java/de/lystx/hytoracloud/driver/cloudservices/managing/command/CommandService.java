@@ -7,9 +7,9 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.CommandInfo;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -50,7 +50,7 @@ public class CommandService implements ICloudService {
      */
     public void registerCommand(Object classObject) {
         for (Method declaredMethod : classObject.getClass().getDeclaredMethods()) {
-            if (Arrays.asList(declaredMethod.getParameterTypes()).contains(CloudCommandSender.class) && Arrays.asList(declaredMethod.getParameterTypes()).contains(String[].class) ) {
+            if (Arrays.asList(declaredMethod.getParameterTypes()).contains(CommandExecutor.class) && Arrays.asList(declaredMethod.getParameterTypes()).contains(String[].class) ) {
                 Command command = declaredMethod.getAnnotation(Command.class);
                 if (this.getCommand(command.name().toLowerCase()) != null) {
                     return;
@@ -75,7 +75,7 @@ public class CommandService implements ICloudService {
      */
     public void unregisterCommand(Object command) {
         for (Method declaredMethod : command.getClass().getDeclaredMethods()) {
-            if (Arrays.asList(declaredMethod.getParameterTypes()).contains(CloudCommandSender.class) && Arrays.asList(declaredMethod.getParameterTypes()).contains(String[].class) ) {
+            if (Arrays.asList(declaredMethod.getParameterTypes()).contains(CommandExecutor.class) && Arrays.asList(declaredMethod.getParameterTypes()).contains(String[].class) ) {
                 Command cmd = declaredMethod.getAnnotation(Command.class);
 
                 this.commandClasses.remove(cmd.name().toLowerCase());
@@ -98,7 +98,7 @@ public class CommandService implements ICloudService {
      * @param line the raw line
      * @return if command found and executed
      */
-    public boolean execute(CloudCommandSender sender, boolean prefix, String line) {
+    public boolean execute(CommandExecutor sender, boolean prefix, String line) {
         if (prefix) line = line.substring(1);
 
         String commandText = line.split(" ")[0];
@@ -185,7 +185,7 @@ public class CommandService implements ICloudService {
      * @param line the line
      * @param cloudConsole the console
      */
-    public void execute(String line, CloudConsole cloudConsole) {
+    public void execute(String line, Console cloudConsole) {
         if (this.getDriver().getParent().getScreenPrinter().isInScreen()) {
             if (line.equalsIgnoreCase("sc leave") || line.equalsIgnoreCase("screen leave") || line.equalsIgnoreCase("leave") || line.equalsIgnoreCase("-l") || line.equalsIgnoreCase("quit")) {
                 for (int i = 0; i < 5; i++) {

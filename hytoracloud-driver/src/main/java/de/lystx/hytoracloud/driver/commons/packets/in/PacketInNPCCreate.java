@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.base.CloudSign;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;

@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleExecutor;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import java.util.UUID;
 
 @AllArgsConstructor @Getter
-public class ConsoleCommandSenderSender implements ConsoleSender {
+public class ConsoleCommandSenderExecutor implements ConsoleExecutor {
 
     private final CommandSender sender;
 

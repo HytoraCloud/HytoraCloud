@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.global.setup;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.utils.Utils;
@@ -39,7 +39,7 @@ public abstract class SetupExecutor<T> {
     /**
      * The console to display questions
      */
-    private final CloudConsole console;
+    private final Console console;
 
     /**
      * The current setup part

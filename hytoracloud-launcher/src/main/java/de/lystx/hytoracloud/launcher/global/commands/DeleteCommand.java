@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceM
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
@@ -24,7 +24,7 @@ import java.util.List;
 public class DeleteCommand implements TabCompletable {
 
     @Command(name = "delete", description = "Deletes stuff", aliases = "remove")
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String group = args[1];
@@ -90,7 +90,7 @@ public class DeleteCommand implements TabCompletable {
         }
     }
 
-    public void correctSyntax(CloudCommandSender sender) {
+    public void correctSyntax(CommandExecutor sender) {
         sender.sendMessage("INFO", "§9delete group <group> §7| §bRemoves a ServiceGroup");
         sender.sendMessage("INFO", "§9delete perms <group> §7| §bRemoves a PermissionGroup");
         sender.sendMessage("INFO", "§9delete fallback <fallback> §7| §bRemoves a Fallback");

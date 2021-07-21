@@ -3,8 +3,7 @@ package de.lystx.hytoracloud.launcher.cloud.handler.managing;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
-import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketInformation;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCService;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.NPCService;
 
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCDelete;
 import net.hytora.networking.elements.packet.HytoraPacket;

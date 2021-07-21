@@ -11,6 +11,7 @@ import java.util.List;
 @Getter @AllArgsConstructor
 public class NPCConfig implements Serializable, Objectable<NPCConfig> {
 
+    private static final long serialVersionUID = 6044206058339675497L;
     /**
      * The rows of the inventory
      */

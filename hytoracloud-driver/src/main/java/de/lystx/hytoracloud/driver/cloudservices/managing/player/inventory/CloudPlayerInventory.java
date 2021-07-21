@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUpdate;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUpdate;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
 
@@ -15,13 +15,14 @@ import java.util.Map;
 @Getter @Setter
 public class CloudPlayerInventory implements Serializable {
 
+    private static final long serialVersionUID = 7903524609725996284L;
     private CloudItem helmet, chestplate, leggings, boots;
     private Map<Integer, CloudItem> slots;
 
-    private final ICloudPlayer ICloudPlayer;
+    private final ICloudPlayer cloudPlayer;
 
-    public CloudPlayerInventory(ICloudPlayer ICloudPlayer) {
-        this.ICloudPlayer = ICloudPlayer;
+    public CloudPlayerInventory(ICloudPlayer cloudPlayer) {
+        this.cloudPlayer = cloudPlayer;
         this.slots = new HashMap<>();
     }
 
@@ -50,7 +51,7 @@ public class CloudPlayerInventory implements Serializable {
      *               values to null and clear the items
      */
     public void update(boolean clearAfter) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketInventoryUpdate(this.ICloudPlayer, this));
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketInventoryUpdate(this.cloudPlayer, this));
         if (clearAfter) {
             this.slots = new HashMap<>();
             this.helmet = null;

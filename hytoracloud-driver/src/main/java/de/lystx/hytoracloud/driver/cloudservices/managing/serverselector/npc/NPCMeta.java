@@ -10,6 +10,7 @@ import java.util.UUID;
 @Getter @AllArgsConstructor
 public class NPCMeta implements Serializable {
 
+    private static final long serialVersionUID = -4480080579940046218L;
     /**
      * The uuid of this meta
      */

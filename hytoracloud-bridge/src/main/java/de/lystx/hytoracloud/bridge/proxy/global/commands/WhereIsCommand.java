@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import lombok.Getter;
 public class WhereIsCommand {
 
     @Command(name = "whereis")
-    public void executeWhereIs(CloudCommandSender commandSender, String[] args) {
+    public void executeWhereIs(CommandExecutor commandSender, String[] args) {
         if (commandSender instanceof ICloudPlayer) {
             ICloudPlayer player = (ICloudPlayer)commandSender;
             if (player.hasPermission("cloudsystem.command.whereis")) {

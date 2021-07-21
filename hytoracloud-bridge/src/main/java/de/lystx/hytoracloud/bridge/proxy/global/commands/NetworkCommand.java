@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import lombok.SneakyThrows;
@@ -13,7 +13,7 @@ public class NetworkCommand {
 
     @SneakyThrows
     @Command(name = "networkInfo", aliases = {"info", "cloudInfo"})
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         ICloudPlayer player = (ICloudPlayer)sender;
         if (player.hasPermission("cloudsystem.command")) {
 

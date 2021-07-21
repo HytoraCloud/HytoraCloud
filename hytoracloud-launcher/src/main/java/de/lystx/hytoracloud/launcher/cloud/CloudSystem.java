@@ -10,8 +10,8 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignService;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.NPCService;
+import de.lystx.hytoracloud.launcher.cloud.impl.manager.SignService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
@@ -135,7 +135,7 @@ public class CloudSystem extends CloudProcess {
             return;
         }
 
-        CloudDriver.getInstance().sendPacket(new PacketOutServerSelector(service.getCloudSigns(), service.getSignLayOut().getDocument(), npcService.getNPCConfig(), npcService.toMetas()));
+        CloudDriver.getInstance().sendPacket(new PacketOutServerSelector(service.getCloudSigns(), service.getConfiguration(), npcService.getNPCConfig(), npcService.toMetas()));
 
         try {
 

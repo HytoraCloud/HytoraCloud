@@ -1,13 +1,7 @@
 package de.lystx.hytoracloud.launcher.global.commands;
 
-import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudItem;
-import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CloudCommandSender;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import lombok.AllArgsConstructor;
 
@@ -18,7 +12,7 @@ public class ReloadCommand {
     private final CloudProcess cloudInstance;
 
     @Command(name = "reload", description = "Reloads the network", aliases = {"rl"})
-    public void execute(CloudCommandSender sender, String[] args) {
+    public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
 
             sender.sendMessage("COMMAND", "§2Debug!");
