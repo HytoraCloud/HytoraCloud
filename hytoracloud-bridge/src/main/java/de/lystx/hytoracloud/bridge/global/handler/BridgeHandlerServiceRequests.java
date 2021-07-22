@@ -1,10 +1,11 @@
 package de.lystx.hytoracloud.bridge.global.handler;
 
-import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
+import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfo;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
+import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMinecraftInfo;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import lombok.Getter;
 import net.hytora.networking.elements.packet.HytoraPacket;
@@ -39,6 +40,14 @@ public class BridgeHandlerServiceRequests implements PacketHandler {
             PropertyObject propertyObject = bridgeInstance.requestProperties();
 
             packet.reply(component -> component.put("properties", propertyObject.toString()));
+        } else if (packet instanceof PacketServiceMinecraftInfo) {
+            PacketServiceMinecraftInfo packetServiceInfo = (PacketServiceMinecraftInfo)packet;
+            if (!packetServiceInfo.getService().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
+                return;
+            }
+
+            BridgeInstance bridgeInstance = CloudBridge.getInstance().getBridgeInstance();
+            packet.reply(component -> component.put("info", bridgeInstance.loadExtras().get("info")));
         }
     }
 }

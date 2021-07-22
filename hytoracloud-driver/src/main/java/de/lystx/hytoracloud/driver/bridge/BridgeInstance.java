@@ -1,8 +1,12 @@
-package de.lystx.hytoracloud.driver.commons.interfaces;
+package de.lystx.hytoracloud.driver.bridge;
 
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public interface BridgeInstance {
 
@@ -37,6 +41,16 @@ public interface BridgeInstance {
         return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
     }
 
+
+    /**
+     * The header and the footer
+     *
+     * @param uniqueId the uuid of the player
+     * @param header header
+     * @param footer footer
+     */
+    void sendTabList(UUID uniqueId, ChatComponent header, ChatComponent footer);
+
     /**
      * Loads the current TPS
      * (Ticks per second)
@@ -51,4 +65,9 @@ public interface BridgeInstance {
      * Stops this instance
      */
     void shutdown();
+
+
+    default Map<String, Object> loadExtras() {
+        return new HashMap<>();
+    }
 }

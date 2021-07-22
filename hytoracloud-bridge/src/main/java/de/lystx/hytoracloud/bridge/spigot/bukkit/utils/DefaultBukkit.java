@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.commons.interfaces.IBukkit;
+import de.lystx.hytoracloud.driver.bridge.IBukkit;
 import de.lystx.hytoracloud.driver.utils.Reflections;
 import lombok.Getter;
 import lombok.Setter;

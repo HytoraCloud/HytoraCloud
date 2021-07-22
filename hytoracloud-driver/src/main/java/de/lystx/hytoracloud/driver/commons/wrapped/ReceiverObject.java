@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.wrapped;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter @RequiredArgsConstructor
 public class ReceiverObject extends WrappedObject<IReceiver, ReceiverObject> implements IReceiver {
@@ -40,8 +42,13 @@ public class ReceiverObject extends WrappedObject<IReceiver, ReceiverObject> imp
     private InetAddress address;
 
     @Override
-    public List<IService> getRunningServices() {
+    public List<IService> getServices() {
         return CloudDriver.getInstance().getServiceManager().getCachedObjects(service -> service.getGroup().getReceiver().equalsIgnoreCase(getName()));
+    }
+
+    @Override
+    public List<ICloudPlayer> getPlayers() {
+        return CloudDriver.getInstance().getPlayerManager().getCachedObjects().stream().filter(players -> players.getService().getGroup().getReceiver().equalsIgnoreCase(getName())).collect(Collectors.toList());
     }
 
     @Override

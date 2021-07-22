@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class MessageConfig implements Serializable {
 
+    private static final long serialVersionUID = 4275321979476787496L;
     /**
      * The prefix of all messages
      */

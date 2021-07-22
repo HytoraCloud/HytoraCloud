@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.console;
 
 
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
@@ -105,8 +105,8 @@ public class Console extends Thread implements CommandExecutor {
     }
 
     @Override
-    public void sendComponent(CloudComponent cloudComponent) {
-        this.sendMessage(cloudComponent.toString());
+    public void sendComponent(ChatComponent chatComponent) {
+        this.sendMessage(chatComponent.toString());
     }
 
     @Override

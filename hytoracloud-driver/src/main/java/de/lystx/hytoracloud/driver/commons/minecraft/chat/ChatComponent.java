@@ -8,8 +8,9 @@ import java.io.Serializable;
 import java.util.*;
 
 @Getter
-public class CloudComponent implements Serializable {
+public class ChatComponent implements Serializable {
 
+    private static final long serialVersionUID = 5453309721161616618L;
     /**
      * The message of this component
      */
@@ -18,7 +19,7 @@ public class CloudComponent implements Serializable {
     /**
      * The list of other components
      */
-    private final List<CloudComponent> cloudComponents;
+    private final List<ChatComponent> chatComponents;
 
     /**
      * A map containing actions
@@ -30,10 +31,10 @@ public class CloudComponent implements Serializable {
      *
      * @param message the message
      */
-    public CloudComponent(String message) {
+    public ChatComponent(String message) {
         this.message = message;
         this.actions = new HashMap<>();
-        this.cloudComponents = new LinkedList<>();
+        this.chatComponents = new LinkedList<>();
     }
 
     /**
@@ -43,7 +44,7 @@ public class CloudComponent implements Serializable {
      * @param value the value (url for website)
      * @return this component
      */
-    public CloudComponent addEvent(CloudComponentAction action, Object... value) {
+    public ChatComponent addEvent(CloudComponentAction action, Object... value) {
         this.actions.put(action, value);
         return this;
     }
@@ -51,11 +52,11 @@ public class CloudComponent implements Serializable {
     /**
      * Adds another component to chain
      *
-     * @param cloudComponent the component to add
+     * @param chatComponent the component to add
      * @return this component
      */
-    public CloudComponent append(CloudComponent cloudComponent) {
-        this.cloudComponents.add(cloudComponent);
+    public ChatComponent append(ChatComponent chatComponent) {
+        this.chatComponents.add(chatComponent);
         return this;
     }
 

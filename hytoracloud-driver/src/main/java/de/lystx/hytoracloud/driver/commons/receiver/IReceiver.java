@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.receiver;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 
 import java.io.Serializable;
@@ -65,7 +66,15 @@ public interface IReceiver extends Serializable {
      *
      * @return list of services
      */
-    List<IService> getRunningServices();
+    List<IService> getServices();
+
+    /**
+     * Gets a list of all {@link ICloudPlayer}s
+     * that are on this receiver
+     *
+     * @return list of players
+     */
+    List<ICloudPlayer> getPlayers();
 
     /**
      * Starts a {@link IService} on this receiver

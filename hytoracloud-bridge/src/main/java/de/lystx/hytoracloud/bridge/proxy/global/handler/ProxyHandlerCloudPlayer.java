@@ -1,11 +1,9 @@
 package de.lystx.hytoracloud.bridge.proxy.global.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketFallback;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketKickPlayer;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendComponent;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendMessage;
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.*;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketConnectServer;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
 import net.hytora.networking.elements.packet.HytoraPacket;
@@ -37,7 +35,11 @@ public class ProxyHandlerCloudPlayer implements PacketHandler {
 
        } else if (packet instanceof PacketSendComponent) {
             PacketSendComponent packetSendComponent = (PacketSendComponent)packet;
-            proxyBridge.sendComponent(packetSendComponent.getUuid(), packetSendComponent.getCloudComponent());
+            proxyBridge.sendComponent(packetSendComponent.getUuid(), packetSendComponent.getChatComponent());
+
+       } else if (packet instanceof PacketSendTablist) {
+           PacketSendTablist packetSendTablist = (PacketSendTablist)packet;
+           CloudDriver.getInstance().getBridgeInstance().sendTabList(packetSendTablist.getUuid(), packetSendTablist.getHeader(), packetSendTablist.getFooter());
 
         } else if (packet instanceof PacketFallback) {
             PacketFallback packetFallback = (PacketFallback)packet;

@@ -3,6 +3,8 @@ package de.lystx.hytoracloud.launcher.global.setups;
 import de.lystx.hytoracloud.driver.cloudservices.global.setup.SetupExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.global.setup.QuestionSkip;
 import de.lystx.hytoracloud.driver.cloudservices.global.setup.Setup;
+import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import lombok.Getter;
 
 @Getter
@@ -31,17 +33,16 @@ public class VersionDownload extends SetupExecutor<VersionDownload> {
     @Setup(
             id = 2,
             question = "What Spigot-Version do you want to download?",
-            message = {
-                    "INFO%%§7There are following §bextra versions§f:",
-                    "INFO%%§7If you §cdon't §fuse any of the above extra versions just type the version you want §h(§b1.8.8§h, §b1.9§h, §b1.12 etc.§h)"
-            },
+            enumOnly = SpigotVersion.class,
             exitAfterAnswer = ""
     )
     private String spigotVersion;
 
     @Setup(
             id = 3,
-            question = "What Proxy-Version do you want to download? §h(§bBUNGEECORD§h, §bWATERFALL§h, §bVELOCITY§h)"
+            question = "What Proxy-Version do you want to download?",
+            enumOnly = ProxyVersion.class
+
     )
     private String proxyVersion;
 }

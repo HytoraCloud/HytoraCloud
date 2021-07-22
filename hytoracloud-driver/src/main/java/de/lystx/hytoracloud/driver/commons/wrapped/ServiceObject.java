@@ -143,23 +143,24 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
         JsonArray array = this.requestInfo().toDocument().getArray("plugins");
 
+        if (array != null) {
+            for (JsonElement jsonElement : array) {
+                JsonDocument jsonDocument = new JsonDocument(jsonElement.toString());
 
-        for (JsonElement jsonElement : array) {
-            JsonDocument jsonDocument = new JsonDocument(jsonElement.toString());
-
-
-            pluginInfos.add(new PluginInfo(
-                    jsonDocument.getString("name"),
-                    jsonDocument.getStringList("authors").toArray(new String[0]),
-                    jsonDocument.getString("version"),
-                    jsonDocument.getString("main-class"),
-                    jsonDocument.getString("website"),
-                    jsonDocument.getStringList("commands").toArray(new String[0]),
-                    jsonDocument.getString("description"),
-                    jsonDocument.getStringList("dependencies").toArray(new String[0]),
-                    jsonDocument.getStringList("soft-dependencies").toArray(new String[0])
-            ));
+                pluginInfos.add(new PluginInfo(
+                        jsonDocument.getString("name"),
+                        jsonDocument.getStringList("authors").toArray(new String[0]),
+                        jsonDocument.getString("version"),
+                        jsonDocument.getString("main-class"),
+                        jsonDocument.getString("website"),
+                        jsonDocument.getStringList("commands").toArray(new String[0]),
+                        jsonDocument.getString("description"),
+                        jsonDocument.getStringList("dependencies").toArray(new String[0]),
+                        jsonDocument.getStringList("soft-dependencies").toArray(new String[0])
+                ));
+            }
         }
+
         return pluginInfos.toArray(new PluginInfo[0]);
     }
 

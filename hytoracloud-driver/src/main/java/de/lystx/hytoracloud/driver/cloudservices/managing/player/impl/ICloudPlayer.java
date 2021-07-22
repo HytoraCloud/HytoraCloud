@@ -3,7 +3,9 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
-import de.lystx.hytoracloud.driver.commons.wrapped.CloudPlayerObject;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
+import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -134,6 +136,14 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
     void openInventory(Inventory inventory);
 
     /**
+     * Sets the tabList of this player
+     *
+     * @param header the header
+     * @param footer the footer
+     */
+    void sendTabList(ChatComponent header, ChatComponent footer);
+
+    /**
      * Plays a sound for this player
      * @param sound the sound
      * @param v1 the first volume
@@ -148,6 +158,21 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      * @param subtitle the subtitle
      */
     void sendTitle(String title, String subtitle);
+
+    /**
+     * Gets the location of this player
+     * Might take some time because its over query
+     *
+     * @return location
+     */
+    MinecraftLocation getLocation();
+
+    /**
+     * Teleports this player to a location
+     *
+     * @param location the location
+     */
+    void teleport(MinecraftLocation location);
 
     /**
      * Adds a property to this player
@@ -215,7 +240,7 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      * @return dummy player
      */
     static ICloudPlayer dummy(String name, UUID uniqueId) {
-        return new CloudPlayerObject(new PlayerConnection(uniqueId, name, "", -1, true, true));
+        return new PlayerObject(new PlayerConnection(uniqueId, name, "", -1, true, true));
     }
 
 }

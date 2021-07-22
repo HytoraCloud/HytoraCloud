@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.command.base;
 
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 
 public interface CommandExecutor extends Identifiable {
@@ -23,9 +23,9 @@ public interface CommandExecutor extends Identifiable {
     /**
      * Sends component
      *
-     * @param cloudComponent the component to send
+     * @param chatComponent the component to send
      */
-    void sendComponent(CloudComponent cloudComponent);
+    void sendComponent(ChatComponent chatComponent);
 
     /**
      * Message with prefix

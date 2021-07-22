@@ -4,8 +4,12 @@ import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @AllArgsConstructor @Getter
-public class PluginInfo {
+public class PluginInfo implements Serializable {
+
+    private static final long serialVersionUID = 6271866535405981573L;
 
     /**
      * Name of the plugin

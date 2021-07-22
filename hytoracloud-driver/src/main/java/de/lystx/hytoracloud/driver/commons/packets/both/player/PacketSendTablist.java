@@ -1,8 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.player;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
-
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;
@@ -10,10 +9,11 @@ import net.hytora.networking.elements.component.Component;
 import java.util.UUID;
 
 @Getter  @AllArgsConstructor
-public class PacketSendComponent extends PacketCommunication {
+public class PacketSendTablist extends PacketCommunication {
 
     private UUID uuid;
-    private ChatComponent chatComponent;
+    private ChatComponent header;
+    private ChatComponent footer;
 
 
     @Override
@@ -21,7 +21,8 @@ public class PacketSendComponent extends PacketCommunication {
         super.read(component);
 
         uuid = component.get("uuid");
-        chatComponent = (ChatComponent) component.get("c");
+        header = component.get("header");
+        footer = component.get("footer");
     }
 
     @Override
@@ -30,7 +31,8 @@ public class PacketSendComponent extends PacketCommunication {
 
         component.append(map -> {
            map.put("uuid", uuid);
-           map.put("c", chatComponent);
+           map.put("header", header);
+           map.put("footer", footer);
         });
     }
 

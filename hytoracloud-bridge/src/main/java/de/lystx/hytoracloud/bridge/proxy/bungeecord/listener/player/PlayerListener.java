@@ -129,7 +129,6 @@ public class PlayerListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player.getName());
 
-
         CloudBridge.getInstance().getProxyBridge().playerQuit(cloudPlayer);
     }
 }

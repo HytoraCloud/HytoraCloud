@@ -132,11 +132,8 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     }
 
     @Override
-    public void unregisterPlayer(ICloudPlayer cloudPlayer) {
-        if (this.getCachedObject(cloudPlayer.getName()) == null) {
-            return;
-        }
-        this.cachedObjects.remove(cloudPlayer);
+    public void unregisterPlayer(ICloudPlayer player) {
+        this.cachedObjects.removeIf(cloudPlayer -> cloudPlayer.getName().equalsIgnoreCase(player.getName()));
     }
 
     @Override

@@ -1,10 +1,12 @@
-package de.lystx.hytoracloud.driver.commons.interfaces;
+package de.lystx.hytoracloud.driver.bridge;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudErrors;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
-import de.lystx.hytoracloud.driver.commons.wrapped.CloudPlayerObject;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
@@ -35,10 +37,10 @@ public interface ProxyBridge {
         if (cachedPlayer != null) {
             //Request timed out couldn't log in.... kicking
             event.setCancelled(true);
-            event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+            event.setComponent(CloudErrors.LOGIN_PROXY.toString());
 
         } else {
-            cachedPlayer = new CloudPlayerObject(connection);
+            cachedPlayer = new PlayerObject(connection);
             cachedPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
             cachedPlayer.update();
 
@@ -89,6 +91,7 @@ public interface ProxyBridge {
         DriverEventPlayerQuit playerQuit = new DriverEventPlayerQuit(player);
         CloudDriver.getInstance().callEvent(playerQuit);
 
+        CloudDriver.getInstance().getPlayerManager().unregisterPlayer(player);
         CloudDriver.getInstance().sendPacket(new PacketUnregisterPlayer(player.getName()));
     }
 
@@ -235,7 +238,7 @@ public interface ProxyBridge {
      * @param uniqueId the uuid of the player
      * @param component the component
      */
-    void sendComponent(UUID uniqueId, CloudComponent component);
+    void sendComponent(UUID uniqueId, ChatComponent component);
 
     /**
      * Unregisters a Service from cache

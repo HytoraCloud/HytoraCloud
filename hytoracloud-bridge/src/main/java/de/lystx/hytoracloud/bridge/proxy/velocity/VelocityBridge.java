@@ -9,7 +9,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
+import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.player.*;
@@ -18,8 +18,8 @@ import de.lystx.hytoracloud.bridge.proxy.velocity.listener.other.TablistListener
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
@@ -160,7 +160,7 @@ public class VelocityBridge implements BridgeInstance {
                 }
 
                 @Override
-                public void sendComponent(UUID uniqueId, CloudComponent component) {
+                public void sendComponent(UUID uniqueId, ChatComponent component) {
 
                     Player player = server.getPlayer(uniqueId).orElse(null);
                     if (player == null) {
@@ -252,14 +252,14 @@ public class VelocityBridge implements BridgeInstance {
 
 
     /**
-     * Creates a {@link Component} from a {@link CloudComponent}
+     * Creates a {@link Component} from a {@link ChatComponent}
      *
-     * @param cloudComponent the cloudComponent
+     * @param chatComponent the cloudComponent
      * @return built md5 textComponent
      */
-    private Component fromCloud(CloudComponent cloudComponent) {
-        Component textComponent = Component.text(cloudComponent.getMessage());
-        cloudComponent.getActions().forEach((action1, objects) -> {
+    private Component fromCloud(ChatComponent chatComponent) {
+        Component textComponent = Component.text(chatComponent.getMessage());
+        chatComponent.getActions().forEach((action1, objects) -> {
 
             if (action1 != null && objects != null) {
                 if (action1.equals(CloudComponentAction.CLICK_EVENT_RUN_COMMAND)) {
@@ -278,7 +278,7 @@ public class VelocityBridge implements BridgeInstance {
 
             }
         });
-        cloudComponent.getCloudComponents().forEach(component -> textComponent.append(this.fromCloud(component)));
+        chatComponent.getChatComponents().forEach(component -> textComponent.append(this.fromCloud(component)));
         return textComponent;
     }
 
@@ -348,6 +348,17 @@ public class VelocityBridge implements BridgeInstance {
         propertyObject.append("plugins", plugins);
 
         return propertyObject;
+    }
+
+    @Override
+    public void sendTabList(UUID uniqueId, ChatComponent header, ChatComponent footer) {
+        Player player = server.getPlayer(uniqueId).orElse(null);
+
+        if (player == null) {
+            return;
+        }
+
+        player.sendPlayerListHeaderAndFooter(fromCloud(header), fromCloud(footer));
     }
 
     @Override

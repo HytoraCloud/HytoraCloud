@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit;
 
-import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
+import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command.ServiceCommand;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command.StopCommand;
@@ -14,21 +14,31 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerQuitListene
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.minecraft.MinecraftInfo;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.entity.MinecraftEntity;
+import de.lystx.hytoracloud.driver.commons.minecraft.entity.MinecraftPlayer;
+import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
+import de.lystx.hytoracloud.driver.commons.minecraft.world.*;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
+import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.utils.Reflections;
+import lombok.SneakyThrows;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.event.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -144,7 +154,6 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
 
         PropertyObject propertyObject = new PropertyObject();
 
-
         propertyObject.append("bukkit",
                 new PropertyObject()
                     .append("version", Bukkit.getVersion())
@@ -183,6 +192,177 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         propertyObject.append("plugins", plugins);
 
         return propertyObject;
+    }
+
+    /**
+     * Loads a {@link MinecraftInfo} of this bukkit server
+     *
+     * @return info with all values
+     */
+    public MinecraftInfo requestMinecraft() {
+        List<MinecraftWorld> worlds = new LinkedList<>();
+        List<MinecraftPlayer> players = new LinkedList<>();
+        List<PluginInfo> plugins = new LinkedList<>();
+
+        for (World world : Bukkit.getWorlds()) {
+
+            Map<String, String> gameRules = new HashMap<>();
+            List<MinecraftChunk> chunks = new LinkedList<>();
+            List<MinecraftEntity> entities = new LinkedList<>();
+
+            for (String gameRule : world.getGameRules()) {
+                gameRules.put(gameRule, world.getGameRuleValue(gameRule));
+            }
+
+            for (Chunk loadedChunk : world.getLoadedChunks()) {
+
+                int x1 = loadedChunk.getX();
+                int z1 = loadedChunk.getZ();
+
+                List<MinecraftBlock> blocks = new LinkedList<>();
+
+                int minX = loadedChunk.getX() << 4;
+                int minZ = loadedChunk.getZ() << 4;
+                int maxX = minX | 15;
+                int maxY = loadedChunk.getWorld().getMaxHeight();
+                int maxZ = minZ | 15;
+
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = 0; y <= maxY; ++y) {
+                        for (int z = minZ; z <= maxZ; ++z) {
+                            
+                        }
+                    }
+                }
+
+                chunks.add(new MinecraftChunk(x1, z1, loadedChunk.isLoaded(), blocks));
+            }
+
+            for (Entity entity : world.getEntities()) {
+                MinecraftEntity minecraftEntity;
+                if (entity instanceof Player) {
+                    Player player = (Player)entity;
+
+                    minecraftEntity = new MinecraftPlayer(
+                            player.getUniqueId(),
+                            player.getEntityId(),
+                            player.getType().name(),
+                            player.getCustomName(),
+                            new MinecraftLocation(
+                                    world.getName(),
+                                    player.getLocation().getX(),
+                                    player.getLocation().getY(),
+                                    player.getLocation().getZ(),
+                                    player.getLocation().getYaw(),
+                                    player.getLocation().getPitch()
+                            ),
+                            player.getName(),
+                            player.getHealth(),
+                            player.getFoodLevel(),
+                            player.getExp()
+                    );
+                } else {
+                    minecraftEntity = new MinecraftEntity(
+                        entity.getUniqueId(),
+                        entity.getEntityId(),
+                        entity.getType().name(),
+                        entity.getCustomName(),
+
+                        new MinecraftLocation(
+                                world.getName(),
+                                entity.getLocation().getX(),
+                                entity.getLocation().getY(),
+                                entity.getLocation().getZ(),
+                                entity.getLocation().getYaw(),
+                                entity.getLocation().getPitch()
+                        )
+                    );
+                }
+                entities.add(minecraftEntity);
+            }
+
+            worlds.add(new MinecraftWorld(world.getName(),  world.getUID(), world.getDifficulty().name(), gameRules, chunks, entities));
+        }
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            players.add(new MinecraftPlayer(
+                            player.getUniqueId(),
+                            player.getEntityId(),
+                            player.getType().name(),
+                            player.getCustomName(),
+                            new MinecraftLocation(
+                                    player.getWorld().getName(),
+                                    player.getLocation().getX(),
+                                    player.getLocation().getY(),
+                                    player.getLocation().getZ(),
+                                    player.getLocation().getYaw(),
+                                    player.getLocation().getPitch()
+                            ),
+                            player.getName(),
+                            player.getHealth(),
+                            player.getFoodLevel(),
+                            player.getExp()
+                    )
+            );
+        }
+
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+
+            plugins.add(new PluginInfo(
+                    plugin.getName(),
+                    plugin.getDescription().getAuthors().toArray(new String[0]),
+                    plugin.getDescription().getVersion(),
+                    plugin.getDescription().getMain(),
+                    plugin.getDescription().getWebsite() == null ? "None" : plugin.getDescription().getWebsite(),
+                    (plugin.getDescription().getCommands() == null ? new LinkedList<>() : plugin.getDescription().getCommands().keySet()).toArray(new String[0]),
+                    plugin.getDescription().getDescription(),
+                    plugin.getDescription().getDepend().toArray(new String[0]),
+                    plugin.getDescription().getSoftDepend().toArray(new String[0]))
+            );
+        }
+
+        return new MinecraftInfo(
+                Bukkit.getVersion(),
+                Bukkit.getMessenger().getOutgoingChannels().toArray(new String[0]),
+                Bukkit.getMessenger().getIncomingChannels().toArray(new String[0]),
+                plugins, worlds, players
+        );
+    }
+
+    @Override
+    public Map<String, Object> loadExtras() {
+        return new CloudMap<String, Object>().append("info", requestMinecraft());
+    }
+
+    @Override @SneakyThrows
+    public void sendTabList(UUID uniqueId, ChatComponent header, ChatComponent footer) {
+
+        Player player = Bukkit.getPlayer(uniqueId);
+
+        if (player == null) {
+            return;
+        }
+
+        Class<?> chatMessageClass = Reflections.getNMSClass("ChatMessage");
+
+        Object tablistHeader = chatMessageClass.getConstructor(String.class, Object[].class).newInstance(header.getMessage(), new Object[0]);
+        Object tablistFooter = chatMessageClass.getConstructor(String.class, Object[].class).newInstance(footer.getMessage(), new Object[0]);
+
+        Object tablist = Reflections.getNMSClass("PacketPlayOutPlayerListHeaderFooter").newInstance();
+        try {
+            Field headerField = tablist.getClass().getDeclaredField("a");
+            headerField.setAccessible(true);
+            headerField.set(tablist, tablistHeader);
+            headerField.setAccessible(!headerField.isAccessible());
+            Field footerField = tablist.getClass().getDeclaredField("b");
+            footerField.setAccessible(true);
+            footerField.set(tablist, tablistFooter);
+            footerField.setAccessible(!footerField.isAccessible());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Reflections.sendPacket(player, tablist);
     }
 
     @Override

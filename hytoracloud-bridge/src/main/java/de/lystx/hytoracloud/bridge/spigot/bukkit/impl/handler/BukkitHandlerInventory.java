@@ -21,7 +21,7 @@ public class BukkitHandlerInventory implements PacketHandler {
         if (rawPacket instanceof PacketOpenInventory) {
             PacketOpenInventory packet = (PacketOpenInventory)rawPacket;
             InventoryObject inventory = packet.getInventoryObject();
-            ICloudPlayer player = CloudDriver.getInstance().getPlayerManager().getCachedObject(packet.getICloudPlayer().getName());
+            ICloudPlayer player = CloudDriver.getInstance().getPlayerManager().getCachedObject(packet.getCloudPlayer().getName());
             Player bukkitPlayer = Bukkit.getPlayer(player.getName());
 
             Inventory inv = Bukkit.createInventory(bukkitPlayer, inventory.getRows() * 9, inventory.getTitle());

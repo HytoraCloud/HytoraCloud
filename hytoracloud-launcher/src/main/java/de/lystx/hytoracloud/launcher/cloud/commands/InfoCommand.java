@@ -1,6 +1,8 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
 
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
@@ -93,11 +95,23 @@ public class InfoCommand implements TabCompletable {
                         sender.sendMessage("  §8> §bLobby: " +  serviceGroup.isLobby() + " §7| §eDynamic: " + serviceGroup.isDynamic() + " §7| §aMaintenance: " + serviceGroup.isMaintenance());
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
+
+                case "receivers":
+                    IReceiverManager receiverManager = CloudDriver.getInstance().getReceiverManager();
+                    sender.sendMessage("INFO", "§7----------------------------------");
+                    for (IReceiver receiver : receiverManager.getAvailableReceivers()) {
+                        sender.sendMessage("§h> §b" + receiver.getName() + " §h[§f" + receiver.getUniqueId() + "§h] §h:");
+                        sender.sendMessage("  §8> §bPlayers: " + receiver.getPlayers().stream() + " §7| §eServices: " + receiver.getServices().size());
+                        sender.sendMessage("  §8> §bAddress: " + receiver.getAddress());
+                        sender.sendMessage("  §8> §bBound: " + receiver.getHost() + ":" + receiver.getPort());
+                    }
+                    sender.sendMessage("INFO", "§7----------------------------------");
             }
         } else {
             sender.sendMessage("INFO", "§9info <servers> §7| §bLists all servers");
             sender.sendMessage("INFO", "§9info <services> §7| §bLists all CloudServices");
             sender.sendMessage("INFO", "§9info <groups> §7| §bLists all groups");
+            sender.sendMessage("INFO", "§9info <receivers> §7| §bLists all receivers");
             sender.sendMessage("INFO", "§9info <cloud> §7| §bLists all cloud-infos");
         }
     }
@@ -105,6 +119,6 @@ public class InfoCommand implements TabCompletable {
 
     @Override
     public List<String> onTabComplete(CloudDriver cloudDriver, String[] args) {
-        return Arrays.asList("servers", "groups", "cloud", "services");
+        return Arrays.asList("servers", "groups", "cloud", "services", "receivers");
     }
 }

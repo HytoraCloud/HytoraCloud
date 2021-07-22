@@ -7,6 +7,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleEx
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
@@ -50,6 +51,9 @@ public class ServiceCommand {
         }
         if (sender instanceof ICloudPlayer) {
             ICloudPlayer player = (ICloudPlayer) sender;
+
+            player.sendTabList(new ChatComponent("TEST"), new ChatComponent("FOOTER"));
+
 
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
@@ -195,8 +199,10 @@ public class ServiceCommand {
                         }
                         ServiceState state = ServiceState.valueOf(name.toUpperCase());
 
-                        CloudDriver.getInstance().getBukkit().setServiceState(state);
-                        CloudDriver.getInstance().getBukkit().update();
+                        IService service = CloudDriver.getInstance().getCurrentService();
+
+                        service.setState(state);
+                        service.update();
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You set the ServiceState of this service to " + state.getColor() + state.name());
                     } else {
                         this.help(player);

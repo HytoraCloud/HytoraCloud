@@ -23,17 +23,11 @@ public class PlayerLoginListener {
         DisconnectEvent.LoginStatus loginStatus = event.getLoginStatus();
         Player player = event.getPlayer();
 
-
-
         ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
 
         if (cloudPlayer == null) {
             return;
-
-
-
         }
-
         CloudBridge.getInstance().getProxyBridge().playerQuit(cloudPlayer);
 
     }

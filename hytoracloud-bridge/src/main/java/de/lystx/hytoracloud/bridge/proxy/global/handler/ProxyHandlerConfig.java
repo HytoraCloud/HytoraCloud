@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.proxy.global.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
+import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import net.hytora.networking.elements.packet.HytoraPacket;

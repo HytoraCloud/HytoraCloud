@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleExecutor;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.command.CommandSender;
@@ -24,7 +24,7 @@ public class ConsoleCommandSenderExecutor implements ConsoleExecutor {
     }
 
     @Override
-    public void sendComponent(CloudComponent cloudComponent) {
+    public void sendComponent(ChatComponent chatComponent) {
 
     }
 

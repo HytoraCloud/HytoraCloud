@@ -161,7 +161,7 @@ public class SignUpdater {
             this.freeSigns.put(current.getGroup().getName(), onlineSins);
         }
 
-        this.setOfflineSigns(current.getGroup().getName(), current, this.freeSigns); //Sets offline signs for current group
+        Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> this.setOfflineSigns(current.getGroup().getName(), current, this.freeSigns)); //Sets offline signs for current group
 
         if (cloudSign != null) {
             try {

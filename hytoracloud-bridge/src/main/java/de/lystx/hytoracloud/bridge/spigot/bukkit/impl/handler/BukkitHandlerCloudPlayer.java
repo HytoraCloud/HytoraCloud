@@ -1,8 +1,10 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 
+import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketPlaySound;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendActionbar;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendTitle;
+import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketTeleportPlayer;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
@@ -10,6 +12,7 @@ import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -30,6 +33,27 @@ public class BukkitHandlerCloudPlayer implements PacketHandler {
             }
             Sound sound = Sound.valueOf(packetPlaySound.getSound());
             player.playSound(player.getLocation(), sound, packetPlaySound.getV1(), packetPlaySound.getV2());
+
+        } else if (packet instanceof PacketTeleportPlayer) {
+            PacketTeleportPlayer teleportPlayer = (PacketTeleportPlayer)packet;
+            Player player = Bukkit.getPlayer(teleportPlayer.getUuid());
+            MinecraftLocation location = teleportPlayer.getLocation();
+            if (player == null || location == null) {
+                return;
+            }
+
+            player.teleport(
+                    new Location(
+                    Bukkit.getWorld(
+                            location.getWorld()
+                    ),
+                    location.getX(),
+                    location.getY(),
+                    location.getZ(),
+                    location.getYaw(),
+                    location.getPitch()
+                    )
+            );
 
         } else if (packet instanceof PacketSendActionbar) {
 

@@ -42,4 +42,11 @@ public class Manager extends CloudProcess {
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", new HytoraServer(0));
     }
 
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        System.exit(0
+        );
+    }
 }

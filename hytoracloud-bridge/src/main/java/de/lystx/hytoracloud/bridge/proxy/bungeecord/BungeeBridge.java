@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.bridge.proxy.bungeecord;
 
-import de.lystx.hytoracloud.driver.commons.interfaces.BridgeInstance;
+import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.commons.interfaces.ProxyBridge;
+import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.other.TablistListener;
@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.CommandListe
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerKickListener;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -153,13 +153,13 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
                 }
 
                 @Override
-                public void sendComponent(UUID uniqueId, CloudComponent cloudComponent) {
+                public void sendComponent(UUID uniqueId, ChatComponent chatComponent) {
 
                     ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uniqueId);
                     if (player == null) {
                         return;
                     }
-                    player.sendMessage(fromCloud(cloudComponent));
+                    player.sendMessage(fromCloud(chatComponent));
                 }
 
                 @Override
@@ -226,14 +226,14 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
 
     /**
-     * Creates a {@link TextComponent} from a {@link CloudComponent}
+     * Creates a {@link TextComponent} from a {@link ChatComponent}
      *
-     * @param cloudComponent the cloudComponent
+     * @param chatComponent the cloudComponent
      * @return built md5 textComponent
      */
-    private TextComponent fromCloud(CloudComponent cloudComponent) {
-        TextComponent textComponent = new TextComponent(cloudComponent.getMessage());
-        cloudComponent.getActions().forEach((action1, objects) -> {
+    private TextComponent fromCloud(ChatComponent chatComponent) {
+        TextComponent textComponent = new TextComponent(chatComponent.getMessage());
+        chatComponent.getActions().forEach((action1, objects) -> {
 
             if (action1 != null && objects != null) {
                 if (action1.equals(CloudComponentAction.CLICK_EVENT_RUN_COMMAND)) {
@@ -252,7 +252,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
             }
         });
-        cloudComponent.getCloudComponents().forEach(component -> textComponent.addExtra(this.fromCloud(component)));
+        chatComponent.getChatComponents().forEach(component -> textComponent.addExtra(this.fromCloud(component)));
         return textComponent;
     }
 
@@ -326,6 +326,20 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
         propertyObject.append("plugins", plugins);
 
         return propertyObject;
+    }
+
+    @Override
+    public void sendTabList(UUID uniqueId, ChatComponent header, ChatComponent footer) {
+
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uniqueId);
+        if (player == null) {
+            return;
+        }
+
+        player.setTabHeader(
+                fromCloud(header),
+                fromCloud(footer)
+        );
     }
 
     public void shutdown() {

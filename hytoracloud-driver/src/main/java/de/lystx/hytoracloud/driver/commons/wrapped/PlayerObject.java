@@ -9,9 +9,11 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponent;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerUpdate;
+import de.lystx.hytoracloud.driver.commons.minecraft.entity.MinecraftPlayer;
+import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.*;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketConnectServer;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
@@ -35,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Getter @Setter
-public class CloudPlayerObject extends WrappedObject<ICloudPlayer, CloudPlayerObject> implements ICloudPlayer {
+public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> implements ICloudPlayer {
 
     private static final long serialVersionUID = 7250454458770916643L;
 
@@ -59,7 +61,7 @@ public class CloudPlayerObject extends WrappedObject<ICloudPlayer, CloudPlayerOb
      */
     private OfflinePlayer offlinePlayer;
 
-    public CloudPlayerObject(PlayerConnection connection) {
+    public PlayerObject(PlayerConnection connection) {
         this.connection = connection;
         this.setOfflinePlayer(CloudDriver.getInstance().getPermissionPool().getCachedObject(connection.getUniqueId()));
     }
@@ -243,13 +245,34 @@ public class CloudPlayerObject extends WrappedObject<ICloudPlayer, CloudPlayerOb
     }
 
     @Override
-    public void sendComponent(CloudComponent cloudComponent) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketSendComponent(this.getUniqueId(), cloudComponent));
+    public void sendComponent(ChatComponent chatComponent) {
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketSendComponent(this.getUniqueId(), chatComponent));
     }
 
     @Override
     public void openInventory(Inventory inventory) {
         CloudDriver.getInstance().getConnection().sendPacket(new PacketOpenInventory(this, (InventoryObject) inventory));
+    }
+
+    @Override
+    public void teleport(MinecraftLocation location) {
+        CloudDriver.getInstance().getConnection().sendPacket(new PacketTeleportPlayer(this.getUniqueId(), location));
+    }
+
+    @Override
+    public MinecraftLocation getLocation() {
+        MinecraftPlayer player = CloudDriver.getInstance().getMinecraftManager().getInfo(this.getService()).getPlayers().stream().filter(minecraftPlayer -> minecraftPlayer.getName().equalsIgnoreCase(this.getName())).findFirst().orElse(null);
+
+        return (player == null ? null : player.getLocation());
+    }
+
+    @Override
+    public void sendTabList(ChatComponent header, ChatComponent footer) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
+            CloudDriver.getInstance().getBridgeInstance().sendTabList(this.getUniqueId(), header, footer);
+        } else {
+            CloudDriver.getInstance().sendPacket(new PacketSendTablist(this.getUniqueId(), header, footer));
+        }
     }
 
     @SneakyThrows @Override
@@ -327,8 +350,8 @@ public class CloudPlayerObject extends WrappedObject<ICloudPlayer, CloudPlayerOb
     }
 
     @Override
-    public Class<CloudPlayerObject> getWrapperClass() {
-        return CloudPlayerObject.class;
+    public Class<PlayerObject> getWrapperClass() {
+        return PlayerObject.class;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.driver.commons.interfaces;
+package de.lystx.hytoracloud.driver.bridge;
 
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 

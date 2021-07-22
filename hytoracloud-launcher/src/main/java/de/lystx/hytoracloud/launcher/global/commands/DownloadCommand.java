@@ -48,23 +48,13 @@ public class DownloadCommand {
             File versionsFile;
 
             if (type.isProxy()) {
-                ProxyVersion proxyVersion = ProxyVersion.byKey(download.getProxyVersion());
-
-                if (proxyVersion == null) {
-                    sender.sendMessage("ERROR", "§cThere is no such proxy-version named §e" + download.getProxyVersion() + "§c!");
-                    return;
-                }
+                ProxyVersion proxyVersion = ProxyVersion.valueOf(download.getProxyVersion());
 
                 versionsFile = new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), proxyVersion.getJarName());
 
                 Utils.download(proxyVersion.getUrl(), versionsFile, "Downloading " + proxyVersion.name());
             } else {
-                SpigotVersion spigotVersion = SpigotVersion.byKey(download.getSpigotVersion());
-
-                if (spigotVersion == null) {
-                    sender.sendMessage("ERROR", "§cThere is no such spigot-version named §e" + download.getSpigotVersion() + "§c!");
-                    return;
-                }
+                SpigotVersion spigotVersion = SpigotVersion.valueOf(download.getSpigotVersion());
 
                 versionsFile = new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), spigotVersion.getJarName());
 

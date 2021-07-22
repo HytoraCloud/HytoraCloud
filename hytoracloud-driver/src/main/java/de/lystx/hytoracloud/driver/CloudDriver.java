@@ -1,6 +1,8 @@
 package de.lystx.hytoracloud.driver;
 
 import ch.qos.logback.classic.LoggerContext;
+import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
+import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.DefaultModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.DefaultChannelMessenger;
@@ -11,6 +13,8 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.IFallbackMana
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.DefaultTemplateManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplateManager;
 import de.lystx.hytoracloud.driver.commons.interfaces.*;
+import de.lystx.hytoracloud.driver.commons.minecraft.DefaultMinecraftManager;
+import de.lystx.hytoracloud.driver.commons.minecraft.IMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
@@ -29,7 +33,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabaseManager;
-import de.lystx.hytoracloud.driver.commons.interfaces.IBukkit;
+import de.lystx.hytoracloud.driver.bridge.IBukkit;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
@@ -112,6 +116,7 @@ public class CloudDriver {
     private final ITemplateManager templateManager; //Manages templates
     private final IModuleManager moduleManager; //Manage modules info
     private final IChannelMessenger messageManager; //Manage to message
+    private final IMinecraftManager minecraftManager; //Manages minecraft
     private final ExecutorService executorService; //For task-execution
 
     /**
@@ -131,6 +136,7 @@ public class CloudDriver {
         this.templateManager = new DefaultTemplateManager();
         this.moduleManager = new DefaultModuleManager();
         this.messageManager = new DefaultChannelMessenger();
+        this.minecraftManager = new DefaultMinecraftManager();
 
         //Setting other default values
         this.networkHandlers = new LinkedList<>();
