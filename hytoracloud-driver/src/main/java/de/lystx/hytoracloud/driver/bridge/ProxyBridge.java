@@ -38,43 +38,42 @@ public interface ProxyBridge {
             //Request timed out couldn't log in.... kicking
             event.setCancelled(true);
             event.setComponent(CloudErrors.LOGIN_PROXY.toString());
-
         } else {
             cachedPlayer = new PlayerObject(connection);
             cachedPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
             cachedPlayer.update();
 
-            if (CloudDriver.getInstance().getFallbackManager().getFallback(cachedPlayer) == null) {
+            if (CloudDriver.getInstance().getFallbackManager().getFallback(cachedPlayer) != null) {
+                DriverEventPlayerJoin playerJoin = new DriverEventPlayerJoin(cachedPlayer);
+                if (!CloudDriver.getInstance().callEvent(playerJoin)) {
+                    if (CloudDriver.getInstance().getProxyConfig().isEnabled()) {
+
+                        if (CloudDriver.getInstance().getNetworkConfig().isMaintenance()
+                                && !CloudDriver.getInstance().getNetworkConfig().getWhitelistedPlayers().contains(cachedPlayer.getName())
+                                && !CloudDriver.getInstance().getPermissionPool().hasPermission(cachedPlayer.getUniqueId(), "cloudsystem.network.maintenance")) {
+
+                            event.setCancelled(true);
+                            event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceNetwork().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                        }
+
+                        if ((CloudDriver.getInstance().getPlayerManager().getCachedObjects().size() + 1) >= CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()) {
+                            event.setCancelled(true);
+                            event.setComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                        }
+                    }
+                } else {
+                    event.setCancelled(true);
+                    event.setComponent(playerJoin.getTargetComponent());
+                }
+            } else {
                 event.setCancelled(true);
                 event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getNoLobbyFound().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
-                return event;
-            }
-
-            DriverEventPlayerJoin playerJoin = new DriverEventPlayerJoin(cachedPlayer);
-            if (CloudDriver.getInstance().callEvent(playerJoin)) {
-                event.setCancelled(true);
-                event.setComponent(playerJoin.getTargetComponent());
-                return event;
-            }
-
-            if (CloudDriver.getInstance().getProxyConfig().isEnabled()) {
-
-                if (CloudDriver.getInstance().getNetworkConfig().isMaintenance()
-                        && !CloudDriver.getInstance().getNetworkConfig().getWhitelistedPlayers().contains(cachedPlayer.getName())
-                        && !CloudDriver.getInstance().getPermissionPool().hasPermission(cachedPlayer.getUniqueId(), "cloudsystem.network.maintenance")) {
-
-                    event.setCancelled(true);
-                    event.setComponent(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceNetwork().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
-
-                }
-
-                if ((CloudDriver.getInstance().getPlayerManager().getCachedObjects().size() + 1) >= CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()) {
-                    event.setCancelled(true);
-                    event.setComponent("%prefix%&cThe network is full!".replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
-                }
             }
         }
 
+        if (event.isCancelled()) {
+            playerQuit(cachedPlayer);
+        }
         return event;
     }
 
@@ -114,35 +113,35 @@ public interface ProxyBridge {
     /**
      * Formats the tablist for a player
      *
-     * @param ICloudPlayer the player
+     * @param cloudPlayer the player
      * @param input the header or footer
      * @return formatted string
      */
-    default String formatTabList(ICloudPlayer ICloudPlayer, String input) {
+    default String formatTabList(ICloudPlayer cloudPlayer, String input) {
         try {
-            IService IService;
+            IService service;
             PermissionGroup permissionGroup;
-            if (ICloudPlayer == null || ICloudPlayer.getPermissionGroup() == null) {
+            if (cloudPlayer == null || cloudPlayer.getPermissionGroup() == null) {
                 permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
             } else {
-                permissionGroup = ICloudPlayer.getCachedPermissionGroup();
+                permissionGroup = cloudPlayer.getCachedPermissionGroup();
             }
-            if (ICloudPlayer == null || ICloudPlayer.getService() == null) {
-                IService = CloudDriver.getInstance().getCurrentService();
+            if (cloudPlayer == null || cloudPlayer.getService() == null) {
+                service = CloudDriver.getInstance().getCurrentService();
             } else {
-                IService = CloudDriver.getInstance().getServiceManager().getCachedObject(ICloudPlayer.getService().getName());
+                service = CloudDriver.getInstance().getServiceManager().getCachedObject(cloudPlayer.getService().getName());
             }
             return input
                     .replace("&", "§")
                     .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()))
                     .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()))
-                    .replace("%id%", IService.getId() + "")
-                    .replace("%group%", IService.getGroup().getName() + "")
+                    .replace("%id%", service.getId() + "")
+                    .replace("%group%", service.getGroup().getName() + "")
                     .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
                     .replace("%receiver%", CloudDriver.getInstance().getCurrentService().getGroup().getReceiver())
                     .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
                     .replace("%proxy%", CloudDriver.getInstance().getCurrentService().getName())
-                    .replace("%server%", IService.getName());
+                    .replace("%server%", service.getName());
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -175,15 +174,15 @@ public interface ProxyBridge {
     /**
      * Called when a player connected on a service
      *
-     * @param ICloudPlayer the player
+     * @param cloudPlayer the player
      * @param service the service
      */
-    default void onServerConnect(ICloudPlayer ICloudPlayer, IService service) {
+    default void onServerConnect(ICloudPlayer cloudPlayer, IService service) {
 
-        ICloudPlayer.setService(service);
-        ICloudPlayer.update();
+        cloudPlayer.setService(service);
+        cloudPlayer.update();
 
-        DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(ICloudPlayer, service);
+        DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, service);
         CloudDriver.getInstance().callEvent(serverChange);
     }
 
