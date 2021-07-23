@@ -1,7 +1,9 @@
 package de.lystx.hytoracloud.bridge.global.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceUpdate;
 import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
+import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
@@ -21,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 public class CloudBridgeServiceManager implements IServiceManager {
@@ -28,10 +31,10 @@ public class CloudBridgeServiceManager implements IServiceManager {
     /**
      * All cached services
      */
-    private Map<IServiceGroup, List<IService>> cachedServices;
+    private List<IService> cachedObjects;
 
     public CloudBridgeServiceManager() {
-        this.cachedServices = new HashMap<>();
+        this.cachedObjects = new LinkedList<>();
     }
 
     @Override
@@ -39,42 +42,40 @@ public class CloudBridgeServiceManager implements IServiceManager {
         return this.getCachedGroups().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
     }
 
-    @Override
-    public void notifyStop(IService service) {
-        throw new UnsupportedOperationException("Not Available for CloudBridge!");
-    }
 
     @Override
     public void updateGroup(IServiceGroup group) {
         IServiceGroup serviceGroup = this.getServiceGroup(group.getName());
-        List<IService> services = this.cachedServices.get(serviceGroup);
-        this.cachedServices.remove(serviceGroup);
-        this.cachedServices.put(group, services);
+
+        List<IService> list = this.getCachedObjects(serviceGroup);
+
+        for (IService service : this.cachedObjects) {
+            if (service.getGroup().getName().equalsIgnoreCase(group.getName())) {
+                int i = cachedObjects.indexOf(service);
+                service.setGroup(serviceGroup);
+                this.cachedObjects.set(i, service);
+            }
+        }
+
     }
+
 
     @Override
     public void updateService(IService service) {
-        IService safeGet = this.getCachedObject(service.getName());
-        IServiceGroup serviceGroup = this.getServiceGroup(safeGet.getGroup().getName());
-        List<IService> iServices = this.cachedServices.get(serviceGroup);
-        iServices.set(iServices.indexOf(safeGet), service);
+
+        IService safeGet = this.cachedObjects.stream().filter(service1 -> service1.getName().equalsIgnoreCase(service.getName())).findFirst().orElse(null);
+        if (safeGet == null) {
+            this.cachedObjects.add(service);
+            return;
+        }
+        this.cachedObjects.set(this.cachedObjects.indexOf(safeGet), service);
+        CloudDriver.getInstance().callEvent(new DriverEventServiceUpdate(service));
     }
 
-    @Override
-    public void startServices(List<IServiceGroup> serviceGroups) {
-        serviceGroups.forEach(this::startService);
-    }
 
     @Override
-    public void startService(IServiceGroup serviceGroup, IService service, PropertyObject properties) {
-        service.setGroup(serviceGroup);
-        service.setProperties(properties);
-        CloudDriver.getInstance().sendPacket(new PacketInStartService(service, properties));
-    }
-
-    @Override
-    public void startService(IServiceGroup serviceGroup, IService service) {
-        throw new UnsupportedOperationException("Not Available for CloudBridge!");
+    public void startService(IService service) {
+        CloudDriver.getInstance().sendPacket(new PacketInStartService(service, service.getProperties()));
     }
 
     @Override
@@ -85,15 +86,6 @@ public class CloudBridgeServiceManager implements IServiceManager {
     @Override
     public void startService(IServiceGroup serviceGroup, PropertyObject properties) {
         CloudDriver.getInstance().sendPacket(new PacketInStartGroupWithProperties(serviceGroup, properties));
-    }
-
-    @Override
-    public List<IService> getCachedObjects() {
-        List<IService> list = new LinkedList<>();
-        if (this.cachedServices != null) {
-            this.cachedServices.values().forEach(list::addAll);
-        }
-        return list;
     }
 
     @Override
@@ -122,69 +114,36 @@ public class CloudBridgeServiceManager implements IServiceManager {
         return list;
     }
 
-    @Override
-    public void setCachedObjects(List<IService> cachedObjects) {
-
-    }
-
-    @Override
-    public IService getCachedObject(UUID uniqueId) {
-        return this.getCachedObjects().stream().filter(service -> service.getUniqueId().equals(uniqueId)).findFirst().orElse(null);
+    public List<IService> getCachedObjects(IServiceGroup serviceGroup) {
+        return this.cachedObjects.stream().filter(service -> service.getGroup().getName().equalsIgnoreCase(serviceGroup.getName())).collect(Collectors.toList());
     }
 
     @Override
     public IService getCachedObject(String name) {
-        return this.getCachedObjects().stream().filter(service -> service.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return this.cachedObjects.stream().filter(service -> service.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     @Override
+    public IService getCachedObject(UUID uniqueId) {
+        return this.cachedObjects.stream().filter(service -> service.getUniqueId().equals(uniqueId)).findFirst().orElse(null);
+    }
+
+    @Override @ScheduledForVersion("1.9")
     public void getObjectAsync(String name, Consumer<IService> consumer) {
-        consumer.accept(getCachedObject(name));
     }
 
-    @Override
+    @Override @ScheduledForVersion("1.9")
     public void getObjectAsync(UUID uniqueId, Consumer<IService> consumer) {
-        consumer.accept(getCachedObject(uniqueId));
     }
 
-    @Override
+    @Override @ScheduledForVersion("1.9")
     public Response<IService> getObjectSync(String name) {
-        return new Response<IService>() {
-            @Override
-            public IService get() {
-                return getCachedObject(name);
-            }
-
-            @Override
-            public Component getComponent() {
-                return new Component();
-            }
-
-            @Override
-            public ResponseStatus getStatus() {
-                return ResponseStatus.SUCCESS;
-            }
-        };
+        return null;
     }
 
-    @Override
+    @Override @ScheduledForVersion("1.9")
     public Response<IService> getObjectSync(UUID uniqueId) {
-        return new Response<IService>() {
-            @Override
-            public IService get() {
-                return getCachedObject(uniqueId);
-            }
-
-            @Override
-            public Component getComponent() {
-                return new Component();
-            }
-
-            @Override
-            public ResponseStatus getStatus() {
-                return ResponseStatus.SUCCESS;
-            }
-        };
+        return null;
     }
 
     @NotNull
@@ -194,63 +153,42 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
 
-    public List<IService> getCachedServices(IServiceGroup serviceGroup) {
-
-        try {
-            List<IService> IServices = new LinkedList<>(this.cachedServices.get(this.getServiceGroup(serviceGroup.getName())));
-            IServices.sort(Comparator.comparingInt(IService::getId));
-            return IServices;
-        } catch (NullPointerException e) {
-            return new LinkedList<>();
-        }
-    }
-
     @Override
     public void unregisterService(IService service) {
         IService service1 = this.getCachedObject(service.getName());
 
         if (service1 != null) {
-            IServiceGroup serviceGroup = this.getServiceGroup(service.getGroup().getName());
-            List<IService> cachedServices = this.getCachedServices(serviceGroup);
-
-            cachedServices.remove(service1);
-            this.cachedServices.put(serviceGroup, cachedServices);
+            cachedObjects.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
         }
 
     }
 
     @Override
     public void registerService(IService service) {
+        if (service == null || service.getName() == null) {
+            return;
+        }
         IService service1 = this.getCachedObject(service.getName());
 
         if (service1 == null) {
-            IServiceGroup serviceGroup = this.getServiceGroup(service.getGroup().getName());
-            List<IService> cachedServices = this.getCachedServices(serviceGroup);
-
-            cachedServices.add(service);
-            this.cachedServices.put(serviceGroup, cachedServices);
+            this.cachedObjects.add(service);
         }
     }
 
     @Override
     public void shutdownAll(IServiceGroup serviceGroup) {
-        this.cachedServices.get(this.getServiceGroup(serviceGroup.getName())).forEach(this::stopService);
-    }
-
-    @Override
-    public List<IService> getServices(IServiceGroup serviceGroup) {
-        List<IService> list = new LinkedList<>();
-        for (IService allIService : this.getCachedObjects()) {
-            if (allIService.getGroup().getName().equalsIgnoreCase(serviceGroup.getName())) {
-                list.add(allIService);
-            }
+        for (IService cachedObject : this.getCachedObjects(serviceGroup)) {
+            this.stopService(cachedObject);
         }
-        return list;
     }
 
     @Override
     public List<IServiceGroup> getCachedGroups() {
-        return new LinkedList<>(this.cachedServices == null ? new ArrayList<>() : this.cachedServices.keySet());
+        List<IServiceGroup> list = new LinkedList<>();
+        for (IService cachedObject : this.cachedObjects) {
+            list.add(cachedObject.getGroup());
+        }
+        return list;
     }
 
     @Override
@@ -259,10 +197,11 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
     @Override
-    public void shutdownAll() {
+    public void shutdownAll(Runnable runnable) {
         for (IService allIService : this.getCachedObjects()) {
             stopService(allIService);
         }
+        runnable.run();
     }
 
 }

@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud.commands;
 
 
+import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
@@ -20,6 +21,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
 public class InfoCommand implements TabCompletable {
@@ -62,7 +64,7 @@ public class InfoCommand implements TabCompletable {
                         sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
                         sender.sendMessage("  §8> §bType: " +  service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getCurrentTemplate().getName());
                         sender.sendMessage("  §8> §bHost: " +  service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
-                        sender.sendMessage("  §8> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage() : "-1") + "/" + service.getGroup().getMemory());
+                        sender.sendMessage("  §8> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage() : "-1") + "/" + service.getGroup().getMemory() + " §7| §eTPS: " + (service.isAuthenticated() ? service.getTPS() : "§c???"));
                         sender.sendMessage("  §8> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
                         if (service.getProperties().keySet().isEmpty()) {
                             sender.sendMessage("  §8> §bProperties: §cNone");
@@ -95,15 +97,19 @@ public class InfoCommand implements TabCompletable {
                         sender.sendMessage("  §8> §bLobby: " +  serviceGroup.isLobby() + " §7| §eDynamic: " + serviceGroup.isDynamic() + " §7| §aMaintenance: " + serviceGroup.isMaintenance());
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
-
+                    return;
                 case "receivers":
                     IReceiverManager receiverManager = CloudDriver.getInstance().getReceiverManager();
+                    if (receiverManager.getAvailableReceivers().isEmpty()) {
+                        sender.sendMessage("ERROR", "§cSadly, there are no active Receivers at the moment!");
+                        return;
+                    }
                     sender.sendMessage("INFO", "§7----------------------------------");
                     for (IReceiver receiver : receiverManager.getAvailableReceivers()) {
-                        sender.sendMessage("§h> §b" + receiver.getName() + " §h[§f" + receiver.getUniqueId() + "§h] §h:");
-                        sender.sendMessage("  §8> §bPlayers: " + receiver.getPlayers().stream() + " §7| §eServices: " + receiver.getServices().size());
-                        sender.sendMessage("  §8> §bAddress: " + receiver.getAddress());
-                        sender.sendMessage("  §8> §bBound: " + receiver.getHost() + ":" + receiver.getPort());
+                        sender.sendMessage("§h> §a" + receiver.getName() + " §h[§d" + receiver.getUniqueId() + " §7| §6Authenticated: " + (receiver.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
+                        sender.sendMessage("  §8> §bPlayers: " + receiver.getPlayers().size() + " §7| §eServices: " + receiver.getServices().size());
+                        sender.sendMessage("  §8> §bAddress: " + receiver.getAddress() + " §7 §eBound: " + receiver.getHost() + ":" + receiver.getPort());
+                        sender.sendMessage("  §8> §bMemory: " + receiver.getMemory() + "/" + receiver.getMaxMemory() + " §7| §eUnused: " + receiver.getUnusedMemory());
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
             }

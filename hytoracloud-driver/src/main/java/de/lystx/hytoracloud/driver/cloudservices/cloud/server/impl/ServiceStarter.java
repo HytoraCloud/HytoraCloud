@@ -43,13 +43,13 @@ public class ServiceStarter {
     private final File pluginsDirectory;
 
 
-    public ServiceStarter(IService service, PropertyObject properties) {
+    public ServiceStarter(IService service) {
         FileService instance = CloudDriver.getInstance().getInstance(FileService.class);
 
         this.service = service;
         this.serviceGroup = service.getGroup();
         this.template = service.getGroup().getCurrentTemplate();
-        this.properties = properties;
+        this.properties = service.getProperties();
 
         this.templateDirectory = instance.getTemplatesDirectory();
 
@@ -398,6 +398,10 @@ public class ServiceStarter {
         jsonDocument.append("port", CloudDriver.getInstance().getCloudAddress().getPort());
         jsonDocument.append("server", service.getName());
         jsonDocument.save();
+
+        JsonDocument document = new JsonDocument(new File(cloud, "orientation.json"));
+        document.append(service);
+        document.save();
     }
 
     /**

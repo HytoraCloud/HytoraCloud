@@ -280,6 +280,64 @@ public class JsonDocument implements Iterable<JsonElement> {
     }
 
     /**
+     * Returns an float by a Key
+     *
+     * @param key the key where the object is stored
+     * @return current Document
+     */
+    public double getFloat(String key) {
+        if (!this.jsonObject.has(key)) {
+            return -1;
+        }
+        return this.jsonObject.get(key).getAsDouble();
+    }
+
+    /**
+     * Returns a float by a Key
+     * And appends and returns a default value if not set
+     *
+     * @param key the key where the object is stored
+     * @param value the default Value
+     * @return current Document
+     */
+    public double getFloat(String key, double value) {
+        if (!this.jsonObject.has(key)) {
+            this.jsonObject.addProperty(key, value);
+            return value;
+        }
+        return this.jsonObject.get(key).getAsDouble();
+    }
+
+    /**
+     * Returns an long by a Key
+     *
+     * @param key the key where the object is stored
+     * @return current Document
+     */
+    public long getLong(String key) {
+        if (!this.jsonObject.has(key)) {
+            return -1;
+        }
+        return this.jsonObject.get(key).getAsLong();
+    }
+
+    /**
+     * Returns a float by a Key
+     * And appends and returns a default value if not set
+     *
+     * @param key the key where the object is stored
+     * @param value the default Value
+     * @return current Document
+     */
+    public long getLong(String key, long value) {
+        if (!this.jsonObject.has(key)) {
+            this.jsonObject.addProperty(key, value);
+            return value;
+        }
+        return this.jsonObject.get(key).getAsLong();
+    }
+
+    /**
      * Returns a Boolean by a Key
      *
      * @param key the key where the object is stored
@@ -515,6 +573,21 @@ public class JsonDocument implements Iterable<JsonElement> {
     public static <T> T fromClass(String input, Class<T> tClass) {
         return new JsonDocument(input).getAs(tClass);
     }
+    /**
+     * Transforms a String into a list
+     *
+     * @param input the input of the string
+     * @param listClass the type of the list
+     * @return object
+     */
+    public static <V> List<V> getListFromClass(String input, Class<V> listClass) {
+        List<V> list = new LinkedList<>();
+        for (JsonElement jsonElement : new JsonDocument(input).getJsonObject().getAsJsonArray()) {
+            JsonDocument document = new JsonDocument(jsonElement.toString());
+            list.add(document.getAs(listClass));
+        }
+        return list;
+    }
 
     /**
      * Iterates through the builder with a given class
@@ -557,4 +630,11 @@ public class JsonDocument implements Iterable<JsonElement> {
         return map;
     }
 
+    /**
+     * Deletes the current file
+     */
+    public void delete() {
+        this.clear();
+        this.file.delete();
+    }
 }

@@ -11,6 +11,8 @@ import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceM
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 
+import java.util.LinkedList;
+
 public class ReceiverHandlerScreen implements PacketHandler {
 
     @Override
@@ -26,7 +28,7 @@ public class ReceiverHandlerScreen implements PacketHandler {
                 return;
             }
 
-            packet.reply(component -> component.put("lines", serviceOutput.getCachedLines()));
+            packet.reply(component -> component.put("lines", serviceOutput.getCachedLines() == null ? new LinkedList<>() : serviceOutput.getCachedLines()));
         }
     }
 }

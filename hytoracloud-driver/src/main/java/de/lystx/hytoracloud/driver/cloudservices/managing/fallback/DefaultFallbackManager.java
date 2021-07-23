@@ -28,7 +28,7 @@ public class DefaultFallbackManager implements IFallbackManager {
             Fallback fallback = this.getHighestFallback(player);
             IService service;
             try {
-                service = CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getServices(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
+                service = CloudDriver.getInstance().getServiceManager().getCachedObjects(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getCachedObjects(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
             } catch (Exception e){
                 service = CloudDriver.getInstance().getServiceManager().getCachedObject(fallback.getGroupName() + "-1");
             }

@@ -83,6 +83,9 @@ public class PacketManager {
             hytoraPacket.read(component);
 
             for (PacketHandler packetHandler : new ArrayList<>(this.packetHandlers)) {
+                if (packetHandler == null) {
+                    continue;
+                }
                 hytoraPacket.handle(connection);
                 packetHandler.handle(hytoraPacket);
             }

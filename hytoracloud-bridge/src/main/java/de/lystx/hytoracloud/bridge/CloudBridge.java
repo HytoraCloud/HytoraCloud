@@ -27,6 +27,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionS
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 
 
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -91,7 +92,8 @@ public class CloudBridge {
                 new BridgeHandlerEvent(),
                 new BridgeHandlerServiceRequests()
         );
-        this.bootstrap();
+
+        new Thread(this::bootstrap, "hytoracloud-bridge-bootstrap").start();
     }
 
     /**
@@ -177,19 +179,12 @@ public class CloudBridge {
                 System.out.println("[CloudBridge] Bridge has connected to cloud at [" + socketAddress.toString() + "]");
                 System.out.println("[CloudBridge] But this Service has not received a Handshake-Component yet!");
 
-                PacketRegisterService packetRegisterService = new PacketRegisterService(jsonDocument.getString("server"));
+                JsonDocument document = new JsonDocument(new File("./CLOUD/orientation.json"));
+                IService service = document.getAs(ServiceObject.class);
+                document.delete();
 
-                packetRegisterService.toReply(client, new Consumer<Component>() {
-
-                    @SneakyThrows
-                    @Override
-                    public void accept(Component component) {
-
-                        IService service = component.get("service");
-                        System.out.println("[CloudBridge] Received Verification from Cloud for '" + service.getName() + "'");
-                    }
-                });
-
+                PacketRegisterService packetRegisterService = new PacketRegisterService(jsonDocument.getString("server"), service);
+                CloudDriver.getInstance().sendPacket(packetRegisterService);
             }
 
             @SneakyThrows

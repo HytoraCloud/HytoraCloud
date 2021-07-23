@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface CloudInfo {
+public @interface DriverInfo {
 
     /**
      * The current version of the cloud

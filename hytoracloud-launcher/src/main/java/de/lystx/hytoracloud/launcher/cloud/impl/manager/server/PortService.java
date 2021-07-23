@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,8 +14,9 @@ import java.util.List;
  * proxyStartPort or serverStartPort
  */
 @Getter
-public class PortService {
+public class PortService implements Serializable {
 
+    private static final long serialVersionUID = -6055013827003323170L;
     /**
      * The used ports
      */

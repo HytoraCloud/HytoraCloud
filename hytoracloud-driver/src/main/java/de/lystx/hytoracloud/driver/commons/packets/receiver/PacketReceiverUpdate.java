@@ -1,26 +1,23 @@
-package de.lystx.hytoracloud.driver.commons.packets.out;
+package de.lystx.hytoracloud.driver.commons.packets.receiver;
 
-
-
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;
 import net.hytora.networking.elements.packet.HytoraPacket;
 
-import java.io.Serializable;
-
 @Getter @AllArgsConstructor
-public class PacketOutStopServer extends HytoraPacket {
+public class PacketReceiverUpdate extends HytoraPacket {
 
-    private String service;
+    private IReceiver receiver;
 
     @Override
     public void write(Component component) {
-        component.put("s", service);
+        component.put("receiver", receiver);
     }
 
     @Override
     public void read(Component component) {
-        service = component.get("s");
+        receiver = component.get("receiver");
     }
 }

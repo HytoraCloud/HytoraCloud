@@ -131,7 +131,7 @@ public class PlayerNPCListener implements Listener {
             inventory.setItem(item.getPreInventorySlot(), BukkitItem.fromCloudItem(item));
         }
 
-        for (IService service : CloudDriver.getInstance().getServiceManager().getServices(serviceGroup)) {
+        for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(serviceGroup)) {
             try {
                 List<String> strings = new LinkedList<>();
 

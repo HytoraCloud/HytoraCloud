@@ -66,7 +66,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     /**
      * The group of this service
      */
-    private IServiceGroup group;
+    private ServiceGroupObject group;
 
     /**
      * If the service is connected to the cloud
@@ -74,16 +74,15 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     private boolean authenticated;
 
     public ServiceObject(IServiceGroup group, int id, int port) {
-        this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), group, false);
+        this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), (ServiceGroupObject) group, false);
     }
 
     public IServiceGroup getGroup() {
-        try {
-            IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(group.getName());
-            return serviceGroup == null ? group : serviceGroup;
-        } catch (Exception e) {
-            return group;
-        }
+        return group;
+    }
+
+    public void setGroup(IServiceGroup group) {
+        this.group = (ServiceGroupObject) group;
     }
 
     @Override
@@ -199,7 +198,10 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public String getTPS() {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
+        if (this.group.getType() == ServiceType.PROXY) {
+            return "§cNo TPS for Proxy";
+        }
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
             return CloudDriver.getInstance().getBridgeInstance().loadTPS();
         } else {
             PacketRequestTPS packetRequestTPS = new PacketRequestTPS(this.getName());
@@ -217,7 +219,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
             CloudDriver.getInstance().getServiceManager().updateService(this);
             return;
         }
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketServiceUpdate(this));
+        CloudDriver.getInstance().sendPacket(new PacketServiceUpdate(this));
     }
 
     @Override

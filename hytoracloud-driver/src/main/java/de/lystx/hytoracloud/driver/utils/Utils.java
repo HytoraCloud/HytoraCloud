@@ -100,28 +100,6 @@ public class Utils {
         return new SimpleDateFormat("hh:mm:ss");
     }
 
-    /**
-     * Checks if a {@link Method} should be executed async or sync
-     * and if its delayed or not and which unit to use
-     *
-     * @param object the object where the annotation might be placed
-     * @param runnable the runnable to execute
-     */
-    public static void runTaskMethod(AccessibleObject object, Runnable runnable) {
-        if (object.isAnnotationPresent(RunTaskSynchronous.class) || object.getClass().isAnnotationPresent(RunTaskSynchronous.class)) {
-            RunTaskSynchronous runTaskSynchronous = object.getAnnotation(RunTaskSynchronous.class);
-            if (runTaskSynchronous.delay() != -1 || runTaskSynchronous.unit() != TimeUnit.NANOSECONDS) {
-                if (runTaskSynchronous.value()) {
-                    Scheduler.getInstance().scheduleDelayedTask(runnable, runTaskSynchronous.delay());
-                } else {
-                    Scheduler.getInstance().scheduleDelayedTaskAsync(runnable, runTaskSynchronous.delay());
-                }
-            }
-        } else {
-            runnable.run();
-        }
-    }
-
 
     /**
      * Downloads a file from a website

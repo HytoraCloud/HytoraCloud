@@ -18,7 +18,6 @@ public class ProxyHandlerRegister implements PacketHandler {
             PacketOutRegisterServer packetOutRegisterServer = (PacketOutRegisterServer)packet;
             proxyBridge.registerService(packetOutRegisterServer.getService());
 
-            CloudDriver.getInstance().getServiceManager().registerService(packetOutRegisterServer.getService());
         }
 
     }

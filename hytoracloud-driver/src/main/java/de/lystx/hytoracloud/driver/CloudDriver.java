@@ -60,6 +60,7 @@ import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.reflect.AccessibleObject;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -68,13 +69,14 @@ import java.util.function.Consumer;
 @Getter
 
 
-@CloudInfo(
+@DriverInfo(
         version = "STABLE-1.8",
         contributors = {"Lystx", "cxt", "Ian S."},
         todo = {
                 "Multi-Root",
                 "1.17 Support",
-                "Higher Java Versions"
+                "Higher Java Versions",
+                "On Receiver-Shutdown remove all Services from Receiver from cache"
         }
 )
 public class CloudDriver {
@@ -151,18 +153,14 @@ public class CloudDriver {
         CloudDriver.getInstance().getServiceRegistry().registerService(new Scheduler());
         CloudDriver.getInstance().getServiceRegistry().registerService(new CommandService());
 
-        //Check for libraries and colored console
-        if (driverType.equals(CloudType.RECEIVER) || driverType.equals(CloudType.CLOUDSYSTEM) || driverType.equals(CloudType.NONE)) {
-            System.out.println("");
-            System.out.println("---------------------------------");
-            //Disable netty and mongoDB logging
+        //Check for libraries
+        File libraryDirectory = driverType.equals(CloudType.BRIDGE) ? new File("../../../../../global/libs/") : this.getInstance(FileService.class).getLibraryDirectory();
 
-            this.libraryService = new LibraryService(this.getInstance(FileService.class).getLibraryDirectory(), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
-        } else {
-            this.libraryService = new LibraryService(new File("../../../../../global/libs/"), ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
-        }
+        this.libraryService = new LibraryService(libraryDirectory, ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
         this.libraryService.installDefaultLibraries();
+
         if (this.driverType != CloudType.BRIDGE) {
+            //Disable netty and mongoDB logging
             Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
             loggers.disable();
             AnsiConsole.systemInstall();
@@ -187,7 +185,7 @@ public class CloudDriver {
      */
 
     /**
-     * This method registere a CloudCommand class object
+     * This method registers a CloudCommand class object
      * And all Methods in this class that have the {@link CommandExecutor}
      * and the {@link String[]} parameter will be cached to be executed after
      * And the method should have a {@link de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command}-Annotation
@@ -257,6 +255,10 @@ public class CloudDriver {
      * @param showUpInConsole > If false it will only be logged
      */
     public void messageCloud(String prefix, String message, boolean showUpInConsole) {
+        if (driverType == CloudType.CLOUDSYSTEM) {
+            this.log(prefix, message);
+            return;
+        }
         this.sendPacket(new PacketLogMessage(prefix, message, showUpInConsole));
     }
 
@@ -345,7 +347,7 @@ public class CloudDriver {
      * @return response
      */
     public Component getResponse(HytoraPacket responsePacket, int timeOut) {
-        return responsePacket.toReply(connection);
+        return responsePacket.toReply(connection, timeOut);
     }
     
     /*
@@ -378,7 +380,7 @@ public class CloudDriver {
             JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
             return new InetSocketAddress(jsonDocument.getString("host"), jsonDocument.getInteger("port"));
         } else if (driverType == CloudType.RECEIVER) {
-            IReceiver receiver = (IReceiver) implementedData.get("receiver");
+            IReceiver receiver = IReceiver.current();
             return new InetSocketAddress(receiver.getHost(), receiver.getPort());
         } else if (driverType == CloudType.CLOUDSYSTEM){
             NetworkConfig networkConfig = getInstance(ConfigService.class).getNetworkConfig();
@@ -467,6 +469,28 @@ public class CloudDriver {
     }
 
     /**
+     * Checks if an {@link AccessibleObject} should be executed async or sync
+     * and if its delayed or not and which unit to use
+     *
+     * @param object the object where the annotation might be placed
+     * @param runnable the runnable to execute
+     */
+    public void runTask(AccessibleObject object, Runnable runnable) {
+        if (object.isAnnotationPresent(RunTaskSynchronous.class) || object.getClass().isAnnotationPresent(RunTaskSynchronous.class)) {
+            RunTaskSynchronous runTaskSynchronous = object.getAnnotation(RunTaskSynchronous.class);
+            if (runTaskSynchronous.delay() != -1 || runTaskSynchronous.unit() != TimeUnit.NANOSECONDS) {
+                if (runTaskSynchronous.value()) {
+                    Scheduler.getInstance().scheduleDelayedTask(runnable, runTaskSynchronous.delay());
+                } else {
+                    Scheduler.getInstance().scheduleDelayedTaskAsync(runnable, runTaskSynchronous.delay());
+                }
+            }
+        } else {
+            runnable.run();
+        }
+    }
+
+    /**
      * Sets a field of this class
      *
      * @param name the name
@@ -477,13 +501,13 @@ public class CloudDriver {
     }
 
     /**
-     * Gets the version via {@link CloudInfo} annotation
+     * Gets the version via {@link DriverInfo} annotation
      *
      * @return current version of cloud
      */
     public String getVersion() {
-        if (CloudDriver.class.isAnnotationPresent(CloudInfo.class)) {
-            return CloudDriver.class.getAnnotation(CloudInfo.class).version();
+        if (CloudDriver.class.isAnnotationPresent(DriverInfo.class)) {
+            return CloudDriver.class.getAnnotation(DriverInfo.class).version();
         } else {
             return "UNKNOWN";
         }

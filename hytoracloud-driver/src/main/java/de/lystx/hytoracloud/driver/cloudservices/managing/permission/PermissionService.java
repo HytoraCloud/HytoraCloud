@@ -30,7 +30,6 @@ public class PermissionService implements ICloudService {
 
     private final File file;
     private boolean ignore;
-    private boolean loaded;
 
     public PermissionService() {
 
@@ -50,13 +49,6 @@ public class PermissionService implements ICloudService {
             return;
         }
         CloudDriver.getInstance().getPermissionPool().setCachedObjects(CloudDriver.getInstance().getDatabaseManager().getDatabase().loadEntries());
-        if (!loaded) {
-            loaded = true;
-            if (!CloudDriver.getInstance().getNetworkConfig().isSetupDone()) {
-                return;
-            }
-            CloudDriver.getInstance().getParent().getConsole().sendMessage("DATABASE", "§7Loaded §b" + CloudDriver.getInstance().getPermissionPool().getCachedObjects().size() + " Players §ffrom Database §h[§7Type: §b" + CloudDriver.getInstance().getDatabaseManager().getDatabase().getType().name() + "§h]!");
-        }
     }
 
     /**

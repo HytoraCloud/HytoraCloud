@@ -145,4 +145,12 @@ public interface IServiceGroup extends Serializable, Identifiable, Objectable<IS
      */
     void deleteAllTemplates();
 
+    /**
+     * Checks if the current process is the right
+     * {@link de.lystx.hytoracloud.driver.commons.receiver.IReceiver} for
+     * this {@link IServiceGroup} to start a new {@link IService}
+     *
+     * @return boolean
+     */
+    boolean isProcessRightReceiver();
 }

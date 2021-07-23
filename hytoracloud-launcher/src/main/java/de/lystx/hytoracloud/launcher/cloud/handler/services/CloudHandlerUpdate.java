@@ -13,8 +13,8 @@ public class CloudHandlerUpdate implements PacketHandler {
     public void handle(HytoraPacket packet) {
         if (packet instanceof PacketServiceUpdate) {
             PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;
-            IService IService = packetServiceUpdate.getService();
-            CloudDriver.getInstance().getServiceManager().updateService(IService);
+            IService service = packetServiceUpdate.getService();
+            CloudDriver.getInstance().getServiceManager().updateService(service);
         }
     }
 }

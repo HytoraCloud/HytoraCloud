@@ -41,7 +41,14 @@ public class GroupSetup extends SetupExecutor<GroupSetup> {
     @Setup(id = 10, question = "How many players may be online at maximum ?", forbiddenAnswers = {"0"})
     private int maxPlayers;
 
-    @Setup(id = 11, question = "On which Receiver should this group run ? (Use " + Utils.INTERNAL_RECEIVER + " for this CloudSystem)")
+    @Setup(
+            id = 11,
+            question = "On which Receiver should this group run ? (Use " + Utils.INTERNAL_RECEIVER + " if you don't use MultiRoot)",
+            message = {
+                    "SETUP%%§7If you §cdon't §7use §bMultiRoot§8, §7just enter §h'" + Utils.INTERNAL_RECEIVER + "§h'",
+                    "SETUP%%§7If you §bdo §7use §bMultiRoot§8, §7you have to enter the §3Receiver §7this group should run"
+            }
+    )
     private String receiver;
 
 

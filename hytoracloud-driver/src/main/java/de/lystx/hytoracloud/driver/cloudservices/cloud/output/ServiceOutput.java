@@ -100,17 +100,17 @@ public class ServiceOutput extends Thread {
                 if (line == null) {
                     continue;
                 }
+                this.cachedLines.add(line);
                 if (CloudDriver.getInstance().getDriverType() == CloudType.RECEIVER) {
                     CloudDriver.getInstance().sendPacket(new PacketReceiverScreenCache(this.serviceName, line));
                 }
-                this.cachedLines.add(line);
                 if (screenPrinter != null && cloudConsole != null && screenPrinter.getScreen() != null) {
                     if (screenPrinter.getScreen().getServiceName().equalsIgnoreCase(this.serviceName)) {
                         this.cloudConsole.getLogger().sendMessage(this.serviceName, line);
                     }
                 }
             } catch (NoSuchElementException e) {
-                //Is ignored and doesn't make sense
+                //No line was found in the reader.... ignoring
             }
         }
     }

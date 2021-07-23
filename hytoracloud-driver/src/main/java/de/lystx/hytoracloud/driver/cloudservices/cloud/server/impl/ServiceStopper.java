@@ -34,7 +34,6 @@ public class ServiceStopper {
         screen.getThread().stop();
         screen.getProcess().destroy();
 
-        CloudDriver.getInstance().getServiceManager().notifyStop(IService);
         CloudDriver.getInstance().getInstance(ServiceOutputService.class).getMap().remove(screen.getServiceName());
 
         CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {

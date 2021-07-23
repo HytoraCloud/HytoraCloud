@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -13,7 +14,9 @@ import java.util.*;
  *    ----> Lobby-1
  */
 @Getter
-public class IDService {
+public class IDService implements Serializable {
+
+    private static final long serialVersionUID = -8130968622207644195L;
 
     /**
      * The used id stored with the groups

@@ -1,12 +1,16 @@
 package de.lystx.hytoracloud.driver.commons.packets.out;
 
+import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 
 
-
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.wrapped.ReceiverObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.hytora.networking.elements.component.Component;
@@ -23,8 +27,22 @@ public class PacketOutGlobalInfo extends HytoraPacket {
     private List<IService> services;
     private List<IReceiver> receivers;
 
+
+    public PacketOutGlobalInfo(NetworkConfig networkConfig, List<IServiceGroup> groups, List<IService> services) {
+        this.networkConfig = networkConfig;
+        this.groups = groups;
+        this.services = services;
+        this.receivers = new LinkedList<>();
+
+        for (IService service : services) {
+            this.receivers.add(service.getReceiver());
+        }
+        this.receivers.removeIf(iReceiver -> iReceiver.getClass() != ReceiverObject.class);
+    }
+
     @Override
     public void write(Component component) {
+
         component.put("config", networkConfig);
         component.put("groups", groups);
         component.put("services", services);
@@ -40,26 +58,4 @@ public class PacketOutGlobalInfo extends HytoraPacket {
         receivers = component.get("receivers");
     }
 
-
-    public Map<IServiceGroup, List<IService>> toMap() {
-        Map<IServiceGroup, List<IService>> map = new HashMap<>();
-
-        for (IServiceGroup group : this.groups) {
-            if (group == null) {
-                continue;
-            }
-            List<IService> list = new LinkedList<>();
-            for (IService service : this.services) {
-                if (service == null) {
-                    continue;
-                }
-                if (service.getGroup().getName().equalsIgnoreCase(group.getName())) {
-                    list.add(service);
-                }
-            }
-            map.put(group, list);
-        }
-
-        return map;
-    }
 }

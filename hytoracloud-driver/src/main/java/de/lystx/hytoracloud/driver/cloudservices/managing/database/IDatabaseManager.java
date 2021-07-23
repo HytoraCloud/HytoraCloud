@@ -11,6 +11,7 @@ public interface IDatabaseManager {
 
     /**
      * Loads the database and connects
+     *
      * @param host the host to connect to
      * @param port the port to connect to
      * @param username the name of the user

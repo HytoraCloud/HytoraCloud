@@ -35,11 +35,6 @@ public class DeleteCommand implements TabCompletable {
                 }
 
                 if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
-                    for (IService service : CloudDriver.getInstance().getServiceManager().getServices(IServiceGroup)) {
-                        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getIdService().removeID(service.getGroup().getName(), service.getId());
-                        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removePort(service.getPort());
-                        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).getPortService().removeProxyPort(service.getPort());
-                    }
                     ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).shutdownAll(IServiceGroup, false);
                     CloudDriver.getInstance().getServiceManager().getCachedObjects().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
 

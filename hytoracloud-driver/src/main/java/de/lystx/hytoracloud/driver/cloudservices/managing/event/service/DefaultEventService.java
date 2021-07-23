@@ -2,6 +2,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.event.service;
 
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.DefaultListener;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.handler.EventMarker;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
@@ -59,11 +60,13 @@ public class DefaultEventService implements IEventService {
             registeredClasses.forEach((object, methodList) -> {
                 for (EventMethod<EventMarker> em : methodList) {
                     if (em.getAClass().equals(cloudEvent.getClass())) {
-                        try {
-                            em.getMethod().invoke(em.getListener(), cloudEvent);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
+                        CloudDriver.getInstance().runTask(em.getMethod(), () -> {
+                            try {
+                                em.getMethod().invoke(em.getListener(), cloudEvent);
+                            } catch (IllegalAccessException | InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
+                        });
                     }
                 }
             });

@@ -5,6 +5,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketGroupMaintenanceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -166,6 +167,19 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
             Utils.deleteFolder(template.getDirectory());
             template.getDirectory().delete();
         }
+    }
+
+    @Override
+    public boolean isProcessRightReceiver() {
+        if (this.getReceiver() == null) {
+            return true;
+        }
+        if (CloudDriver.getInstance().getDriverType().equals(CloudType.RECEIVER)) {
+            return this.getReceiver().equalsIgnoreCase(IReceiver.current().getName());
+        } else if (CloudDriver.getInstance().getDriverType().equals(CloudType.CLOUDSYSTEM)) {
+            return this.getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER);
+        }
+        return true;
     }
 
     @Override

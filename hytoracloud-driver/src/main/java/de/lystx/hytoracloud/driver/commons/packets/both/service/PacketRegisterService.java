@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.driver.commons.packets.both.service;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 
 
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,15 +17,23 @@ public class PacketRegisterService extends HytoraPacket {
 
     private String service;
 
+    private IService iService;
+
+    public PacketRegisterService(String service) {
+        this(service, null);
+    }
+
     @Override
     public void read(Component component) {
 
-        service = component.get("s");
+        service = component.get("service");
+        iService = component.get("iService");
     }
 
     @Override
     public void write(Component component) {
-        component.append(map -> map.put("s", service));
+        component.put("iService", iService);
+        component.put("service", service);
     }
 
 }

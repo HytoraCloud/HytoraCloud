@@ -29,28 +29,11 @@ public interface IServiceManager extends IPool<IService> {
     void updateService(IService service);
 
     /**
-     * Starts {@link IService}s from a given list
+     * Starts a {@link IService}
      *
-     * @param serviceGroups the groups to start
-     */
-    void startServices(List<IServiceGroup> serviceGroups);
-
-    /**
-     * Starts a {@link IService} from a {@link IServiceGroup} with properties as {@link JsonObject}
-     *
-     * @param serviceGroup the group
-     * @param service the service
-     * @param properties the properties
-     */
-    void startService(IServiceGroup serviceGroup, IService service, PropertyObject properties);
-
-    /**
-     * Starts a {@link IService} from a {@link IServiceGroup} with no properties as {@link PropertyObject}
-     *
-     * @param serviceGroup the group
      * @param service the service
      */
-    void startService(IServiceGroup serviceGroup, IService service);
+    void startService(IService service);
 
     /**
      * Starts a {@link IService} from a {@link IServiceGroup}
@@ -75,23 +58,9 @@ public interface IServiceManager extends IPool<IService> {
     void stopService(IService service);
 
     /**
-     * Updates the cached {@link IService}s
-     *
-     * @param cachedServices the cached services and its groups
-     */
-    void setCachedServices(Map<IServiceGroup, List<IService>> cachedServices);
-
-    /**
      * Stops all services
      */
-    void shutdownAll();
-
-    /**
-     * Notifies about a {@link IService} thats stopping
-     *
-     * @param service the stopping service
-     */
-    void notifyStop(IService service);
+    void shutdownAll(Runnable runnable);
 
     /**
      * Stops all {@link IService}s from a {@link IServiceGroup}
@@ -106,7 +75,7 @@ public interface IServiceManager extends IPool<IService> {
      * @param serviceGroup the group
      * @return list of services
      */
-    List<IService> getServices(IServiceGroup serviceGroup);
+    List<IService> getCachedObjects(IServiceGroup serviceGroup);
 
     /**
      * Gets a list of all online {@link IService}s that match a given {@link ServiceType}

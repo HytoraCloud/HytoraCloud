@@ -37,7 +37,7 @@ public class ScreenCommand implements TabCompletable {
             } else {
                 String serverName = args[0];
                 ServiceOutput screen = cloudInstance.getInstance(ServiceOutputService.class).getOrRequest(serverName);
-                if (screen != null) {
+                if (screen != null && screen.getCachedLines() != null) {
                     if (screen.getCachedLines().isEmpty()) {
                         sender.sendMessage("ERROR", "§cThis screen does not contain any lines at all! Maybe it's still booting up");
                         return;
@@ -47,11 +47,8 @@ public class ScreenCommand implements TabCompletable {
                     CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
                     sender.sendMessage("ERROR", "§2You joined screen §2" + serverName + " §2!");
                     this.screenPrinter.create(screen);
-                    try {
-                        for (String cachedLine : screen.getCachedLines()) {
-                            sender.sendMessage(screen.getServiceName(), cachedLine);
-                        }
-                    } catch (ConcurrentModificationException ignored) {
+                    for (String cachedLine : new LinkedList<>(screen.getCachedLines())) {
+                        sender.sendMessage(screen.getServiceName(), cachedLine);
                     }
                 } else {
                     sender.sendMessage("ERROR", "§cThe service §e" + serverName + " §cis not online!");

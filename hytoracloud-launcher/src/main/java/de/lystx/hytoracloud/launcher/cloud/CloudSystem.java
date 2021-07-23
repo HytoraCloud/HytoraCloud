@@ -1,10 +1,12 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.NetworkService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
+import de.lystx.hytoracloud.launcher.global.InternalReceiver;
 import de.lystx.hytoracloud.launcher.global.webserver.WebServer;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
@@ -58,11 +60,9 @@ import de.lystx.hytoracloud.launcher.global.setups.DatabaseSetupExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -112,7 +112,7 @@ public class CloudSystem extends CloudProcess {
 
         this.authManager.createKey();
         this.bootstrap();
-        
+
     }
 
     @Override
@@ -147,8 +147,7 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
                     CloudDriver.getInstance().getNetworkConfig(),
                     CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
-                    CloudDriver.getInstance().getServiceManager().getCachedObjects(),
-                    CloudDriver.getInstance().getReceiverManager().getAvailableReceivers()
+                    CloudDriver.getInstance().getServiceManager().getCachedObjects()
             ));
 
         } catch (NullPointerException e) {
@@ -195,6 +194,9 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new ScreenCommand(this.getScreenPrinter(), this));
             CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new RunCommand(this));
             CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new LogCommand(this));
+
+            CloudDriver.getInstance().getImplementedData().put("receiver", new InternalReceiver());
+            CloudDriver.getInstance().getReceiverManager().registerReceiver(new InternalReceiver());
 
             CloudDriver.getInstance().setInstance("connection", CloudDriver.getInstance().getInstance(NetworkService.class).getHytoraServer());
             CloudDriver.getInstance().setInstance("serviceManager", new CloudSideServiceManager(CloudDriver.getInstance().getInstance(GroupService.class).getGroups()));
@@ -337,22 +339,18 @@ public class CloudSystem extends CloudProcess {
     @Override @SneakyThrows
     public void shutdown() {
         this.sendPacket(new PacketShutdown());
-        this.getServiceManager().shutdownAll();
+        this.getServiceManager().shutdownAll(() -> {
+            this.getInstance(LogService.class).save();
+            this.getInstance(ConfigService.class).shutdown();
+            this.getInstance(ModuleService.class).shutdown();
 
-        this.getInstance(LogService.class).save();
-        this.getInstance(ConfigService.class).shutdown();
-        this.getInstance(ModuleService.class).shutdown();
+            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> this.getInstance(NetworkService.class).shutdown(), 7L);
+            super.shutdown();
 
-        this.getInstance(Scheduler.class).scheduleDelayedTask(() -> this.getInstance(NetworkService.class).shutdown(), 60L);
-        super.shutdown();
+            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> Utils.deleteFolder(this.getInstance(FileService.class).getDynamicServerDirectory()), 10L);
+            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 40L);
+        });
 
-        this.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-            try {
-                FileUtils.deleteDirectory(this.getInstance(FileService.class).getDynamicServerDirectory());
-            } catch (IOException ignored) {}
-        }, 20L);
-
-        this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 80L);
     }
 
 }

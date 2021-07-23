@@ -39,8 +39,9 @@ public class CloudHandlerStart implements PacketHandler {
             CloudDriver.getInstance().getServiceManager().startService(get, packetPlayInStartGroup.getProperties());
         } else if (packet instanceof PacketInStartService) {
             PacketInStartService packetInStartService = (PacketInStartService)packet;
-            IService IService = packetInStartService.getIService();
-            CloudDriver.getInstance().getServiceManager().startService(IService.getGroup(), IService, packetInStartService.getProperties());
+            IService service = packetInStartService.getIService();
+            service.setProperties(packetInStartService.getProperties());
+            CloudDriver.getInstance().getServiceManager().startService(service);
         }
     }
 }

@@ -318,7 +318,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     @Override
     public void connectRandom(IServiceGroup serviceGroup) {
 
-        List<IService> services = CloudDriver.getInstance().getServiceManager().getServices(serviceGroup);
+        List<IService> services = CloudDriver.getInstance().getServiceManager().getCachedObjects(serviceGroup);
         IService service = services.get(new Random().nextInt(services.size()));
 
         this.connect(service);

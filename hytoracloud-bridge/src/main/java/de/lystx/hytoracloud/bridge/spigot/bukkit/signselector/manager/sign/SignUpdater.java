@@ -18,7 +18,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.conversations.Conversation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -115,7 +114,7 @@ public class SignUpdater {
             this.serviceMap.clear();
 
             for (IServiceGroup globalServerGroup : CloudDriver.getInstance().getServiceManager().getCachedGroups()) {
-                for (IService service : CloudDriver.getInstance().getServiceManager().getServices(globalServerGroup)) {
+                for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(globalServerGroup)) {
                     if (!service.getState().equals(ServiceState.INGAME) && !service.getState().equals(ServiceState.OFFLINE)) {
                         this.update(service);
                     }
@@ -176,13 +175,15 @@ public class SignUpdater {
                 } catch (IOException exception) {
                     //IGNORING IT WORKS FINE
                 }
-                Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
-                if (!blockAt.getType().equals(Material.WALL_SIGN)) {
-                    return;
-                }
-                Sign sign = (Sign) blockAt.getState();
-                this.signUpdate(sign, current, serverPinger);
-                sign.update();
+                Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> {
+                    Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
+                    if (!blockAt.getType().equals(Material.WALL_SIGN)) {
+                        return;
+                    }
+                    Sign sign = (Sign) blockAt.getState();
+                    this.signUpdate(sign, current, serverPinger);
+                    sign.update();
+                });
             } catch (NullPointerException e) {
                 //IGNORING ON BOOTUP
             }

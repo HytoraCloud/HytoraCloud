@@ -15,6 +15,8 @@ import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceM
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 
+import de.lystx.hytoracloud.launcher.global.InternalReceiver;
+import de.lystx.hytoracloud.launcher.receiver.handler.ReceiverHandlerActions;
 import de.lystx.hytoracloud.launcher.receiver.handler.ReceiverHandlerRegister;
 import de.lystx.hytoracloud.launcher.receiver.handler.ReceiverHandlerScreen;
 import de.lystx.hytoracloud.launcher.receiver.impl.manager.ConfigService;
@@ -70,15 +72,26 @@ public class Receiver extends CloudProcess {
         if (configService.getReceiver().getName().equalsIgnoreCase("DefaultReceiver")) {
             //Setup not done yet
             new ReceiverSetup().start(receiverSetup -> {
+
+                if (receiverSetup.isCancelled()) {
+                    System.exit(0);
+                    return;
+                }
+
                 String name = receiverSetup.getName();
                 Integer port = receiverSetup.getPort();
                 String host = receiverSetup.getHost();
+                long memory = receiverSetup.getMemory();
 
-                configService.setReceiver(new ReceiverObject(host, port, name, UUID.randomUUID()));
+                try {
+                    configService.setReceiver(new ReceiverObject(host, port, name, UUID.randomUUID(), memory, false, InetAddress.getLocalHost()));
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
                 configService.save();
                 configService.reload();
 
-                console.sendMessage("INFO", "§7Successfully set up §h'§9" + name + "§8' for §b" + host + "@" + port + "§h!");
+                console.sendMessage("INFO", "§7Successfully set up §h'§9" + name + "§h' §7with §a" + memory + "MB §7for §b" + host + "@" + port + "§h!");
                 console.sendMessage("INFO", "§7The §bReceiver §7will now §cshut down §7and you have to restart it to confirm all changes made§h!");
                 System.exit(0);
             });
@@ -92,7 +105,11 @@ public class Receiver extends CloudProcess {
                 e.printStackTrace();
             }
 
-            CloudDriver.getInstance().getImplementedData().put("receiver", receiver);
+            IReceiver internalReceiver = new InternalReceiver();
+            internalReceiver.setName(receiver.getName());
+
+            CloudDriver.getInstance().getImplementedData().put("receiver", internalReceiver);
+            CloudDriver.getInstance().getReceiverManager().registerReceiver(internalReceiver);
 
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§f\n" +
@@ -116,6 +133,9 @@ public class Receiver extends CloudProcess {
 
                 @Override
                 public void onHandshake() {
+
+                    receiver.setAuthenticated(true);
+                    receiver.update();
 
                     new PacketReceiverLogin((ReceiverObject) receiver, authManager.getKey()).toReply(hytoraClient, component -> {
                         boolean allow = component.get("allowed");
@@ -175,6 +195,7 @@ public class Receiver extends CloudProcess {
             //Registering packet handler
             this.hytoraClient.registerPacketHandler(new ReceiverHandlerRegister());
             this.hytoraClient.registerPacketHandler(new ReceiverHandlerScreen());
+            this.hytoraClient.registerPacketHandler(new ReceiverHandlerActions());
 
             CloudDriver.getInstance().setInstance("connection", this.hytoraClient);
         }
@@ -192,20 +213,21 @@ public class Receiver extends CloudProcess {
             this.sendPacket(new PacketReceiverShutdown(receiver));
 
             ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).setRunning(false);
-            CloudDriver.getInstance().getServiceManager().shutdownAll();
+            CloudDriver.getInstance().getServiceManager().shutdownAll(() -> {
+                log("WARNING", "§cShutting down §e'" + receiver.getName() + "'§c...");
+                this.hytoraClient.close();
+                this.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
+                    try {
+                        FileUtils.deleteDirectory(this.getInstance(FileService.class).getDynamicServerDirectory());
+                    } catch (IOException ignored) {}
+                }, 20L);
 
-            log("WARNING", "§cShutting down §e'" + receiver.getName() + "'§c...");
-            this.hytoraClient.close();
-            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-                try {
-                    FileUtils.deleteDirectory(this.getInstance(FileService.class).getDynamicServerDirectory());
-                } catch (IOException ignored) {}
-            }, 20L);
+            });
 
-            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 50L);
         } catch (Exception e) {
             //IGNORING
         }
+        this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 50L);
     }
 
     @Override

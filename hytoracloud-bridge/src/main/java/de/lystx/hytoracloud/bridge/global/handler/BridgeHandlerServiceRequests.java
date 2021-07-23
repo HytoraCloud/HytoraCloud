@@ -20,6 +20,9 @@ public class BridgeHandlerServiceRequests implements PacketHandler {
 
     @Override
     public void handle(HytoraPacket packet) {
+        if (CloudDriver.getInstance().getCurrentService() == null) {
+            return;
+        }
         if (packet instanceof PacketServiceMemoryUsage) {
             PacketServiceMemoryUsage packetServiceMemoryUsage = (PacketServiceMemoryUsage)packet;
 

@@ -107,7 +107,15 @@ public class UserManager {
      * @return The list containing the active references of the searched user.
      */
     public List<HytoraConnectionBridge> getUsers(String name) {
-        return this.connectedUsers.getOrDefault(name, new LinkedList<>());
+        List<HytoraConnectionBridge> connectionBridges = new LinkedList<>();
+        for (List<HytoraConnectionBridge> value : new ArrayList<>(this.connectedUsers.values())) {
+            for (HytoraConnectionBridge bridge : value) {
+                if (bridge.getName().equalsIgnoreCase(name)) {
+                    connectionBridges.add(bridge);
+                }
+            }
+        }
+        return connectionBridges;
     }
 
     /**

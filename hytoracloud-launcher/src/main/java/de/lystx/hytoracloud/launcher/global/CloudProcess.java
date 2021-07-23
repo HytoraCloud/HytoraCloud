@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.global;
 
+import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.launcher.manager.Manager;
 import lombok.Setter;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
