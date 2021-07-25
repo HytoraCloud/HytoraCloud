@@ -14,8 +14,7 @@
         <module>hytoracloud-launcher</module>
         <module>hytoracloud-discordbot</module>
         <module>hytoracloud-networking</module>
-        <module>hytoracloud-example</module>
-        <module>hytoracloud-packets</module>
+        <module>hytoracloud-modules/module-cloudflare</module>
     </modules>
 
     <properties>

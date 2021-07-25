@@ -146,7 +146,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
     @Override
     public NameChange[] getNameChanges() {
-        return CloudDriver.getInstance().getUuidPool().getNameChanges(this.getUniqueId());
+        return CloudDriver.getInstance().getMojangPool().getNameChanges(this.getUniqueId());
     }
 
     @Override

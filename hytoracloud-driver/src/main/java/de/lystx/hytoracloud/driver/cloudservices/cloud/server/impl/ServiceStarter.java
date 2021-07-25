@@ -32,7 +32,7 @@ public class ServiceStarter {
     private final IService service;
     private final IServiceGroup serviceGroup;
     private final ITemplate template;
-    private final PropertyObject properties;
+    private PropertyObject properties;
 
     private final File templateDirectory;
     private final File spigotPlugins;
@@ -42,13 +42,13 @@ public class ServiceStarter {
     private final File serverLocation;
     private final File pluginsDirectory;
 
+    private final int maxPlayers, timeOut, memory;
 
     public ServiceStarter(IService service) {
         FileService instance = CloudDriver.getInstance().getInstance(FileService.class);
 
         this.service = service;
         this.serviceGroup = service.getGroup();
-        this.template = service.getGroup().getCurrentTemplate();
         this.properties = service.getProperties();
 
         this.templateDirectory = instance.getTemplatesDirectory();
@@ -71,6 +71,28 @@ public class ServiceStarter {
 
         this.serverLocation.mkdirs();
         this.pluginsDirectory.mkdirs();
+
+
+        service.setProperties((this.properties == null ? new PropertyObject() : this.properties));
+        this.properties = service.getProperties();
+
+        maxPlayers = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getInteger("maxPlayers") : service.getGroup().getMaxPlayers();
+        memory = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getInteger("memory") : service.getGroup().getMemory();
+        timeOut = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getInteger("timeOut") : -1;
+
+        String templateName = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getString("template") : service.getGroup().getCurrentTemplate().getName();
+        ITemplate template = CloudDriver.getInstance().getTemplateManager().getTemplate(service.getGroup(), templateName);
+
+        if (template == null) {
+            template = service.getGroup().getCurrentTemplate();
+        }
+
+        this.template = template;
+
+        properties.remove("_serviceBuilder");
+        if (timeOut != -1) {
+            properties.append("serviceTimeOut", timeOut);
+        }
     }
 
     /**
@@ -171,7 +193,6 @@ public class ServiceStarter {
             bungeecord = false;
         }
 
-        service.setProperties((this.properties == null ? new PropertyObject() : this.properties));
         if (service.getGroup().getType().isProxy()) {
             File serverIcon = new File(global, "server-icon.png");
             if (serverIcon.exists()) {
@@ -360,7 +381,7 @@ public class ServiceStarter {
                 properties.load(stream);
                 properties.setProperty("server-port", service.getPort() + "");
                 properties.setProperty("server-ip", "0");
-                properties.setProperty("max-players", String.valueOf(service.getGroup().getMaxPlayers()));
+                properties.setProperty("max-players", String.valueOf(maxPlayers));
                 properties.setProperty("server-name", service.getName());
                 properties.setProperty("online-mode", "false");
                 FileOutputStream fileOutputStream = new FileOutputStream(serverLocation + "/server.properties");
@@ -432,7 +453,7 @@ public class ServiceStarter {
                         "-Dio.netty.recycler.maxCapacity=0",
                         "-Dio.netty.recycler.maxCapacity.default=0",
                         "-Djline.terminal=jline.UnsupportedTerminal",
-                        "-Xmx" + service.getGroup().getMemory() + "M",
+                        "-Xmx" + memory + "M",
                         "-jar",
                         getJarFile(),
                         service.isInstanceOf(ServiceType.SPIGOT) ? "nogui" : ""

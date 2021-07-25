@@ -10,7 +10,7 @@ import io.vson.elements.object.Objectable;
 import java.io.Serializable;
 import java.util.List;
 
-public interface IServiceGroup extends Serializable, Identifiable, Objectable<IServiceGroup>{
+public interface IServiceGroup extends Serializable, Identifiable {
 
     /**
      * The template of this group
@@ -27,6 +27,15 @@ public interface IServiceGroup extends Serializable, Identifiable, Objectable<IS
     List<ITemplate> getTemplates();
 
     void setTemplates(List<ITemplate> templateObjects);
+
+    /**
+     * Prepares a {@link ServiceBuilder}
+     *
+     * @return builder for new service
+     */
+    default ServiceBuilder prepareService() {
+        return new ServiceBuilder(this);
+    }
 
     /**
      * The type of this group (PROXY, SPIGOT)

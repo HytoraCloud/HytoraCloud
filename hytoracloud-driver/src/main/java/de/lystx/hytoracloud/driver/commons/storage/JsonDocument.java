@@ -2,11 +2,13 @@ package de.lystx.hytoracloud.driver.commons.storage;
 
 import com.google.gson.*;
 
+import de.lystx.hytoracloud.driver.cloudservices.managing.database.impl.DocumentDatabase;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
@@ -471,6 +473,16 @@ public class JsonDocument implements Iterable<JsonElement> {
     public <T> T getObject(String key, Class<T> tClass) {
         return this.getObject(this.getJsonObject(key), tClass);
     }
+    /**
+     * Returns an Object from a given Class
+     *
+     * @param key the key where its stored
+     * @param type the type of what you want to get
+     * @return the object
+     */
+    public <T> T getObject(String key, Type type) {
+        return GSON.fromJson(this.getJsonObject(key), type);
+    }
 
     /**
      * Returns a List full of custom objects
@@ -636,5 +648,9 @@ public class JsonDocument implements Iterable<JsonElement> {
     public void delete() {
         this.clear();
         this.file.delete();
+    }
+
+    public JsonDocument name(String name) {
+        return this.append(DocumentDatabase.NAME_KEY, name);
     }
 }

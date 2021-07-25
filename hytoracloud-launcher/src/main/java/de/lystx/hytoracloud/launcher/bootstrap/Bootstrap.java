@@ -14,25 +14,33 @@ import java.io.IOException;
 public class Bootstrap {
 
     public static void main(String[] args)  {
-
-        for (String arg : args) {
-            if (arg.equalsIgnoreCase("--generateFiles")) {
-                try {
-                    Utils.copyResource("/implements/start/start.bat", new File("start.bat").toString(), Bootstrap.class);
-                    Utils.copyResource("/implements/start/start.sh", new File("start.sh").toString(), Bootstrap.class);
-                    System.out.println("[Bootstrap] Generated needed files!");
-                    System.out.println("[Bootstrap] Stopping...");
+        try {
+            File bat = new File("start.bat");
+            File sh = new File("start.sh");
+            if (System.getProperty("os.name").contains("Windows")) {
+                if (!bat.exists()) {
+                    Utils.copyResource("/implements/start/start.bat", bat.toString(), Bootstrap.class);
                     System.exit(0);
-                    break;
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            } else if (arg.equalsIgnoreCase("--process=MANAGER")) {
+            } else {
+                if (!sh.exists()) {
+                    Utils.copyResource("/implements/start/start.sh", sh.toString(), Bootstrap.class);
+                    System.exit(0);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (String arg : args) {
+           if (arg.equalsIgnoreCase("--process=MANAGER")) {
                 Manager manager = new Manager();
+                return;
             } else if (arg.equalsIgnoreCase("--process=CLOUD")) {
                 CloudSystem cloudSystem = new CloudSystem();
+                return;
             } else if (arg.equalsIgnoreCase("--process=RECEIVER")) {
                 Receiver receiver = new Receiver();
+                return;
             }
         }
 

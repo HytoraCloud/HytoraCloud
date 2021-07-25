@@ -59,6 +59,25 @@ public class CloudBridgeServiceManager implements IServiceManager {
 
     }
 
+    @Override
+    public int getFreeId(IServiceGroup group) {
+        int size = this.getCachedObjects(group).size();
+        return size + 1;
+    }
+
+    @Override
+    public int getFreePort(IServiceGroup group) {
+        int maxPort = 0;
+
+        for (IService cachedObject : this.getCachedObjects(group)) {
+            if (cachedObject.getPort() > maxPort) {
+                maxPort = cachedObject.getPort();
+            }
+        }
+
+        return maxPort + 1;
+    }
+
 
     @Override
     public void updateService(IService service) {
@@ -69,7 +88,6 @@ public class CloudBridgeServiceManager implements IServiceManager {
             return;
         }
         this.cachedObjects.set(this.cachedObjects.indexOf(safeGet), service);
-        CloudDriver.getInstance().callEvent(new DriverEventServiceUpdate(service));
     }
 
 
@@ -194,6 +212,10 @@ public class CloudBridgeServiceManager implements IServiceManager {
     @Override
     public void stopService(IService service) {
         CloudDriver.getInstance().sendPacket(new PacketInStopServer(service.getName()));
+    }
+
+    @Override @ScheduledForVersion("1.9")
+    public void stopServiceForcibly(IService service) {
     }
 
     @Override

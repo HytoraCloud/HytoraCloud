@@ -429,15 +429,19 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
      * player being online
      */
     public void startStopTimer() {
+        IService currentService = CloudDriver.getInstance().getCurrentService();
+        if (currentService == null) {
+            return;
+        }
         try {
-            if (!CloudDriver.getInstance().getCurrentService().getProperties().has("waitingForPlayers")) {
+            if (!currentService.getProperties().has("serviceTimeOut")) {
                 return;
             }
             this.taskId = CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
                 if (Bukkit.getOnlinePlayers().size() <= 0) {
                     this.shutdown();
                 }
-            }, 6000L).getId();
+            }, (currentService.getProperties().getLong("serviceTimeOut") * 20)).getId();
         } catch (NullPointerException e) {
             //NullPointerException when executing '/stop'
         }

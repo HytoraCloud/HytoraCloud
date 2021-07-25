@@ -60,18 +60,18 @@ public class InfoCommand implements TabCompletable {
                     sender.sendMessage("INFO", "§7----------------------------------");
                     for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
                         sender.sendMessage("§h> §a" + service.getName() + " §h[§d" + service.getUniqueId() + " §7| §6Authenticated: " + (service.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
-                        sender.sendMessage("  §8> §bID: #" +  service.getId() + " §7| §eState: " + service.getState().getColor() + service.getState().name());
-                        sender.sendMessage("  §8> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
-                        sender.sendMessage("  §8> §bType: " +  service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getCurrentTemplate().getName());
-                        sender.sendMessage("  §8> §bHost: " +  service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
-                        sender.sendMessage("  §8> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage() : "-1") + "/" + service.getGroup().getMemory() + " §7| §eTPS: " + (service.isAuthenticated() ? service.getTPS() : "§c???"));
-                        sender.sendMessage("  §8> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
+                        sender.sendMessage("  §h> §bID: #" +  service.getId() + " §7| §eState: " + service.getState().getColor() + service.getState().name());
+                        sender.sendMessage("  §h> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
+                        sender.sendMessage("  §h> §bType: " +  service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getCurrentTemplate().getName());
+                        sender.sendMessage("  §h> §bHost: " +  service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
+                        sender.sendMessage("  §h> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage() : "-1") + "/" + service.getGroup().getMemory() + " §7| §eTPS: " + (service.isAuthenticated() ? service.getTPS() : "§c???"));
+                        sender.sendMessage("  §h> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
                         if (service.getProperties().keySet().isEmpty()) {
-                            sender.sendMessage("  §8> §bProperties: §cNone");
+                            sender.sendMessage("  §h> §bProperties: §cNone");
                         } else {
-                            sender.sendMessage("  §8> §bProperties: §a" + service.getProperties().keySet().size());
+                            sender.sendMessage("  §h> §bProperties: §a" + service.getProperties().keySet().size());
                             for (String s : service.getProperties().keySet()) {
-                                sender.sendMessage("     §8> §e" + s + ": §6" + service.getProperties().get(s));
+                                sender.sendMessage("     §h> §e" + s + ": §6" + service.getProperties().get(s));
                             }
                         }
                     }
@@ -89,12 +89,12 @@ public class InfoCommand implements TabCompletable {
                         int max = serviceGroup.getServices().size() * serviceGroup.getMaxPlayers();
 
                         sender.sendMessage("§h> §b" + serviceGroup.getName() + " §h[§f" + serviceGroup.getUniqueId() + "§h] §h:");
-                        sender.sendMessage("  §8> §bType: " + serviceGroup.getType() + " §7| §eReceiver: " + serviceGroup.getReceiver());
-                        sender.sendMessage("  §8> §bPlayers: " +  serviceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getCurrentTemplate().getName());
-                        sender.sendMessage("  §8> §bMemory: " + serviceGroup.getMemory());
-                        sender.sendMessage("  §8> §bMinServer: " +  serviceGroup.getMinServer() + " §7| §eMaxServer: " + serviceGroup.getMaxServer());
-                        sender.sendMessage("  §8> §bNew-Server-At: " +  serviceGroup.getNewServerPercent() + "% §7| §eProperties: " + serviceGroup.getProperties().keySet().size());
-                        sender.sendMessage("  §8> §bLobby: " +  serviceGroup.isLobby() + " §7| §eDynamic: " + serviceGroup.isDynamic() + " §7| §aMaintenance: " + serviceGroup.isMaintenance());
+                        sender.sendMessage("  §h> §bType: " + serviceGroup.getType() + " §7| §eReceiver: " + serviceGroup.getReceiver());
+                        sender.sendMessage("  §h> §bPlayers: " +  serviceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getCurrentTemplate().getName());
+                        sender.sendMessage("  §h> §bMemory: " + serviceGroup.getMemory());
+                        sender.sendMessage("  §h> §bMinServer: " +  serviceGroup.getMinServer() + " §7| §eMaxServer: " + serviceGroup.getMaxServer());
+                        sender.sendMessage("  §h> §bNew-Server-At: " +  serviceGroup.getNewServerPercent() + "% §7| §eProperties: " + serviceGroup.getProperties().keySet().size());
+                        sender.sendMessage("  §h> §bLobby: " +  serviceGroup.isLobby() + " §7| §eDynamic: " + serviceGroup.isDynamic() + " §7| §aMaintenance: " + serviceGroup.isMaintenance());
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
                     return;
@@ -107,9 +107,9 @@ public class InfoCommand implements TabCompletable {
                     sender.sendMessage("INFO", "§7----------------------------------");
                     for (IReceiver receiver : receiverManager.getAvailableReceivers()) {
                         sender.sendMessage("§h> §a" + receiver.getName() + " §h[§d" + receiver.getUniqueId() + " §7| §6Authenticated: " + (receiver.isAuthenticated() ? "§aYes" : "§cNo")+ "§h] §h:");
-                        sender.sendMessage("  §8> §bPlayers: " + receiver.getPlayers().size() + " §7| §eServices: " + receiver.getServices().size());
-                        sender.sendMessage("  §8> §bAddress: " + receiver.getAddress() + " §7 §eBound: " + receiver.getHost() + ":" + receiver.getPort());
-                        sender.sendMessage("  §8> §bMemory: " + receiver.getMemory() + "/" + receiver.getMaxMemory() + " §7| §eUnused: " + receiver.getUnusedMemory());
+                        sender.sendMessage("  §h> §bPlayers: " + receiver.getPlayers().size() + " §7| §eServices: " + receiver.getServices().size());
+                        sender.sendMessage("  §h> §bAddress: " + receiver.getAddress() + " §7 §eBound: " + receiver.getHost() + ":" + receiver.getPort());
+                        sender.sendMessage("  §h> §bMemory: " + receiver.getMemory() + "/" + receiver.getMaxMemory() + " §7| §eUnused: " + receiver.getUnusedMemory());
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
             }

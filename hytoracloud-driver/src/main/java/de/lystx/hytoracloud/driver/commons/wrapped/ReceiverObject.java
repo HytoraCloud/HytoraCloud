@@ -69,7 +69,7 @@ public class ReceiverObject extends WrappedObject<IReceiver, ReceiverObject> imp
 
     @Override
     public void startService(IService service, Consumer<IService> consumer) {
-        CloudDriver.getInstance().getReceiverManager().sendPacket(this, new PacketReceiverStartService(this, service));
+        CloudDriver.getInstance().sendPacket(new PacketReceiverStartService(this, service), component -> consumer.accept(service));
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ReceiverObject extends WrappedObject<IReceiver, ReceiverObject> imp
 
     @Override
     public void stopService(IService service, Consumer<IService> consumer) {
-        CloudDriver.getInstance().getReceiverManager().sendPacket(this, new PacketReceiverStopService(this, service));
+        CloudDriver.getInstance().sendPacket(new PacketReceiverStopService(this, service), component -> consumer.accept(service));
     }
 
     @Override

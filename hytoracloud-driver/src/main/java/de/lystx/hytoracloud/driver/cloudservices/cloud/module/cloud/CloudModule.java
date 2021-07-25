@@ -12,12 +12,12 @@ public abstract class CloudModule {
     /**
      * The base of this module
      */
-    private IFileModule base;
+    protected IFileModule base;
 
     /**
      * The config
      */
-    private JsonDocument config;
+    protected JsonDocument config;
 
     /**
      * Called first

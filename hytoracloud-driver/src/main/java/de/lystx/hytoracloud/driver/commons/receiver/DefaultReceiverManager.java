@@ -72,6 +72,13 @@ public class DefaultReceiverManager implements IReceiverManager {
             CloudDriver.getInstance().log("NETWORK", "§h'§9" + receiver.getName() + "§h' §ctried to disconnect but was never registered!");
             return;
         }
+
+        for (IService cachedObject : new HashSet<>(CloudDriver.getInstance().getServiceManager().getCachedObjects())) {
+            if (cachedObject.getGroup().getReceiver().equalsIgnoreCase(receiver.getName())) {
+                CloudDriver.getInstance().getServiceManager().unregisterService(cachedObject);
+            }
+        }
+
         this.availableReceivers.remove(cachedReceiver);
         CloudDriver.getInstance().log("NETWORK", "§h'§9" + receiver.getName() + "§h' §7disconnected§h!");
     }

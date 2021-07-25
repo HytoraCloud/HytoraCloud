@@ -18,7 +18,6 @@ public class ReloadCommand {
     @Command(name = "reload", description = "Reloads the network", aliases = {"rl"})
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
-
             sender.sendMessage("COMMAND", "§2Debug!");
             return;
         }

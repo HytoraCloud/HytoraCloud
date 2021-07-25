@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IFileModule;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModule;
+import de.lystx.hytoracloud.driver.commons.enums.other.ModuleCopyType;
 import de.lystx.hytoracloud.driver.commons.wrapped.FileModuleObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ModuleObject;
 import de.lystx.hytoracloud.driver.utils.HytoraClassLoader;
@@ -62,8 +63,9 @@ public class ModuleLoader {
                             this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
                             return;
                         }
-                        if (document.has("main") && document.has("author") && document.has("version") && document.has("name") && document.has("copyType")) {
-                            Class<?> cl = classLoader.findClass(document.getString("main"));
+
+                        if (document.has("mainClass") && document.has("author") && document.has("version") && document.has("name") && document.has("copyType") && document.has("website") && document.has("description")) {
+                            Class<?> cl = classLoader.findClass(document.getString("mainClass"));
                             if (cl == null) {
                                 this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §ccouldn't be found!");
                                 return;
@@ -71,7 +73,16 @@ public class ModuleLoader {
                             if (cl.getSuperclass().getName().equalsIgnoreCase(CloudModule.class.getName())) {
                                 CloudModule cloudModule = (CloudModule) cl.newInstance();
 
-                                IFileModule fileModule = document.getAs(FileModuleObject.class);
+                                IFileModule fileModule = new FileModuleObject(
+                                        document.getString("name"),
+                                        document.getString("author"),
+                                        document.getString("description"),
+                                        document.getString("mainClass"),
+                                        document.getString("website"),
+                                        document.getString("version"),
+                                        ModuleCopyType.valueOf(document.getString("copyType"))
+                                );
+
                                 fileModule.setFile(file);
 
                                 cloudModule.setBase(fileModule);
@@ -94,8 +105,7 @@ public class ModuleLoader {
                             }
                         } else {
                             this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§cA Module doesn't have all needed attributes in the §econfig.json§c!");
-                            String needed = Arrays.toString(ModuleObject.class.getDeclaredFields()).replace("[", "").replace("]", "");
-                            this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§cNeeded§h: §e" + needed);
+                            this.cloudDriver.getParent().getConsole().getLogger().sendMessage("MODULES", "§cNeeded§h: §e[name, description, author, version, mainClass, website]");
                         }
                     }
                 }

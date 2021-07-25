@@ -40,10 +40,8 @@ public class PlayerJoinListener implements Listener {
 
         if (percent <= 100 && (((double) Bukkit.getOnlinePlayers().size()) / (double) Bukkit.getMaxPlayers()) * 100 >= percent) {
 
-            PropertyObject propertyObject = new PropertyObject();
-            propertyObject.append("waitingForPlayers", true);
-
-            CloudDriver.getInstance().getServiceManager().startService(service.getGroup(), propertyObject);
+            //Starting new service of this group with timeout of 5 minutes
+            service.getGroup().prepareService().timeOutIfNoPlayers(300).startService();
         }
 
         if (CloudDriver.getInstance().getBukkit().shouldUseNameTags() && CloudDriver.getInstance().getPermissionPool().isAvailable()) {

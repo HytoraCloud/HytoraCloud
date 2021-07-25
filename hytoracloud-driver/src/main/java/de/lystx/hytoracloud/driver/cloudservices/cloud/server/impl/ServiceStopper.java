@@ -4,20 +4,17 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
-import org.apache.commons.io.FileUtils;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.function.Consumer;
 
+@AllArgsConstructor @Getter
 public class ServiceStopper {
 
-    private final IService IService;
-
-    public ServiceStopper(IService IService) {
-        this.IService = IService;
-    }
-
+    private final IService service;
 
     /**
      * Stops a given service
@@ -27,37 +24,37 @@ public class ServiceStopper {
      */
     public void stop(Consumer<IService> consumer) throws Exception {
 
-        ServiceOutput screen = CloudDriver.getInstance().getInstance(ServiceOutputService.class).getMap().get(IService.getName());
+        ServiceOutput screen = CloudDriver.getInstance().getInstance(ServiceOutputService.class).getMap().get(service.getName());
         if (screen == null || screen.getDirectory() == null) {
-            throw new IllegalAccessException("Tried to stop a Service (" + IService.getName() + ") which has no screen!");
+            CloudDriver.getInstance().messageCloud("ERROR", "§cCan't stop §e" + service.getName() + " §cbecause no Screen with Process was found!");
+            return;
         }
-        screen.getThread().stop();
-        screen.getProcess().destroy();
 
-        CloudDriver.getInstance().getInstance(ServiceOutputService.class).getMap().remove(screen.getServiceName());
+        Process process = screen.getProcess();
+        Thread thread = screen.getThread();
+
+        //thread.stop(); //Stopping thread
+        process.destroy(); //Shutting down process
 
         CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
-            if (IService.getGroup().isDynamic()) {
-                try {
-                    FileUtils.deleteDirectory(screen.getDirectory());
-                } catch (IOException e) {
-                    //Ignoring
-                }
-                consumer.accept(IService);
+
+            //It's dynamic delete whole directory
+            if (service.getGroup().isDynamic()) {
+                Utils.deleteFolder(screen.getDirectory());
+                consumer.accept(service);
                 return;
             }
 
-            File cloudAPI = new File(screen.getDirectory(), "plugins/CloudAPI.jar");
-            if (!cloudAPI.exists()) {
+            //Static only remove Cloud-Folder and CloudBridge
+            File bridgeFile = new File(screen.getDirectory(), "plugins/hytoracloud-bridge.jar");
+            if (!bridgeFile.exists()) {
                 return;
             }
-            try {
-                FileUtils.deleteDirectory(new File(screen.getDirectory(), "CLOUD"));
-                FileUtils.forceDelete(cloudAPI);
-            } catch (Exception e) {
-                //Ignoring
+
+            Utils.deleteFolder(new File(screen.getDirectory(), "CLOUD"));
+            if (bridgeFile.delete()) {
+                consumer.accept(service);
             }
-            consumer.accept(IService);
         }, 5L);
     }
 }

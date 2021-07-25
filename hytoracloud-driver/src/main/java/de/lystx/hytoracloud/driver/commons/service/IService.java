@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface IService extends Serializable, Identifiable, Objectable<IService> {
+public interface IService extends Serializable, Identifiable {
 
     /**
      * The ID of this service
@@ -188,6 +188,11 @@ public interface IService extends Serializable, Identifiable, Objectable<IServic
      * Stops this service
      */
     void shutdown();
+
+    /**
+     * Starts this service
+     */
+    void bootstrap();
 
     /**
      * Uploads the log of the server

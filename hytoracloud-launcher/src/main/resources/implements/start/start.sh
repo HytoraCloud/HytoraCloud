@@ -1,1 +1,1 @@
-screen -S CloudSystem java -jar hytoracloud-launcher.jar
+screen -RS HytoraCloud java -jar hytoracloud-launcher.jar

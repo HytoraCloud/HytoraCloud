@@ -3,13 +3,10 @@ package de.lystx.hytoracloud.launcher.global;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.ServiceStarter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.ServiceStopper;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceQueue;
-import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStarted;
-import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStop;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -19,8 +16,8 @@ import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.utils.Action;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.IDService;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.PortService;
+import de.lystx.hytoracloud.driver.commons.service.IDService;
+import de.lystx.hytoracloud.driver.commons.service.PortService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -154,7 +151,9 @@ public class InternalReceiver implements IReceiver {
     @Override
     public void stopService(IService service, Consumer<IService> consumer) {
 
-        CloudDriver.getInstance().sendPacket(new PacketOutStopServer(service.getName()));
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            CloudDriver.getInstance().sendPacket(new PacketOutStopServer(service.getName()));
+        }
 
         this.idService.removeID(service.getGroup().getName(), service.getId());
         this.portService.removeProxyPort(service.getPort());

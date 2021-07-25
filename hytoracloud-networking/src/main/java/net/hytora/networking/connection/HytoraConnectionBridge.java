@@ -145,7 +145,7 @@ public class HytoraConnectionBridge implements ComponentSender {
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {
-                if (e instanceof EOFException || e instanceof SocketException) {
+                if (e instanceof EOFException || e instanceof SocketException || e instanceof java.io.StreamCorruptedException) {
                     return;
                 }
 

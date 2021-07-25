@@ -188,6 +188,13 @@ public abstract class HytoraPacket {
     }
 
     /**
+     * It just respons that everything went well
+     */
+    public void success() {
+        this.reply(ResponseStatus.SUCCESS);
+    }
+
+    /**
      * Responds to the packet with a {@link Component}
      *
      * @param component the component to respond with

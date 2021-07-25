@@ -66,9 +66,6 @@ public class CreateCommand implements TabCompletable {
                     sender.sendMessage("INFO", "§2Created ServiceGroup §a" + group.getName() + " §7| §bMemory " + group.getMemory() + " §7| §bMinServer " + group.getMinServer() + " §7| §bMaxServer" + group.getMaxServer());
                     CloudDriver.getInstance().getInstance(GroupService.class).createGroup(group);
 
-                    if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
-                        ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).needServices(group);
-                    }
                     CloudDriver.getInstance().reload();
                 });
             } else if (args[0].equalsIgnoreCase("fallback")) {

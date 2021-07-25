@@ -1,0 +1,9 @@
+{
+  "mainClass": "de.lystx.hytoracloud.modules.cloudflare.CloudFlareModule",
+  "name": "module-cloudflare",
+  "author": "Lystx",
+  "version": "1.0",
+  "description": "This is a CloudFlare-Support-Module to create DNS-Records",
+  "website": "https://hytora.cloud",
+  "copyType": "COPY_NOT"
+}

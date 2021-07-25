@@ -280,7 +280,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
             uniqueId = offlinePlayer.getUniqueId();
         }
 
-        return uniqueId == null ? CloudDriver.getInstance().getUuidPool().getUniqueId(name) : uniqueId;
+        return uniqueId == null ? CloudDriver.getInstance().getMojangPool().getUniqueId(name) : uniqueId;
     }
 
     /**
@@ -308,7 +308,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
         if (offlinePlayer != null) {
             name = offlinePlayer.getName();
         }
-        return name == null ? CloudDriver.getInstance().getUuidPool().getName(uuid) : name;
+        return name == null ? CloudDriver.getInstance().getMojangPool().getName(uuid) : name;
     }
 
     /*

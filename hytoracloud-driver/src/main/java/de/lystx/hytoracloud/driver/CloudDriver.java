@@ -76,7 +76,8 @@ import java.util.function.Consumer;
                 "Multi-Root",
                 "1.17 Support",
                 "Higher Java Versions",
-                "On Receiver-Shutdown remove all Services from Receiver from cache"
+                "Fix when fallbacking player unregisters",
+                "When more than 1 service errors on shutdown and service wont stop!"
         }
 )
 public class CloudDriver {
@@ -89,7 +90,7 @@ public class CloudDriver {
     private final CloudMap<String, Object> implementedData; //Data to store to not have to create attributes
     private final LibraryService libraryService; //The libraryService to install MavenLibraries
     private final TicksPerSecond ticksPerSecond; //The util to get the ticks per second (TPS)
-    private final UUIDPool uuidPool; //The current UUIDPool for uuid-name-cache management
+    private final UUIDPool mojangPool; //The current UUIDPool for uuid-name-cache management
     private final List<NetworkHandler> networkHandlers; //THe network handlers to easily interact with the network
 
     //Non final other values
@@ -101,7 +102,6 @@ public class CloudDriver {
 
     @Setter
     private PermissionPool permissionPool; //The current PermissionPool for perms management
-    
     @Setter
     private NetworkConfig networkConfig; //The network config of this instance
 
@@ -144,7 +144,7 @@ public class CloudDriver {
         this.networkHandlers = new LinkedList<>();
         this.implementedData = new CloudMap<>();
         this.permissionPool = new PermissionPool();
-        this.uuidPool = new UUIDPool(1);
+        this.mojangPool = new UUIDPool(1);
         this.networkConfig = NetworkConfig.defaultConfig();
         this.ticksPerSecond = new TicksPerSecond();
 
@@ -219,6 +219,9 @@ public class CloudDriver {
      * @param cloudEvent the event to call
      */
     public boolean callEvent(CloudEvent cloudEvent) {
+        if (this.getCurrentService() == null) {
+            return false;
+        }
         if (this.driverType == CloudType.BRIDGE) {
             if (this.connection != null) {
                 this.connection.sendPacket(new PacketCallEvent(cloudEvent, this.getCurrentService().getName()));
@@ -538,7 +541,7 @@ public class CloudDriver {
         for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
             registeredService.save();
         }
-        this.uuidPool.shutdown();
+        this.mojangPool.shutdown();
     }
 
 }

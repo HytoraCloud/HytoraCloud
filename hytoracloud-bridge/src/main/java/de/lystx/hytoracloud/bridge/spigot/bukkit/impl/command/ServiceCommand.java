@@ -52,9 +52,6 @@ public class ServiceCommand {
         if (sender instanceof ICloudPlayer) {
             ICloudPlayer player = (ICloudPlayer) sender;
 
-            player.sendTabList(new ChatComponent("TEST"), new ChatComponent("FOOTER"));
-
-
             if (player.hasPermission("cloudsystem.command.service")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("info")) {

@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.cloud.server;
 import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.IPool;
 import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
+import de.lystx.hytoracloud.driver.commons.service.IDService;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -20,6 +21,22 @@ public interface IServiceManager extends IPool<IService> {
      * @param group the old group
      */
     void updateGroup(IServiceGroup group);
+
+    /**
+     * Gets a free id for a {@link IService}
+     *
+     * @param group the group
+     * @return id
+     */
+    int getFreeId(IServiceGroup group);
+
+    /**
+     * Gets a free port for a {@link IService}
+     *
+     * @param group the group
+     * @return id
+     */
+    int getFreePort(IServiceGroup group);
 
     /**
      * Updates a {@link IService} in every cache
@@ -56,6 +73,15 @@ public interface IServiceManager extends IPool<IService> {
      * @param service the service to stop
      */
     void stopService(IService service);
+
+    /**
+     * Stops a {@link IService} but does not
+     * start a new services if the minimum services
+     * are lower than the online services of the group
+     *
+     * @param service the service
+     */
+    void stopServiceForcibly(IService service);
 
     /**
      * Stops all services

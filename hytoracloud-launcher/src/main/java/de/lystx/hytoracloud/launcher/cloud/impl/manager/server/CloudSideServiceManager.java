@@ -1,33 +1,24 @@
 package de.lystx.hytoracloud.launcher.cloud.impl.manager.server;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.commons.events.other.*;
 import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.commons.service.*;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
-import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverNotifyStop;
-import de.lystx.hytoracloud.driver.utils.Action;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
-import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.launcher.global.InternalReceiver;
-import de.lystx.hytoracloud.launcher.receiver.Receiver;
-import de.lystx.hytoracloud.launcher.receiver.impl.manager.ConfigService;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
@@ -150,10 +141,23 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     }
 
     @Override
+    public int getFreeId(IServiceGroup group) {
+        return this.idService.getFreeID(group.getName());
+    }
+
+    @Override
+    public int getFreePort(IServiceGroup group) {
+        return group.getType() == ServiceType.PROXY  ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
+    }
+
+    @Override
     public void updateService(IService service) {
 
         this.cachedObjects.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
         this.cachedObjects.add(service);
+
+        this.otherReceiverCache.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
+        this.otherReceiverCache.add(service);
 
         CloudDriver.getInstance().callEvent(new DriverEventServiceUpdate(service));
     }
@@ -174,7 +178,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (this.getCachedObject(service.getName()) == null) {
             this.cachedObjects.add(service);
         }
-        if (service == null || !this.running || !service.getGroup().isProcessRightReceiver()) {
+        if (service == null || !this.running) {
             return;
         }
 
@@ -185,33 +189,23 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         receiver.registerService(service);
     }
 
-    public void needServices(IServiceGroup serviceGroup) {
-        if (!this.running || !serviceGroup.isProcessRightReceiver()) {
-            return;
-        }
-
-        this.getDriver().getInstance(Scheduler.class).scheduleDelayedTask(() -> {
-            if (this.getCachedObjects(serviceGroup).size() < serviceGroup.getMinServer()) {
-                for (int i = this.getCachedObjects(serviceGroup).size(); i < serviceGroup.getMinServer(); i++) {
-                    int id = idService.getFreeID(serviceGroup.getName());
-                    int port = serviceGroup.getType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-
-                    this.startService(new ServiceObject(serviceGroup, id, port));
-                }
-            }
-        }, 3L);
-    }
-
-
     @Override
     public void unregisterService(IService service) {
-        this.cachedObjects.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
-        this.otherReceiverCache.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
+        try {
+            this.cachedObjects.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
+            this.otherReceiverCache.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
+
+            ServiceOutputService instance = CloudDriver.getInstance().getInstance(ServiceOutputService.class);
+            instance.getCachedLines().remove(service.getName());
+            instance.getMap().remove(service.getName());
+        } catch (Exception e) {
+            //IGnoring on shutdown
+        }
     }
 
     @Override
     public void startService(IService service) {
-        if (!this.running || !service.getGroup().isProcessRightReceiver()) {
+        if (!this.running) {
             return;
         }
 
@@ -234,7 +228,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     @Override
     public void startService(IServiceGroup serviceGroup) {
-        if (!this.running || !serviceGroup.isProcessRightReceiver()) {
+        if (!this.running) {
             return;
         }
 
@@ -244,7 +238,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     @Override
     public void startService(IServiceGroup serviceGroup, PropertyObject properties) {
-        if (!this.running || !serviceGroup.isProcessRightReceiver()) {
+        if (!this.running) {
             return;
         }
 
@@ -258,35 +252,52 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     @Override
     public void stopService(IService service) {
-        if (!service.getGroup().isProcessRightReceiver()) {
+        if (service == null) {
             return;
         }
-        this.stopService(service, true);
-    }
-
-    public void stopService(IService service, boolean newServices) {
-        if (!service.getGroup().isProcessRightReceiver()) {
-            return;
-        }
-
         IReceiver receiver = service.getReceiver();
         if (receiver == null) {
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("ERROR", "§cNo Receiver was found to stop §e" + service.getName() + " §c! Using §eInternalReceiver§c!");
             receiver = new InternalReceiver();
         }
 
-        this.cachedObjects.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
+        this.idService.removeID(service.getGroup().getName(), service.getId());
+        this.portService.removePort(service.getPort());
+        this.portService.removeProxyPort(service.getPort());
         CloudDriver.getInstance().callEvent(new DriverEventServiceStop(service));
+
         IReceiver finalReceiver = receiver;
         receiver.stopService(service, s -> {
-            if (newServices) {
-                finalReceiver.needsServices(s.getGroup());
-            }
-            if (!running || CloudDriver.getInstance().getParent().getScreenPrinter().getScreen() != null && CloudDriver.getInstance().getParent().getScreenPrinter().isInScreen()) {
+            finalReceiver.needsServices(s.getGroup());
+            this.unregisterService(service);
+            if (CloudDriver.getInstance().getParent().getScreenPrinter().getScreen() != null && CloudDriver.getInstance().getParent().getScreenPrinter().isInScreen()) {
                 return;
             }
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "§h'§9" + finalReceiver.getName() + "§h' §7stopped §b" + service.getName() + "§h!");
 
+        });
+    }
+
+    @Override
+    public void stopServiceForcibly(IService service) {
+        IReceiver receiver = service.getReceiver();
+        if (receiver == null) {
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("ERROR", "§cNo Receiver was found to stop §e" + service.getName() + " §c! Using §eInternalReceiver§c!");
+            receiver = new InternalReceiver();
+        }
+
+        this.idService.removeID(service.getGroup().getName(), service.getId());
+        this.portService.removePort(service.getPort());
+        this.portService.removeProxyPort(service.getPort());
+        CloudDriver.getInstance().callEvent(new DriverEventServiceStop(service));
+
+        IReceiver finalReceiver = receiver;
+        receiver.stopService(service, s -> {
+            this.unregisterService(service);
+            if (!running || CloudDriver.getInstance().getParent().getScreenPrinter().getScreen() != null && CloudDriver.getInstance().getParent().getScreenPrinter().isInScreen()) {
+                return;
+            }
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "§h'§9" + finalReceiver.getName() + "§h' §7stopped §b" + service.getName() + "§h!");
         });
     }
 
@@ -345,17 +356,13 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     public boolean shutdownAll(IServiceGroup serviceGroup, boolean newOnes) {
 
-        if (!serviceGroup.isProcessRightReceiver()) {
-            return true;
-        }
-
         int count = 0;
         for (IService service : this.getCachedObjects(serviceGroup)) {
-            this.stopService(service, false);
+            this.stopServiceForcibly(service);
 
             count--;
             if (count <= 0 && newOnes) {
-                this.needServices(serviceGroup);
+                service.getReceiver().needsServices(serviceGroup);
             }
         }
         return true;

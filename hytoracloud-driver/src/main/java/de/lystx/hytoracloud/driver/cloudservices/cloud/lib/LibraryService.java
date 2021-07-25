@@ -73,8 +73,12 @@ public class LibraryService {
      */
     public void installDefaultLibraries() {
         //APACHE
-        this.install("org.apache.httpcomponents", "httpclient", "4.3.2", Repository.CENTRAL);
+        this.install("org.apache.httpcomponents", "httpclient", "4.5.3", Repository.CENTRAL);
         this.install("org.apache.httpcomponents", "httpcore", "4.3.2", Repository.CENTRAL);
+        this.install("org.apache.httpcomponents", "httpasyncclient", "4.1.3", Repository.CENTRAL);
+        this.install("org.apache.httpcomponents", "httpmime", "4.5.3", Repository.CENTRAL);
+        this.install("org.apache.commons", "commons-lang3", "3.5", Repository.CENTRAL);
+
         this.install("commons-io", "commons-io", "2.6", Repository.CENTRAL);
         this.install("commons-logging", "commons-logging", "1.2", Repository.CENTRAL);
         this.install("commons-lang", "commons-lang", "2.5", Repository.CENTRAL);

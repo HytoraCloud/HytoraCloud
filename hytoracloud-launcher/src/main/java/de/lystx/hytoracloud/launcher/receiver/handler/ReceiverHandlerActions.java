@@ -4,6 +4,7 @@ import de.lystx.hytoracloud.driver.commons.packets.receiver.*;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
+import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 import java.lang.management.ManagementFactory;
 
@@ -19,7 +20,6 @@ public class ReceiverHandlerActions implements PacketHandler {
 
                 long used = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
                 packet.reply(component -> component.put("memory", used));
-
             }
 
         } else if (packet instanceof PacketReceiverNeedServices) {
@@ -28,15 +28,16 @@ public class ReceiverHandlerActions implements PacketHandler {
 
         } else if (packet instanceof PacketReceiverStartService) {
             PacketReceiverStartService packetReceiverStartService = (PacketReceiverStartService)packet;
-            IReceiver.current().startService(packetReceiverStartService.getService(), service -> {});
+            IReceiver.current().startService(packetReceiverStartService.getService(), service -> packet.success());
 
         } else if (packet instanceof PacketReceiverStopService) {
             PacketReceiverStopService stopService = (PacketReceiverStopService)packet;
-            IReceiver.current().stopService(stopService.getService(), service -> {});
+            IReceiver.current().stopService(stopService.getService(), service -> packet.success());
 
         } else if (packet instanceof PacketReceiverRegisterService) {
             PacketReceiverRegisterService registerService = (PacketReceiverRegisterService)packet;
             IReceiver.current().registerService(registerService.getService());
+
         }
     }
 }

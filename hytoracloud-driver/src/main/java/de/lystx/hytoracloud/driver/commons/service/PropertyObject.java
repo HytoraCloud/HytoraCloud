@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.driver.commons.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.Getter;
 
@@ -16,6 +17,8 @@ import java.util.*;
  * Document uses Gson which isn't
  */
 public class PropertyObject extends HashMap<String, Object> implements Serializable {
+
+    private static final long serialVersionUID = 3815533212648499512L;
 
     public PropertyObject() {
 
@@ -39,6 +42,8 @@ public class PropertyObject extends HashMap<String, Object> implements Serializa
     public PropertyObject append(String key, Object value) {
         if (value instanceof JsonDocument) {
             this.put(key, ((JsonDocument) value).getJsonObject());
+        } else if (value instanceof PropertyObject) {
+            this.put(key, value);
         } else {
             this.put(key, value);
         }
@@ -87,7 +92,43 @@ public class PropertyObject extends HashMap<String, Object> implements Serializa
      * @return
      */
     public Integer getInteger(String key) {
-        return (Integer) this.get(key);
+        Object o = this.get(key);
+        if (o instanceof JsonPrimitive) {
+            JsonPrimitive primitive = (JsonPrimitive)o;
+            return primitive.getAsInt();
+        }
+        return (Integer) o;
+    }
+
+    /**
+     * Gets value as long
+     * @param key
+     * @return
+     */
+    public long getLong(String key) {
+        Object o = this.get(key);
+        if (o instanceof JsonPrimitive) {
+            JsonPrimitive primitive = (JsonPrimitive)o;
+            return primitive.getAsLong();
+        }
+        if (o instanceof Double) {
+            return Long.parseLong(String.valueOf(o).split("\\.")[0]);
+        }
+        return Long.parseLong("" + o);
+    }
+
+    /**
+     * Gets value as double
+     * @param key
+     * @return
+     */
+    public double getDouble(String key) {
+        Object o = this.get(key);
+        if (o instanceof JsonPrimitive) {
+            JsonPrimitive primitive = (JsonPrimitive)o;
+            return primitive.getAsDouble();
+        }
+        return (double) o;
     }
 
     /**
@@ -96,7 +137,12 @@ public class PropertyObject extends HashMap<String, Object> implements Serializa
      * @return
      */
     public Boolean getBoolean(String key) {
-        return (Boolean) this.get(key);
+        Object o = this.get(key);
+        if (o instanceof JsonPrimitive) {
+            JsonPrimitive primitive = (JsonPrimitive)o;
+            return primitive.getAsBoolean();
+        }
+        return (Boolean) o;
     }
 
     /**
@@ -117,7 +163,12 @@ public class PropertyObject extends HashMap<String, Object> implements Serializa
      * @return
      */
     public String getString(String key) {
-        return (String) this.get(key);
+        Object o = this.get(key);
+        if (o instanceof JsonPrimitive) {
+            JsonPrimitive primitive = (JsonPrimitive)o;
+            return primitive.getAsString();
+        }
+        return (String) o;
     }
 
     /**

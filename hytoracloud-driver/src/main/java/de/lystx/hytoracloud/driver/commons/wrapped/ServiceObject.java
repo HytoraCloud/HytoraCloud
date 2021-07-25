@@ -227,6 +227,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         CloudDriver.getInstance().getServiceManager().stopService(this);
     }
 
+    @Override
+    public void bootstrap() {
+        CloudDriver.getInstance().getServiceManager().startService(this);
+    }
+
     /**
      * This pings the current Service
      * to get all Data of it

@@ -61,10 +61,12 @@ public class ServiceOutputService implements ICloudService {
      * @return screen output
      */
     public ServiceOutput getOrRequest(String name) {
+        if (CloudDriver.getInstance().getServiceManager().getCachedObject(name) == null) {
+            return null;
+        }
         if (this.map.containsKey(name)) {
             return this.map.get(name);
         } else {
-
             //Creating packet request and waiting for component-response
             PacketReceiverScreenRequest screenRequest = new PacketReceiverScreenRequest(name);
             Component component = screenRequest.toReply(CloudDriver.getInstance().getConnection(), 100);
