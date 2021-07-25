@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.driver.cloudservices.global.cloudflare;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.manage.CloudFlareAuth;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.objects.ResultInfo;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.config.CloudFlareAuth;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.CloudFlareResult;
 import lombok.Getter;
 
 import java.util.*;
@@ -50,9 +50,9 @@ public class CloudFlareResponse<T> {
     private final Map<Integer, String> errors;
     
     /**
-     * Some infos about the returned result regarding the pagination.
+     * Some info about the returned result regarding the pagination.
      */
-    private final ResultInfo resultInfo;
+    private final CloudFlareResult resultInfo;
 
     public CloudFlareResponse(JsonObject json, T object, boolean successful, int status, String message) {
         this.json = json;
@@ -63,7 +63,7 @@ public class CloudFlareResponse<T> {
         this.errors = new HashMap<>();
         this.messages = new LinkedList<>();
 
-        this.resultInfo = this.json.has( "result_info" ) ? CloudFlareAuth.GSON.fromJson( getJson().getAsJsonObject( "result_info" ), ResultInfo.class ) : null;
+        this.resultInfo = this.json.has( "result_info" ) ? CloudFlareAuth.GSON.fromJson( getJson().getAsJsonObject( "result_info" ), CloudFlareResult.class ) : null;
 
         // Errors
         JsonObject o;

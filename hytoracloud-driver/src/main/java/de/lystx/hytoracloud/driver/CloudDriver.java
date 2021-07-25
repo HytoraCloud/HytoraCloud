@@ -161,7 +161,7 @@ public class CloudDriver {
 
         if (this.driverType != CloudType.BRIDGE) {
             //Disable netty and mongoDB logging
-            Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver"});
+            Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver", "org.apache.http.impl.conn.PoolingHttpClientConnectionManager"});
             loggers.disable();
             AnsiConsole.systemInstall();
         }

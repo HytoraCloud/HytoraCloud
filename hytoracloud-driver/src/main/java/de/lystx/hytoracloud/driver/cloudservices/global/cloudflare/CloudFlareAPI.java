@@ -1,9 +1,11 @@
 package de.lystx.hytoracloud.driver.cloudservices.global.cloudflare;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.constants.CloudFlareAction;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.manage.CloudFlareAuth;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.objects.dns.DNSRecord;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.objects.zone.Zone;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.enums.CloudFlareAction;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.config.CloudFlareAuth;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.dns.DNSRecord;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.user.CloudFlareUser;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.user.UserOrganization;
+import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.zone.CloudFlareZone;
 import lombok.Getter;
 
 import java.util.List;
@@ -32,6 +34,41 @@ public class CloudFlareAPI {
         this.token = token;
     }
 
+    /**
+     * ==========================
+     *      User MANAGING
+     * ==========================
+     */
+
+    /**
+     * Gets a list of all {@link CloudFlareUser}s
+     *
+     * @return list of users
+     */
+    public List<CloudFlareUser> getUsers() {
+        CloudFlareRequest<CloudFlareUser> flareRequest = new CloudFlareRequest<>(CloudFlareAction.USER_DETAILS, auth);
+        return flareRequest.typeClass(CloudFlareUser.class).singleTonOrList().asList();
+    }
+
+    /**
+     * Gets an {@link CloudFlareZone} by username
+     *
+     * @param username the username
+     * @return the user or null
+     */
+    public CloudFlareUser getUser(String username) {
+        return this.getUsers().stream().filter(user -> user.getUsername().equalsIgnoreCase(username)).findFirst().orElse(null);
+    }
+
+    /**
+     * Gets an {@link CloudFlareZone} by id
+     *
+     * @param id the username
+     * @return the user or null
+     */
+    public CloudFlareUser getUserById(String id) {
+        return this.getUsers().stream().filter(user -> user.getId().equalsIgnoreCase(id)).findFirst().orElse(null);
+    }
 
     /**
      * ==========================
@@ -39,35 +76,34 @@ public class CloudFlareAPI {
      * ==========================
      */
 
-
     /**
-     * Gets an {@link Zone} by name
+     * Gets an {@link CloudFlareZone} by name
      *
      * @param name the name
      * @return the zone or null
      */
-    public Zone getZone(String name) {
-        return this.getZones().stream().filter(zone -> zone.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    public CloudFlareZone getZone(String name) {
+        return this.getZones().stream().filter(cloudFlareZone -> cloudFlareZone.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     /**
-     * Gets an {@link Zone} by uniqueId
+     * Gets an {@link CloudFlareZone} by id
      *
-     * @param uniqueId the name
+     * @param id the id
      * @return the zone or null
      */
-    public Zone getZone(UUID uniqueId) {
-        return this.getZones().stream().filter(zone -> zone.getId().equalsIgnoreCase(uniqueId.toString())).findFirst().orElse(null);
+    public CloudFlareZone getZoneById(String id) {
+        return this.getZones().stream().filter(cloudFlareZone -> cloudFlareZone.getId().equalsIgnoreCase(id)).findFirst().orElse(null);
     }
 
     /**
-     * Gets a list of all {@link Zone}s
+     * Gets a list of all {@link CloudFlareZone}s
      *
      * @return list zone
      */
-    public List<Zone> getZones() {
-        CloudFlareResponse<List<Zone>> listCloudFlareResponse = new CloudFlareRequest(CloudFlareAction.LIST_ZONES, auth).asList(Zone.class);
-        return listCloudFlareResponse.getObject();
+    public List<CloudFlareZone> getZones() {
+        CloudFlareResponse<CloudFlareZone> listCloudFlareResponse = new CloudFlareRequest<CloudFlareZone>(CloudFlareAction.LIST_ZONES, auth).typeClass(CloudFlareZone.class).singleTonOrList();
+        return listCloudFlareResponse.asList();
     }
 
     /**
@@ -102,9 +138,10 @@ public class CloudFlareAPI {
      * @return list of records
      */
     public List<DNSRecord> getDNSRecords() {
-        CloudFlareRequest flareRequest = new CloudFlareRequest(CloudFlareAction.LIST_DNS_RECORDS, this.auth);
+        CloudFlareRequest<DNSRecord> flareRequest = new CloudFlareRequest<>(CloudFlareAction.LIST_DNS_RECORDS, this.auth);
+        flareRequest.typeClass(DNSRecord.class);
         flareRequest.identifiers(this.token);
-        return flareRequest.asCollection(DNSRecord.class).asList();
+        return flareRequest.singleTonOrList().asList();
     }
 
     /**
@@ -113,7 +150,8 @@ public class CloudFlareAPI {
      * @param record the record
      */
     public void createRecord(DNSRecord record) {
-        CloudFlareRequest flareRequest = new CloudFlareRequest(CloudFlareAction.CREATE_DNS_RECORD, this.auth);
+        CloudFlareRequest<DNSRecord> flareRequest = new CloudFlareRequest<>(CloudFlareAction.CREATE_DNS_RECORD, this.auth);
+        flareRequest.typeClass(DNSRecord.class);
         flareRequest.identifiers(this.token);
         flareRequest.asVoid();
     }
@@ -124,7 +162,8 @@ public class CloudFlareAPI {
      * @param record the record
      */
     public void updateRecord(DNSRecord record) {
-        CloudFlareRequest flareRequest = new CloudFlareRequest(CloudFlareAction.UPDATE_DNS_RECORD, this.auth);
+        CloudFlareRequest<DNSRecord> flareRequest = new CloudFlareRequest<>(CloudFlareAction.UPDATE_DNS_RECORD, this.auth);
+        flareRequest.typeClass(DNSRecord.class);
         flareRequest.identifiers(this.token, record.getName());
         flareRequest.asVoid();
     }
@@ -135,8 +174,67 @@ public class CloudFlareAPI {
      * @param record the record
      */
     public void deleteRecord(DNSRecord record) {
-        CloudFlareRequest flareRequest = new CloudFlareRequest(CloudFlareAction.DELETE_DNS_RECORD, this.auth);
+        CloudFlareRequest<DNSRecord> flareRequest = new CloudFlareRequest<>(CloudFlareAction.DELETE_DNS_RECORD, this.auth);
+        flareRequest.typeClass(DNSRecord.class);
         flareRequest.identifiers(this.token, record.getId());
         flareRequest.asVoid();
+    }
+
+    /**
+     * ==========================
+     *      Other MANAGING
+     * ==========================
+     */
+
+
+    public List<CloudFlareUser> get() {
+        CloudFlareRequest<CloudFlareUser> flareRequest = new CloudFlareRequest<>(CloudFlareAction.LIST_USER_POOLS, auth);
+        flareRequest.typeClass(CloudFlareUser.class);
+        return flareRequest.singleTonOrList().asList();
+
+    }
+
+    /**
+     * Gets an {@link UserOrganization} by name
+     *
+     * @param name the name
+     * @return the organization or null
+     */
+    public UserOrganization getOrganization(String name) {
+        return this.getOrganizations().stream().filter(organization -> organization.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    /**
+     * Gets an {@link UserOrganization} by id
+     *
+     * @param id the id
+     * @return the organization or null
+     */
+    public UserOrganization getOrganizationById(String id) {
+        return this.getOrganizations().stream().filter(organization -> organization.getId().equalsIgnoreCase(id)).findFirst().orElse(null);
+    }
+
+    /**
+     * Gets all {@link CloudFlareUser}s out of a {@link UserOrganization}
+     *
+     * @param organization the organization
+     * @return list of users
+     */
+    public List<CloudFlareUser> getUsers(UserOrganization organization) {
+        CloudFlareRequest<CloudFlareUser> flareRequest = new CloudFlareRequest<>(CloudFlareAction.LIST_ORGANIZATION_MEMBERS, auth);
+        flareRequest.identifiers(organization.getId());
+        flareRequest.typeClass(CloudFlareUser.class);
+        return flareRequest.singleTonOrList().asList();
+    }
+
+    /**
+     * Gets a list of all {@link UserOrganization}s
+     *
+     * @return list of organizations
+     */
+    public List<UserOrganization> getOrganizations() {
+        CloudFlareRequest<UserOrganization> flareRequest = new CloudFlareRequest<>(CloudFlareAction.LIST_USER_ORGANIZATIONS, auth);
+        flareRequest.typeClass(UserOrganization.class);
+        return flareRequest.singleTonOrList().asList();
     }
 }

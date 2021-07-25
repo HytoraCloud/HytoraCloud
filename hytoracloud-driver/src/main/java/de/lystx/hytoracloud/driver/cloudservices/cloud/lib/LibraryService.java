@@ -66,17 +66,16 @@ public class LibraryService {
         mavenLibrary.install(url);
     }
 
-
-
     /**
      * Installs default maven libraries
      */
     public void installDefaultLibraries() {
         //APACHE
-        this.install("org.apache.httpcomponents", "httpclient", "4.5.3", Repository.CENTRAL);
+        this.install("org.apache.httpcomponents", "httpcore-nio", "4.4.6", Repository.CENTRAL);
         this.install("org.apache.httpcomponents", "httpcore", "4.3.2", Repository.CENTRAL);
-        this.install("org.apache.httpcomponents", "httpasyncclient", "4.1.3", Repository.CENTRAL);
         this.install("org.apache.httpcomponents", "httpmime", "4.5.3", Repository.CENTRAL);
+        this.install("org.apache.httpcomponents", "httpclient", "4.5.3", Repository.CENTRAL);
+        this.install("org.apache.httpcomponents", "httpclient", "4.5.2", Repository.CENTRAL);
         this.install("org.apache.commons", "commons-lang3", "3.5", Repository.CENTRAL);
 
         this.install("commons-io", "commons-io", "2.6", Repository.CENTRAL);
@@ -88,7 +87,6 @@ public class LibraryService {
 
         //NETWORK
         this.install("io.netty", "netty-all", "4.1.44.Final", Repository.CENTRAL);
-
         //Logging and Console
         this.install("jline", "jline", "2.14.6", Repository.CENTRAL);
         this.install("org.jline", "jline-terminal-jna", "3.18.0", Repository.CENTRAL);
