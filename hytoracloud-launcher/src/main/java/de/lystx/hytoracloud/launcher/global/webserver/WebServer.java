@@ -3,7 +3,6 @@ package de.lystx.hytoracloud.launcher.global.webserver;
 import com.sun.net.httpserver.HttpServer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.commons.http.listener.IListener;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.Getter;
 
@@ -21,10 +20,6 @@ public class WebServer {
      */
     private HttpServer server;
 
-    /**
-     * All the handlers
-     */
-    private final List<IListener> listeners;
 
     /**
      * The registered routes
@@ -55,7 +50,6 @@ public class WebServer {
     public WebServer(CloudDriver cloudDriver) {
 
         this.routes = new LinkedList<>();
-        this.listeners = new LinkedList<>();
 
         this.config = new JsonDocument(new File(cloudDriver.getInstance(FileService.class).getDatabaseDirectory(), "web.json"));
 

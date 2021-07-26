@@ -109,29 +109,32 @@ public class InternalReceiver implements IReceiver {
         this.actions.put(service.getName(), new Action());
         this.services.add(service);
 
-        ServiceStarter serviceStarter = new ServiceStarter(service);
+        IService finalService = service;
+        CloudDriver.getInstance().executeIf(() -> {
+            ServiceStarter serviceStarter = new ServiceStarter(finalService);
 
-        if (serviceStarter.checkForSpigot()) {
-            try {
-                serviceStarter.copyFiles();
-                serviceStarter.createProperties();
-                serviceStarter.createCloudFiles();
-                serviceStarter.start(new Consumer<IService>() {
-                    @Override
-                    public void accept(IService iService) {
-                        consumer.accept(iService);
+            if (serviceStarter.checkForSpigot()) {
+                try {
+                    serviceStarter.copyFiles();
+                    serviceStarter.createProperties();
+                    serviceStarter.createCloudFiles();
+                    serviceStarter.start(new Consumer<IService>() {
+                        @Override
+                        public void accept(IService iService) {
+                            consumer.accept(iService);
 
-                        //If in screen not sending message!
-                        if (CloudDriver.getInstance().getParent().getScreenPrinter().getScreen() != null && CloudDriver.getInstance().getParent().getScreenPrinter().isInScreen()) {
-                            return;
+                            //If in screen not sending message!
+                            if (CloudDriver.getInstance().getParent().getScreenPrinter().getScreen() != null && CloudDriver.getInstance().getParent().getScreenPrinter().isInScreen()) {
+                                return;
+                            }
+                            CloudDriver.getInstance().messageCloud("NETWORK", "§h'§9" + getName() + "§h' §7queued §b" + iService.getName() + " §h[§7Port: §b" + iService.getPort() + " §7| §7Mode: §b" + (iService.getGroup().isDynamic() ? "DYNAMIC" : "STATIC") + "_" + iService.getGroup().getType() + "§h]");
                         }
-                        CloudDriver.getInstance().messageCloud("NETWORK", "§h'§9" + getName() + "§h' §7queued §b" + iService.getName() + " §h[§7Port: §b" + iService.getPort() + " §7| §7Mode: §b" + (iService.getGroup().isDynamic() ? "DYNAMIC" : "STATIC") + "_" + iService.getGroup().getType() + "§h]");
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        }, () -> CloudDriver.getInstance().getServiceManager() != null);
     }
 
     @Override

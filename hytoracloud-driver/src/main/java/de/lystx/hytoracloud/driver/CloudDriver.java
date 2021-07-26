@@ -76,12 +76,10 @@ import java.util.function.Consumer;
         version = "STABLE-1.8",
         contributors = {"Lystx", "cxt", "Ian S."},
         todo = {
-                "Multi-Root",
                 "1.17 Support",
                 "Higher Java Versions",
                 "Fix when fallbacking player unregisters",
-                "When more than 1 service errors on shutdown and service wont stop!",
-                "Add Modules to bukkit"
+                "When more than 1 service errors on shutdown and service wont stop!"
         }
 )
 public class CloudDriver {

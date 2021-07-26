@@ -118,6 +118,18 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
         return copy;
     }
 
+    public int getMaxPlayers() {
+        if (this.type == ServiceType.PROXY) {
+            int proxies = getServices().size();
+            int maxPlayers = CloudDriver.getInstance().getNetworkConfig().getMaxPlayers();
+
+            return maxPlayers / proxies;
+        } else {
+            return maxPlayers;
+        }
+
+    }
+
     @Override
     public void setCurrentTemplate(ITemplate currentTemplate) {
         this.currentTemplate = (TemplateObject) currentTemplate;
@@ -152,11 +164,18 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
         if (CloudDriver.getInstance() == null) {
             return new LinkedList<>();
         }
-        return CloudDriver.getInstance().getPlayerManager().getCachedObjects().stream().filter(iCloudPlayer -> iCloudPlayer.getService() != null && iCloudPlayer.getService().getGroup().getName().equalsIgnoreCase(this.getName())).collect(Collectors.toList());
+        if (this.type == ServiceType.SPIGOT) {
+            return CloudDriver.getInstance().getPlayerManager().getCachedObjects().stream().filter(iCloudPlayer -> iCloudPlayer.getService() != null && iCloudPlayer.getService().getGroup().getName().equalsIgnoreCase(this.getName())).collect(Collectors.toList());
+        } else {
+            return CloudDriver.getInstance().getPlayerManager().getCachedObjects().stream().filter(iCloudPlayer -> iCloudPlayer.getProxy() != null && iCloudPlayer.getProxy().getGroup().getName().equalsIgnoreCase(this.getName())).collect(Collectors.toList());
+        }
     }
     @Override
     public List<IService> getServices() {
         if (CloudDriver.getInstance() == null) {
+            return new LinkedList<>();
+        }
+        if (CloudDriver.getInstance().getServiceManager() == null) {
             return new LinkedList<>();
         }
         return CloudDriver.getInstance().getServiceManager().getCachedObjects().stream().filter(service -> service.getGroup().getName().equalsIgnoreCase(this.name)).collect(Collectors.toList());

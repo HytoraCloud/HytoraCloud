@@ -1,4 +1,4 @@
-package de.lystx.hytoracloud.launcher.manager;
+package de.lystx.hytoracloud.launcher.global.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;

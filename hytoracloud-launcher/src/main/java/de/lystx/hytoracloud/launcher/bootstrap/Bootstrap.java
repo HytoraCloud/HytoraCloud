@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.launcher.manager.Manager;
+import de.lystx.hytoracloud.launcher.global.manager.Manager;
 import de.lystx.hytoracloud.launcher.receiver.Receiver;
 
 import java.io.File;

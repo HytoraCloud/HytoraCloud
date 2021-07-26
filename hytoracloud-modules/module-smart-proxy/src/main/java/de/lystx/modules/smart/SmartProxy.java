@@ -109,10 +109,6 @@ public class SmartProxy extends DriverModule {
     public void onReload() {
     }
 
-    public void info(String s) {
-        System.out.println(s);
-    }
-
     /**
      * Forwards a ping request to a {@link IService} and connects the requester to it
      *
@@ -162,6 +158,9 @@ public class SmartProxy extends DriverModule {
                 });
     }
 
+    /**
+     * The last provided random service
+     */
     private IService lastRandom;
 
     /**
@@ -176,6 +175,9 @@ public class SmartProxy extends DriverModule {
      * @return service if found or null
      */
     public IService getFreeProxy(IServiceGroup group, int state) {
+        if (group.getServices().size() == 1) {
+            return group.getServices().get(0);
+        }
         //Only free proxies
         IService value = null;
         List<IService> proxies = group.getServices().stream().filter(proxy -> proxy.getPlayers().size() < proxy.getGroup().getMaxPlayers()).collect(Collectors.toList());
