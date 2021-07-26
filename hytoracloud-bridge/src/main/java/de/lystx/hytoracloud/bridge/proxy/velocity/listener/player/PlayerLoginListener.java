@@ -39,12 +39,9 @@ public class PlayerLoginListener {
         if (subject instanceof Player) {
             Player player = (Player)subject;
 
-            event.setProvider(subject1 -> {
-
-                return (PermissionFunction) s -> {
-                    boolean b = CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), s);
-                    return Tristate.fromBoolean(b);
-                };
+            event.setProvider(subject1 -> s -> {
+                boolean b = CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), s);
+                return Tristate.fromBoolean(b);
             });
         }
     }

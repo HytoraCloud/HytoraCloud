@@ -28,21 +28,21 @@ public class DeleteCommand implements TabCompletable {
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String group = args[1];
-                IServiceGroup IServiceGroup = CloudDriver.getInstance().getInstance(GroupService.class).getGroup(group);
-                if (IServiceGroup == null) {
+                IServiceGroup iServiceGroup = CloudDriver.getInstance().getInstance(GroupService.class).getGroup(group);
+                if (iServiceGroup == null) {
                     sender.sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
 
                 if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
-                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).shutdownAll(IServiceGroup, false);
-                    CloudDriver.getInstance().getServiceManager().getCachedObjects().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName()));
+                    ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).shutdownAll(iServiceGroup, false, () -> {});
+                    CloudDriver.getInstance().getServiceManager().getCachedObjects().remove(CloudDriver.getInstance().getServiceManager().getServiceGroup(iServiceGroup.getName()));
 
                 }
 
-                CloudDriver.getInstance().getInstance(GroupService.class).deleteGroup(IServiceGroup);
+                CloudDriver.getInstance().getInstance(GroupService.class).deleteGroup(iServiceGroup);
                 CloudDriver.getInstance().reload();
-                sender.sendMessage("INFO", "§9The ServiceGroup §b" + IServiceGroup.getName() + " §9was deleted!");
+                sender.sendMessage("INFO", "§9The ServiceGroup §b" + iServiceGroup.getName() + " §9was deleted!");
             } else if (args[0].equalsIgnoreCase("fallback")) {
                 String fallback = args[1];
 

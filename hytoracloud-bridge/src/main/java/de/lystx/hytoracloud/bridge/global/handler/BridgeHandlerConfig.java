@@ -25,6 +25,7 @@ public class BridgeHandlerConfig implements PacketHandler {
             CloudDriver.getInstance().getServiceManager().setCachedObjects(packetOutGlobalInfo.getServices());
             CloudDriver.getInstance().getReceiverManager().getAvailableReceivers().clear();
             CloudDriver.getInstance().getReceiverManager().getAvailableReceivers().addAll(packetOutGlobalInfo.getReceivers());
+            CloudDriver.getInstance().getPlayerManager().setCachedObjects(packetOutGlobalInfo.getCloudPlayers());
 
         } else if (packet instanceof PacketOutRegisterServer) {
 

@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.bridge;
 
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
 
@@ -66,6 +67,12 @@ public interface BridgeInstance {
      */
     void shutdown();
 
+    /**
+     * The type of the bridge instance
+     *
+     * @return type
+     */
+    ServiceType type();
 
     default Map<String, Object> loadExtras() {
         return new HashMap<>();

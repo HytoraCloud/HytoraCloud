@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.commons.events.network.DriverEventNetworkPing;
+import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
@@ -62,21 +63,22 @@ public class ProxyPingListener {
 
             }
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {
-                builder.version(new ServerPing.Version(2, "§7" + this.replace(motd.getVersionString(), port)));
+                builder.version(new ServerPing.Version(2, "§7" + PlaceHolder.apply(motd.getVersionString(), motd)));
             }
 
-            if (motd.getProtocolString() != null && !motd.getProtocolString().trim().isEmpty()) {
-                String[] playerInfo = (motd.getProtocolString().replace("||", "-_-")).split("-_-");
+            if (motd.getPlayerInfo().length != 0) {
 
-                ServerPing.SamplePlayer[] playerInfos = new ServerPing.SamplePlayer[playerInfo.length];
-                IntStream.range(0, playerInfos.length).forEach(i -> playerInfos[i] = new ServerPing.SamplePlayer(this.replace(playerInfo[i].replace("-_-", ""), port), UUID.randomUUID()));
+                ServerPing.SamplePlayer[] playerInfos = new ServerPing.SamplePlayer[motd.getPlayerInfo().length];
+                for (int i = 0; i < playerInfos.length; i++) {
+                    playerInfos[i] = new ServerPing.SamplePlayer(PlaceHolder.apply(motd.getPlayerInfo()[i], motd), UUID.randomUUID());
+                }
 
                 builder.samplePlayers(playerInfos);
 
             }
             builder.maximumPlayers(networkConfig.getMaxPlayers());
 
-            builder.description(Component.text(this.replace(motd.getFirstLine(), port) + "\n" + this.replace(motd.getSecondLine(), port)));
+            builder.description(Component.text(PlaceHolder.apply(motd.getFirstLine(), motd) + "\n" + PlaceHolder.apply(motd.getSecondLine(), motd)));
 
             event.setPing(builder.build());
         } catch (Exception e) {
@@ -90,12 +92,4 @@ public class ProxyPingListener {
 
     }
 
-    public String replace(String string, int port) {
-        IService service = CloudDriver.getInstance().getServiceManager().getCachedObjects(service1 -> service1.getPort() == port).get(0);
-        return (string
-                .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()))
-                .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()))
-                .replace("%proxy%", service == null ? "NO-PROXY-FOUND" : service.getName())
-                .replace("%maintenance%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().isMaintenance()))).replace("&", "§");
-    }
 }

@@ -25,6 +25,16 @@ public interface IFallbackManager {
     IService getFallback(ICloudPlayer player);
 
     /**
+     * Searches for a free {@link Fallback} as {@link IService}
+     * it searches every online service except the provided
+     *
+     * @param player the player
+     * @param service the service that should be ignored
+     * @return fallback as service
+     */
+    IService getFallbackExcept(ICloudPlayer player, IService service);
+
+    /**
      * Gets the {@link Fallback} with the highest priority
      * for this player and only if he is allowed to join it
      *

@@ -21,6 +21,21 @@ public @interface DriverInfo {
     String version();
 
     /**
+     * The lowest cloud supported version
+     *
+     * @return version string
+     */
+    String lowestSupportVersion();
+
+
+    /**
+     * The highest cloud supported version
+     *
+     * @return version string
+     */
+    String highestSupportVersion();
+
+    /**
      * All contributors that did something
      * for the cloud
      *

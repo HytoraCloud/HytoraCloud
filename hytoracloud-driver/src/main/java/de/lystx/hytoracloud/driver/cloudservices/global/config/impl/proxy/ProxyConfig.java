@@ -2,12 +2,16 @@ package de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy;
 
 
 
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.interfaces.DriverInfo;
+import de.lystx.hytoracloud.driver.utils.Array;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,6 +54,7 @@ public class ProxyConfig implements Serializable {
      * @return ProxyConfig
      */
     public static ProxyConfig defaultConfig() {
+        DriverInfo driverInfo = CloudDriver.getInstance().driverInfo();
         return new ProxyConfig(
                 true,
                 true,
@@ -57,24 +62,47 @@ public class ProxyConfig implements Serializable {
                      Collections.singletonList(
                         new TabList(
                                 true,
-                                "&8┃&8&m------------------------------------------&8┃&r\n\n&8» &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&7! &8«\n&7Service &8&l‴&7&l‴ &b%server% &8┃ &7Online &8&l‴&7&l‴ &b%online_players%&8/&b%max_players%\n",
-                                "\n&8» &7Developer &8┃ &bLystx &8«\n &8» &7Proxy &8┃ &b%proxy%&8«\n\n&8┃&8&m------------------------------------------&8┃"
+                                new String[]
+                                        {
+                                            "&8",
+                                            "&8        &8» &bHytoraCloud &8«        &8",
+                                            "&8        &3Server &8» &7%server%      &8",
+                                            "&8        &3Proxy &8» &7%proxy%        &8",
+                                            "&8"
+                                        },
+                                new String[]
+                                        {
+                                            "&8",
+                                            "&8 &3Twitter &8» &7@HytoraCloud &8┃ &3Developer &8» &7Lystx &8",
+                                            "&8"
+                                        }
                         )),
                          Collections.singletonList(
                                  new Motd(
                                     true,
-                                    "&r  &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&8! &8[&f1.8 &8- &b1.16&8]",
-                                    "&r  &8» &7News &8× &7Now Public &8» §a%proxy%",
-                                    "",
+                                    "&8» &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem &8[&f" + driverInfo.lowestSupportVersion() + "&7-&f" + driverInfo.highestSupportVersion() + "&8]",
+                                    "&8» &3Status &8× §aOnline §8┃ §7Proxy &8× §3%proxy%",
+                                    new String[0],
                                     ""
                                 )
                          ),
                 Collections.singletonList(
                         new Motd(
                                 true,
-                                "&r  &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem&8! &8[&f1.8 &8- &b1.16&8]",
-                                "&r  &8» &cWe are in §emaintenance &8» §a%proxy%",
-                                "&8&m--------------------------------------------||&7||&7||&7                 &8» &bCloudSystem &8┃ &7made for &byou&8                 &8||    &8||&7                 &8➜ &bTwitter &8● &7@HytoraCloud         &8||&7                 &8➜ &bDiscord &8● &7discord.io/HytoraCloud    &8||&7                 &8➜ &bSpigotSupport &8● &71.8 &8- &71.16.1   &8||&8||&8||&8&m-------------------------------------------",
+                                "&8» &bHytoraCloud &8&l‴&7&l‴ &7your &bcloudSystem &8[&f" + driverInfo.lowestSupportVersion() + "&7-&f" + driverInfo.highestSupportVersion() + "&8]",
+                                "&8» &3Status &8× §cMaintenance §8┃ §7Proxy &8× §3%proxy%",
+                                new String[]{
+                                        "§bHytoraCloud §7Information",
+                                        "§8§m--------------------------",
+                                        "§8",
+                                        "&bVersion &8» &7" + driverInfo.version(),
+                                        "&bThanks to &8» &7" + new Array<>(driverInfo.contributors()),
+                                        "&bTwitter &8» &7@HytoraCloud",
+                                        "&bDiscord &8» &7pazzqaGSVs",
+                                        "§8",
+                                        "§8§m--------------------------",
+                                        "§8"
+                                },
                                 "&8» &c&oMaintenance"
                         )
                 )

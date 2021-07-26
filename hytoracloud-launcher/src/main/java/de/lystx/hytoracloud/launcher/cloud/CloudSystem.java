@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.NetworkService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
@@ -138,11 +137,7 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().getPermissionPool().update();
 
             //Sending network config and services and groups
-            CloudDriver.getInstance().sendPacket(new PacketOutGlobalInfo(
-                    CloudDriver.getInstance().getNetworkConfig(),
-                    CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
-                    CloudDriver.getInstance().getServiceManager().getCachedObjects()
-            ));
+            CloudDriver.getInstance().sendPacket(reloadPacket());
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -337,12 +332,11 @@ public class CloudSystem extends CloudProcess {
             this.getInstance(LogService.class).save();
             this.getInstance(ConfigService.class).shutdown();
             this.getInstance(ModuleService.class).shutdown();
-
-            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> this.getInstance(NetworkService.class).shutdown(), 7L);
+            this.getInstance(NetworkService.class).shutdown();
             super.shutdown();
 
-            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> Utils.deleteFolder(this.getInstance(FileService.class).getDynamicServerDirectory()), 10L);
-            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 40L);
+            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> Utils.deleteFolder(this.getInstance(FileService.class).getDynamicServerDirectory()), 5L);
+            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 8L);
         });
 
     }

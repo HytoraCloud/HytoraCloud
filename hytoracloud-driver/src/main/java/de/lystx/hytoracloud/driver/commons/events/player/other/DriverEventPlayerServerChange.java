@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class DriverEventPlayerServerChange extends CloudEvent implements Serializable {
 
+    private static final long serialVersionUID = 9008527573162953171L;
     private final ICloudPlayer player;
     private final IService service;
 

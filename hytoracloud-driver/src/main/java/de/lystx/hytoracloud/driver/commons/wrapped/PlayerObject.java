@@ -169,12 +169,14 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
     @Override
     public void update() {
+        CloudDriver.getInstance().getPlayerManager().update(this);
+
+        PacketUpdatePlayer packetUpdatePlayer = new PacketUpdatePlayer(this);
+        CloudDriver.getInstance().sendPacket(packetUpdatePlayer);
 
         DriverEventPlayerUpdate playerUpdate = new DriverEventPlayerUpdate(this);
         CloudDriver.getInstance().callEvent(playerUpdate);
 
-        PacketUpdatePlayer packetUpdatePlayer = new PacketUpdatePlayer(this);
-        CloudDriver.getInstance().sendPacket(packetUpdatePlayer);
     }
 
     @Override
@@ -226,17 +228,8 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     }
 
     @Override
-    public void sendMessage(Object message) {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            if (CloudDriver.getInstance().getCurrentService().getGroup().getType() == ServiceType.PROXY) {
-                CloudDriver.getInstance().getProxyBridge().messagePlayer(this.getUniqueId(), message.toString());
-            } else {
-                Object player = Reflections.getBukkitPlayer(this.getName());
-                Reflections.callMethod(player, "sendMessage", message.toString());
-            }
-        } else {
-            CloudDriver.getInstance().getConnection().sendPacket(new PacketSendMessage(this.getUniqueId(), message.toString()));
-        }
+    public void sendMessage(String message) {
+        this.sendMessage(new ChatComponent(message));
     }
 
     @Override
@@ -245,7 +238,13 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     }
 
     @Override
-    public void sendComponent(ChatComponent chatComponent) {
+    public void sendMessage(ChatComponent chatComponent) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
+            if (CloudDriver.getInstance().getCurrentService().getGroup().getType() == ServiceType.PROXY) {
+                CloudDriver.getInstance().getProxyBridge().sendComponent(this.getUniqueId(), chatComponent);
+                return;
+            }
+        }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketSendComponent(this.getUniqueId(), chatComponent));
     }
 

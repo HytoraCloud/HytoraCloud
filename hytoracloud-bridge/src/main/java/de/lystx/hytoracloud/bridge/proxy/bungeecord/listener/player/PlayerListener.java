@@ -78,10 +78,10 @@ public class PlayerListener implements Listener {
     public void onConnected(ServerConnectedEvent event) {
 
         ProxiedPlayer player = event.getPlayer();
-        Server server = event.getServer();
+        ServerInfo server = event.getServer().getInfo();
 
         ICloudPlayer iCloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
-        IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(server.getInfo().getName());
+        IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(server.getName());
 
         if (iCloudPlayer == null || service == null) {
             return;

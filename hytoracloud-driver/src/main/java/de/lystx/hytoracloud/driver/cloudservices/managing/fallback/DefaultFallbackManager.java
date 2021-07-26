@@ -3,11 +3,13 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.fallback;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class DefaultFallbackManager implements IFallbackManager {
 
@@ -26,9 +28,11 @@ public class DefaultFallbackManager implements IFallbackManager {
     public IService getFallback(ICloudPlayer player) {
         try {
             Fallback fallback = this.getHighestFallback(player);
+            IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName());
             IService service;
             try {
-                service = CloudDriver.getInstance().getServiceManager().getCachedObjects(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).get(new Random().nextInt(CloudDriver.getInstance().getServiceManager().getCachedObjects(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName())).size()));
+                List<IService> cachedObjects = CloudDriver.getInstance().getServiceManager().getCachedObjects(serviceGroup);
+                service = cachedObjects.get(new Random().nextInt(cachedObjects.size()));
             } catch (Exception e){
                 service = CloudDriver.getInstance().getServiceManager().getCachedObject(fallback.getGroupName() + "-1");
             }
@@ -36,6 +40,17 @@ public class DefaultFallbackManager implements IFallbackManager {
         } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    @Override
+    public IService getFallbackExcept(ICloudPlayer player, IService service) {
+        Fallback fallback = this.getHighestFallback(player);
+        List<IService> services = CloudDriver.getInstance().getServiceManager().getCachedObjects(CloudDriver.getInstance().getServiceManager().getServiceGroup(fallback.getGroupName()));
+        IService finalService = service;
+        services.removeIf(s -> s.getName().equalsIgnoreCase(finalService.getName()));
+
+        service = services.get(new Random().nextInt(services.size()));
+        return service;
     }
 
     @Override

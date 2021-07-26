@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor @Getter
 public class ConsoleCommandSenderExecutor implements ConsoleExecutor {
 
+    private static final long serialVersionUID = 1944182643634166341L;
     private final CommandSender sender;
 
     @Override
@@ -19,12 +20,12 @@ public class ConsoleCommandSenderExecutor implements ConsoleExecutor {
     }
 
     @Override
-    public void sendMessage(Object message) {
+    public void sendMessage(String message) {
         sender.sendMessage(message.toString());
     }
 
     @Override
-    public void sendComponent(ChatComponent chatComponent) {
+    public void sendMessage(ChatComponent chatComponent) {
 
     }
 

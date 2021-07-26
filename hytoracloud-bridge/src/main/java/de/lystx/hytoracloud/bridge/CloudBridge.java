@@ -17,6 +17,7 @@ import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -112,6 +113,7 @@ public class CloudBridge {
     public void setProxyBridge(ProxyBridge proxyBridge) {
         this.proxyBridge = proxyBridge;
 
+        CloudDriver.getInstance().getScheduler().scheduleRepeatingTaskAsync(() -> CloudBridge.getInstance().getProxyBridge().updateTabList(loadRandomTablist()), 0L, 5L);
         CloudDriver.getInstance().setInstance("proxyBridge", proxyBridge);
 
         //NetworkHandler
@@ -231,6 +233,12 @@ public class CloudBridge {
 
             @Override
             public void packetIn(HytoraPacket packet) {
+                if (packet instanceof PacketOutUpdateTabList) {
+                    if (CloudBridge.getInstance().getProxyBridge() == null) {
+                        return;
+                    }
+                    CloudBridge.getInstance().getProxyBridge().updateTabList(loadRandomTablist());
+                }
             }
 
             @Override

@@ -10,12 +10,7 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 
 import java.lang.reflect.Field;
 
-public class IpInjector {
-
-    @Subscribe(order = PostOrder.EARLY)
-    public void onPreLoginEvent(PreLoginEvent event) {
-        injectConnection(event.getConnection());
-    }
+public class PlayerInjectListener {
 
     @Subscribe(order = PostOrder.EARLY)
     public void onProxyPingEvent(ProxyPingEvent event) {
@@ -27,6 +22,16 @@ public class IpInjector {
         injectConnection(event.getConnection());
     }
 
+    @Subscribe(order = PostOrder.EARLY)
+    public void onPreLoginEvent(PreLoginEvent event) {
+        injectConnection(event.getConnection());
+    }
+
+    /**
+     * Injects a custom ip into this connection
+     *
+     * @param connection the connection
+     */
     private void injectConnection(InboundConnection connection) {
         if (CloudBridge.getInstance().getAddresses().get(connection.getRemoteAddress()) == null)
             return;

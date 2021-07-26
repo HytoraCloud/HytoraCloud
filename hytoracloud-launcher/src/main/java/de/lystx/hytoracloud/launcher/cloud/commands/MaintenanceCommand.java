@@ -30,6 +30,7 @@ public class MaintenanceCommand implements TabCompletable {
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
                 CloudSystem.getInstance().getInstance(ConfigService.class).reload();
+                CloudDriver.getInstance().getNetworkConfig().update();
             } else if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("INFO", "§bWhitelisted Players§7:");
                 for (String whitelistedPlayer : config.getWhitelistedPlayers()) {
@@ -54,6 +55,7 @@ public class MaintenanceCommand implements TabCompletable {
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
                 CloudSystem.getInstance().getInstance(ConfigService.class).reload();
+                CloudDriver.getInstance().getNetworkConfig().update();
                 sender.sendMessage("COMMAND", "§7The player §a" + user + " §7was added to maintenance§8!");
             } else if (identifier.equalsIgnoreCase("remove")) {
                 if (!contains) {
@@ -65,6 +67,7 @@ public class MaintenanceCommand implements TabCompletable {
                 CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
                 CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
                 CloudSystem.getInstance().getInstance(ConfigService.class).reload();
+                CloudDriver.getInstance().getNetworkConfig().update();
                 sender.sendMessage("COMMAND", "§7The player §a" + user + " §7was removed to maintenance§8!");
             } else {
                 sendUsage(sender);

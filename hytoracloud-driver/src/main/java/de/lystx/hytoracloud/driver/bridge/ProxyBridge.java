@@ -1,10 +1,13 @@
 package de.lystx.hytoracloud.driver.bridge;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudErrors;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
 import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
@@ -23,7 +26,6 @@ import java.util.*;
 public interface ProxyBridge {
 
 
-    String loadMotd();
 
     /**
      * Called when a player joins the network
@@ -95,6 +97,7 @@ public interface ProxyBridge {
 
         CloudDriver.getInstance().getPlayerManager().unregisterPlayer(player);
         CloudDriver.getInstance().sendPacket(new PacketUnregisterPlayer(player.getName()));
+
     }
 
     /**
@@ -121,6 +124,7 @@ public interface ProxyBridge {
      * @return formatted string
      */
     default String formatTabList(ICloudPlayer cloudPlayer, String input) {
+
         try {
             IService service;
             PermissionGroup permissionGroup;
@@ -132,7 +136,7 @@ public interface ProxyBridge {
             if (cloudPlayer == null || cloudPlayer.getService() == null) {
                 service = CloudDriver.getInstance().getCurrentService();
             } else {
-                service = CloudDriver.getInstance().getServiceManager().getCachedObject(cloudPlayer.getService().getName());
+                service = cloudPlayer.getService();
             }
             return input
                     .replace("&", "§")
@@ -144,6 +148,7 @@ public interface ProxyBridge {
                     .replace("%receiver%", CloudDriver.getInstance().getCurrentService().getGroup().getReceiver())
                     .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
                     .replace("%proxy%", CloudDriver.getInstance().getCurrentService().getName())
+                    .replace("%service%", service.getName())
                     .replace("%server%", service.getName());
 
         } catch (NullPointerException e) {
@@ -152,10 +157,54 @@ public interface ProxyBridge {
         return null;
     }
 
+    default void updateTabList(ICloudPlayer cloudPlayer, TabList tabList) {
+        if (!CloudDriver.getInstance().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
+            return;
+        }
+
+        String[] footerLines = tabList.getFooterLines();
+        String[] headerLines = tabList.getHeaderLines();
+
+        for (int i = 0; i < footerLines.length; i++) {
+            footerLines[i] = formatTabList(cloudPlayer, footerLines[i]);
+        }
+
+        for (int i = 0; i < headerLines.length; i++) {
+            headerLines[i] = formatTabList(cloudPlayer, headerLines[i]);
+        }
+
+        StringBuilder footerBuilder = new StringBuilder();
+        StringBuilder headerBuilder = new StringBuilder();
+
+        for (int i = 0; i < headerLines.length; i++) {
+            String headerLine = headerLines[i];
+            headerBuilder.append(headerLine);
+            if (!((i + 1) >= headerLines.length)) {
+                headerBuilder.append("\n");
+            }
+        }
+
+        for (int i = 0; i < footerLines.length; i++) {
+            String footerLine = footerLines[i];
+            footerBuilder.append(footerLine);
+            if (!((i + 1) >= footerLines.length)) {
+                footerBuilder.append("\n");
+            }
+        }
+
+        cloudPlayer.sendTabList(
+                new ChatComponent(headerBuilder.toString()),
+                new ChatComponent(footerBuilder.toString())
+        );
+    }
     /**
      * Updates the {@link TabList} for all players
      */
-   void updateTabList();
+   default void updateTabList(TabList tabList) {
+       for (ICloudPlayer cloudPlayer : CloudDriver.getInstance().getPlayerManager()) {
+           updateTabList(cloudPlayer, tabList);
+       }
+   }
 
     /**
      * If a player gets kicked of a service
@@ -166,7 +215,7 @@ public interface ProxyBridge {
      */
     default boolean onServerKick(ICloudPlayer cloudPlayer, IService service) {
         try {
-            IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(cloudPlayer);
+            IService fallback = CloudDriver.getInstance().getFallbackManager().getFallbackExcept(cloudPlayer, service);
             cloudPlayer.connect(fallback);
             return true;
         } catch (NullPointerException e) {
@@ -180,14 +229,8 @@ public interface ProxyBridge {
      * @param cloudPlayer the player
      * @param service the service
      */
-    default void onServerConnect(ICloudPlayer cloudPlayer, IService service) {
+    void onServerConnect(ICloudPlayer cloudPlayer, IService service);
 
-        cloudPlayer.setService(service);
-        cloudPlayer.update();
-
-        DriverEventPlayerServerChange serverChange = new DriverEventPlayerServerChange(cloudPlayer, service);
-        CloudDriver.getInstance().callEvent(serverChange);
-    }
 
     /**
      * Gets the current {@link NetworkHandler}
@@ -198,6 +241,7 @@ public interface ProxyBridge {
 
     /**
      * Gets the ping of a player
+     *
      * @param uniqueId the uuid of the player
      * @return ping of player
      */

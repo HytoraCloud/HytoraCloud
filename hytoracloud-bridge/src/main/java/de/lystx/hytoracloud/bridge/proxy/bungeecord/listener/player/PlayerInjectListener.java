@@ -11,23 +11,27 @@ import net.md_5.bungee.event.EventPriority;
 
 import java.lang.reflect.Field;
 
-public class IpInjector implements Listener {
+public class PlayerInjectListener implements Listener {
 
+    @EventHandler (priority = -128)
+    public void onPlayerHandshakeEvent(PlayerHandshakeEvent event) {
+        this.injectConnection(event.getConnection());
+    }
     @EventHandler (priority = EventPriority.LOW)
     public void onPreLoginEvent(PreLoginEvent event) {
-        injectConnection(event.getConnection());
+        this.injectConnection(event.getConnection());
     }
 
     @EventHandler (priority = EventPriority.LOW)
     public void onProxyPingEvent(ProxyPingEvent event) {
-        injectConnection(event.getConnection());
+        this.injectConnection(event.getConnection());
     }
 
-    @EventHandler (priority = -128)
-    public void onPlayerHandshakeEvent(PlayerHandshakeEvent event) {
-        injectConnection(event.getConnection());
-    }
-
+    /**
+     * Injects a custom ip into this connection
+     *
+     * @param connection the connection
+     */
     private void injectConnection(Connection connection) {
         if (CloudBridge.getInstance().getAddresses().get(connection.getAddress()) == null) return;
         try {

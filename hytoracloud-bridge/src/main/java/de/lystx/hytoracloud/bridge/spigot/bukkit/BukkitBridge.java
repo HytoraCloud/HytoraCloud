@@ -14,6 +14,9 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerQuitListene
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.minecraft.MinecraftInfo;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.entity.MinecraftEntity;
@@ -381,6 +384,11 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     }
 
     @Override
+    public ServiceType type() {
+        return ServiceType.SPIGOT;
+    }
+
+    @Override
     public void shutdown() {
 
         if (this.taskId != -1) {
@@ -398,9 +406,16 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         int count = Bukkit.getOnlinePlayers().size();
         for (Player player : Bukkit.getOnlinePlayers()) {
 
-            player.kickPlayer(msg);
-            count--;
+            ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player.getName());
+            if (cloudPlayer == null) {
+                player.kickPlayer(msg);
+            } else {
+                IService fallback = CloudDriver.getInstance().getFallbackManager().getFallbackExcept(cloudPlayer, CloudDriver.getInstance().getCurrentService());
+                cloudPlayer.sendMessage(new ChatComponent(msg));
+                cloudPlayer.connect(fallback);
+            }
 
+            count--;
             if (count <= 0) {
                 CloudDriver.getInstance().getScheduler().scheduleDelayedTask(this::shutdownDriver, 6L);
             }

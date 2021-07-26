@@ -37,7 +37,7 @@ public class ServerKickListener implements Listener {
 
             event.setCancelled(CloudBridge.getInstance().getProxyBridge().onServerKick(cloudPlayer, service));
         } catch (NullPointerException e) {
-            //IGNORING
+            //Ignoring on login-kick
         }
     }
 }

@@ -67,13 +67,14 @@ public class ProxyPingListener implements Listener {
                 ping.setVersion(new ServerPing.Protocol("§7" + ChatColor.translateAlternateColorCodes('&', PlaceHolder.apply(motd.getVersionString(), motd)), 2));
             }
 
-            if (motd.getProtocolString() != null && !motd.getProtocolString().trim().isEmpty()) {
-                String[] playerInfo = (motd.getProtocolString().replace("||", "-_-")).split("-_-");
 
-                ServerPing.PlayerInfo[] playerInfos = new ServerPing.PlayerInfo[playerInfo.length];
-                IntStream.range(0, playerInfos.length).forEach(i -> playerInfos[i] = new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', PlaceHolder.apply(playerInfo[i].replace("-_-", ""))), UUID.randomUUID()));
+
+            if (motd.getPlayerInfo().length != 0) {
+                ServerPing.PlayerInfo[] playerInfos = new ServerPing.PlayerInfo[motd.getPlayerInfo().length];
+                for (int i = 0; i < motd.getPlayerInfo().length; i++) {
+                    playerInfos[i] = new ServerPing.PlayerInfo(ChatColor.translateAlternateColorCodes('&', PlaceHolder.apply(motd.getPlayerInfo()[i])), UUID.randomUUID());
+                }
                 ping.setPlayers(new ServerPing.Players(networkConfig.getMaxPlayers(), CloudDriver.getInstance().getPlayerManager().getCachedObjects().size(), playerInfos));
-
             }
             ping.getPlayers().setMax(networkConfig.getMaxPlayers());
 

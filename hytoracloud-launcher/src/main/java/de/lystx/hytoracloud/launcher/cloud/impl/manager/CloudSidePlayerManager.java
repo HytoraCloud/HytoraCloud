@@ -48,7 +48,6 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
         if (!registered) {
             this.database.createEntry(cloudPlayer);
         }
-        this.clearDoubles();
         if (!registered) {
             CloudDriver.getInstance().getPermissionPool().update();
         }
@@ -78,26 +77,20 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
         try {
             ICloudPlayer cachedPlayer = getCachedObject(cloudPlayer.getName());
             if (cachedPlayer != null) {
-                cachedObjects.remove(cachedPlayer);
-                cachedObjects.remove(cloudPlayer);
+                int index = this.cachedObjects.indexOf(cachedPlayer);
+
+                try {
+                    this.cachedObjects.set(index, cloudPlayer);
+                } catch (IndexOutOfBoundsException e) {
+                    cachedObjects.removeIf(player -> player.getName().equalsIgnoreCase(cloudPlayer.getName()));
+                    cachedObjects.add(cloudPlayer);
+                }
             } else {
                 this.registerPlayer(cloudPlayer);
             }
-            this.clearDoubles();
+
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public void clearDoubles() {
-        List<UUID> checked = new LinkedList<>();
-
-        for (ICloudPlayer onlinePlayer : new LinkedList<>(this.cachedObjects)) {
-            if (checked.contains(onlinePlayer.getUniqueId())) {
-                this.cachedObjects.remove(onlinePlayer);
-                continue;
-            }
-            checked.add(onlinePlayer.getUniqueId());
         }
     }
 

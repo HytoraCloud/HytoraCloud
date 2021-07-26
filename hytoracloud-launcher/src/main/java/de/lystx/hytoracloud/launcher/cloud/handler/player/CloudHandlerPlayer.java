@@ -39,6 +39,7 @@ public class CloudHandlerPlayer implements PacketHandler {
 
             //Intern method decides if updating or registering
             playerManager.update(cloudPlayer);
+            CloudDriver.getInstance().sendPacket(packet);
         }
 
         if (packet instanceof PacketUnregisterPlayer) {

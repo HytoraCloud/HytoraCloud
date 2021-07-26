@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class Motd implements Serializable {
 
+    private static final long serialVersionUID = -4225937531956533199L;
     /**
      * If the motd is enabled
      */
@@ -27,9 +28,9 @@ public class Motd implements Serializable {
     private final String secondLine;
 
     /**
-     * The protocol line
+     * The playerInfo lines
      */
-    private final String protocolString;
+    private final String[] playerInfo;
 
 
     /**

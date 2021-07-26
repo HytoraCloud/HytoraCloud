@@ -4,6 +4,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -22,7 +24,6 @@ public interface PlaceHolder<V> {
                 public String apply(IService service, String input) {
                     input = input.replace("%service%", service.getName());
                     input = input.replace("%server%", service.getName());
-                    input = input.replace("%proxy%", service.getName());
                     input = input.replace("%id%", service.getId() + "");
                     input = input.replace("%state%", service.getState().name());
                     input = input.replace("%port%", service.getPort() + "");
@@ -33,6 +34,12 @@ public interface PlaceHolder<V> {
                     input = input.replace("%motd%", service.getMotd());
                     input = input.replace("%group%", service.getGroup().getName());
 
+                    return input;
+                }
+
+                @Override
+                public String applyIf(IService service, String input) {
+                    input = input.replace("%proxy%", service.getName());
                     return input;
                 }
 
@@ -57,6 +64,11 @@ public interface PlaceHolder<V> {
                 }
 
                 @Override
+                public String applyIf(IServiceGroup group, String input) {
+                    return input;
+                }
+
+                @Override
                 public Class<?>[] getAcceptedClasses() {
                     return new Class[]{IServiceGroup.class, ServiceGroupObject.class};
                 }
@@ -72,8 +84,34 @@ public interface PlaceHolder<V> {
                 }
 
                 @Override
+                public String applyIf(NetworkConfig group, String input) {
+                    return input;
+                }
+
+                @Override
                 public Class<?>[] getAcceptedClasses() {
                     return new Class[]{NetworkConfig.class};
+                }
+            },
+            new PlaceHolder<ICloudPlayer>() {
+                @Override
+                public String apply(ICloudPlayer player, String input) {
+                    input = input.replace("%player%", player.getName());
+                    input = input.replace("%uuid%", player.getUniqueId().toString());
+                    input = input.replace("%ip%", player.getIpAddress());
+                    input = input.replace("%rank", player.getPermissionGroup().getName());
+                    input = input.replace("%rank_color", player.getPermissionGroup().getDisplay());
+                    return input;
+                }
+
+                @Override
+                public String applyIf(ICloudPlayer player, String input) {
+                    return input;
+                }
+
+                @Override
+                public Class<?>[] getAcceptedClasses() {
+                    return new Class[]{PlayerObject.class, ICloudPlayer.class};
                 }
             },
 
@@ -88,6 +126,11 @@ public interface PlaceHolder<V> {
                     input = input.replace("%display%", permissionGroup.getDisplay());
                     input = input.replace("%group_id%", permissionGroup.getId() + "");
 
+                    return input;
+                }
+
+                @Override
+                public String applyIf(PermissionGroup permissionGroup, String input) {
                     return input;
                 }
 
@@ -109,12 +152,38 @@ public interface PlaceHolder<V> {
                 }
 
                 @Override
+                public String applyIf(Motd motd, String input) {
+                    return input;
+                }
+
+                @Override
                 public Class<?>[] getAcceptedClasses() {
                     return new Class[]{Motd.class};
                 }
             }
     );
 
+    @SafeVarargs
+    static <V> String applyIf(String input, Requestable<V> requestable, V... objects) {
+        for (PlaceHolder<?> placeHolder : PLACE_HOLDERS) {
+            for (V object : objects) {
+                for (Class<?> acceptedClass : placeHolder.getAcceptedClasses()) {
+                    if (acceptedClass == null || object == null || object.getClass() == null) {
+                        continue;
+                    }
+                    if (acceptedClass.equals(object.getClass())) {
+                        PlaceHolder<V> vPlaceHolder = (PlaceHolder<V>)placeHolder;
+                        if (requestable.isRequested(object)) {
+                            input = vPlaceHolder.applyIf(object, input);
+                        } else {
+                            input = vPlaceHolder.apply(object, input);
+                        }
+                    }
+                }
+            }
+        }
+        return input.replace("&", "§");
+    }
     /**
      * Applies all placeholers to a given string
      * with a given amount of input objects
@@ -146,6 +215,15 @@ public interface PlaceHolder<V> {
      * @param input the input string
      */
     String apply(V v, String input);
+
+    /**
+     * Applies if something is true
+     *
+     * @param v the object
+     * @param input the input
+     * @return string input
+     */
+    String applyIf(V v, String input);
 
     Class<?>[] getAcceptedClasses();
 }

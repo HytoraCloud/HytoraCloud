@@ -6,24 +6,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.hytora.networking.elements.component.Component;
+import net.hytora.networking.elements.packet.HytoraPacket;
 
 
 @Getter @AllArgsConstructor @Setter
-public class PacketUpdatePlayer extends PacketCommunication {
+public class PacketUpdatePlayer extends HytoraPacket {
 
     private ICloudPlayer cloudPlayer;
 
 
     @Override
     public void read(Component component) {
-        super.read(component);
 
         cloudPlayer = component.get("player");
     }
 
     @Override
     public void write(Component component) {
-        super.write(component);
 
         component.put("player", cloudPlayer);
     }

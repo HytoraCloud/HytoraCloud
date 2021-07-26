@@ -130,6 +130,7 @@ public abstract class SetupExecutor<T> {
 
         if (this.printHeader) {
             try {
+                this.console.sendMessage("SETUP", "§7Loading §bSetupHeader§h...");
                 this.htmlHeader = "\n" + loadHeaderFromWeb();
 
             } catch (Exception e) {

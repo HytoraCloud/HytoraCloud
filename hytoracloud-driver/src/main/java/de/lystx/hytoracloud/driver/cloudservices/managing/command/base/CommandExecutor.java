@@ -16,16 +16,18 @@ public interface CommandExecutor extends Identifiable {
     /**
      * Sends message
      *
+     * @deprecated you should use {@link ChatComponent}s
      * @param message the message to send
      */
-    void sendMessage(Object message);
+    @Deprecated
+    void sendMessage(String message);
 
     /**
      * Sends component
      *
      * @param chatComponent the component to send
      */
-    void sendComponent(ChatComponent chatComponent);
+    void sendMessage(ChatComponent chatComponent);
 
     /**
      * Message with prefix

@@ -14,18 +14,19 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.player.*;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.other.ProxyPingListener;
-import de.lystx.hytoracloud.bridge.proxy.velocity.listener.other.TablistListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
+import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
@@ -72,32 +73,6 @@ public class VelocityBridge implements BridgeInstance {
             CloudBridge.getInstance().setProxyBridge(new ProxyBridge() {
 
                 @Override
-                public void updateTabList() {
-
-                    for (Player player : server.getAllPlayers()) {
-
-                        TabList tabList = CloudBridge.getInstance().loadRandomTablist();
-
-                        if (!CloudDriver.getInstance().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
-                            return;
-                        }
-
-                        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUniqueId());
-
-                        player.sendPlayerListHeaderAndFooter(
-                                Component.text(Objects.requireNonNull(formatTabList(ICloudPlayer, tabList.getHeader()))),
-                                Component.text(Objects.requireNonNull(formatTabList(ICloudPlayer, tabList.getFooter())))
-                        );
-                    }
-                }
-
-                @Override
-                public String loadMotd() {
-                    Motd motd = CloudBridge.getInstance().loadRandomMotd();
-                    return motd.getFirstLine() + "\n" + motd.getSecondLine();
-                }
-
-                @Override
                 public NetworkHandler getNetworkHandler() {
                     return new CloudListener();
                 }
@@ -113,6 +88,11 @@ public class VelocityBridge implements BridgeInstance {
                     return player.getPing();
                 }
 
+                @Override
+                public void onServerConnect(ICloudPlayer cloudPlayer, IService service) {
+                    cloudPlayer.setService(service);
+                    cloudPlayer.update();
+                }
                 @Override
                 public void kickPlayer(UUID uniqueId, String reason) {
 
@@ -294,12 +274,11 @@ public class VelocityBridge implements BridgeInstance {
         //Registers all Listeners
         this.server.getEventManager().register(this, new CommandListener());
         this.server.getEventManager().register(this, new ProxyPingListener());
-        this.server.getEventManager().register(this, new TablistListener());
         this.server.getEventManager().register(this, new PlayerLoginListener());
         this.server.getEventManager().register(this, new PlayerServerListener());
         this.server.getEventManager().register(this, new ServerKickListener());
         this.server.getEventManager().register(this, new ServerConnectListener());
-        this.server.getEventManager().register(this, new IpInjector());
+        this.server.getEventManager().register(this, new PlayerInjectListener());
 
     }
 
@@ -357,6 +336,12 @@ public class VelocityBridge implements BridgeInstance {
 
         return propertyObject;
     }
+
+    @Override
+    public ServiceType type() {
+        return ServiceType.PROXY;
+    }
+
 
     @Override
     public void sendTabList(UUID uniqueId, ChatComponent header, ChatComponent footer) {

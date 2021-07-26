@@ -100,12 +100,12 @@ public class Console extends Thread implements CommandExecutor {
     }
 
     @Override
-    public void sendMessage(Object message) {
+    public void sendMessage(String message) {
         this.logger.sendMessage(message.toString());
     }
 
     @Override
-    public void sendComponent(ChatComponent chatComponent) {
+    public void sendMessage(ChatComponent chatComponent) {
         this.sendMessage(chatComponent.toString());
     }
 

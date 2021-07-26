@@ -14,6 +14,7 @@ import net.hytora.networking.elements.packet.response.Response;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.beans.ConstructorProperties;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -38,7 +39,7 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
         try {
             this.cachedObjects.set(cachedObjects.indexOf(cachedObject), cloudPlayer);
         } catch (IndexOutOfBoundsException e) {
-            //Ignoring this one
+            e.printStackTrace();
         }
     }
 

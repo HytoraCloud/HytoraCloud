@@ -10,8 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor @Getter
 public class DriverEventPlayerUpdate extends CloudEvent implements Serializable {
 
-    /**
-     * The joined player
-     */
+    private static final long serialVersionUID = 1231855920836347843L;
+
     private final ICloudPlayer player;
 }

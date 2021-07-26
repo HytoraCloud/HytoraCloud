@@ -13,8 +13,8 @@ public class ServerKickListener {
     public void handle(KickedFromServerEvent event) {
 
         Player player = event.getPlayer();
-        ICloudPlayer ICloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUsername());
-        CloudBridge.getInstance().getProxyBridge().onServerKick(ICloudPlayer, CloudDriver.getInstance().getServiceManager().getCachedObject(event.getServer().getServerInfo().getName()));
+        ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUsername());
+        CloudBridge.getInstance().getProxyBridge().onServerKick(cloudPlayer, CloudDriver.getInstance().getServiceManager().getCachedObject(event.getServer().getServerInfo().getName()));
 
     }
 }

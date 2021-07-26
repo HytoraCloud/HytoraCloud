@@ -7,6 +7,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColo
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.DefaultModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.DefaultChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
@@ -19,9 +20,12 @@ import de.lystx.hytoracloud.driver.commons.interfaces.*;
 import de.lystx.hytoracloud.driver.commons.minecraft.DefaultMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.minecraft.IMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
+import de.lystx.hytoracloud.driver.commons.service.IDService;
+import de.lystx.hytoracloud.driver.commons.service.PortService;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketCallEvent;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketLogMessage;
@@ -75,11 +79,12 @@ import java.util.function.Consumer;
 @DriverInfo(
         version = "STABLE-1.8",
         contributors = {"Lystx", "cxt", "Ian S."},
+        lowestSupportVersion = "1.8",
+        highestSupportVersion = "1.16.5",
         todo = {
                 "1.17 Support",
                 "Higher Java Versions",
-                "Fix when fallbacking player unregisters",
-                "When more than 1 service errors on shutdown and service wont stop!"
+                "FIx TabList-Updating"
         }
 )
 public class CloudDriver {
@@ -93,6 +98,8 @@ public class CloudDriver {
     private final LibraryService libraryService; //The libraryService to install MavenLibraries
     private final TicksPerSecond ticksPerSecond; //The util to get the ticks per second (TPS)
     private final UUIDPool mojangPool; //The current UUIDPool for uuid-name-cache management
+    private final PortService portService;
+    private final IDService idService;
     private final List<NetworkHandler> networkHandlers; //THe network handlers to easily interact with the network
 
     //Non final other values
@@ -104,7 +111,6 @@ public class CloudDriver {
 
     @Setter
     private PermissionPool permissionPool; //The current PermissionPool for perms management
-    @Setter
     private NetworkConfig networkConfig; //The network config of this instance
 
     //Non-Final managers
@@ -149,6 +155,8 @@ public class CloudDriver {
         this.mojangPool = new UUIDPool(1);
         this.networkConfig = NetworkConfig.defaultConfig();
         this.ticksPerSecond = new TicksPerSecond();
+        this.idService = new IDService();
+        this.portService = new PortService(25565, 30000);
 
         //Register Default-Services
         CloudDriver.getInstance().getServiceRegistry().registerService(new FileService());
@@ -412,6 +420,9 @@ public class CloudDriver {
             return null;
         }
         NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
+        if (networkConfig == null || CloudDriver.getInstance().getCurrentService() == null) {
+            return ProxyConfig.defaultConfig();
+        }
         ProxyConfig proxyConfig = networkConfig.getProxyConfigs().get(CloudDriver.getInstance().getCurrentService().getGroup().getName());
         return proxyConfig == null ? ProxyConfig.defaultConfig() : proxyConfig;
     }
@@ -422,6 +433,33 @@ public class CloudDriver {
      * ======================================
      */
 
+    public PacketOutGlobalInfo reloadPacket() {
+        return (new PacketOutGlobalInfo(
+                CloudDriver.getInstance().getNetworkConfig(),
+                CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
+                CloudDriver.getInstance().getServiceManager().getCachedObjects(),
+                CloudDriver.getInstance().getPlayerManager().getCachedObjects()
+        ));
+    }
+
+    /**
+     * Sets the network config and updates the port values
+     *
+     * @param networkConfig config
+     */
+    public void setNetworkConfig(NetworkConfig networkConfig) {
+        this.networkConfig = networkConfig;
+        this.portService.setServerPort(networkConfig.getServerStartPort());
+        this.portService.setProxyPort(networkConfig.getProxyStartPort());
+    }
+
+    /**
+     * The {@link ServiceType} of the current process
+     * Comparable with {@link CloudDriver#getDriverType()}
+     * to identify the process and determine if allowed
+     *
+     * @return type
+     */
     public ServiceType getServiceType() {
         if (this.driverType == CloudType.CLOUDSYSTEM) {
             return ServiceType.CLOUDSYSTEM;
@@ -530,10 +568,19 @@ public class CloudDriver {
      * @return current version of cloud
      */
     public String getVersion() {
+        return driverInfo() == null ? "UNKNOWN" : driverInfo().version();
+    }
+
+    /**
+     * The {@link DriverInfo} of this driver
+     *
+     * @return cloud based information
+     */
+    public DriverInfo driverInfo() {
         if (CloudDriver.class.isAnnotationPresent(DriverInfo.class)) {
-            return CloudDriver.class.getAnnotation(DriverInfo.class).version();
+            return CloudDriver.class.getAnnotation(DriverInfo.class);
         } else {
-            return "UNKNOWN";
+            return null;
         }
     }
 

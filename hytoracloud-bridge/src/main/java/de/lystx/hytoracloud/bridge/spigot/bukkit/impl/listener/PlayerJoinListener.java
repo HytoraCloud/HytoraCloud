@@ -57,7 +57,6 @@ public class PlayerJoinListener implements Listener {
         }
 
         updatePermissions(event.getPlayer(), new CloudPermissibleBase(event.getPlayer()));
-
     }
     /**
      * Injects the CloudPermissibleBase to the Player

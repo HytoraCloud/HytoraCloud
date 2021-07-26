@@ -46,9 +46,6 @@ public class InternalReceiver implements IReceiver {
 
     private boolean authenticated;
 
-    private final PortService portService;
-    private final IDService idService;
-
     private final Map<String, Action> actions;
 
     private final List<IService> services;
@@ -66,8 +63,6 @@ public class InternalReceiver implements IReceiver {
 
         this.actions = new CloudMap<>();
         this.services = new LinkedList<>();
-        this.portService = new PortService(CloudDriver.getInstance().getNetworkConfig().getProxyStartPort(), CloudDriver.getInstance().getNetworkConfig().getServerStartPort());
-        this.idService = new IDService();
     }
 
     @Override
@@ -100,8 +95,8 @@ public class InternalReceiver implements IReceiver {
         }
 
         if (service.getPort() <= 0) {
-            int port = service.getGroup().getType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
-            int id = this.idService.getFreeID(serviceGroup.getName());
+            int port = service.getGroup().getType().equals(ServiceType.PROXY) ? CloudDriver.getInstance().getPortService().getFreeProxyPort() : CloudDriver.getInstance().getPortService().getFreePort();
+            int id = CloudDriver.getInstance().getIdService().getFreeID(serviceGroup.getName());
             service = new ServiceObject(serviceGroup, id, port);
         }
         service.setProperties((service.getProperties() == null ? new PropertyObject() : service.getProperties()));
@@ -158,9 +153,9 @@ public class InternalReceiver implements IReceiver {
             CloudDriver.getInstance().sendPacket(new PacketOutStopServer(service.getName()));
         }
 
-        this.idService.removeID(service.getGroup().getName(), service.getId());
-        this.portService.removeProxyPort(service.getPort());
-        this.portService.removePort(service.getPort());
+        CloudDriver.getInstance().getIdService().removeID(service.getGroup().getName(), service.getId());
+        CloudDriver.getInstance().getPortService().removeProxyPort(service.getPort());
+        CloudDriver.getInstance().getPortService().removePort(service.getPort());
 
         this.services.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
 
@@ -181,8 +176,8 @@ public class InternalReceiver implements IReceiver {
         CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
             if (this.getServices(serviceGroup).size() < serviceGroup.getMinServer()) {
                 for (int i = this.getServices(serviceGroup).size(); i < serviceGroup.getMinServer(); i++) {
-                    int id = idService.getFreeID(serviceGroup.getName());
-                    int port = serviceGroup.getType().equals(ServiceType.PROXY) ? this.portService.getFreeProxyPort() : this.portService.getFreePort();
+                    int id = CloudDriver.getInstance().getIdService().getFreeID(serviceGroup.getName());
+                    int port = serviceGroup.getType().equals(ServiceType.PROXY) ? CloudDriver.getInstance().getPortService().getFreeProxyPort() : CloudDriver.getInstance().getPortService().getFreePort();
                     this.startService(new ServiceObject(serviceGroup, id, port), service -> {});
                 }
             }

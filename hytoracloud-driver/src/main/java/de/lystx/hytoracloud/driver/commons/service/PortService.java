@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -30,7 +31,8 @@ public class PortService implements Serializable {
     /**
      * The start proxyPort and start serverPort
      */
-    private final int proxyPort, serverPort;
+    @Setter
+    private int proxyPort, serverPort;
 
     public PortService(int proxyPort, int serverPort) {
         this.proxyPort = proxyPort;

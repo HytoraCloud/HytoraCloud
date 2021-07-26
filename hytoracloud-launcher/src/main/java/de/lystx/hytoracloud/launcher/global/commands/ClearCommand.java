@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ClearCommand  {
+public class ClearCommand {
 
     private final CloudProcess cloudInstance;
 
