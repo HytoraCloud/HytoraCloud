@@ -19,6 +19,7 @@ import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerConnectL
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
@@ -88,6 +89,12 @@ public class VelocityBridge implements BridgeInstance {
                                 Component.text(Objects.requireNonNull(formatTabList(ICloudPlayer, tabList.getFooter())))
                         );
                     }
+                }
+
+                @Override
+                public String loadMotd() {
+                    Motd motd = CloudBridge.getInstance().loadRandomMotd();
+                    return motd.getFirstLine() + "\n" + motd.getSecondLine();
                 }
 
                 @Override
@@ -292,6 +299,7 @@ public class VelocityBridge implements BridgeInstance {
         this.server.getEventManager().register(this, new PlayerServerListener());
         this.server.getEventManager().register(this, new ServerKickListener());
         this.server.getEventManager().register(this, new ServerConnectListener());
+        this.server.getEventManager().register(this, new IpInjector());
 
     }
 

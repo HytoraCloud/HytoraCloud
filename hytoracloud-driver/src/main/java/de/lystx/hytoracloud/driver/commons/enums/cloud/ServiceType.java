@@ -5,6 +5,7 @@ import java.io.Serializable;
 public enum ServiceType implements Serializable {
 
     SPIGOT,
+    NONE,
     CLOUDSYSTEM,
     PROXY;
 

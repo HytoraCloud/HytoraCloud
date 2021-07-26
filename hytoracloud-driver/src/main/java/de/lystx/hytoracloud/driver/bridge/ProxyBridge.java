@@ -22,6 +22,9 @@ import java.util.*;
 
 public interface ProxyBridge {
 
+
+    String loadMotd();
+
     /**
      * Called when a player joins the network
      *

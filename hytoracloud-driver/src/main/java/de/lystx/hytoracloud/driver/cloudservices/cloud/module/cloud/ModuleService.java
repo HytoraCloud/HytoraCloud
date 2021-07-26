@@ -5,9 +5,11 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import lombok.Getter;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,14 +25,14 @@ import java.util.List;
 )
 public class ModuleService implements ICloudService {
 
-    private final List<CloudModule> cloudModules;
+    private final List<DriverModule> driverModules;
     private final ModuleLoader moduleLoader;
     private final File moduleDir;
 
-    public ModuleService() {
-        this.moduleDir = CloudDriver.getInstance().getInstance(FileService.class).getModulesDirectory();
+    public ModuleService(File moduleDir) {
+        this.moduleDir = moduleDir;
         moduleDir.mkdirs();
-        this.cloudModules = new LinkedList<>();
+        this.driverModules = new LinkedList<>();
 
         this.moduleLoader = new ModuleLoader(moduleDir, this, CloudDriver.getInstance());
         this.load();
@@ -41,8 +43,8 @@ public class ModuleService implements ICloudService {
      * @param name
      * @return
      */
-    public CloudModule getModule(String name) {
-        return this.cloudModules.stream().filter((module -> module.getBase().getName().equalsIgnoreCase(name))).findFirst().orElse(null);
+    public DriverModule getModule(String name) {
+        return this.driverModules.stream().filter((module -> module.getBase().getName().equalsIgnoreCase(name))).findFirst().orElse(null);
     }
 
     /**
@@ -50,20 +52,41 @@ public class ModuleService implements ICloudService {
      */
     public void load() {
         this.moduleLoader.loadModules();
-        this.cloudModules.forEach((CloudModule::onEnable));
-        CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
+        this.driverModules.forEach(driverModule -> {
+            CloudDriver.getInstance().executeIf(() -> {
+                if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
+                    driverModule.onEnable();
+                }
+            }, () -> CloudDriver.getInstance().getServiceType() != ServiceType.NONE);
+        });
+        if (CloudDriver.getInstance().getParent() != null) {
+            CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
+        }
     }
 
     /**
      * Disables all modules
      */
     public void shutdown() {
-        this.cloudModules.forEach((CloudModule::onDisable));
+        this.driverModules.forEach(driverModule -> {
+
+            CloudDriver.getInstance().executeIf(() -> {
+                if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
+                    driverModule.onDisable();
+                }
+            }, () -> CloudDriver.getInstance().getServiceType() != ServiceType.NONE);
+        });
     }
 
     @Override
     public void reload() {
-
+        this.driverModules.forEach(driverModule -> {
+            CloudDriver.getInstance().executeIf(() -> {
+                if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
+                    driverModule.onReload();
+                }
+            }, () -> CloudDriver.getInstance().getServiceType() != ServiceType.NONE);
+        });
     }
 
     @Override

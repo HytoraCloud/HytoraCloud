@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -60,7 +61,29 @@ public class HytoraClassLoader {
      * @return JsonObject from File content
      */
     public JsonObject loadJson(String filename) {
-        return new JsonParser().parse(this.loadFile(filename)).getAsJsonObject();
+        String file = this.loadFile(filename);
+        if (file == null) {
+            return new JsonObject();
+        }
+        return new JsonParser().parse(file).getAsJsonObject();
+    }
+
+    @SneakyThrows
+    public Class<?> loadClass(String name) {
+        return Class.forName(name, true, classLoader());
+    }
+
+    /**
+     * Loads the class loader
+     * @return
+     */
+    public URLClassLoader classLoader() {
+        try {
+            return URLClassLoader.newInstance(new URL[]{ new URL("jar:file:" + file.toPath() +"!/") });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

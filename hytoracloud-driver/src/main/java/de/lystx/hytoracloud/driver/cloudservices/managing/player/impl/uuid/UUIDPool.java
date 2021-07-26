@@ -1,11 +1,10 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.uuid;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
-import io.vson.VsonValue;
-import io.vson.elements.VsonArray;
-import io.vson.elements.object.VsonObject;
-import io.vson.manage.vson.VsonParser;
-import io.vson.other.TempVsonOptions;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import jdk.nashorn.api.scripting.URLReader;
 
 import java.io.*;
@@ -91,11 +90,11 @@ public class UUIDPool {
                 stringBuilder.append(line);
             }
 
-            VsonObject object = new VsonObject(stringBuilder.toString());
+            JsonDocument object = new JsonDocument(stringBuilder.toString());
 
-            String uuidAsString = object.get("id").asString();
+            String uuidAsString = object.getString("id");
 
-            this.cache.put(object.get("name").asString(), parseUUIDFromString(uuidAsString));
+            this.cache.put(object.getString("name"), parseUUIDFromString(uuidAsString));
             return parseUUIDFromString(uuidAsString);
         } catch (Exception e) {
             return null;
@@ -122,20 +121,21 @@ public class UUIDPool {
                     return null;
                 }
 
-                VsonValue element = new VsonParser(new BufferedReader(new URLReader(url)), new TempVsonOptions()).parse();
-                if (!element.toString().equalsIgnoreCase("{}")) {
-                    VsonArray array = element.asArray();
+                JsonElement parse = (new JsonParser()).parse(new BufferedReader(new URLReader(url)));
+                
+                if (!parse.toString().equalsIgnoreCase("{}")) {
+                    JsonArray array = parse.getAsJsonArray();
 
-                    for (VsonValue vsonValue : array) {
-                        VsonObject vsonObject = (VsonObject) vsonValue;
+                    for (JsonElement jsonValue : array) {
+                        JsonDocument document = new JsonDocument(jsonValue.toString());
 
                         NameChange nameChange;
 
-                        if (!vsonObject.has("changedToAt")) {
-                            nameChange = new NameChange(vsonObject.getString("name"), -1L, true);
+                        if (!document.has("changedToAt")) {
+                            nameChange = new NameChange(document.getString("name"), -1L, true);
                             continue;
                         }
-                        nameChange = new NameChange(vsonObject.getString("name"), vsonObject.getLong("changedToAt"), false);
+                        nameChange = new NameChange(document.getString("name"), document.getLong("changedToAt"), false);
                         nameChanges.add(nameChange);
                     }
 
@@ -175,18 +175,17 @@ public class UUIDPool {
                 connection.setReadTimeout(5000);
                 connection.connect();
 
-                VsonValue vsonValue = new VsonParser(new BufferedReader(new InputStreamReader(connection.getInputStream())), new TempVsonOptions()).parse();
-
-
-                if (vsonValue.toString().equals("{}")) {
+                JsonElement parse = new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getInputStream())));
+                
+                if (parse.toString().equals("{}")) {
                     return null;
                 }
 
-                VsonArray vsonArray = (VsonArray) vsonValue;
+                JsonArray jsonArray = (JsonArray) parse;
 
-                VsonObject vsonObject = (VsonObject) vsonArray.get(vsonArray.size() - 1);
-                String name = vsonObject.getString("name");
-                UUID id = UUID.fromString(vsonObject.getString("id"));
+                JsonDocument jsonObject = new JsonDocument(jsonArray.get(jsonArray.size() - 1).toString());
+                String name = jsonObject.getString("name");
+                UUID id = UUID.fromString(jsonObject.getString("id"));
 
                 cache.append(name, id);
                 return name;

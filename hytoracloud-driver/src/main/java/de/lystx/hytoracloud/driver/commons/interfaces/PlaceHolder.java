@@ -1,6 +1,8 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
@@ -92,6 +94,23 @@ public interface PlaceHolder<V> {
                 @Override
                 public Class<?>[] getAcceptedClasses() {
                     return new Class[]{PermissionGroup.class};
+                }
+            },
+            new PlaceHolder<Motd>() {
+
+                @Override
+                public String apply(Motd motd, String input) {
+
+                    input = input.replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()));
+                    input = input.replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()));
+                    input = input.replace("%proxy%", CloudDriver.getInstance().getCurrentService().getName());
+
+                    return input;
+                }
+
+                @Override
+                public Class<?>[] getAcceptedClasses() {
+                    return new Class[]{Motd.class};
                 }
             }
     );

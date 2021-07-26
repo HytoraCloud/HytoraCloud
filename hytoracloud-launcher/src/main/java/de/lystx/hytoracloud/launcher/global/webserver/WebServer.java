@@ -1,12 +1,10 @@
 package de.lystx.hytoracloud.launcher.global.webserver;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.commons.http.listener.IListener;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import io.vson.elements.object.VsonObject;
-import io.vson.enums.FileFormat;
 import lombok.Getter;
 
 import java.io.File;
@@ -26,7 +24,7 @@ public class WebServer {
     /**
      * All the handlers
      */
-    private final Map<String, HttpHandler> handlers;
+    private final List<IListener> listeners;
 
     /**
      * The registered routes
@@ -57,7 +55,7 @@ public class WebServer {
     public WebServer(CloudDriver cloudDriver) {
 
         this.routes = new LinkedList<>();
-        this.handlers = new HashMap<>();
+        this.listeners = new LinkedList<>();
 
         this.config = new JsonDocument(new File(cloudDriver.getInstance(FileService.class).getDatabaseDirectory(), "web.json"));
 
@@ -75,6 +73,7 @@ public class WebServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     /**
@@ -140,7 +139,7 @@ public class WebServer {
                 os.write(content.getBytes());
                 os.close();
             } else {
-                String response = new VsonObject().append("response", "Your ip is not allowed to view this content!").toString(FileFormat.JSON);
+                String response = new JsonDocument().append("response", "Your ip is not allowed to view this content!").toString();
                 httpExchange.sendResponseHeaders(403, response.length());
                 OutputStream os = httpExchange.getResponseBody();
                 os.write(response.getBytes());

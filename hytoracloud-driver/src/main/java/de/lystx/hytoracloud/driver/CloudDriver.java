@@ -3,8 +3,10 @@ package de.lystx.hytoracloud.driver;
 import ch.qos.logback.classic.LoggerContext;
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.DefaultModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModuleManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.DefaultChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
@@ -12,6 +14,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.DefaultFallba
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.IFallbackManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.DefaultTemplateManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplateManager;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.*;
 import de.lystx.hytoracloud.driver.commons.minecraft.DefaultMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.minecraft.IMinecraftManager;
@@ -77,7 +80,8 @@ import java.util.function.Consumer;
                 "1.17 Support",
                 "Higher Java Versions",
                 "Fix when fallbacking player unregisters",
-                "When more than 1 service errors on shutdown and service wont stop!"
+                "When more than 1 service errors on shutdown and service wont stop!",
+                "Add Modules to bukkit"
         }
 )
 public class CloudDriver {
@@ -247,6 +251,10 @@ public class CloudDriver {
      * @param message the message behind brackets
      */
     public void log(String prefix, String message) {
+        if (this.parent == null) {
+            System.out.println("[" + prefix + "] " + ConsoleColor.stripColor(message));
+            return;
+        }
         this.parent.getConsole().getLogger().sendMessage(prefix, message);
     }
 
@@ -369,6 +377,9 @@ public class CloudDriver {
         if (this.driverType != CloudType.BRIDGE) {
             return null;
         }
+        if (this.serviceManager == null) {
+            return null;
+        }
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
         return this.serviceManager.getCachedObject(jsonDocument.getString("server"));
     }
@@ -412,6 +423,18 @@ public class CloudDriver {
      *         Other Methods
      * ======================================
      */
+
+    public ServiceType getServiceType() {
+        if (this.driverType == CloudType.CLOUDSYSTEM) {
+            return ServiceType.CLOUDSYSTEM;
+        } else {
+            if (this.getCurrentService() == null) {
+                return ServiceType.NONE;
+            } else {
+                return this.getCurrentService().getGroup().getType();
+            }
+        }
+    }
 
     /**
      * This Method iterates through all registered

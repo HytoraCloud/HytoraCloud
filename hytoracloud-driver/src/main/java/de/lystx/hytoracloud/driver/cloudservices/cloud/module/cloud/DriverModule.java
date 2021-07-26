@@ -1,13 +1,16 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud;
 
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IFileModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleInfo;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.function.Consumer;
+
 
 @Setter @Getter
-public abstract class CloudModule {
+public abstract class DriverModule {
 
     /**
      * The base of this module
@@ -39,4 +42,7 @@ public abstract class CloudModule {
      */
     public abstract void onReload();
 
+    public ModuleInfo info() {
+        return this.getClass().getAnnotation(ModuleInfo.class);
+    }
 }

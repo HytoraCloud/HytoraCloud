@@ -1,14 +1,15 @@
 package de.lystx.hytoracloud.driver.cloudservices.global.config.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.Fallback;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
 
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
-import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import java.io.Serializable;
 import java.util.*;
 
 @Getter @Setter @AllArgsConstructor
-public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
+public class NetworkConfig implements Serializable {
 
     private static final long serialVersionUID = 2412230558827763090L;
     /**
@@ -121,6 +122,13 @@ public class NetworkConfig implements Serializable, Objectable<NetworkConfig> {
      * to sync it all over the network
      */
     public void update() {
-        CloudDriver.getInstance().sendPacket(new PacketUpdateNetworkConfig(this));
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
+            CloudDriver.getInstance().sendPacket(new PacketUpdateNetworkConfig(this));
+        } else {
+            ConfigService instance = CloudDriver.getInstance().getInstance(ConfigService.class);
+            instance.setNetworkConfig(this);
+            instance.shutdown();
+            instance.reload();
+        }
     }
 }

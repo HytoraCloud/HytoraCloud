@@ -41,6 +41,20 @@ public class LibraryService {
     }
 
     /**
+     * Injects a dependency into runtime
+     * @param path
+     */
+    public void addURL(Path path, URLClassLoader classLoader) {
+        try {
+            Method method = classLoader.getClass().getDeclaredMethod("addURL", URL.class);
+            method.setAccessible(true);
+            method.invoke(classLoader, path.toUri().toURL());
+        } catch (IllegalAccessException | InvocationTargetException | MalformedURLException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Installs a library from a repo
      * @param groupId
      * @param artifactId
@@ -87,6 +101,8 @@ public class LibraryService {
 
         //NETWORK
         this.install("io.netty", "netty-all", "4.1.44.Final", Repository.CENTRAL);
+        this.install("javax.servlet", "servlet-api", "2.5", Repository.CENTRAL);
+
         //Logging and Console
         this.install("jline", "jline", "2.14.6", Repository.CENTRAL);
         this.install("org.jline", "jline-terminal-jna", "3.18.0", Repository.CENTRAL);

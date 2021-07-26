@@ -9,7 +9,6 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser
 
 
 
-import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +18,7 @@ import java.io.Serializable;
 import java.util.*;
 
 @Getter @Setter @AllArgsConstructor
-public class OfflinePlayer implements Serializable, IPermissionUser, Objectable<OfflinePlayer> {
+public class OfflinePlayer implements Serializable, IPermissionUser {
 
     private static final long serialVersionUID = 4187696359635163423L;
 

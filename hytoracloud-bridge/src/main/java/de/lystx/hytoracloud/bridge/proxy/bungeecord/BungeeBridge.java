@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.bridge.proxy.bungeecord;
 
+import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.IpInjector;
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
@@ -10,6 +11,8 @@ import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.CommandListe
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerKickListener;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
@@ -19,10 +22,13 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabLis
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.utils.Action;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -36,6 +42,7 @@ import net.md_5.bungee.api.plugin.PluginDescription;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.function.Consumer;
 
 @Getter
 public class BungeeBridge extends Plugin implements BridgeInstance {
@@ -77,6 +84,12 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
                                 )
                         );
                     }
+                }
+
+                @Override
+                public String loadMotd() {
+                    Motd motd = CloudBridge.getInstance().loadRandomMotd();
+                    return motd.getFirstLine() + "\n" + motd.getSecondLine();
                 }
 
                 @Override
@@ -268,7 +281,20 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerConnectListener());
+        this.getProxy().getPluginManager().registerListener(this, new IpInjector());
 
+        CloudDriver.getInstance().getMessageManager().registerChannel("smart-proxy", new Consumer<IChannelMessage>() {
+            @SneakyThrows
+            @Override
+            public void accept(IChannelMessage channelMessage) {
+                if (channelMessage.getKey().equalsIgnoreCase("PROXY_SET_IP")) {
+                    JsonDocument document = channelMessage.getDocument();
+                    InetSocketAddress client_address = Utils.getAddress(document.getString("CLIENT_ADDRESS"));
+                    InetSocketAddress channel_address = Utils.getAddress(document.getString("CHANNEL_ADDRESS"));
+                    CloudBridge.getInstance().getAddresses().put(channel_address, client_address);
+                }
+            }
+        });
 
         if (CloudDriver.getInstance().getProxyConfig() == null) {
             CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getCurrentService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");

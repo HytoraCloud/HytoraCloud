@@ -15,6 +15,7 @@
         <module>hytoracloud-discordbot</module>
         <module>hytoracloud-networking</module>
         <module>hytoracloud-modules/module-cloudflare</module>
+        <module>hytoracloud-modules/module-smart-proxy</module>
     </modules>
 
     <properties>

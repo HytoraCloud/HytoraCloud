@@ -8,9 +8,9 @@ import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
-import io.vson.elements.object.Objectable;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +29,10 @@ public interface IService extends Serializable, Identifiable {
      */
     default IReceiver getReceiver() {
         return CloudDriver.getInstance().getReceiverManager().getReceiver(this.getGroup().getReceiver());
+    }
+
+    default InetSocketAddress getAddress() {
+        return new InetSocketAddress(this.getHost(), this.getPort());
     }
 
     /**

@@ -18,7 +18,7 @@ public interface IModule extends Serializable {
      *
      * @return author
      */
-    String getAuthor();
+    String[] getAuthor();
 
     /**
      * The version of this module

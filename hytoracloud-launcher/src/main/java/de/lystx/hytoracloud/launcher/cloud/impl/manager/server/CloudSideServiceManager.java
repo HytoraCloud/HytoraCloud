@@ -153,6 +153,8 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     @Override
     public void updateService(IService service) {
 
+        this.cachedObjects = new LinkedList<>(this.cachedObjects);
+
         this.cachedObjects.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
         this.cachedObjects.add(service);
 

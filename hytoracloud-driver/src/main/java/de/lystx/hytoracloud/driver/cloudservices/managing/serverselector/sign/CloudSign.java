@@ -2,7 +2,6 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign;
 
 
 
-import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +13,7 @@ import java.util.UUID;
  * CloudSign to work with it later
  */
 @Getter @AllArgsConstructor
-public class CloudSign implements Serializable, Objectable<CloudSign> {
+public class CloudSign implements Serializable  {
 
     private static final long serialVersionUID = -2627011017230396868L;
 

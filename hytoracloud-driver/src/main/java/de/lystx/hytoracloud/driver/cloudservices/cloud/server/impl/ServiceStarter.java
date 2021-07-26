@@ -40,7 +40,7 @@ public class ServiceStarter {
     private final File global;
     private final File version;
     private final File serverLocation;
-    private final File pluginsDirectory;
+    private final File pluginsDirectory, modulesDirectory;
 
     private final int maxPlayers, timeOut, memory;
 
@@ -68,8 +68,10 @@ public class ServiceStarter {
                                 CloudDriver.getInstance().getInstance(FileService.class).getStaticProxyDirectory() :
                                 CloudDriver.getInstance().getInstance(FileService.class).getStaticBukkitDirectory()), service.getGroup().getName() + "/" + service.getName() + "/");
         this.pluginsDirectory = new File(serverLocation, "plugins/");
+        this.modulesDirectory = new File(serverLocation, "cloud-modules/");
 
         this.serverLocation.mkdirs();
+        this.modulesDirectory.mkdirs();
         this.pluginsDirectory.mkdirs();
 
 
@@ -151,16 +153,16 @@ public class ServiceStarter {
             IFileModule fileModule = (IFileModule)module;
             switch (module.getCopyType()) {
                 case COPY_ALL:
-                    FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
+                    FileUtils.copyFile(fileModule.getFile(), new File(this.modulesDirectory, fileModule.getFile().getName()));
                     break;
                 case COPY_BUNGEE:
                     if (service.getGroup().getType().equals(ServiceType.PROXY)) {
-                        FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
+                        FileUtils.copyFile(fileModule.getFile(), new File(this.modulesDirectory, fileModule.getFile().getName()));
                     }
                     break;
                 case COPY_SPIGOT:
                     if (service.getGroup().getType().equals(ServiceType.SPIGOT)) {
-                        FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
+                        FileUtils.copyFile(fileModule.getFile(), new File(this.modulesDirectory, fileModule.getFile().getName()));
                     }
                 case COPY_NOT:
                     break;

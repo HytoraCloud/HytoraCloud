@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.module.base;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestModules;
@@ -16,8 +16,8 @@ public class DefaultModuleManager implements IModuleManager {
     public List<IModule> getModules() {
         List<IModule> list = new LinkedList<>();
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
-            for (CloudModule cloudModule : CloudDriver.getInstance().getInstance(ModuleService.class).getCloudModules()) {
-                list.add(cloudModule.getBase());
+            for (DriverModule driverModule : CloudDriver.getInstance().getInstance(ModuleService.class).getDriverModules()) {
+                list.add(driverModule.getBase());
             }
         } else if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             PacketRequestModules packetRequestModules = new PacketRequestModules();

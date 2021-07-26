@@ -139,7 +139,8 @@ public class JsonDocument implements Iterable<JsonElement> {
                 return this;
             }
             if (value instanceof JsonDocument) {
-                this.jsonObject.add(key, ((JsonDocument) value).getJsonObject());
+                JsonDocument document = (JsonDocument)value;
+                this.jsonObject.add(key, document.getJsonObject());
             } else {
                 this.jsonObject.add(key, GSON.toJsonTree(value));
             }

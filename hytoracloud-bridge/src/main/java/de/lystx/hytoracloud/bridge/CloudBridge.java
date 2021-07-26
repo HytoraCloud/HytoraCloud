@@ -14,8 +14,10 @@ import de.lystx.hytoracloud.bridge.global.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
+import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
@@ -28,6 +30,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputServi
 
 
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
+import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -45,6 +48,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @Getter @Setter
@@ -56,6 +60,7 @@ public class CloudBridge {
     private final CloudDriver cloudDriver;
     private final HytoraClient client;
     private final BridgeInstance bridgeInstance;
+    private final Map<InetSocketAddress, InetSocketAddress> addresses;
 
     private ProxyBridge proxyBridge;
 
@@ -63,8 +68,10 @@ public class CloudBridge {
         instance = this;
 
         this.bridgeInstance = bridgeInstance;
+        this.addresses = new CloudMap<>();
         this.cloudDriver = new CloudDriver(CloudType.BRIDGE);
 
+        CloudDriver.getInstance().getServiceRegistry().registerService(new ModuleService(new File("cloud-modules/")));
         CloudDriver.getInstance().setInstance("bridgeInstance", bridgeInstance);
 
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
@@ -198,7 +205,11 @@ public class CloudBridge {
                     System.out.println("[CloudBridge] Verifying Service '" + service.getName() + "' that it is fully set up!");
                     try {
                         service.setAuthenticated(true);
-                        service.setHost(InetAddress.getLocalHost().getHostAddress());
+                        if (service.getGroup().getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER)) {
+                            service.setHost("127.0.0.1");
+                        } else {
+                            service.setHost(InetAddress.getLocalHost().getHostAddress());
+                        }
                         service.update();
                     } catch (UnknownHostException e) {
                         e.printStackTrace();

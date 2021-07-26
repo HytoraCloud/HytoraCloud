@@ -18,4 +18,5 @@ public @interface ICloudServiceInfo {
     String[] description();
 
     double version();
+
 }

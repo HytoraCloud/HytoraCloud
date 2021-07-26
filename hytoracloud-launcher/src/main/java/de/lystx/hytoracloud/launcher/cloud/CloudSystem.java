@@ -1,8 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.NetworkService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
@@ -123,11 +122,6 @@ public class CloudSystem extends CloudProcess {
         CloudDriver.getInstance().getInstance(GroupService.class).reload();
         CloudDriver.getInstance().getInstance(ConfigService.class).reload();
 
-        //Reloading all modules
-        for (CloudModule cloudModule : this.getInstance(ModuleService.class).getCloudModules()) {
-            cloudModule.onReload();
-        }
-
         SignService service = CloudDriver.getInstance().getInstance(SignService.class);
         NPCService npcService = CloudDriver.getInstance().getInstance(NPCService.class);
 
@@ -179,11 +173,11 @@ public class CloudSystem extends CloudProcess {
 
             CloudDriver.getInstance().getDatabaseManager().getDatabase().connect();
             CloudDriver.getInstance().getServiceRegistry().registerService(new NetworkService());
-            CloudDriver.getInstance().getServiceRegistry().registerService(new ModuleService());
+            CloudDriver.getInstance().getServiceRegistry().registerService(new ModuleService(CloudDriver.getInstance().getInstance(FileService.class).getModulesDirectory()));
 
             this.screenPrinter = new ServiceOutputPrinter();
             this.webServer = new WebServer(this);
-            
+
             this.webServer.update("", new JsonDocument().append("info", "There's nothing to see here").append("routes", this.webServer.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
             this.webServer.start();
 

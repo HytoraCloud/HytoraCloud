@@ -41,7 +41,8 @@ public class PropertyObject extends HashMap<String, Object> implements Serializa
      */
     public PropertyObject append(String key, Object value) {
         if (value instanceof JsonDocument) {
-            this.put(key, ((JsonDocument) value).getJsonObject());
+            JsonDocument document = (JsonDocument)value;
+            this.put(key, document.build());
         } else if (value instanceof PropertyObject) {
             this.put(key, value);
         } else {

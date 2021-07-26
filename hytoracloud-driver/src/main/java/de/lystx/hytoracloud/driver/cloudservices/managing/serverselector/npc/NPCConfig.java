@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudItem;
-import io.vson.elements.object.Objectable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Getter @AllArgsConstructor
-public class NPCConfig implements Serializable, Objectable<NPCConfig> {
+public class NPCConfig implements Serializable{
 
     private static final long serialVersionUID = 6044206058339675497L;
     /**

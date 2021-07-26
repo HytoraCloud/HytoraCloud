@@ -5,11 +5,13 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.Progr
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBarStyle;
 import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.config.CloudFlareAuth;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
+import io.netty.buffer.ByteBuf;
 import lombok.SneakyThrows;
 import org.apache.http.Header;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +25,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class Utils {
@@ -80,6 +83,57 @@ public class Utils {
             }
             typeMap.put(typeParameter[i], actualTypeArgument[i]);
         }
+    }
+
+    public static InetSocketAddress getAddress(String address) throws Exception {
+        String[] split = address.split(":");
+        String hostname = Arrays.stream(Arrays.copyOfRange(split, 0, split.length - 1)).collect(Collectors.joining(":"));
+        int port = Integer.parseInt(split[split.length-1]);
+        return InetSocketAddress.createUnresolved(hostname, port);
+    }
+
+    public static int readVarInt(ByteBuf input) {
+        return readVarInt(input, 5);
+    }
+
+    public static int readVarInt(ByteBuf input, int maxBytes) {
+        int out = 0;
+        int bytes = 0;
+        byte in;
+        while (true) {
+            in = input.readByte();
+            out |= (in & 0x7F) << (bytes++ * 7);
+            if (bytes > maxBytes) throw new RuntimeException("VarInt too big");
+            if ((in & 0x80) != 0x80) break;
+        }
+        return out;
+    }
+
+    public static void writeVarInt(int value, ByteBuf output) {
+        int part;
+        while (true) {
+            part = value & 0x7F;
+            value >>>= 7;
+            if (value != 0) {
+                part |= 0x80;
+            }
+            output.writeByte(part);
+            if (value == 0) break;
+        }
+    }
+
+    public static void writeString(String s, ByteBuf buf) {
+        byte[] b = s.getBytes();
+        writeVarInt(b.length, buf);
+        buf.writeBytes(b);
+    }
+
+    public static void writeVarShort(ByteBuf buf, int toWrite) {
+        int low = toWrite & 0x7FFF;
+        int high = (toWrite & 0x7F8000) >> 15;
+        if (high != 0) low = low | 0x8000;
+        buf.writeShort(low);
+        if (high != 0) buf.writeByte(high);
     }
 
     public static Class<?> findSubClassParameterType(Object instance, Class<?> classOfInterest, int parameterIndex) {

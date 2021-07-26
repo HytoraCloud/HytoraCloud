@@ -17,7 +17,7 @@ public class FileModuleObject extends ModuleObject implements IFileModule {
      */
     private File file;
 
-    public FileModuleObject(String name, String author, String description, String mainClass, String website, String version, ModuleCopyType copyType) {
+    public FileModuleObject(String name, String[] author, String description, String mainClass, String website, String version, ModuleCopyType copyType) {
         super(name, author, description, mainClass, website, version, copyType);
     }
 }

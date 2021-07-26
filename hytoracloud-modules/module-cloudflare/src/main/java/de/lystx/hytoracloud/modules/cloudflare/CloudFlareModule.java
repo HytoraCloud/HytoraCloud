@@ -1,7 +1,6 @@
 package de.lystx.hytoracloud.modules.cloudflare;
 
-import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.CloudModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
 import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.CloudFlareAPI;
 import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.config.CloudFlareAuth;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
@@ -9,7 +8,7 @@ import de.lystx.hytoracloud.modules.cloudflare.elements.ModuleConfig;
 import lombok.Getter;
 
 @Getter
-public class CloudFlareModule extends CloudModule {
+public class CloudFlareModule extends DriverModule {
 
     /**
      * The instance

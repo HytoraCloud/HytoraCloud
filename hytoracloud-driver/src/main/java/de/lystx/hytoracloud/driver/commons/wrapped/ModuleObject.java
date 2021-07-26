@@ -20,7 +20,7 @@ public class ModuleObject extends WrappedObject<IModule, ModuleObject> implement
     /**
      * The author
      */
-    private String author;
+    private String[] author;
 
     /**
      * The description

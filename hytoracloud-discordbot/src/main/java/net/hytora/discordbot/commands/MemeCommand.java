@@ -45,9 +45,9 @@ public class MemeCommand extends CommandHandler {
                 stringCreator.append(line);
             }
 
-            JsonDocument vsonObject = new JsonDocument(stringCreator.toString());
-            CURRENT_SUB_REDDIT = vsonObject;
-            if (vsonObject.getBoolean("nsfw") && !channel.isNSFW()) {
+            JsonDocument jsonObject = new JsonDocument(stringCreator.toString());
+            CURRENT_SUB_REDDIT = jsonObject;
+            if (jsonObject.getBoolean("nsfw") && !channel.isNSFW()) {
                 channel.sendMessage(
                         new EmbedBuilder()
                         .setTitle("Memes | Failed")
@@ -60,9 +60,9 @@ public class MemeCommand extends CommandHandler {
             }
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setColor(Color.ORANGE)
-                    .setImage(vsonObject.getString("url"))
-                    .setTitle(vsonObject.getString("title"))
-                    .setFooter("Subreddit | " + vsonObject.getString("subreddit"), executor.getUser().getEffectiveAvatarUrl());
+                    .setImage(jsonObject.getString("url"))
+                    .setTitle(jsonObject.getString("title"))
+                    .setFooter("Subreddit | " + jsonObject.getString("subreddit"), executor.getUser().getEffectiveAvatarUrl());
 
             channel.sendMessage(embedBuilder.build()).queue(message -> {
                 message.addReaction("⬆️").queue();
