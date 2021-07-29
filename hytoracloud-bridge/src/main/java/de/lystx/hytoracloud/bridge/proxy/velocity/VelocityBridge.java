@@ -18,10 +18,7 @@ import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerConnectL
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
@@ -30,7 +27,8 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
 
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -78,14 +76,14 @@ public class VelocityBridge implements BridgeInstance {
                 }
 
                 @Override
-                public long getPing(UUID uniqueId) {
+                public int getPing(UUID uniqueId) {
 
                     Player player = server.getPlayer(uniqueId).orElse(null);
                     if (player == null) {
-                        return -1L;
+                        return -1;
                     }
 
-                    return player.getPing();
+                    return (int) player.getPing();
                 }
 
                 @Override
@@ -283,6 +281,11 @@ public class VelocityBridge implements BridgeInstance {
     }
 
     @Override
+    public int getPing(UUID playerUniqueId) {
+        return CloudDriver.getInstance().getProxyBridge().getPing(playerUniqueId);
+    }
+
+    @Override
     public void flushCommand(String command) {
         server.getCommandManager().execute(server.getConsoleCommandSource(), command);
     }
@@ -306,7 +309,7 @@ public class VelocityBridge implements BridgeInstance {
                         .append("online-mode", CloudDriver.getInstance().getProxyConfig().isOnlineMode())
         );
 
-        List<PropertyObject> plugins = new LinkedList<>();
+        List<JsonObject<?>> plugins = new LinkedList<>();
 
         for (PluginContainer plugin : server.getPluginManager().getPlugins()) {
             PluginDescription desc = plugin.getDescription();
@@ -318,7 +321,7 @@ public class VelocityBridge implements BridgeInstance {
             }
 
             plugins.add(
-                    new PropertyObject()
+                    JsonObject.serializable()
                             .append("name", desc.getName().orElse("None"))
                             .append("website", desc.getUrl())
                             .append("commands", new LinkedList<>())

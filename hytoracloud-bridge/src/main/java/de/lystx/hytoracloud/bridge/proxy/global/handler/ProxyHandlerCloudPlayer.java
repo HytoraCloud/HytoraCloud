@@ -6,15 +6,34 @@ import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.*;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketConnectServer;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;
 import net.hytora.networking.elements.packet.response.ResponseStatus;
 
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class ProxyHandlerCloudPlayer implements PacketHandler {
 
+
+    public ProxyHandlerCloudPlayer() {
+        CloudDriver.getInstance().getRequestManager().registerRequestHandler(new Consumer<DriverRequest<?>>() {
+            @Override
+            public void accept(DriverRequest<?> driverRequest) {
+                JsonObject document = driverRequest.getDocument();
+                if (driverRequest.getKey().equalsIgnoreCase("PLAYER_CONNECT_REQUEST")) {
+
+                    CloudBridge.getInstance().getProxyBridge().connectPlayer(UUID.fromString(document.getString("uniqueId")), document.getString("server"));
+                    driverRequest.createResponse(Boolean.class).data(true).send();
+                } else if (driverRequest.getKey().equalsIgnoreCase("PLAYER_GET_PING")) {
+                    driverRequest.createResponse(Integer.class).data(CloudBridge.getInstance().getProxyBridge().getPing(UUID.fromString(document.getString("uniqueId")))).send();
+                }
+            }
+        });
+    }
 
     @Override
     public void handle(HytoraPacket packet) {

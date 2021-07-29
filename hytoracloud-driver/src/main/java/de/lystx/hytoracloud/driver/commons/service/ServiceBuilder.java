@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.driver.commons.service;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @RequiredArgsConstructor
 public class ServiceBuilder {
@@ -27,7 +27,7 @@ public class ServiceBuilder {
     /**
      * The properties of the service
      */
-    private PropertyObject properties;
+    private JsonObject<?> properties;
 
     /**
      * The memory of the service
@@ -60,7 +60,7 @@ public class ServiceBuilder {
         return this;
     }
 
-    public ServiceBuilder properties(PropertyObject properties) {
+    public ServiceBuilder properties(JsonObject<?> properties) {
         this.properties = properties;
         return this;
     }
@@ -103,11 +103,11 @@ public class ServiceBuilder {
         IService service = new ServiceObject(this.group, this.id, this.port);
 
         if (this.properties == null) {
-            this.properties = new PropertyObject();
+            this.properties = JsonObject.serializable();
         }
 
         this.properties.append("_serviceBuilder",
-                new PropertyObject()
+                JsonObject.serializable()
                     .append("maxPlayers", this.maxPlayers == 0 ? this.group.getMaxPlayers() : this.maxPlayers)
                     .append("memory", this.memory == 0 ? this.group.getMemory() : this.memory)
                     .append("template", this.template == null ? this.group.getCurrentTemplate().getName() : this.template)

@@ -69,6 +69,7 @@ public class PlayerCommand {
                         if (cloudPlayer != null) {
                             sender.sendMessage("INFO", "§7Proxy | §b" + cloudPlayer.getProxy());
                             sender.sendMessage("INFO", "§7Server | §b" + cloudPlayer.getService().getName());
+                            sender.sendMessage("INFO", "§7Ping | §b" + cloudPlayer.getPing().setTimeOut(20).setTimeOutValue(-1).pullValue() + "ms");
                         }
                     } catch (NullPointerException e) {
                         sender.sendMessage("ERROR", "§cAn error has occured while attempting to perform this command!");

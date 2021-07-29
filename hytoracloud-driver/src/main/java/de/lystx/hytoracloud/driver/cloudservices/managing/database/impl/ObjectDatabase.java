@@ -37,7 +37,7 @@ public class ObjectDatabase<V> extends DocumentDatabase {
         List<V> list = new LinkedList<>();
 
         for (JsonDocument document : this.getDocuments()) {
-            list.add(document.getObject("object", vClass));
+            list.add(document.get("object", vClass));
         }
         return list;
     }

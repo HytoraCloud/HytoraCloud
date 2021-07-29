@@ -1,6 +1,7 @@
 package net.hytora.discordbot.manager.ticket;
 
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,7 +34,7 @@ public class Ticket {
     public void selectLanguage(boolean english, Message message) {
         this.english = english;
 
-        JsonDocument json = Hytora.getHytora().getJsonConfig().getJson("roles").getJson("support");
+        JsonObject<?> json = Hytora.getHytora().getJsonConfig().getObject("roles").getObject("support");
 
         Role role = Hytora.getHytora().getDiscord().getRolesByName(json.getString("name"), true).get(0);
 

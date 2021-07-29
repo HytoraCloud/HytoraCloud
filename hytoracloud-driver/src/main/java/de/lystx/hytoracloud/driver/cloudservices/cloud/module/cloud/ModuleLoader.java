@@ -4,8 +4,10 @@ import com.google.gson.JsonObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IFileModule;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleInfo;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleState;
+import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.wrapped.FileModuleObject;
+import de.lystx.hytoracloud.driver.utils.Array;
 import de.lystx.hytoracloud.driver.utils.HytoraClassLoader;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import lombok.AllArgsConstructor;
@@ -13,7 +15,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -71,55 +72,51 @@ public class ModuleLoader {
                 if (file.getName().endsWith(".jar")) {
 
                     HytoraClassLoader classLoader = new HytoraClassLoader(file);
-                    JsonDocument document = new JsonDocument(classLoader.loadJson("config.json").toString());
-                    if (document.isEmpty()) {
-                        this.cloudDriver.log("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
-                        return;
-                    }
-
-                    if (document.has("main")) {
-                        Class<?> cl = classLoader.findClass(document.getString("main"));
-                        if (cl == null) {
-                            this.cloudDriver.log("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §ccouldn't be found!");
+                    if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
+                        JsonDocument document = new JsonDocument(classLoader.loadJson("config.json").toString());
+                        if (document.isEmpty()) {
+                            this.cloudDriver.log("MODULES", "§cThe file §e" + file.getName() + " §cdoesn't own a §4config.json§c!");
                             return;
                         }
-                        if (cl.getSuperclass().getName().equalsIgnoreCase(DriverModule.class.getName())) {
-                            DriverModule cloudModule = (DriverModule) cl.newInstance();
-                            ModuleInfo annotation = cloudModule.getClass().getAnnotation(ModuleInfo.class);
 
-                            IFileModule fileModule = new FileModuleObject(
-                                    annotation.name(),
-                                    annotation.authors(),
-                                    annotation.description(),
-                                    annotation.main().getName(),
-                                    annotation.website(),
-                                    annotation.website(),
-                                    annotation.copyType()
-                            );
-
-                            fileModule.setFile(file);
-                            cloudModule.setBase(fileModule);
-
-                            File directory = new File(this.moduleService.getModuleDir(), fileModule.getName()); directory.mkdirs();
-                            JsonDocument config = new JsonDocument(new File(directory, "config.json"));
-                            config.save();
-
-                            cloudModule.setConfig(config);
-                            if (Arrays.asList(cloudModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
-                                cloudModule.onLoadConfig();
+                        if (document.has("main")) {
+                            Class<?> cl = classLoader.findClass(document.getString("main"));
+                            if (cl == null) {
+                                this.cloudDriver.log("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §ccouldn't be found!");
+                                return;
                             }
+                            if (cl.getSuperclass().getName().equalsIgnoreCase(DriverModule.class.getName())) {
+                                DriverModule driverModule = (DriverModule) cl.newInstance();
 
-                            moduleService.getDriverModules().add(cloudModule);
-                            this.cloudDriver.log("MODULES", "§7The Cloud-Module §b" + annotation.name() + " §h[§7Author§b: " + Arrays.toString(annotation.authors()) + " §7| Version§b: " + annotation.version() + " §7| Copy§b: " + annotation.copyType() + "§h] §7was loaded!");
+                                ModuleInfo annotation = driverModule.getClass().getAnnotation(ModuleInfo.class);
+
+                                IFileModule fileModule = new FileModuleObject(annotation.name(), annotation.authors(), annotation.description(), annotation.main().getName(), annotation.website(), annotation.website(), annotation.copyType());
+
+                                fileModule.setFile(file);
+                                driverModule.setBase(fileModule);
+
+                                File directory = new File(this.moduleService.getModuleDir(), fileModule.getName());
+                                directory.mkdirs();
+                                JsonDocument config = new JsonDocument(new File(directory, "config.json"));
+                                config.save();
+
+                                driverModule.setConfig(config);
+                                moduleService.registerModuleTasks(driverModule, driverModule);
+                                if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
+                                    moduleService.callTasks(driverModule, ModuleState.LOADING);
+                                }
+
+                                moduleService.getDriverModules().add(driverModule);
+                                this.cloudDriver.log("MODULES", "§7The Cloud-Module §b" + annotation.name() + " §h[§7Author§b: " + new Array<>(annotation.authors()).toString() + " §7| Version§b: " + annotation.version() + " §7| Copy§b: " + annotation.copyType() + "§h] §7was loaded!");
+                            } else {
+                                this.cloudDriver.log("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §cdoesn't extends the " + DriverModule.class.getSimpleName() + ".class!");
+                            }
                         } else {
-                            this.cloudDriver.log("MODULES", "§cThe provided MainClass of the Module §e" + file.getName() + " §cdoesn't extends the Module.class!");
+                            this.cloudDriver.log("MODULES", "§cA Module doesn't have the §emain-attribute in the §econfig.json§c!");
                         }
                     } else {
-                        this.cloudDriver.log("MODULES", "§cA Module doesn't have the §emain-attribute in the §econfig.json§c!");
-                    }
 
 
-                    /*
                     Class<?> loadedClass = null;
                     URLClassLoader urlClassLoader = classLoader.classLoader();
 
@@ -127,7 +124,7 @@ public class ModuleLoader {
 
                     JsonObject jsonObject = classLoader.loadJson("config.json");
 
-                    if (jsonObject == null) {
+                    if (jsonObject.keySet().isEmpty()) {
                         JarFile jarFile = new JarFile(file);
                         Enumeration<JarEntry> e = jarFile.entries();
 
@@ -188,15 +185,18 @@ public class ModuleLoader {
                         config.save();
 
                         driverModule.setConfig(config);
-
-                        driverModule.onLoadConfig();
+                        moduleService.registerModuleTasks(driverModule, driverModule);
+                        if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
+                            moduleService.callTasks(driverModule, ModuleState.LOADING);
+                        }
 
                         moduleService.getDriverModules().add(driverModule);
                         this.cloudDriver.log("MODULES", "§7The Cloud-Module §b" + info.name() + " §h[§7Author§b: " + Arrays.toString(info.authors()) + " §7| Version§b: " + info.version() + " §7| Copy§b: " + info.copyType() + "§h] §7was loaded!");
                     } else {
                         this.cloudDriver.log("MODULES", "§cThe class §e" + loadedClass.getName() + " §cof the Module §e" + file.getName() + " §cdoesn't have a §e@" + ModuleInfo.class.getSimpleName() + "-Annotation!");
                     }
-                       */
+
+                    }
                 }
             }
 

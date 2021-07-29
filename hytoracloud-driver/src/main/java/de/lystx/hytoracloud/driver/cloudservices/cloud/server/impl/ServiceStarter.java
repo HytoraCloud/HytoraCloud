@@ -4,7 +4,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IFileModule;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModule;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -32,7 +33,7 @@ public class ServiceStarter {
     private final IService service;
     private final IServiceGroup serviceGroup;
     private final ITemplate template;
-    private PropertyObject properties;
+    private JsonObject<?> properties;
 
     private final File templateDirectory;
     private final File spigotPlugins;
@@ -78,11 +79,11 @@ public class ServiceStarter {
         service.setProperties((this.properties == null ? new PropertyObject() : this.properties));
         this.properties = service.getProperties();
 
-        maxPlayers = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getInteger("maxPlayers") : service.getGroup().getMaxPlayers();
-        memory = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getInteger("memory") : service.getGroup().getMemory();
-        timeOut = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getInteger("timeOut") : -1;
+        maxPlayers = service.getProperties().has("_serviceBuilder") ? service.getProperties().getObject("_serviceBuilder").getInteger("maxPlayers") : service.getGroup().getMaxPlayers();
+        memory = service.getProperties().has("_serviceBuilder") ? service.getProperties().getObject("_serviceBuilder").getInteger("memory") : service.getGroup().getMemory();
+        timeOut = service.getProperties().has("_serviceBuilder") ? service.getProperties().getObject("_serviceBuilder").getInteger("timeOut") : -1;
 
-        String templateName = service.getProperties().has("_serviceBuilder") ? service.getProperties().getDocument("_serviceBuilder").getString("template") : service.getGroup().getCurrentTemplate().getName();
+        String templateName = service.getProperties().has("_serviceBuilder") ? service.getProperties().getObject("_serviceBuilder").getString("template") : service.getGroup().getCurrentTemplate().getName();
         ITemplate template = CloudDriver.getInstance().getTemplateManager().getTemplate(service.getGroup(), templateName);
 
         if (template == null) {

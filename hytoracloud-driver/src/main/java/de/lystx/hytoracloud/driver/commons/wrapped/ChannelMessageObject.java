@@ -4,6 +4,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -49,7 +50,7 @@ public class ChannelMessageObject extends WrappedObject<IChannelMessage, Channel
      */
     private Identifiable sender;
 
-    public ChannelMessageObject(String key, String channel, long id, JsonDocument document, Identifiable receiver) {
+    public ChannelMessageObject(String key, String channel, long id, JsonObject<?> document, Identifiable receiver) {
         this.key = key;
         this.channel = channel;
         this.id = id;

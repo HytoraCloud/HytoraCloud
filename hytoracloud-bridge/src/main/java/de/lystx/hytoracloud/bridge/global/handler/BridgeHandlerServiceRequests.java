@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfo;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMinecraftInfo;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.Getter;
 import net.hytora.networking.elements.packet.HytoraPacket;
 import net.hytora.networking.elements.packet.handler.PacketHandler;

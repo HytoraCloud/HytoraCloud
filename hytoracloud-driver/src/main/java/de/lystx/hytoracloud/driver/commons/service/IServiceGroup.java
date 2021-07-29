@@ -4,6 +4,8 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 
 
 import java.io.Serializable;
@@ -109,9 +111,9 @@ public interface IServiceGroup extends Serializable, Identifiable {
     /**
      * The properties of this group to store extra values
      */
-    PropertyObject getProperties();
+    JsonObject<?> getProperties();
 
-    void setProperties(PropertyObject properties);
+    void setProperties(JsonObject<?> properties);
 
     /**
      * Updates the {@link IServiceGroup} on all

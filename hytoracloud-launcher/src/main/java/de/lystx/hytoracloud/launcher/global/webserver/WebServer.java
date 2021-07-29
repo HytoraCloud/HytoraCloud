@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import lombok.Getter;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public class WebServer {
     /**
      * The config containing host and port
      */
-    private final JsonDocument config;
+    private final JsonObject<?> config;
 
     /**
      * The port
@@ -54,7 +55,7 @@ public class WebServer {
         this.config = new JsonDocument(new File(cloudDriver.getInstance(FileService.class).getDatabaseDirectory(), "web.json"));
 
         this.port = this.config.has("port") ? this.config.getInteger("port") : this.config.append("port", 2217).getInteger("port");
-        this.enabled = this.config.getBoolean("enabled", true);
+        this.enabled = this.config.def(true).getBoolean("enabled");
 
         this.whitelistedIps = this.config.has("whitelistedIps") ?
                 this.config.getList("whitelistedIps", String.class) :
@@ -75,7 +76,7 @@ public class WebServer {
      */
     public void start() {
         CloudDriver.getInstance().getScheduler().scheduleRepeatingTask(() -> {
-            this.update("", new JsonDocument().append("info", "There's nothing to see here").append("routes", this.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
+            this.update("", JsonObject.gson().append("info", "There's nothing to see here").append("routes", this.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
         }, 0L, 60L);
 
         if (this.enabled) {
@@ -104,10 +105,10 @@ public class WebServer {
      * Updates a "route"
      *
      * @param web the route
-     * @param jsonDocument the content
+     * @param jsonObject the content
      */
-    public void update(String web, JsonDocument jsonDocument) {
-        this.update(web, jsonDocument.toString());
+    public void update(String web, JsonObject<?> jsonObject) {
+        this.update(web, jsonObject.toString());
     }
 
     /**

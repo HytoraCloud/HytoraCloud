@@ -52,7 +52,7 @@ public class SuggestCommand extends CommandHandler {
                 raw.delete().queue();
                 return;
             }
-            if (!channel.getId().equalsIgnoreCase(Hytora.getHytora().getJsonConfig().getJson("suggestions").getString("commands"))) {
+            if (!channel.getId().equalsIgnoreCase(Hytora.getHytora().getJsonConfig().getObject("suggestions").getString("commands"))) {
                 raw.delete().queue();
                 return;
             }

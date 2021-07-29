@@ -1,9 +1,7 @@
 package de.lystx.hytoracloud.driver.utils;
 
-import com.google.gson.JsonArray;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBar;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBarStyle;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.config.CloudFlareAuth;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import io.netty.buffer.ByteBuf;
 import lombok.SneakyThrows;
@@ -47,26 +45,6 @@ public class Utils {
 
     //Cloudflare utils
     public static final String CLOUDFLARE_API_BASE_URL = "https://api.cloudflare.com/client/v4/";
-
-    //Internal method to util
-    public static  <T> List<T> toListOfObjects(JsonArray jsonArray, Class<T> objectType) {
-        return CloudFlareAuth.GSON.fromJson(jsonArray, new ParameterizedType() {
-            @Override
-            public Type[] getActualTypeArguments() {
-                return new Type[]{objectType};
-            }
-
-            @Override
-            public Type getRawType() {
-                return List.class;
-            }
-
-            @Override
-            public Type getOwnerType() {
-                return null;
-            }
-        });
-    }
 
     private static void extractTypeArguments(Map<Type, Type> typeMap, Class<?> clazz) {
         Type genericSuperclass = clazz.getGenericSuperclass();

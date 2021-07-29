@@ -7,6 +7,8 @@ import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 
 
 import java.io.Serializable;
@@ -67,14 +69,14 @@ public interface IService extends Serializable, Identifiable {
     /**
      * The properties of this service to store values
      */
-    PropertyObject getProperties();
+    JsonObject<?> getProperties();
 
     /**
      * Sets the properties of this service
      *
      * @param properties the properties
      */
-    void setProperties(PropertyObject properties);
+    void setProperties(JsonObject<?> properties);
 
     /**
      * The group of this service
@@ -114,7 +116,7 @@ public interface IService extends Serializable, Identifiable {
      * @param key the name of the property
      * @param propertyObject the propertyObject
      */
-    void addProperty(String key, PropertyObject propertyObject);
+    void addProperty(String key, JsonObject<?> propertyObject);
 
     /**
      * Checks if Service is for example
@@ -147,7 +149,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @return properties
      */
-    PropertyObject requestInfo();
+    JsonObject<?> requestInfo();
 
     /**
      * Returns the Motd of this Service

@@ -3,6 +3,7 @@ package net.hytora.discordbot;
 
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
@@ -71,7 +72,7 @@ public class Hytora {
     /**
      * The config where all values are stored
      */
-    private JsonDocument jsonConfig;
+    private JsonObject<?> jsonConfig;
 
     /**
      * The JDA to manage all discord stuff
@@ -242,9 +243,9 @@ public class Hytora {
     public void manageDefaultRoles() {
 
         //Roles
-        JsonDocument roles = this.jsonConfig.getJson("roles");
-        JsonDocument defaultRole = roles.getJson("default");
-        JsonDocument supportRole = roles.getJson("support");
+        JsonObject<?> roles = this.jsonConfig.getObject("roles");
+        JsonObject<?> defaultRole = roles.getObject("default");
+        JsonObject<?> supportRole = roles.getObject("support");
 
         this.createRole(defaultRole, df -> {
 
@@ -272,7 +273,7 @@ public class Hytora {
      * @param jsonDocument the data for the role
      * @param consumer the consumer
      */
-    public void createRole(JsonDocument jsonDocument, Consumer<Role> consumer) {
+    public void createRole(JsonObject<?> jsonDocument, Consumer<Role> consumer) {
 
         String name = jsonDocument.getString("name");
         String color = jsonDocument.getString("color");
@@ -330,19 +331,19 @@ public class Hytora {
             this.botManaging = this.guild.getTextChannelById(botManagingId);
 
             //Suggestions
-            JsonDocument suggestions = this.jsonConfig.getJson("suggestions");
+            JsonObject<?> suggestions = this.jsonConfig.getObject("suggestions");
             String commands = suggestions.getString("commands");
             String suggestionsChannel = suggestions.getString("suggestions");
 
             this.suggestionManager = new SuggestionManager(suggestionsChannel);
 
 
-            JsonDocument tickets = this.jsonConfig.getJson("tickets");
+            JsonObject<?> tickets = this.jsonConfig.getObject("tickets");
             String channel = tickets.getString("channel");
             this.ticketManager = new TicketManager(channel);
 
 
-            JsonDocument reactionRoles = this.jsonConfig.getJson("reactionRoles");
+            JsonObject<?> reactionRoles = this.jsonConfig.getObject("reactionRoles");
             this.reactionRolesManager = new ReactionRolesManager(reactionRoles.getString("channel"), reactionRoles);
 
             return true;
@@ -360,7 +361,7 @@ public class Hytora {
 
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Hytora.class.getResourceAsStream("/config.json"))));
-            this.jsonConfig = new JsonDocument(reader);
+            this.jsonConfig = JsonObject.gson(reader);
             return !this.jsonConfig.isEmpty();
         } catch (Exception e) {
             e.printStackTrace();
@@ -448,7 +449,7 @@ public class Hytora {
         return commandManager;
     }
 
-    public JsonDocument getJsonConfig() {
+    public JsonObject<?> getJsonConfig() {
         return jsonConfig;
     }
 

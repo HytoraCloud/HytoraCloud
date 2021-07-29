@@ -54,4 +54,11 @@ public interface IModule extends Serializable {
      * @return type
      */
     ModuleCopyType getCopyType();
+
+    /**
+     * Registers a class and all its tasks
+     *
+     * @param taskClassObject the class object instance
+     */
+    void registerTasks(Object taskClassObject);
 }

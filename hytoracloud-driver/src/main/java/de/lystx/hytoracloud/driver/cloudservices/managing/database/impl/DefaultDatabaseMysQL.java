@@ -92,7 +92,7 @@ public class DefaultDatabaseMysQL implements IDatabase {
         }
         try {
             JsonDocument jsonDocument = new JsonDocument(data);
-            return jsonDocument.getObject(jsonDocument.getJsonObject(), OfflinePlayer.class);
+            return jsonDocument.get(jsonDocument.getJsonObject(), OfflinePlayer.class);
         } catch (NullPointerException e) {
             return null;
         }

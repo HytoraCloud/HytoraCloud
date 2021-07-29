@@ -1,5 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.launcher.cloud.handler.player.CloudHandlerPlayerRequest;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.NetworkService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
@@ -17,7 +19,6 @@ import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutServerSelector;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -25,7 +26,7 @@ import de.lystx.hytoracloud.driver.commons.wrapped.TemplateObject;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.log.LogService;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.utils.Action;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.launcher.cloud.commands.*;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerGroupUpdate;
 import de.lystx.hytoracloud.launcher.cloud.handler.group.CloudHandlerTemplateCopy;
@@ -107,6 +108,8 @@ public class CloudSystem extends CloudProcess {
         this.getInstance(CommandService.class).registerCommand(new DownloadCommand());
         this.getInstance(CommandService.class).registerCommand(new CreateCommand());
         this.getInstance(CommandService.class).registerCommand(new DeleteCommand());
+
+        CloudDriver.getInstance().getRequestManager().registerRequestHandler(new CloudHandlerPlayerRequest());
 
         this.authManager.createKey();
         this.bootstrap();
@@ -233,8 +236,8 @@ public class CloudSystem extends CloudProcess {
                     return;
                 }
 
-                spigot.set(SpigotVersion.valueOf(setup.getSpigotVersion()));
-                proxy.set(ProxyVersion.valueOf(setup.getBungeeCordType()));
+                spigot.set(SpigotVersion.valueOf(setup.getSpigotVersion().toUpperCase()));
+                proxy.set(ProxyVersion.valueOf(setup.getBungeeCordType().toUpperCase()));
 
                 if (spigot.get() == null) {
                     this.getParent().getConsole().getLogger().sendMessage("ERROR", "§cPlease redo the setup and provide a §evalid spigot version§c!");
@@ -274,7 +277,7 @@ public class CloudSystem extends CloudProcess {
                     this.getParent().getConsole().getLogger().sendMessage("§9");
                     DatabaseSetupExecutor databaseSetup = new DatabaseSetupExecutor();
                     databaseSetup.start( ds -> {
-                        JsonDocument jsonDocument1 = new JsonDocument()
+                        JsonObject<?> jsonObject = JsonObject.gson()
                                 .append("type", setup.getDatabase().toUpperCase())
                                 .append("host", ds.getHost())
                                 .append("port", ds.getPort())
@@ -282,7 +285,7 @@ public class CloudSystem extends CloudProcess {
                                 .append("defaultDatabase", ds.getDefaultDatabase())
                                 .append("collectionOrTable", ds.getCollectionOrTable())
                                 .append("password", ds.getPassword());
-                        jsonDocument1.save(new File(this.getInstance(FileService.class).getDatabaseDirectory(), "database.json"));
+                        jsonObject.save(new File(this.getInstance(FileService.class).getDatabaseDirectory(), "database.json"));
 
                         //Loading database
                         this.getDatabaseManager().load(ds.getHost(), ds.getPort(), ds.getUsername(), ds.getPassword(), ds.getCollectionOrTable(), ds.getDefaultDatabase(), DatabaseType.valueOf(setup.getDatabase().toUpperCase()));
@@ -330,13 +333,14 @@ public class CloudSystem extends CloudProcess {
         this.sendPacket(new PacketShutdown());
         this.getServiceManager().shutdownAll(() -> {
             this.getInstance(LogService.class).save();
-            this.getInstance(ConfigService.class).shutdown();
-            this.getInstance(ModuleService.class).shutdown();
-            this.getInstance(NetworkService.class).shutdown();
-            super.shutdown();
+            this.getInstance(ModuleService.class).shutdown(() -> {
+                this.getInstance(ConfigService.class).shutdown();
+                this.getInstance(NetworkService.class).shutdown();
+                super.shutdown();
 
-            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> Utils.deleteFolder(this.getInstance(FileService.class).getDynamicServerDirectory()), 5L);
-            this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 8L);
+                this.getInstance(Scheduler.class).scheduleDelayedTask(() -> Utils.deleteFolder(this.getInstance(FileService.class).getDynamicServerDirectory()), 5L);
+                this.getInstance(Scheduler.class).scheduleDelayedTask(() -> System.exit(0), 8L);
+            });
         });
 
     }

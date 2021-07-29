@@ -64,7 +64,7 @@ public class SignService implements ICloudService {
             new JsonDocument(this.signFile).save(this.signFile);
         }
         JsonDocument config = new JsonDocument(this.signFile);
-        this.cloudSigns = new LinkedList<>(config.keys(CloudSign.class));
+        this.cloudSigns = new LinkedList<>(config.keySet(CloudSign.class));
     }
 
     /**

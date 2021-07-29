@@ -7,6 +7,8 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 
+import java.util.Arrays;
+
 public class ModulesCommand {
 
 
@@ -20,12 +22,13 @@ public class ModulesCommand {
                 }
                 sender.sendMessage("INFO", "§bModules§7:");
                 for (DriverModule driverModule : CloudSystem.getInstance().getInstance(ModuleService.class).getDriverModules()) {
-                    sender.sendMessage("INFO", "§9" + driverModule.getBase().getName() + " §7| §bVersion " + driverModule.getBase().getVersion() + " §7| §bAuthor " + driverModule.getBase().getAuthor());
+                    sender.sendMessage("INFO", "§9" + driverModule.getBase().getName() + " §7| §bVersion " + driverModule.getBase().getVersion() + " §7| §bAuthor " + Arrays.toString(driverModule.getBase().getAuthor()));
                 }
             } else if (args[0].equalsIgnoreCase("rl")) {
-                CloudSystem.getInstance().getInstance(ModuleService.class).shutdown();
-                CloudSystem.getInstance().getInstance(ModuleService.class).load();
-                sender.sendMessage("INFO", "§aThe modules were §2reloaded§a!");
+                CloudSystem.getInstance().getInstance(ModuleService.class).shutdown(() -> {
+                    CloudSystem.getInstance().getInstance(ModuleService.class).load();
+                    sender.sendMessage("INFO", "§aThe modules were §2reloaded§a!");
+                });
             } else {
                 this.correctSyntax(sender);
             }
@@ -37,8 +40,6 @@ public class ModulesCommand {
                     sender.sendMessage("ERROR", "§cThe module §e" + module + " §cseems not to exist!");
                     return;
                 }
-                finalDriverModule.onDisable();
-                CloudSystem.getInstance().getInstance(Scheduler.class).scheduleDelayedTask(finalDriverModule::onEnable, 5L);
                 sender.sendMessage("INFO", "§aThe module §2" + finalDriverModule.getBase().getName() + " §awas §2reloaded§a!");
             } else {
                 this.correctSyntax(sender);

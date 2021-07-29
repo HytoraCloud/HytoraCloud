@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.bridge;
 
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
@@ -42,6 +42,12 @@ public interface BridgeInstance {
         return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
     }
 
+    /**
+     * Loads the ping of a player
+     * @param playerUniqueId the uuid of player
+     * @return ping as long
+     */
+    int getPing(UUID playerUniqueId);
 
     /**
      * The header and the footer

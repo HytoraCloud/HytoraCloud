@@ -15,7 +15,6 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.minecraft.MinecraftInfo;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
@@ -27,13 +26,13 @@ import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.utils.Reflections;
 import lombok.SneakyThrows;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.*;
@@ -42,6 +41,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -94,6 +94,25 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     }
 
 
+    /**
+     * Transforms a {@link MinecraftLocation} into bukkit {@link Location}
+     *
+     * @param location the mc location
+     * @return bukkit location
+     */
+    public Location fromLocation(MinecraftLocation location) {
+        return new Location(Bukkit.getWorld(location.getWorld()), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
+
+    /**
+     * Transforms a {@link Location} into bukkit {@link MinecraftLocation}
+     *
+     * @param location the bukkit location
+     * @return mc location
+     */
+    public MinecraftLocation toLocation(Location location) {
+        return new MinecraftLocation(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
 
     @Override
     public void onDisable() {
@@ -176,10 +195,10 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
                     .append("online-mode", Bukkit.getOnlineMode())
         );
 
-        List<PropertyObject> plugins = new LinkedList<>();
+        List<JsonObject<?>> plugins = new LinkedList<>();
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 
-            plugins.add(new PropertyObject()
+            plugins.add(JsonObject.serializable()
                     .append("name", plugin.getName())
                     .append("version", plugin.getDescription().getVersion())
                     .append("authors", plugin.getDescription().getAuthors())
@@ -435,6 +454,21 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public int getPing(UUID playerUniqueId) {
+        Player player = Bukkit.getPlayer(playerUniqueId);
+        if (player == null) {
+            return -1;
+        }
+        try {
+            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+            return (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     /*

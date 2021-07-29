@@ -57,7 +57,9 @@ public class SuggestionManager extends ListenerAdapter {
         this.jsonDocument.save();
 
         //Load saved suggestions
-        this.jsonDocument.forEach(Suggestion.class, this.pendingSuggestions::add);
+        for (String key : this.jsonDocument.keySet()) {
+            this.pendingSuggestions.add(this.jsonDocument.get(key, Suggestion.class));
+        }
         Hytora.getHytora().getLogManager().log("SUGGESTIONS", "§7Loaded §b" + this.pendingSuggestions.size() + " §7Pending §3Suggestions§8!");
 
         Hytora.getHytora().getDiscord().addEventListener(this);

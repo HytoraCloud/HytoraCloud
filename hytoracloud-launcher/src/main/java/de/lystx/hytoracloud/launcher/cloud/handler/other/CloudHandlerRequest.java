@@ -8,7 +8,6 @@ import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketReques
 import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroupAdd;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroupGet;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.property.PacketRequestAddProperty;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.property.PacketRequestGetProperty;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import net.hytora.networking.elements.packet.HytoraPacket;
@@ -70,16 +69,6 @@ public class CloudHandlerRequest implements PacketHandler {
                 offlinePlayer.addProperty(packetRequestAddProperty.getName(), packetRequestAddProperty.getProperty());
                 offlinePlayer.update();
                 packet.reply(ResponseStatus.SUCCESS);
-            } catch (Exception e) {
-                packet.reply(ResponseStatus.FAILED);
-            }
-
-        } else if (packet instanceof PacketRequestGetProperty) {
-            try {
-                PacketRequestGetProperty packetRequestGetProperty = (PacketRequestGetProperty)packet;
-                OfflinePlayer offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestGetProperty.getPlayerUUID());
-
-                packet.reply(ResponseStatus.SUCCESS, offlinePlayer.getProperty(packetRequestGetProperty.getName()).toString());
             } catch (Exception e) {
                 packet.reply(ResponseStatus.FAILED);
             }

@@ -62,8 +62,8 @@ public class SignUpdater {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitBridge.getInstance(), () -> {
             SignConfiguration configuration = ServerSelector.getInstance().getSignManager().getConfiguration();
             if (configuration.getKnockBackConfig().getBoolean("enabled")) {
-                double strength = (double) configuration.getKnockBackConfig().get("strength");
-                double distance = (double) configuration.getKnockBackConfig().get("distance");
+                double strength = configuration.getKnockBackConfig().getDouble("strength");
+                double distance = configuration.getKnockBackConfig().getDouble("distance");
                 Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> {
                     for (CloudSign sign : ServerSelector.getInstance().getSignManager().getCloudSigns()) {
                         World world = Bukkit.getWorld(sign.getWorld());

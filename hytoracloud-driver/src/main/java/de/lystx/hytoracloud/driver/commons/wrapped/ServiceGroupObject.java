@@ -11,8 +11,9 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -110,6 +111,14 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
             return;
         }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketInUpdateServiceGroup(this));
+    }
+
+    public JsonObject<?> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(JsonObject<?> properties) {
+        this.properties = (PropertyObject) properties;
     }
 
     public List<ITemplate> getTemplates() {

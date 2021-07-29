@@ -30,6 +30,8 @@ public class CloudCommand implements TabCompletable {
             if (player.hasPermission("cloudsystem.command")) {
                 if (args.length == 1) {
 
+                    player.sendMessage(player.getLocation().pullValue().toString());
+
                     if (args[0].equalsIgnoreCase("rl") || args[0].equalsIgnoreCase("reload")) {
                         CloudDriver.getInstance().sendPacket(new PacketReload());
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");

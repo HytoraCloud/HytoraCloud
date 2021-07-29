@@ -1,20 +1,18 @@
 package de.lystx.hytoracloud.driver.commons.storage;
 
 import com.google.gson.*;
+import com.google.gson.JsonObject;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.database.impl.DocumentDatabase;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Consumer;
 
 @Getter @Setter
-public class JsonDocument implements Iterable<JsonElement> {
+public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage.JsonObject<JsonDocument> {
 
     /**
      * Gson constant to (de-)serialize Objects
@@ -35,6 +33,11 @@ public class JsonDocument implements Iterable<JsonElement> {
      * The data of this Document
      */
     private JsonObject jsonObject;
+
+    /**
+     * The current default value
+     */
+    private Object defaultValue;
 
     /**
      * Constructs an Empty Document
@@ -60,23 +63,6 @@ public class JsonDocument implements Iterable<JsonElement> {
         } catch (Exception e) {
             jsonObject = new JsonObject();
         }
-    }
-
-    /**
-     * Parses the object from file
-     *
-     * @param file the file
-     */
-    public JsonDocument readFile(String file) {
-        File file1 = new File(file);
-        if (file1.exists()) {
-            try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
-                jsonObject = parser.parse(new BufferedReader(reader)).getAsJsonObject();
-            } catch (Exception e) {
-                jsonObject = new JsonObject();
-            }
-        }
-        return this;
     }
 
     /**
@@ -126,21 +112,18 @@ public class JsonDocument implements Iterable<JsonElement> {
         }
     }
 
-    /**
-     * Appends am Object to this Document
-     *
-     * @param key the key where it gets saved
-     * @param value the value
-     * @return current Document
-     */
-    public JsonDocument append(String key, Object value) {
+    @Override
+    public de.lystx.hytoracloud.driver.commons.storage.JsonObject<JsonDocument> append(String key, Object value) {
         try {
             if (value == null) {
                 return this;
             }
             if (value instanceof JsonDocument) {
-                JsonDocument document = (JsonDocument)value;
+                JsonDocument document = (JsonDocument) value;
                 this.jsonObject.add(key, document.getJsonObject());
+            } else if (value instanceof de.lystx.hytoracloud.driver.commons.storage.JsonObject) {
+                de.lystx.hytoracloud.driver.commons.storage.JsonObject<?> jsonObject = (de.lystx.hytoracloud.driver.commons.storage.JsonObject<?>) value;
+                this.jsonObject.add(key, parser.parse(jsonObject.toString()));
             } else {
                 this.jsonObject.add(key, GSON.toJsonTree(value));
             }
@@ -150,13 +133,8 @@ public class JsonDocument implements Iterable<JsonElement> {
         return this;
     }
 
-    /**
-     * Appends a whole Value to the document
-     *
-     * @param value the value to add
-     * @return current Document
-     */
-    public JsonDocument append(Object value) {
+    @Override
+    public de.lystx.hytoracloud.driver.commons.storage.JsonObject<JsonDocument> append(Object value) {
         if (value == null) {
             return this;
         }
@@ -164,49 +142,30 @@ public class JsonDocument implements Iterable<JsonElement> {
         return this;
     }
 
-    /**
-     * Removes an Object from a key
-     *
-     * @param key the key where the object is stored
-     * @return current Document
-     */
-    public JsonDocument remove(String key) {
+    @Override
+    public void remove(String key) {
         this.jsonObject.remove(key);
-        return this;
     }
 
-    /**
-     * Loads a list of objects with a given class
-     *
-     * @param tClass the class you want the objects to be
-     * @param <T> generic type
-     * @return list of objects
-     */
-    public <T> List<T> keys(Class<T> tClass) {
+    @Override
+    public <T> List<T> keySet(Class<T> tClass) {
         List<T> list = new ArrayList<>();
-        for (String key : this.keys()) {
-            list.add(this.getObject(key, tClass));
+        for (String key : this.keySet()) {
+            list.add(this.get(key, tClass));
         }
         return list;
     }
 
-    /**
-     * Loads the keys of this Document
-     *
-     * @return list of keys
-     */
-    public List<String> keys() {
+    @Override
+    public List<String> keySet() {
         List<String> list = new LinkedList<>();
         for (Map.Entry<String, JsonElement> jsonElementEntry : this.jsonObject.entrySet()) {
             list.add(jsonElementEntry.getKey());
         }
         return list;
     }
-    /**
-     * Loads the keys of this Document
-     *
-     * @return list of keys
-     */
+
+    @Override
     public List<String> keysExclude(String... strings) {
         List<String> list = new LinkedList<>();
         for (Map.Entry<String, JsonElement> jsonElementEntry : this.jsonObject.entrySet()) {
@@ -224,221 +183,132 @@ public class JsonDocument implements Iterable<JsonElement> {
         return list;
     }
 
-    /**
-     * Returns a String by a Key
-     *
-     * @param key the key where the object is stored
-     * @return current Document
-     */
+    @Override
     public String getString(String key) {
         if (!this.jsonObject.has(key)) {
-            return "ERROR";
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof String ? (String) this.defaultValue : null;
         }
         return this.jsonObject.get(key).getAsString();
     }
 
-    /**
-     * Returns a String by a Key
-     * And appends and returns a default value if not set
-     *
-     * @param key the key where the object is stored
-     * @param value the default Value
-     * @return current Document
-     */
-    public String getString(String key, String value) {
-        if (!this.jsonObject.has(key)) {
-            this.jsonObject.addProperty(key, value);
-            return value;
-        }
-        return this.jsonObject.get(key).getAsString();
-    }
-
-    /**
-     * Returns an Integer by a Key
-     *
-     * @param key the key where the object is stored
-     * @return current Document
-     */
+    @Override
     public int getInteger(String key) {
         if (!this.jsonObject.has(key)) {
-            return -1;
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof Integer ? (Integer) this.defaultValue : -1;
         }
         return this.jsonObject.get(key).getAsInt();
     }
 
-    /**
-     * Returns a Integer by a Key
-     * And appends and returns a default value if not set
-     *
-     * @param key the key where the object is stored
-     * @param value the default Value
-     * @return current Document
-     */
-    public int getInteger(String key, Integer value) {
-        if (!this.jsonObject.has(key)) {
-            this.jsonObject.addProperty(key, value);
-            return value;
-        }
-        return this.jsonObject.get(key).getAsInt();
-    }
-
-    /**
-     * Returns an float by a Key
-     *
-     * @param key the key where the object is stored
-     * @return current Document
-     */
-    public double getFloat(String key) {
-        if (!this.jsonObject.has(key)) {
-            return -1;
-        }
-        return this.jsonObject.get(key).getAsDouble();
-    }
-
-    /**
-     * Returns a float by a Key
-     * And appends and returns a default value if not set
-     *
-     * @param key the key where the object is stored
-     * @param value the default Value
-     * @return current Document
-     */
-    public double getFloat(String key, double value) {
-        if (!this.jsonObject.has(key)) {
-            this.jsonObject.addProperty(key, value);
-            return value;
-        }
-        return this.jsonObject.get(key).getAsDouble();
-    }
-
-    /**
-     * Returns an long by a Key
-     *
-     * @param key the key where the object is stored
-     * @return current Document
-     */
+    @Override
     public long getLong(String key) {
         if (!this.jsonObject.has(key)) {
-            return -1;
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof Long ? (Long) this.defaultValue : -1;
         }
         return this.jsonObject.get(key).getAsLong();
     }
 
-    /**
-     * Returns a float by a Key
-     * And appends and returns a default value if not set
-     *
-     * @param key the key where the object is stored
-     * @param value the default Value
-     * @return current Document
-     */
-    public long getLong(String key, long value) {
+    @Override
+    public double getDouble(String key) {
         if (!this.jsonObject.has(key)) {
-            this.jsonObject.addProperty(key, value);
-            return value;
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof Double ? (Double) this.defaultValue : -1;
         }
-        return this.jsonObject.get(key).getAsLong();
+        return this.jsonObject.get(key).getAsDouble();
     }
 
-    /**
-     * Returns a Boolean by a Key
-     *
-     * @param key the key where the object is stored
-     * @return current Document
-     */
+    @Override
     public boolean getBoolean(String key) {
         if (!this.jsonObject.has(key)) {
-            return false;
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof Boolean ? (Boolean) this.defaultValue : false;
         }
         return this.jsonObject.get(key).getAsBoolean();
     }
 
-    /**
-     * Returns a Boolean by a Key
-     * And appends and returns a default value if not set
-     *
-     * @param key the key where the object is stored
-     * @param value the default Value
-     * @return current Document
-     */
-    public boolean getBoolean(String key, Boolean value) {
+    @Override
+    public JsonElement getElement(String key) {
         if (!this.jsonObject.has(key)) {
-            this.jsonObject.addProperty(key, value);
-            return value;
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof JsonElement ? (JsonElement) this.defaultValue : null;
         }
-        return this.jsonObject.get(key).getAsBoolean();
+        return this.jsonObject.get(key);
     }
 
-
-    /**
-     * Returns a {@link JsonArray} by key
-     *
-     * @param key the key where the array is stored
-     * @return array
-     */
-    public JsonArray getArray(String key) {
+    @Override
+    public JsonArray getJsonArray(String key) {
         if (!this.jsonObject.has(key)) {
-            return null;
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof JsonArray ? (JsonArray) this.defaultValue : null;
         }
         return this.jsonObject.get(key).getAsJsonArray();
     }
 
-    /**
-     * Checks if this document has a value
-     * stored under this key
-     *
-     * @param key the provided key
-     * @return boolean
-     */
+
+    @Override
+    public de.lystx.hytoracloud.driver.commons.storage.JsonObject<JsonDocument> def(Object defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
+    }
+
+    @Override
     public boolean has(String key) {
         return this.jsonObject.has(key);
     }
 
-    /**
-     * Checks if document is empty
-     * @return boolean
-     */
-    public Boolean isEmpty() {
-        return this.keys().isEmpty();
+    @Override
+    public boolean isEmpty() {
+        return this.keySet().isEmpty();
     }
 
-    /**
-     * Clears this document
-     * (Removes every object)
-     */
+    @Override
     public void clear() {
-        this.keys().forEach(this::remove);
+        this.keySet().forEach(this::remove);
     }
 
-    /**
-     * Returns a Sub-Document inside this Document
-     * to work with it
-     *
-     * @param key the key where its stored
-     * @return document
-     */
-    public JsonDocument getJson(String key) {
-        return new JsonDocument(this.getJsonObject(key));
-    }
-
-    /**
-     * Returns a {@link JsonObject} from key
-     *
-     * @param key the key where its stored
-     * @return jsonObject
-     */
-    public JsonObject getJsonObject(String key) {
+    @Override
+    public JsonObject getGoogleJsonObject(String key) {
         return this.jsonObject.get(key).getAsJsonObject();
     }
 
-
-    /**
-     * Returns a raw Object from key
-     * @param key the key
-     * @return object
-     */
-    public Object getObject(String key) {
+    @Override
+    public Object get(String key) {
         return this.jsonObject.get(key);
+    }
+
+    @Override
+    public de.lystx.hytoracloud.driver.commons.storage.JsonObject<?> getObject(String key) {
+        return de.lystx.hytoracloud.driver.commons.storage.JsonObject.gson(this.getGoogleJsonObject(key).toString());
     }
 
     /**
@@ -448,121 +318,97 @@ public class JsonDocument implements Iterable<JsonElement> {
      * @param tClass the type of what you want to get
      * @return the object
      */
-    public <T> T getObject(JsonObject jsonObject, Class<T> tClass) {
+    public <T> T get(JsonObject jsonObject, Class<T> tClass) {
         if (jsonObject == null) {
             return null;
         }
         return GSON.fromJson(jsonObject, tClass);
     }
 
-    /**
-     * Returns this whole Document as
-     * @param tClass the class u want it to be
-     * @return the object
-     */
+    @Override
     public <T> T getAs(Class<T> tClass) {
-        return this.getObject(this.getJsonObject(), tClass);
+        return this.get(this.getJsonObject(), tClass);
     }
 
-    /**
-     * Returns an Object from a given Class
-     *
-     * @param key the key where its stored
-     * @param tClass the type of what you want to get
-     * @return the object
-     */
-    public <T> T getObject(String key, Class<T> tClass) {
-        return this.getObject(this.getJsonObject(key), tClass);
-    }
-    /**
-     * Returns an Object from a given Class
-     *
-     * @param key the key where its stored
-     * @param type the type of what you want to get
-     * @return the object
-     */
-    public <T> T getObject(String key, Type type) {
-        return GSON.fromJson(this.getJsonObject(key), type);
+    @Override
+    public <T> T get(String key, Class<T> tClass) {
+        if (!this.has(key)) {
+            return this.defaultValue != null && this.defaultValue.getClass().equals(tClass) ? (T) this.defaultValue : null;
+        }
+        return this.get(this.getGoogleJsonObject(key), tClass);
     }
 
-    /**
-     * Returns a List full of custom objects
-     *
-     * @param key the key where the list is stored
-     * @param tClass the class of the object you want
-     * @return list
-     */
+    @Override
+    public <T> T get(String key, Type type) {
+        if (!this.has(key)) {
+            return this.defaultValue != null ? (T) this.defaultValue : null;
+        }
+        return GSON.fromJson(this.getGoogleJsonObject(key), type);
+    }
+
+    @Override
     public <T> List<T> getList(String key, Class<T> tClass) {
+        if (!this.has(key)) {
+            return this.defaultValue != null && this.defaultValue instanceof List ? (List<T>) this.defaultValue : null;
+        }
         List<T> tList = new ArrayList<>();
-        JsonArray array = this.getArray(key);
+        JsonArray array = this.getJsonArray(key);
         for (JsonElement jsonElement : array) {
             tList.add(GSON.fromJson(jsonElement, tClass));
         }
         return tList;
     }
 
-    /**
-     * Returns a list full of strings
-     *
-     * @param key the key where the list is stored
-     * @return list
-     */
+    @Override
     public List<String> getStringList(String key) {
+        if (!this.has(key)) {
+            return this.defaultValue != null && this.defaultValue instanceof List ? (List<String>) this.defaultValue : null;
+        }
         List<String> list = new LinkedList<>();
 
-        for (JsonElement jsonElement : this.getArray(key)) {
+        for (JsonElement jsonElement : this.getJsonArray(key)) {
             list.add(jsonElement.getAsString());
         }
         return list;
     }
 
-    /**
-     * Saves it (only if file is set)
-     */
+
+    @Override
     public void save() {
         this.save(this.file);
     }
 
-    /**
-     * Saves this Document to a file
-     *
-     * @param file the file to save it to
-     */
+    @Override
     public void save(File file) {
         this.file = file;
         try (PrintWriter w = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), true)) {
-            w.print(GSON.toJson(this.getJsonObject()));
+            w.print(GSON.toJson(this.jsonObject));
             w.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
+    @Override
     public void save(OutputStream outputStream) {
         try (PrintWriter w = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true)) {
-            w.print(GSON.toJson(this.getJsonObject()));
+            w.print(GSON.toJson(this.jsonObject));
             w.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Returns Document as formatted
-     * Json String with PrettyPrinting
-     *
-     * @return string
-     */
-    public String toString() {
-        return GSON.toJson(this.getJsonObject());
+    @Override
+    public void delete() {
+        this.clear();
+        this.file.delete();
     }
 
-    /**
-     * Builds the object
-     * @return data
-     */
-    public JsonObject build() {
-        return jsonObject;
+    @Override
+    public String toString() {
+        return GSON.toJson(this.jsonObject);
     }
 
     /**
@@ -586,72 +432,5 @@ public class JsonDocument implements Iterable<JsonElement> {
     public static <T> T fromClass(String input, Class<T> tClass) {
         return new JsonDocument(input).getAs(tClass);
     }
-    /**
-     * Transforms a String into a list
-     *
-     * @param input the input of the string
-     * @param listClass the type of the list
-     * @return object
-     */
-    public static <V> List<V> getListFromClass(String input, Class<V> listClass) {
-        List<V> list = new LinkedList<>();
-        for (JsonElement jsonElement : new JsonDocument(input).getJsonObject().getAsJsonArray()) {
-            JsonDocument document = new JsonDocument(jsonElement.toString());
-            list.add(document.getAs(listClass));
-        }
-        return list;
-    }
 
-    /**
-     * Iterates through the builder with a given class
-     *
-     * @param tClass the class
-     * @param consumer the consumer
-     * @param <T> the generic type
-     */
-    public <T> void forEach(Class<T> tClass, Consumer<T> consumer) {
-        List<T> tList = new ArrayList<>();
-
-        for (String key : this.keys()) {
-            tList.add(this.getObject(key, tClass));
-        }
-        tList.forEach(consumer);
-    }
-
-
-    @NotNull
-    @Override
-    public Iterator<JsonElement> iterator() {
-        List<JsonElement> objects = new ArrayList<>();
-        for (String key : keys()) {
-            objects.add(this.jsonObject.get(key));
-        }
-        return objects.iterator();
-    }
-
-
-    /**
-     * Transforms this entity to a serializable map
-     *
-     * @return map filled with all objects
-     */
-    public Map<String, Object> toSerializableMap() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        for (String key : this.keys()) {
-            map.getOrDefault(key, this.getObject(key));
-        }
-        return map;
-    }
-
-    /**
-     * Deletes the current file
-     */
-    public void delete() {
-        this.clear();
-        this.file.delete();
-    }
-
-    public JsonDocument name(String name) {
-        return this.append(DocumentDatabase.NAME_KEY, name);
-    }
 }

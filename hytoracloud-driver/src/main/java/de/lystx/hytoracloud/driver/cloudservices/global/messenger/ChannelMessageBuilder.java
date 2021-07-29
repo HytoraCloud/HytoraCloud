@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.global.messenger;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.Identification;
 import de.lystx.hytoracloud.driver.commons.wrapped.ChannelMessageObject;
 
@@ -23,7 +24,7 @@ public class ChannelMessageBuilder {
     /**
      * The data
      */
-    private JsonDocument document;
+    private JsonObject<?> document;
 
     /**
      * The receiver
@@ -58,7 +59,7 @@ public class ChannelMessageBuilder {
      * @param document the document
      * @return current builder
      */
-    public ChannelMessageBuilder document(JsonDocument document) {
+    public ChannelMessageBuilder document(JsonObject<?> document) {
         this.document = document;
         return this;
     }

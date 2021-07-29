@@ -128,7 +128,7 @@ public interface ProxyBridge {
         try {
             IService service;
             PermissionGroup permissionGroup;
-            if (cloudPlayer == null || cloudPlayer.getPermissionGroup() == null) {
+            if (cloudPlayer == null || cloudPlayer.getCachedPermissionGroup() == null) {
                 permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
             } else {
                 permissionGroup = cloudPlayer.getCachedPermissionGroup();
@@ -245,7 +245,7 @@ public interface ProxyBridge {
      * @param uniqueId the uuid of the player
      * @return ping of player
      */
-    long getPing(UUID uniqueId);
+    int getPing(UUID uniqueId);
 
     /**
      * Kicks a player from the network

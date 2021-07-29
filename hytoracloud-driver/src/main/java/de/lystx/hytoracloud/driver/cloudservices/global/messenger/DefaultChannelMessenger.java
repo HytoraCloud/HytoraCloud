@@ -27,16 +27,18 @@ public class DefaultChannelMessenger implements IChannelMessenger {
     @Override
     public void registerChannel(String channel, Consumer<IChannelMessage> consumer) {
         this.cache.put(channel, consumer);
-        CloudDriver.getInstance().getConnection().registerChannelHandler(channel, new Consumer<RepliableComponent>() {
-            @Override
-            public void accept(RepliableComponent reply) {
-                Component component = reply.getComponent();
-                if (component.has("iMessage")) {
-                    IChannelMessage iChannelMessage = component.get("iMessage");
-                    consumer.accept(iChannelMessage);
+        CloudDriver.getInstance().executeIf(() -> {
+            CloudDriver.getInstance().getConnection().registerChannelHandler(channel, new Consumer<RepliableComponent>() {
+                @Override
+                public void accept(RepliableComponent reply) {
+                    Component component = reply.getComponent();
+                    if (component.has("iMessage")) {
+                        IChannelMessage iChannelMessage = component.get("iMessage");
+                        consumer.accept(iChannelMessage);
+                    }
                 }
-            }
-        });
+            });
+        }, () -> CloudDriver.getInstance().getConnection() != null);
     }
 
     @Override
@@ -58,6 +60,7 @@ public class DefaultChannelMessenger implements IChannelMessenger {
         HytoraConnection connection = CloudDriver.getInstance().getConnection();
         if (connection instanceof HytoraClient) {
             HytoraClient client = (HytoraClient)connection;
+            component.setReceiver("SERVER");
             client.sendComponent(component);
         } else {
             HytoraServer server = (HytoraServer) connection;

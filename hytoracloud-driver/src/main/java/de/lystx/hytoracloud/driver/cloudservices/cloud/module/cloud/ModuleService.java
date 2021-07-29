@@ -1,17 +1,23 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleState;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleTask;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ScheduledModuleTask;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.HandlerMethod;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.handler.EventMarker;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import lombok.Getter;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 @Getter
 
@@ -28,11 +34,13 @@ public class ModuleService implements ICloudService {
     private final List<DriverModule> driverModules;
     private final ModuleLoader moduleLoader;
     private final File moduleDir;
+    private final Map<String, Map<Object, List<HandlerMethod<ModuleTask>>>> moduleTasks;
 
     public ModuleService(File moduleDir) {
         this.moduleDir = moduleDir;
         moduleDir.mkdirs();
         this.driverModules = new LinkedList<>();
+        this.moduleTasks = new HashMap<>();
 
         this.moduleLoader = new ModuleLoader(moduleDir, this, CloudDriver.getInstance());
         this.load();
@@ -48,17 +56,104 @@ public class ModuleService implements ICloudService {
     }
 
     /**
+     * Registers all tasks for a {@link IModule}
+     *
+     * @param module the module
+     * @param objectClass the class
+     */
+    public void registerModuleTasks(IModule module, Object objectClass) {
+        List<HandlerMethod<ModuleTask>> moduleTasks = new ArrayList<>();
+
+        for (Method m : objectClass.getClass().getDeclaredMethods()) {
+            ModuleTask annotation = m.getAnnotation(ModuleTask.class);
+            ScheduledModuleTask scheduledModuleTask = m.getAnnotation(ScheduledModuleTask.class);
+
+            if (annotation != null) {
+                HandlerMethod<ModuleTask> moduleTaskHandlerMethod = new HandlerMethod<>(objectClass, m, Void.class, annotation);
+                if (scheduledModuleTask != null) {
+                    moduleTaskHandlerMethod.setObjects(new Object[]{scheduledModuleTask});
+                }
+                moduleTasks.add(moduleTaskHandlerMethod);
+            }
+        }
+
+        moduleTasks.sort(Comparator.comparingInt(em -> em.getAnnotation().id()));
+
+        Map<Object, List<HandlerMethod<ModuleTask>>> listMap = this.moduleTasks.get(module.getName());
+        if (listMap == null) {
+            listMap = new HashMap<>();
+        }
+        listMap.put(objectClass, moduleTasks);
+        this.moduleTasks.put(module.getName(), listMap);
+
+    }
+
+    /**
+     * Calls all tasks for a {@link IModule}
+     *
+     * @param module the module
+     * @param state the current state
+     */
+    public void callTasks(IModule module, ModuleState state) {
+        Map<Object, List<HandlerMethod<ModuleTask>>> map = this.moduleTasks.get(module.getName());
+        if (map == null) {
+            return;
+        }
+        map.forEach((object, handlers) -> {
+            for (HandlerMethod<ModuleTask> em : handlers) {
+                if (em.getObjects() != null && em.getObjects()[0] instanceof ScheduledModuleTask) {
+                    ScheduledModuleTask scheduledModuleTask = (ScheduledModuleTask)em.getObjects()[0];
+                    Scheduler scheduler = CloudDriver.getInstance().getScheduler();
+
+                    long delay = scheduledModuleTask.delay();
+                    boolean sync = scheduledModuleTask.sync();
+                    long repeat = scheduledModuleTask.repeat();
+
+                    if (repeat != -1) {
+                        if (sync) {
+                            scheduler.scheduleRepeatingTask(() -> this.subExecute(em, state), delay, repeat);
+                        } else {
+                            scheduler.scheduleRepeatingTaskAsync(() -> this.subExecute(em, state), delay, repeat);
+                        }
+                    } else {
+                        if (sync) {
+                            scheduler.scheduleDelayedTask(() -> this.subExecute(em, state), delay);
+                        } else {
+                            scheduler.scheduleDelayedTaskAsync(() -> this.subExecute(em, state), delay);
+                        }
+                    }
+                } else {
+                    this.subExecute(em, state);
+                }
+            }
+        });
+    }
+
+    private void subExecute(HandlerMethod<ModuleTask> em, ModuleState state) {
+
+        if (em.getAnnotation().state() == state) {
+            CloudDriver.getInstance().runTask(em.getMethod(), () -> {
+                try {
+                    em.getMethod().invoke(em.getListener());
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    /**
      * Enables all modules
      */
     public void load() {
         this.moduleLoader.loadModules();
-        this.driverModules.forEach(driverModule -> {
+        for (DriverModule driverModule : this.driverModules) {
             CloudDriver.getInstance().executeIf(() -> {
                 if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
-                    driverModule.onEnable();
+                    this.callTasks(driverModule, ModuleState.STARTING);
                 }
             }, () -> CloudDriver.getInstance().getServiceType() != ServiceType.NONE);
-        });
+        }
         if (CloudDriver.getInstance().getParent() != null) {
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
         }
@@ -67,26 +162,29 @@ public class ModuleService implements ICloudService {
     /**
      * Disables all modules
      */
-    public void shutdown() {
-        this.driverModules.forEach(driverModule -> {
-
-            CloudDriver.getInstance().executeIf(() -> {
-                if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
-                    driverModule.onDisable();
-                }
-            }, () -> CloudDriver.getInstance().getServiceType() != ServiceType.NONE);
-        });
+    public void shutdown(Runnable runnable) {
+        int count = this.driverModules.size();
+        if (this.driverModules.isEmpty()) {
+            runnable.run();
+        }
+        for (DriverModule driverModule : this.driverModules) {
+            if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
+                this.callTasks(driverModule, ModuleState.STOPPING);
+            }
+            count--;
+            if (count <= 0) {
+                runnable.run();
+            }
+        }
     }
 
     @Override
     public void reload() {
-        this.driverModules.forEach(driverModule -> {
-            CloudDriver.getInstance().executeIf(() -> {
-                if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
-                    driverModule.onReload();
-                }
-            }, () -> CloudDriver.getInstance().getServiceType() != ServiceType.NONE);
-        });
+        for (DriverModule driverModule : this.driverModules) {
+            if (Arrays.asList(driverModule.info().allowedTypes()).contains(CloudDriver.getInstance().getServiceType())) {
+                this.callTasks(driverModule, ModuleState.RELOADING);
+            }
+        }
     }
 
     @Override

@@ -7,13 +7,13 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleEx
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
@@ -74,7 +74,7 @@ public class ServiceCommand {
                         player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getCurrentService().getGroup().getCurrentTemplate().getName());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
                         player.sendMessage("  §8» §bInternal CPU Usage §8┃ §7" + format);
-                        PropertyObject properties = CloudDriver.getInstance().getCurrentService().getProperties();
+                        JsonObject<?> properties = CloudDriver.getInstance().getCurrentService().getProperties();
                         if (!properties.keySet().isEmpty()) {
                             for (String key : properties.keySet()) {
                                 player.sendMessage("  §8» §b" + key + " §8┃ §7" + properties.get(key));

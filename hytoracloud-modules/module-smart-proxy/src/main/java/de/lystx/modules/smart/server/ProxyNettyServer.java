@@ -42,6 +42,15 @@ public class ProxyNettyServer {
     }
 
     /**
+     * Unbinds this server
+     */
+    public void unbind() {
+        //Shutting down all groups
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
+
+    /**
      * Binds this server
      *
      * @throws Exception if something goes wrong

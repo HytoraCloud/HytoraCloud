@@ -6,6 +6,8 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.event.handler.EventMar
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.handler.EventListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.lang.reflect.Method;
 
@@ -14,12 +16,14 @@ import java.lang.reflect.Method;
  *  and {@link EventMarker}
  * @param <T>
  */
-@Getter @AllArgsConstructor
-public class EventMethod<T> {
+@Getter @RequiredArgsConstructor
+public class HandlerMethod<T> {
 
-    private final EventListener listener;
+    private final Object listener;
     private final Method method;
     private final Class<?> aClass;
     private final T annotation;
 
+    @Setter
+    private Object[] objects;
 }

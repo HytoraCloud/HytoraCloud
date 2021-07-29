@@ -1,6 +1,7 @@
 
 package de.lystx.hytoracloud.driver.cloudservices.global.cloudflare;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -14,6 +15,8 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -155,11 +158,11 @@ public class CloudFlareRequest<T> {
     }
 
     public CloudFlareRequest<T> body(T object) {
-        return this.body(new JsonDocument().append(object).build());
+        return this.body(new JsonDocument().append(object).toString());
     }
 
     public CloudFlareRequest<T> body(String s) {
-        return this.body(new JsonDocument(s).build());
+        return this.body(new JsonDocument(s).getJsonObject());
     }
 
     /**
@@ -214,8 +217,6 @@ public class CloudFlareRequest<T> {
     /**
      * Sends request. Parses the json result as the object type.
      *
-     * @param objectType class of object
-     * @param <T>        type of object
      * @return CloudflareResponse<T>
      */
     @SneakyThrows
@@ -237,8 +238,6 @@ public class CloudFlareRequest<T> {
     /**
      * Sends the request and it might return
      * a list of objects or just one object of the given type
-     *
-     * @param <T> the generic
      * @return response
      */
     @SneakyThrows
@@ -254,7 +253,7 @@ public class CloudFlareRequest<T> {
         // Check if result is json array.
         if (json.get("result").isJsonArray() ) {
             // Map object from json array to object list.
-            object = (T) Utils.toListOfObjects(json.getAsJsonArray( "result" ), typeClass);
+            object = (T) toListOfObjects(json.getAsJsonArray( "result" ), typeClass);
         } else if (json.get("result").isJsonObject() )
             // json is a json object and the object is not mapped in a List
             object = CloudFlareAuth.GSON.fromJson(json.getAsJsonObject("result"), typeClass);
@@ -264,10 +263,29 @@ public class CloudFlareRequest<T> {
         return new CloudFlareResponse<>(json, object, httpResponse.isSuccessful(), httpResponse.getStatus(), httpResponse.getMessage());
     }
 
+    //Internal method to util
+    public static  <T> List<T> toListOfObjects(JsonArray jsonArray, Class<T> objectType) {
+        return CloudFlareAuth.GSON.fromJson(jsonArray, new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[]{objectType};
+            }
+
+            @Override
+            public Type getRawType() {
+                return List.class;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        });
+    }
+
     /**
      * Sends request. Parses and maps all entries in the json array result as a List<object type>.
      *
-     * @param <T>        type of object
      * @return CloudflareResponse
      */
     public CloudFlareResponse<List<T>> asList() {
@@ -275,7 +293,7 @@ public class CloudFlareRequest<T> {
         HttpResponse<String> httpResponse = response().getLeft();
         
         if (json.get("result").isJsonArray()) {
-            return new CloudFlareResponse<>(json, Utils.toListOfObjects(json.getAsJsonArray("result"), typeClass), httpResponse.isSuccessful(), httpResponse.getStatus(), httpResponse.getMessage());
+            return new CloudFlareResponse<>(json, toListOfObjects(json.getAsJsonArray("result"), typeClass), httpResponse.isSuccessful(), httpResponse.getStatus(), httpResponse.getMessage());
         } else if (json.get("result").isJsonObject()) {
             throw new IllegalStateException("Property 'result' is not a json array, because it is a json object use asObject() instead of asObjectList().");
         }

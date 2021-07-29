@@ -30,7 +30,7 @@ public class CloudHandlerStart implements PacketHandler {
             CloudDriver.getInstance().getServiceManager().startService(get);
         } else if (packet instanceof PacketInStartGroupWithProperties) {
             PacketInStartGroupWithProperties packetPlayInStartGroup = (PacketInStartGroupWithProperties) packet;
-            IServiceGroup group = packetPlayInStartGroup.getIServiceGroup();
+            IServiceGroup group = packetPlayInStartGroup.getGroup();
             IServiceGroup get = this.cloudSystem.getInstance(GroupService.class).getGroup(group.getName());
             if (get == null) {
                 cloudSystem.getParent().getConsole().getLogger().sendMessage("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
@@ -39,7 +39,7 @@ public class CloudHandlerStart implements PacketHandler {
             CloudDriver.getInstance().getServiceManager().startService(get, packetPlayInStartGroup.getProperties());
         } else if (packet instanceof PacketInStartService) {
             PacketInStartService packetInStartService = (PacketInStartService)packet;
-            IService service = packetInStartService.getIService();
+            IService service = packetInStartService.getService();
             service.setProperties(packetInStartService.getProperties());
             CloudDriver.getInstance().getServiceManager().startService(service);
         }

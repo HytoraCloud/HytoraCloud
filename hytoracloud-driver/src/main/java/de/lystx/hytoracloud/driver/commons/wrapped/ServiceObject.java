@@ -17,7 +17,8 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,7 +75,15 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     private boolean authenticated;
 
     public ServiceObject(IServiceGroup group, int id, int port) {
-        this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), ServiceState.LOBBY, new PropertyObject(), (ServiceGroupObject) group, false);
+        this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), ServiceState.LOBBY, (PropertyObject) JsonObject.serializable(), (ServiceGroupObject) group, false);
+    }
+
+    public void setProperties(JsonObject<?> properties) {
+        this.properties = (PropertyObject) properties;
+    }
+
+    public JsonObject<?> getProperties() {
+        return properties;
     }
 
     public IServiceGroup getGroup() {
@@ -91,7 +100,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public void addProperty(String key, PropertyObject data) {
+    public void addProperty(String key, JsonObject<?> data) {
         this.properties.append(key, data);
     }
 
@@ -140,7 +149,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     public PluginInfo[] getPlugins() {
         List<PluginInfo> pluginInfos = new LinkedList<>();
 
-        JsonArray array = this.requestInfo().toDocument().getArray("plugins");
+        JsonArray array = this.requestInfo().getJsonArray("plugins");
 
         if (array != null) {
             for (JsonElement jsonElement : array) {

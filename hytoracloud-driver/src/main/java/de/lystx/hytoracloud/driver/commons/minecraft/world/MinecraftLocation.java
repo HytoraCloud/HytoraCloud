@@ -2,10 +2,11 @@ package de.lystx.hytoracloud.driver.commons.minecraft.world;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
-@Getter @AllArgsConstructor
+@Getter @AllArgsConstructor @ToString
 public class MinecraftLocation implements Serializable {
 
     private static final long serialVersionUID = 6469977870942812925L;

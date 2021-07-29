@@ -6,7 +6,6 @@ import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.DefaultModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModuleManager;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.DefaultChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessenger;
@@ -24,6 +23,7 @@ import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
+import de.lystx.hytoracloud.driver.commons.requests.RequestManager;
 import de.lystx.hytoracloud.driver.commons.service.IDService;
 import de.lystx.hytoracloud.driver.commons.service.PortService;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
@@ -84,7 +84,8 @@ import java.util.function.Consumer;
         todo = {
                 "1.17 Support",
                 "Higher Java Versions",
-                "FIx TabList-Updating"
+                "FIx TabList-Updating",
+                "Implement more DriverRequest"
         }
 )
 public class CloudDriver {
@@ -128,6 +129,8 @@ public class CloudDriver {
     private final IChannelMessenger messageManager; //Manage to message
     private final IMinecraftManager minecraftManager; //Manages minecraft
     private final ExecutorService executorService; //For task-execution
+    private final RequestManager requestManager; //For request managing
+
 
     /**
      * Initialises the Driver with a Type
@@ -157,6 +160,7 @@ public class CloudDriver {
         this.ticksPerSecond = new TicksPerSecond();
         this.idService = new IDService();
         this.portService = new PortService(25565, 30000);
+        this.requestManager = new RequestManager();
 
         //Register Default-Services
         CloudDriver.getInstance().getServiceRegistry().registerService(new FileService());
@@ -312,7 +316,7 @@ public class CloudDriver {
     public void registerNetworkHandler(NetworkHandler... networkHandlers) {
         this.networkHandlers.addAll(Arrays.asList(networkHandlers));
     }
-    
+
     /**
      * Sends a packet to the the cloudSystem
      * Without consumer to call back
@@ -449,8 +453,12 @@ public class CloudDriver {
      */
     public void setNetworkConfig(NetworkConfig networkConfig) {
         this.networkConfig = networkConfig;
-        this.portService.setServerPort(networkConfig.getServerStartPort());
-        this.portService.setProxyPort(networkConfig.getProxyStartPort());
+        try {
+            this.portService.setServerPort(networkConfig.getServerStartPort());
+            this.portService.setProxyPort(networkConfig.getProxyStartPort());
+        } catch (NullPointerException e) {
+            //Ignoring
+        }
     }
 
     /**

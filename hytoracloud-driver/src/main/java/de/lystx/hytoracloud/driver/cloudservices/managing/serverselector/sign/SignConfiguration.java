@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign;
 
-import de.lystx.hytoracloud.driver.commons.service.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -64,7 +64,7 @@ public class SignConfiguration implements Serializable {
         SignLayout loading4 = new SignLayout("LOADING", new String[]{"", "&8│ &bLoading... &8│", "&7%group% &8x &7⬛⬛⬛", ""}, "STAINED_CLAY", 14);
 
         return new SignConfiguration(20,
-                new PropertyObject()
+                (PropertyObject) JsonObject.serializable()
                     .append("enabled", true)
                     .append("strength", 0.7)
                     .append("distance", 0.5)

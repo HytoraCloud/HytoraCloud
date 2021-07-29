@@ -134,12 +134,12 @@ public class PermissionService implements ICloudService {
 
 
         List<PermissionGroup> groups = new ArrayList<>();
-        for (String key : jsonDocument.keys()) {
+        for (String key : jsonDocument.keySet()) {
             if (key.equalsIgnoreCase("enabled")) {
                 CloudDriver.getInstance().getPermissionPool().setEnabled(jsonDocument.getBoolean(key));
                 continue;
             }
-            PermissionGroup group = jsonDocument.getObject(key, PermissionGroup.class);
+            PermissionGroup group = jsonDocument.get(key, PermissionGroup.class);
             groups.add(group);
         }
 

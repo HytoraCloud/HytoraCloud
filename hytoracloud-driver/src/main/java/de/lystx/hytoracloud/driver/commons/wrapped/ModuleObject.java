@@ -1,6 +1,8 @@
 package de.lystx.hytoracloud.driver.commons.wrapped;
 
+import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModule;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.commons.enums.other.ModuleCopyType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,5 +57,10 @@ public class ModuleObject extends WrappedObject<IModule, ModuleObject> implement
     @Override
     Class<IModule> getInterface() {
         return IModule.class;
+    }
+
+    @Override
+    public void registerTasks(Object taskClassObject) {
+        CloudDriver.getInstance().getInstance(ModuleService.class).registerModuleTasks(this, taskClassObject);
     }
 }

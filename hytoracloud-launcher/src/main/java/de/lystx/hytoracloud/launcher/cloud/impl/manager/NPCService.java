@@ -103,7 +103,7 @@ public class NPCService implements ICloudService {
 
 
     public List<NPCMeta> toMetas() {
-        return this.jsonDocument.keys(NPCMeta.class);
+        return this.jsonDocument.keySet(NPCMeta.class);
     }
 
     /**

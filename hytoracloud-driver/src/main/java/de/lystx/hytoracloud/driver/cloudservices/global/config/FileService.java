@@ -5,6 +5,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
+import de.lystx.hytoracloud.driver.commons.interfaces.BooleanRequest;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -146,14 +147,23 @@ public class FileService implements ICloudService {
         }
 
         CloudDriver.getInstance().executeIf(() -> {
-            if (Utils.existsClass("org.apache.commons.io.FileUtils")) {
-                try {
-                    for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {
-                        if (file.isDirectory()) FileUtils.deleteDirectory(file); else FileUtils.forceDelete(file);
-                    }
-                } catch (IOException ignored) {}
+
+            for (File file : Objects.requireNonNull(this.dynamicServerDirectory.listFiles())) {
+                if (file.isDirectory()) {
+                    Utils.deleteFolder(file);
+                } else {
+                    file.delete();
+                }
             }
-        }, () -> Utils.existsClass("org.apache.commons.io.FileUtils"));
+
+        }, () -> {
+            try {
+                Class.forName("org.apache.commons.io.FileUtils");
+                return true;
+            } catch (ClassNotFoundException e) {
+                return false;
+            }
+        });
 
     }
 

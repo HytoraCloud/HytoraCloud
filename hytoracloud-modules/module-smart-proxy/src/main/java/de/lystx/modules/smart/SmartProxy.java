@@ -2,6 +2,8 @@ package de.lystx.modules.smart;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleInfo;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleState;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleTask;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
@@ -13,8 +15,8 @@ import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.modules.smart.commands.SmartProxyCommand;
 import de.lystx.modules.smart.packet.MinecraftPacket;
 import de.lystx.modules.smart.packet.PingPacket;
-import de.lystx.modules.smart.proxy.ProxyDownstreamHandler;
-import de.lystx.modules.smart.proxy.ProxyUpstreamHandler;
+import de.lystx.modules.smart.proxy.ForwardDownStream;
+import de.lystx.modules.smart.proxy.ForwardUpStream;
 import de.lystx.modules.smart.server.*;
 import de.lystx.modules.smart.utils.MinecraftState;
 import io.netty.bootstrap.Bootstrap;
@@ -43,30 +45,67 @@ import java.util.stream.Collectors;
 @Getter @Setter
 public class SmartProxy extends DriverModule {
 
+    private static final long serialVersionUID = -7805187373620103010L;
+
     //Config stuff
+    /**
+     * The searching mode for a free proxy
+     */
     private String proxySearchMode;
+
+    /**
+     * If module is enabled
+     */
     private boolean enabled;
 
     //Packet registry and network stuff
+    /**
+     * All registered {@link MinecraftPacket}s
+     */
     public static final Map<Integer, Class<? extends MinecraftPacket>> MINECRAFT_PACKETS = new HashMap<>();
-    public final static AttributeKey<MinecraftState> CONNECTION_STATE = AttributeKey.valueOf("connectionstate");
-    public final static AttributeKey<ProxyUpstreamHandler> UPSTREAM_HANDLER = AttributeKey.valueOf("upstreamhandler");
-    public final static AttributeKey<ProxyDownstreamHandler> DOWNSTREAM_HANDLER = AttributeKey.valueOf("downstreamhandler");
 
+    /**
+     * The connection states
+     */
+    public final static AttributeKey<MinecraftState> CONNECTION_STATE = AttributeKey.valueOf("connectionstate");
+
+    /**
+     * The {@link ForwardDownStream}s
+     */
+    public final static AttributeKey<ForwardDownStream> FORWARDING_DOWN = AttributeKey.valueOf("downstreamhandler");
+
+    /**
+     * The {@link ForwardUpStream}s
+     */
+    public final static AttributeKey<ForwardUpStream> FORWARDING_UP = AttributeKey.valueOf("upstreamhandler");
+
+    /**
+     * The netty server
+     */
     private ProxyNettyServer proxyNettyServer;
+
+    /**
+     * The netty channel
+     */
     private Channel channel;
+
+    /**
+     * The netty worker group
+     */
     private EventLoopGroup workerGroup;
 
-    //Instance
+    /**
+     * The static instance
+     */
     @Getter
     private static SmartProxy instance;
 
-    @Override
-    public void onLoadConfig() {
+    @ModuleTask(id = 1, state = ModuleState.LOADING)
+    public void loadConfig() {
         instance = this;
 
-        this.enabled = this.config.getBoolean("enabled", true);
-        this.proxySearchMode = this.config.getString("proxySearchMode", "RANDOM");
+        this.enabled = this.config.def(true).getBoolean("enabled");
+        this.proxySearchMode = this.config.def("RANDOM").getString("proxySearchMode");
         this.config.save();
 
         NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
@@ -87,8 +126,8 @@ public class SmartProxy extends DriverModule {
         networkConfig.update();
     }
 
-    @Override
-    public void onEnable() {
+    @ModuleTask(id = 2, state = ModuleState.STARTING)
+    public void startModule() {
         if (this.enabled) {
             this.workerGroup = new NioEventLoopGroup();
             this.proxyNettyServer = new ProxyNettyServer("127.0.0.1", 25565);
@@ -101,12 +140,9 @@ public class SmartProxy extends DriverModule {
         }
     }
 
-    @Override
-    public void onDisable() {
-    }
-
-    @Override
-    public void onReload() {
+    @ModuleTask(id = 3, state = ModuleState.STOPPING)
+    public void stopModule() {
+        this.proxyNettyServer.unbind();
     }
 
     /**
@@ -118,8 +154,8 @@ public class SmartProxy extends DriverModule {
      * @param login the login packet as buf
      */
     public void forwardRequestToNextProxy(Channel channel, IService proxy, ByteBuf login, int state) {
-        ProxyDownstreamHandler downstreamHandler = channel.attr(SmartProxy.DOWNSTREAM_HANDLER).get() == null ? new ProxyDownstreamHandler(channel) : channel.attr(SmartProxy.DOWNSTREAM_HANDLER).get();
-        channel.attr(SmartProxy.DOWNSTREAM_HANDLER).set(downstreamHandler);
+        ForwardDownStream downstreamHandler = channel.attr(SmartProxy.FORWARDING_DOWN).get() == null ? new ForwardDownStream(channel) : channel.attr(SmartProxy.FORWARDING_DOWN).get();
+        channel.attr(SmartProxy.FORWARDING_DOWN).set(downstreamHandler);
         channel.attr(SmartProxy.CONNECTION_STATE).set(MinecraftState.HANDSHAKE);
 
         new Bootstrap()
@@ -135,12 +171,12 @@ public class SmartProxy extends DriverModule {
                 }).connect(proxy.getAddress()).addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
 
-                        if (channel.attr(SmartProxy.UPSTREAM_HANDLER).get() == null) {
-                            ProxyUpstreamHandler upstreamHandler = new ProxyUpstreamHandler(channelFuture.channel(), downstreamHandler);
+                        if (channel.attr(SmartProxy.FORWARDING_UP).get() == null) {
+                            ForwardUpStream upstreamHandler = new ForwardUpStream(channelFuture.channel(), downstreamHandler);
                             channel.pipeline().addLast(upstreamHandler);
-                            channel.attr(SmartProxy.UPSTREAM_HANDLER).set(upstreamHandler);
+                            channel.attr(SmartProxy.FORWARDING_UP).set(upstreamHandler);
                         } else {
-                            channel.attr(SmartProxy.UPSTREAM_HANDLER).get().setChannel(channelFuture.channel());
+                            channel.attr(SmartProxy.FORWARDING_UP).get().setChannel(channelFuture.channel());
                         }
 
                         if (channel.pipeline().get("minecraftdecoder") != null) {
@@ -189,7 +225,13 @@ public class SmartProxy extends DriverModule {
                 if (this.proxySearchMode.equalsIgnoreCase("BALANCED")) {
                     value = proxies.get(0);
                 } else {
-                    value = proxies.get(proxies.size() - 1);
+                    for (int i = proxies.size() - 1; i >= 0; i--) {
+                        IService server = proxies.get(i);
+                        if (server.getPlayers().size() < server.getGroup().getMaxPlayers()) {
+                            value = server;
+                            break;
+                        }
+                    }
                 }
             }
         }

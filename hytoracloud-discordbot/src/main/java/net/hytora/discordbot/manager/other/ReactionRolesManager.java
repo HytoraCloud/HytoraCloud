@@ -1,6 +1,7 @@
 package net.hytora.discordbot.manager.other;
 
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.utils.StringCreator;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -25,7 +26,7 @@ public class ReactionRolesManager extends ListenerAdapter {
      */
     private final Map<String, String> rolesAndEmotes;
 
-    public ReactionRolesManager(String channel, JsonDocument jsonDocument) {
+    public ReactionRolesManager(String channel, JsonObject<?> jsonDocument) {
 
         this.rolesAndEmotes = new HashMap<>();
         this.textChannel = Hytora.getHytora().getDiscord().getTextChannelById(channel);
@@ -34,7 +35,7 @@ public class ReactionRolesManager extends ListenerAdapter {
 
 
             Hytora.getHytora().createRole(
-                    new JsonDocument()
+                    JsonObject.gson()
                             .append("color", "GRAY")
                             .append("name", role)
                             .append("mentionable", true)

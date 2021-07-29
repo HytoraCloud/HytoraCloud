@@ -10,6 +10,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabaseMana
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.impl.DefaultDatabaseFiles;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import lombok.Getter;
 
 import java.io.File;
@@ -27,7 +28,7 @@ import java.io.IOException;
 public class CloudSideDatabaseManager implements ICloudService, IDatabaseManager {
 
     private IDatabase database;
-    private JsonDocument jsonDocument;
+    private JsonObject<?> jsonDocument;
     private DatabaseType databaseType;
     private String host;
     private String username;
@@ -56,16 +57,16 @@ public class CloudSideDatabaseManager implements ICloudService, IDatabaseManager
      * Saves settings
      * @param jsonDocument
      */
-    public void reload(JsonDocument jsonDocument) {
+    public void reload(JsonObject<?> jsonDocument) {
 
         this.load(
-                jsonDocument.getString("host", "127.0.0.1"),
-                jsonDocument.getInteger("port", 3306),
-                jsonDocument.getString("username", "root"),
-                jsonDocument.getString("password", "pw"),
-                jsonDocument.getString("collectionOrTable", "value"),
-                jsonDocument.getString("defaultDatabase", "database"),
-                DatabaseType.valueOf(jsonDocument.getString("type", "FILES"))
+                jsonDocument.def("127.0.0.1").getString("host"),
+                jsonDocument.def(3306).getInteger("port"),
+                jsonDocument.def("root").getString("username"),
+                jsonDocument.def("pw").getString("password"),
+                jsonDocument.def("value").getString("collectionOrTable"),
+                jsonDocument.def("database").getString("defaultDatabase"),
+                DatabaseType.valueOf(jsonDocument.def("FILES").getString("type"))
         );
 
         this.jsonDocument = jsonDocument;

@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.*;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
