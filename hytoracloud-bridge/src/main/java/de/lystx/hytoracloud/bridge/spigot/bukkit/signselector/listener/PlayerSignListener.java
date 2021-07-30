@@ -39,7 +39,7 @@ public class PlayerSignListener implements Listener {
                 return;
             }
 
-            if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName()) && !service.getGroup().isMaintenance()) {
+            if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName()) && !service.getGroup().isMaintenance()) {
                 player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 return;
             }

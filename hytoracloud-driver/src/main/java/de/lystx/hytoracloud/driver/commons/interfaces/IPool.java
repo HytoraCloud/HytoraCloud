@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 
 import java.util.List;

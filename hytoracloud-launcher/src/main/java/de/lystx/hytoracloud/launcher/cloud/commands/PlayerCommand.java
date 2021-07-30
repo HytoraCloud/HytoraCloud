@@ -10,6 +10,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 
 import java.util.Date;
 import java.util.UUID;
@@ -98,6 +99,29 @@ public class PlayerCommand {
             cloudPlayer.kick(sb.toString());
             ps.unregisterPlayer(cloudPlayer);
             sender.sendMessage("INFO", "§7The player §b" + cloudPlayer.getName() + " §7was kicked for §a" + sb + "§7!");
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("connect")) {
+            String player = args[1];
+            String server = args[2];
+            ICloudPlayer cloudPlayer = ps.getCachedObject(player);
+            IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(server);
+
+            if (cloudPlayer == null) {
+                sender.sendMessage("ERROR", "§cThe player §e" + player + " §cseems not to be online!");
+                return;
+            }
+
+            if (service == null) {
+                sender.sendMessage("ERROR", "§cThe service §e" + server + " §cseems not to be online!");
+                return;
+            }
+
+            cloudPlayer.connect(service).addFutureListener(booleanIQuery -> {
+                if (booleanIQuery.isSuccess()) {
+                    sender.sendMessage("INFO", "§7The player §b" + cloudPlayer.getName() + " §7was connected to §a" + service.getName() + "§7!");
+                } else {
+                    sender.sendMessage("INFO", "§cSomething went wrong!");
+                }
+            });
         } else {
             this.correctSyntax(sender);
         }
@@ -107,6 +131,7 @@ public class PlayerCommand {
         sender.sendMessage("INFO", "§9Help for §bPlayers§7:");
         sender.sendMessage("INFO", "§9players <list> §7| Lists all players");
         sender.sendMessage("INFO", "§9players <info> <player> §7| Gives info on a player");
+        sender.sendMessage("INFO", "§9players <connect> <player> <server> §7| Connects a player to a server");
         sender.sendMessage("INFO", "§9players <kick> <player> <reason> §7| Kicks a player ");
     }
 }

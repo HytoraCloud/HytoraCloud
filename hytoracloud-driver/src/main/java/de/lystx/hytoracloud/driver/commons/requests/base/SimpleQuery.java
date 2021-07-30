@@ -9,7 +9,9 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 @Getter
 public class SimpleQuery<T> implements IQuery<T> {
@@ -30,6 +32,11 @@ public class SimpleQuery<T> implements IQuery<T> {
      * The latches to lock and unlock
      */
     private final Collection<CountDownLatch> countDownLatches;
+
+    /**
+     * All listeners
+     */
+    private final List<Consumer<IQuery<T>>> driverResponses;
 
     /**
      * The response if set
@@ -66,16 +73,23 @@ public class SimpleQuery<T> implements IQuery<T> {
      */
     private T timeOutValue;
 
-    public SimpleQuery(String typeDummy, T dummy) {
+    SimpleQuery(String typeDummy, T dummy) {
         this(new DriverRequestObject<>(typeDummy));
 
         this.dummyObject = dummy;
     }
 
-    public SimpleQuery(DriverRequest<T> request) {
+    SimpleQuery(DriverRequest<T> request) {
         this.request = request;
         this.countDownLatches = new ArrayList<>();
         this.timeOut = -1;
+        this.driverResponses = new ArrayList<>();
+    }
+
+    @Override
+    public IQuery<T> addFutureListener(Consumer<IQuery<T>> listener) {
+        this.driverResponses.add(listener);
+        return this;
     }
 
     @Override
@@ -99,7 +113,7 @@ public class SimpleQuery<T> implements IQuery<T> {
         if (success) {
             return response;
         }
-        throw getError();
+        throw getError() == null ? new DriverRequestException("The request timed out and no error was provided!", 0x99, NullPointerException.class) : getError();
     }
 
     @Override
@@ -124,6 +138,9 @@ public class SimpleQuery<T> implements IQuery<T> {
             this.response = (T) response.getData();
         } else {
             this.error = response.getError();
+        }
+        for (Consumer<IQuery<T>> driverRespons : this.driverResponses) {
+            driverRespons.accept(this);
         }
         for (CountDownLatch latch : countDownLatches) {
             latch.countDown();

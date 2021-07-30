@@ -108,7 +108,33 @@ public class PropertyObject implements JsonObject<PropertyObject> {
         if (this.defaultValue != null) {
             this.append(key, this.defaultValue);
         }
-        return ((defaultValue != null && defaultValue instanceof Integer) ? (int) defaultValue : null);
+        return ((defaultValue != null && defaultValue instanceof Integer) ? (int) defaultValue : -1);
+    }
+
+    @Override
+    public short getShort(String key) {
+        JsonDocument document = new JsonDocument(this.jsonString);
+        if (document.has(key)) {
+            return document.getShort(key);
+        }
+
+        if (this.defaultValue != null) {
+            this.append(key, this.defaultValue);
+        }
+        return ((defaultValue != null && defaultValue instanceof Short) ? (short) defaultValue : -1);
+    }
+
+    @Override
+    public byte getByte(String key) {
+        JsonDocument document = new JsonDocument(this.jsonString);
+        if (document.has(key)) {
+            return document.getByte(key);
+        }
+
+        if (this.defaultValue != null) {
+            this.append(key, this.defaultValue);
+        }
+        return ((defaultValue != null && defaultValue instanceof Byte) ? (byte) defaultValue : -1);
     }
 
     @Override
@@ -121,7 +147,7 @@ public class PropertyObject implements JsonObject<PropertyObject> {
         if (this.defaultValue != null) {
             this.append(key, this.defaultValue);
         }
-        return ((defaultValue != null && defaultValue instanceof Float) ? (Float) defaultValue : null);
+        return ((defaultValue != null && defaultValue instanceof Float) ? (Float) defaultValue : -1);
     }
 
     @Override
@@ -134,7 +160,7 @@ public class PropertyObject implements JsonObject<PropertyObject> {
         if (this.defaultValue != null) {
             this.append(key, this.defaultValue);
         }
-        return ((defaultValue != null && defaultValue instanceof Long) ? (long) defaultValue : null);
+        return ((defaultValue != null && defaultValue instanceof Long) ? (long) defaultValue : -1);
     }
 
     @Override
@@ -147,7 +173,7 @@ public class PropertyObject implements JsonObject<PropertyObject> {
         if (this.defaultValue != null) {
             this.append(key, this.defaultValue);
         }
-        return ((defaultValue != null && defaultValue instanceof Boolean) ? (boolean) defaultValue : null);
+        return ((defaultValue != null && defaultValue instanceof Boolean) ? (boolean) defaultValue : false);
     }
 
     @Override
@@ -160,7 +186,7 @@ public class PropertyObject implements JsonObject<PropertyObject> {
         if (this.defaultValue != null) {
             this.append(key, this.defaultValue);
         }
-        return ((defaultValue != null && defaultValue instanceof Short) ? (short) defaultValue : null);
+        return ((defaultValue != null && defaultValue instanceof Short) ? (short) defaultValue : -1);
     }
 
     @Override
@@ -187,6 +213,11 @@ public class PropertyObject implements JsonObject<PropertyObject> {
             this.append(key, this.defaultValue);
         }
         return ((defaultValue != null && defaultValue instanceof JsonArray) ? (JsonArray) defaultValue : null);
+    }
+
+    @Override
+    public JsonElement getBase() {
+        return new JsonDocument(this.jsonString).getBase();
     }
 
     @Override
@@ -218,6 +249,11 @@ public class PropertyObject implements JsonObject<PropertyObject> {
     @Override
     public <T> List<T> getList(String key, Class<T> tClass) {
         return new JsonDocument(this.jsonString).getList(key, tClass);
+    }
+
+    @Override
+    public <T> List<T> getInterfaceList(String key, Class<T> interfaceClass, Class<? extends T> wrapperObjectClass) {
+        return new JsonDocument(this.jsonString).getInterfaceList(key, interfaceClass, wrapperObjectClass);
     }
 
     @Override

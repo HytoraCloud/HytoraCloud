@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.bridge.global.manager;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
 import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
@@ -18,6 +19,7 @@ import lombok.Setter;
 import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -39,12 +41,27 @@ public class CloudBridgeServiceManager implements IServiceManager {
         return this.getCachedGroups().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
     }
 
+    @Override
+    public IService getCurrentService() {
+        JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
+        return this.getCachedObject(jsonDocument.getString("server"));
+    }
+
+    @Override
+    public void sync(List<IServiceGroup> groups) {
+        for (IServiceGroup group : groups) {
+            for (IService cachedObject : this.cachedObjects) {
+                if (cachedObject.getGroup().getName().equalsIgnoreCase(group.getName())) {
+                    cachedObject.setGroup(group);
+                    this.updateService(cachedObject);
+                }
+            }
+        }
+    }
 
     @Override
     public void updateGroup(IServiceGroup group) {
         IServiceGroup serviceGroup = this.getServiceGroup(group.getName());
-
-        List<IService> list = this.getCachedObjects(serviceGroup);
 
         for (IService service : this.cachedObjects) {
             if (service.getGroup().getName().equalsIgnoreCase(group.getName())) {

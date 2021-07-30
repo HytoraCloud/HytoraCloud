@@ -5,13 +5,10 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.*;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketConnectServer;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.networking.elements.packet.Packet;
 import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
-import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 
 import java.util.UUID;
@@ -60,16 +57,7 @@ public class ProxyHandlerCloudPlayer implements PacketHandler {
     public void handle(Packet packet) {
         ProxyBridge proxyBridge = CloudBridge.getInstance().getProxyBridge();
 
-       if (packet instanceof PacketRequestPing) {
-            PacketRequestPing packetOutPingRequest = (PacketRequestPing)packet;
-            UUID uuid = packetOutPingRequest.getUuid();
-            packet.reply(ResponseStatus.SUCCESS, proxyBridge.getPing(uuid));
-
-        } else if (packet instanceof PacketConnectServer) {
-            PacketConnectServer packetConnectServer = (PacketConnectServer)packet;
-            proxyBridge.connectPlayer(packetConnectServer.getUuid(), packetConnectServer.getServer());
-
-       } else if (packet instanceof PacketSendComponent) {
+        if (packet instanceof PacketSendComponent) {
             PacketSendComponent packetSendComponent = (PacketSendComponent)packet;
             proxyBridge.sendComponent(packetSendComponent.getUuid(), packetSendComponent.getChatComponent());
 

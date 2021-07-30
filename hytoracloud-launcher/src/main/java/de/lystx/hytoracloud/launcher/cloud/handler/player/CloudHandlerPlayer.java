@@ -2,7 +2,6 @@ package de.lystx.hytoracloud.launcher.cloud.handler.player;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUpdatePlayer;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPing;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerNamed;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerUniqueId;
@@ -76,13 +75,5 @@ public class CloudHandlerPlayer implements PacketHandler {
         }
 
 
-        if (packet instanceof PacketRequestPing) {
-
-            PacketRequestPing packetOutPingRequest = (PacketRequestPing)packet;
-            ICloudPlayer cachedPlayer = playerManager.getCachedObject(packetOutPingRequest.getUuid());
-
-            packet.reply(ResponseStatus.SUCCESS, CloudDriver.getInstance().getResponse(new PacketRequestPing(cachedPlayer.getUniqueId())).reply().getMessage());
-
-        }
     }
 }

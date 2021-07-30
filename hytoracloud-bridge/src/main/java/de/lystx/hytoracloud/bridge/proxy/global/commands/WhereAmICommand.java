@@ -16,7 +16,7 @@ public class WhereAmICommand {
         if (commandSender instanceof ICloudPlayer) {
             ICloudPlayer player = (ICloudPlayer)commandSender;
 
-            IService proxy = CloudDriver.getInstance().getCurrentService();
+            IService proxy = CloudDriver.getInstance().getServiceManager().getCurrentService();
             IService service = player.getService();
 
             if (service == null) {

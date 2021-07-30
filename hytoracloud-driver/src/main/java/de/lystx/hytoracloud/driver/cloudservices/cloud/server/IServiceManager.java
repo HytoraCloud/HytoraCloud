@@ -125,6 +125,22 @@ public interface IServiceManager extends IPool<IService> {
     List<IService> getCachedObjects(ServiceState serviceState);
 
     /**
+     * Returns the {@link IService} the driver
+     * is currently running on
+     *
+     * @return service or null if not bridge
+     */
+    IService getCurrentService();
+
+    /**
+     * Updates all {@link IService}s
+     * and sets the given {@link IServiceGroup} if needed
+     *
+     * @param groups the groups
+     */
+    void sync(List<IServiceGroup> groups);
+
+    /**
      * Gets a list of all online {@link IService}s that are LobbyServers
      *
      * @return list of services

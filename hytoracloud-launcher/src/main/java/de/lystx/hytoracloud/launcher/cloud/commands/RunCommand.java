@@ -21,24 +21,22 @@ public class RunCommand implements TabCompletable {
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             String group = args[0];
-            IServiceGroup IServiceGroup = cloudInstance.getInstance(GroupService.class).getGroup(group);
-            if (IServiceGroup == null) {
+            IServiceGroup serviceGroup = cloudInstance.getInstance(GroupService.class).getGroup(group);
+            if (serviceGroup == null) {
                 sender.sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
                 return;
             }
-            CloudDriver.getInstance().getServiceManager().startService(IServiceGroup);
+            serviceGroup.startNewService();
         } else if (args.length == 2) {
             try {
                 int id = Integer.parseInt(args[1]);
                 String group = args[0];
-                IServiceGroup IServiceGroup = cloudInstance.getInstance(GroupService.class).getGroup(group);
-                if (IServiceGroup == null) {
+                IServiceGroup serviceGroup = cloudInstance.getInstance(GroupService.class).getGroup(group);
+                if (serviceGroup == null) {
                     sender.sendMessage("ERROR", "§cThe ServiceGroup §e" + group + " §cseems not to exist!");
                     return;
                 }
-                for (int i = 0; i < id; i++) {
-                    CloudDriver.getInstance().getServiceManager().startService(IServiceGroup);
-                }
+                serviceGroup.startNewService(id);
             } catch (NumberFormatException e) {
                 sender.sendMessage("ERROR", "§cPlease provide a valid number!");
             }

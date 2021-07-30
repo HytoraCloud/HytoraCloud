@@ -65,7 +65,7 @@ public class InfoCommand implements TabCompletable {
                         sender.sendMessage("INFO", "  §h> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
                         sender.sendMessage("INFO", "  §h> §bType: " + service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getCurrentTemplate().getName());
                         sender.sendMessage("INFO", "  §h> §bHost: " + service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
-                        sender.sendMessage("INFO", "  §h> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage() : "-1") + "/" + service.getGroup().getMemory() + " §7| §eTPS: " + (service.isAuthenticated() ? service.getTPS() : "§c???"));
+                        sender.sendMessage("INFO", "  §h> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage().setTimeOut(30, -1L).pullValue() : "-1") + "/" + service.getGroup().getMemory() + " §7| §eTPS: " + (service.isAuthenticated() ? service.getTPS().setTimeOut(30, "§c???").pullValue() : "§c???"));
                         sender.sendMessage("INFO", "  §h> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
                         if (service.getProperties().keySet().isEmpty()) {
                             sender.sendMessage("INFO", "  §h> §bProperties: §cNone");

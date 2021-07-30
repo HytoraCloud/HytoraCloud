@@ -47,7 +47,7 @@ public class CreateCommand implements TabCompletable {
                     IServiceGroup group = new ServiceGroupObject(
                             UUID.randomUUID(),
                             setup.getServerName(),
-                            new TemplateObject(setup.getServerName(), "default", true),
+                            "default",
                             ServiceType.valueOf(setup.getType().toUpperCase()),
                             setup.getReceiver(),
                             setup.getMaxyServer(),

@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.commons.packets.out;
 
+import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -7,7 +8,11 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 
 
+import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ReceiverObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import de.lystx.hytoracloud.networking.elements.component.Component;
@@ -41,9 +46,13 @@ public class PacketOutGlobalInfo extends Packet {
     @Override
     public void write(Component component) {
 
+        JsonObject<?> jsonObject = JsonObject.gson();
+
+        jsonObject.append("groups", groups);
+        jsonObject.append("services", services);
+
+        component.put("json", jsonObject.toString());
         component.put("config", networkConfig);
-        component.put("groups", groups);
-        component.put("services", services);
         component.put("receivers", receivers);
         component.put("cloudPlayers", cloudPlayers);
     }
@@ -51,11 +60,14 @@ public class PacketOutGlobalInfo extends Packet {
     @Override
     public void read(Component component) {
 
-        networkConfig = component.get("config");
-        services = component.get("services");
-        groups = component.get("groups");
-        receivers = component.get("receivers");
-        cloudPlayers = component.get("cloudPlayers");
+        JsonObject<?> jsonObject = JsonObject.gson((String) component.get("json"));
+
+        this.groups = jsonObject.getInterfaceList("groups", IServiceGroup.class, ServiceGroupObject.class);
+        this.services = jsonObject.getInterfaceList("services", IService.class, ServiceObject.class);
+
+        this.networkConfig = component.get("config");
+        this.receivers = component.get("receivers");
+        this.cloudPlayers = component.get("cloudPlayers");
     }
 
 }

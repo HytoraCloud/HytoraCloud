@@ -3,16 +3,16 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.sign;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignConfiguration;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignLayout;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.*;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -59,28 +59,34 @@ public class SignUpdater {
         this.serviceMap = new HashMap<>();
         this.serverPinger = plugin.getServerPinger();
 
+        CloudDriver.getInstance().registerPacketHandler(packet -> {
+            if (packet instanceof PacketOutGlobalInfo) {
+                update();
+            }
+        });
+
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitBridge.getInstance(), () -> {
             SignConfiguration configuration = ServerSelector.getInstance().getSignManager().getConfiguration();
-            if (configuration.getKnockBackConfig().getBoolean("enabled")) {
-                double strength = configuration.getKnockBackConfig().getDouble("strength");
-                double distance = configuration.getKnockBackConfig().getDouble("distance");
-                Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> {
-                    for (CloudSign sign : ServerSelector.getInstance().getSignManager().getCloudSigns()) {
-                        World world = Bukkit.getWorld(sign.getWorld());
-                        if (world != null) {
-                            Location location = new Location(world, sign.getX(), sign.getY(), sign.getZ());
-                            for (Entity entity : location.getWorld().getNearbyEntities(location, distance, distance, distance)) {
-                                if (entity instanceof Player && !entity.hasPermission(configuration.getKnockBackConfig().getString("byPassPermission"))) {
-                                    if (location.getBlock().getState() instanceof Sign) {
-                                        Location entityLocation = entity.getLocation();
-                                        entity.setVelocity(new org.bukkit.util.Vector(entityLocation.getX() - location.getX(), entityLocation.getY() - location.getY(), entityLocation.getZ() - location.getZ()).normalize().multiply(strength).setY(0.2D));
-                                    }
-                                }
-                            }
+            KnockbackConfig knockBackConfig = configuration.getKnockBackConfig();
+            if (!knockBackConfig.isEnabled()) {
+                return;
+            }
+            double strength = knockBackConfig.getStrength();
+            double distance = knockBackConfig.getDistance();
+            Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> {
+                for (CloudSign sign : ServerSelector.getInstance().getSignManager().getCloudSigns()) {
+                    World world = Bukkit.getWorld(sign.getWorld());
+                    if (world == null) {
+                        return;
+                    }
+                    Location location = new Location(world, sign.getX(), sign.getY(), sign.getZ());
+                    for (Entity entity : location.getWorld().getNearbyEntities(location, distance, distance, distance)) {
+                        if (entity instanceof Player && !entity.hasPermission(knockBackConfig.getByPassPermission()) && location.getBlock().getState() instanceof Sign) {
+                            entity.setVelocity(new org.bukkit.util.Vector(entity.getLocation().getX() - location.getX(), entity.getLocation().getY() - location.getY(), entity.getLocation().getZ() - location.getZ()).normalize().multiply(strength).setY(0.2D));
                         }
                     }
-                });
-            }
+                }
+            });
         }, 0L, 5L);
     }
 
@@ -90,7 +96,7 @@ public class SignUpdater {
      * and executes the {@link SignUpdater#update()} Method
      */
     public void run() {
-        long repeat = plugin.getConfiguration().getRepeatingTick();
+        long repeat = plugin.getConfiguration().getLoadingLayout().getRepeatingTick();
         if (animationScheduler != 0) {
             Bukkit.getScheduler().cancelTask(this.animationScheduler);
         }
@@ -113,11 +119,9 @@ public class SignUpdater {
             this.freeSigns.clear();
             this.serviceMap.clear();
 
-            for (IServiceGroup globalServerGroup : CloudDriver.getInstance().getServiceManager().getCachedGroups()) {
-                for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(globalServerGroup)) {
-                    if (!service.getState().equals(ServiceState.INGAME) && !service.getState().equals(ServiceState.OFFLINE)) {
-                        this.update(service);
-                    }
+            for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceType.SPIGOT)) {
+                if (!service.getState().equals(ServiceState.INGAME) && !service.getState().equals(ServiceState.OFFLINE)) {
+                    this.update(service);
                 }
             }
 
@@ -218,13 +222,13 @@ public class SignUpdater {
                 }
 
 
-                List<SignLayout> array = ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout();
+                SignAnimation loadingLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout();
                 SignLayout signLayout;
                 if (animationsTick >= ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout().size()) {
                     animationsTick = 0;
-                    signLayout = array.get(0);
+                    signLayout = loadingLayout.get(0);
                 } else {
-                    signLayout = array.get(animationsTick);
+                    signLayout = loadingLayout.get(animationsTick);
                 }
                 for (int i = 0; i != 4; i++) {
                     sign.setLine(i, PlaceHolder.apply(signLayout.getLines()[i], service, service.getGroup()));
@@ -278,10 +282,9 @@ public class SignUpdater {
      * @param serverPinger the pinger
      */
     public void signUpdate(Sign sign, IService service, ServerPinger serverPinger) {
-        service = CloudDriver.getInstance().getServiceManager().getCachedObject(service.getName());
 
         SignLayout signLayout;
-        ServiceState state ;
+        ServiceState state;
         if (service.getState().equals(ServiceState.MAINTENANCE) || service.getSyncedGroup().orElse(service.getGroup()).isMaintenance()) {
             signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getMaintenanceLayout();
             state = ServiceState.MAINTENANCE;

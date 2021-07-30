@@ -13,6 +13,11 @@ import lombok.SneakyThrows;
 public class PacketCallEvent extends PacketCommunication {
 
     /**
+     * If events should be parsed as json string
+     */
+    private static final boolean USE_JSON = false;
+
+    /**
      * The cloud event
      */
     private CloudEvent cloudEvent;
@@ -27,10 +32,14 @@ public class PacketCallEvent extends PacketCommunication {
     public void read(Component component) {
         super.read(component);
 
-        JsonObject<?> jsonObject = JsonObject.gson((String) component.get("event"));
-        Class<?> eventClass = Class.forName(component.get("class"));
+        if (USE_JSON) {
+            JsonObject<?> jsonObject = JsonObject.gson((String) component.get("event"));
+            Class<?> eventClass = Class.forName(component.get("class"));
 
-        cloudEvent = (CloudEvent) jsonObject.getAs(eventClass);
+            this.cloudEvent = (CloudEvent) jsonObject.getAs(eventClass);
+        } else {
+            this.cloudEvent = component.get("event");
+        }
         this.except = component.get("except");
     }
 
@@ -39,10 +48,13 @@ public class PacketCallEvent extends PacketCommunication {
     public void write(Component component) {
         super.write(component);
 
-        JsonObject<?> jsonObject = JsonObject.gson().append(cloudEvent);
-
-        component.put("event", jsonObject.toString());
-        component.put("class", cloudEvent.getClass().getName());
+        if (USE_JSON) {
+            JsonObject<?> jsonObject = JsonObject.gson().append(cloudEvent);
+            component.put("class", cloudEvent.getClass().getName());
+            component.put("event", jsonObject.toString());
+        } else {
+            component.put("event", cloudEvent);
+        }
         component.put("except", except);
     }
 

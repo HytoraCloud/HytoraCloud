@@ -46,6 +46,14 @@ public interface DriverRequest<T> {
     DriverRequest<T> append(String key, Object value);
 
     /**
+     * Appends the whole json object
+     *
+     * @param jsonData the data
+     * @return current request
+     */
+    DriverRequest<T> json(JsonObject<?> jsonData);
+
+    /**
      * The key of this request
      * Here you can provide a basic action name
      * so you can listen for it (e.g. "UPDATE_CACHE")

@@ -83,11 +83,10 @@ public class InternalReceiver implements IReceiver {
     public void startService(IService service, Consumer<IService> consumer) {
         IServiceGroup serviceGroup = service.getGroup();
 
-        if (serviceGroup.getMaxServer() != -1 && CloudDriver.getInstance().getServiceManager().getCachedObjects(serviceGroup).size() >= serviceGroup.getMaxServer()) {
+        if (serviceGroup.getMaxServer() != -1 && serviceGroup.getServices().size() >= serviceGroup.getMaxServer()) {
             CloudDriver.getInstance().messageCloud("INFO", "§cThe service §e" + service.getName() + " §cwasn't started because there are to much §cservices of this group online!");
             return;
         }
-
 
         if (service.getPort() <= 0) {
             int port = service.getGroup().getType().equals(ServiceType.PROXY) ? CloudDriver.getInstance().getPortService().getFreeProxyPort() : CloudDriver.getInstance().getPortService().getFreePort();
@@ -102,7 +101,6 @@ public class InternalReceiver implements IReceiver {
         IService finalService = service;
         CloudDriver.getInstance().executeIf(() -> {
             ServiceStarter serviceStarter = new ServiceStarter(finalService);
-
             if (serviceStarter.checkForSpigot()) {
                 try {
                     serviceStarter.copyFiles();

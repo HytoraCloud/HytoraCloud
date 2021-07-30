@@ -71,6 +71,9 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
         for (IServiceGroup group : serviceGroups) {
 
+            if (group == null) {
+                continue;
+            }
             //Creating template if not existent
             CloudDriver.getInstance().getTemplateManager().createTemplate(group);
             for (int i = 0; i < group.getMinServer(); i++) {
@@ -143,6 +146,9 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     @Override
     public void updateService(IService service) {
 
+        if (this.getCachedObject(service.getName()) == null) {
+            return;
+        }
         this.cachedObjects = new LinkedList<>(this.cachedObjects);
 
         try {
@@ -150,7 +156,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
             this.otherReceiverCache.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
             this.otherReceiverCache.add(service);
             this.cachedObjects.add(service);
-        } catch (ConcurrentModificationException e) {
+        } catch (Exception e) {
             //Ignoring ex
         }
 
@@ -202,6 +208,31 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     }
 
     @Override
+    public IService getCurrentService() {
+        return null;
+    }
+
+    @Override
+    public void sync(List<IServiceGroup> groups) {
+        for (IServiceGroup group : groups) {
+            for (IService cachedObject : this.cachedObjects) {
+                int index = this.cachedObjects.indexOf(cachedObject);
+                int indexReceiver = this.otherReceiverCache.indexOf(cachedObject);
+                if (cachedObject.getGroup().getName().equalsIgnoreCase(group.getName())) {
+                    cachedObject.setGroup(group);
+
+                    if (index != -1) {
+                        this.cachedObjects.set(index, cachedObject);
+                    }
+                    if (indexReceiver != -1) {
+                        this.otherReceiverCache.set(indexReceiver, cachedObject);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public void startService(IService service) {
         if (!this.running) {
             return;
@@ -210,6 +241,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (this.getCachedObject(service.getName()) != null) {
             return;
         }
+
         CloudDriver.getInstance().callEvent(new DriverEventServiceQueue(service));
 
         IReceiver receiver = service.getReceiver();
@@ -273,7 +305,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
                 return;
             }
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "§h'§9" + finalReceiver.getName() + "§h' §7stopped §b" + service.getName() + "§h!");
-
+            CloudDriver.getInstance().reload();
         });
     }
 
@@ -297,6 +329,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
                 return;
             }
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("NETWORK", "§h'§9" + finalReceiver.getName() + "§h' §7stopped §b" + service.getName() + "§h!");
+            CloudDriver.getInstance().reload();
         });
     }
     @Override

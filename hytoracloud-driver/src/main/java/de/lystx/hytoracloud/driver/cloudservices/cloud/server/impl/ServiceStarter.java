@@ -35,7 +35,6 @@ public class ServiceStarter {
     private final ITemplate template;
     private JsonObject<?> properties;
 
-    private final File templateDirectory;
     private final File spigotPlugins;
     private final File bungeePlugins;
     private final File global;
@@ -51,8 +50,6 @@ public class ServiceStarter {
         this.service = service;
         this.serviceGroup = service.getGroup();
         this.properties = service.getProperties();
-
-        this.templateDirectory = instance.getTemplatesDirectory();
 
         this.spigotPlugins = instance.getSpigotPluginsDirectory();
         this.bungeePlugins = instance.getBungeeCordPluginsDirectory();

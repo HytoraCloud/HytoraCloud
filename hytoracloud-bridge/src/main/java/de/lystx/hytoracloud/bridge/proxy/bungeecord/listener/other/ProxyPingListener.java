@@ -35,7 +35,7 @@ public class ProxyPingListener implements Listener {
 
         ServerPing ping = event.getResponse();
         try {
-            int port = CloudDriver.getInstance().getCurrentService().getPort();
+            int port = CloudDriver.getInstance().getServiceManager().getCurrentService().getPort();
 
 
             NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();

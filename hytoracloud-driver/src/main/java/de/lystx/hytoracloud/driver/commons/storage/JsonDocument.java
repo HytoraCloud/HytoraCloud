@@ -249,6 +249,32 @@ public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage
     }
 
     @Override
+    public short getShort(String key) {
+        if (!this.jsonObject.has(key)) {
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof Short ? (Short) this.defaultValue : -1;
+        }
+        return this.jsonObject.get(key).getAsShort();
+    }
+
+    @Override
+    public byte getByte(String key) {
+        if (!this.jsonObject.has(key)) {
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof Byte ? (Byte) this.defaultValue : -1;
+        }
+        return this.jsonObject.get(key).getAsByte();
+    }
+
+    @Override
     public boolean getBoolean(String key) {
         if (!this.jsonObject.has(key)) {
 
@@ -373,6 +399,19 @@ public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage
     }
 
     @Override
+    public <T> List<T> getInterfaceList(String key, Class<T> interfaceClass, Class<? extends T> wrapperObjectClass) {
+        if (!this.has(key)) {
+            return this.defaultValue != null && this.defaultValue instanceof List ? (List<T>) this.defaultValue : null;
+        }
+        List<T> tList = new ArrayList<>();
+        JsonArray array = this.getJsonArray(key);
+        for (JsonElement jsonElement : array) {
+            tList.add(GSON.fromJson(jsonElement, wrapperObjectClass));
+        }
+        return tList;
+    }
+
+    @Override
     public List<String> getStringList(String key) {
         if (!this.has(key)) {
             return this.defaultValue != null && this.defaultValue instanceof List ? (List<String>) this.defaultValue : null;
@@ -411,6 +450,11 @@ public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public JsonElement getBase() {
+        return this.jsonObject;
     }
 
     @Override

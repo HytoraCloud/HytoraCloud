@@ -293,7 +293,7 @@ public class VelocityBridge implements BridgeInstance {
     @Override
     public PropertyObject requestProperties() {
 
-        IService service = CloudDriver.getInstance().getCurrentService();
+        IService service = CloudDriver.getInstance().getServiceManager().getCurrentService();
         PropertyObject propertyObject = new PropertyObject();
 
         propertyObject.append("bungeeCord",

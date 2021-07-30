@@ -9,7 +9,6 @@ import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.CommandListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerListener;
-import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -186,7 +185,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
                         return;
                     }
                     if (ProxyServer.getInstance().getServerInfo(service.getName()) == null) {
-                        System.out.println("[" + service.getName() + "] <-> ServerRegister [" + (CloudDriver.getInstance().getCurrentService() == null ? "GlobalProxy" : CloudDriver.getInstance().getCurrentService().getName()) + "] has connected");
+                        System.out.println("[" + service.getName() + "] <-> ServerRegister [" + (CloudDriver.getInstance().getServiceManager().getCurrentService() == null ? "GlobalProxy" : CloudDriver.getInstance().getServiceManager().getCurrentService().getName()) + "] has connected");
                     }
                     ServerInfo info = ProxyServer.getInstance().constructServerInfo(service.getName(), new InetSocketAddress(service.getHost(), service.getPort()), "CloudService", false);
                     ProxyServer.getInstance().getServers().put(service.getName(), info);
@@ -198,7 +197,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
                         return;
                     }
                     if (ProxyServer.getInstance().getServerInfo(server) != null) {
-                        System.out.println("[" + server + "] <-> ServerRegister [" + CloudDriver.getInstance().getCurrentService().getName() + "] has disconnected");
+                        System.out.println("[" + server + "] <-> ServerRegister [" + CloudDriver.getInstance().getServiceManager().getCurrentService().getName() + "] has disconnected");
                     }
                     ProxyServer.getInstance().getServers().remove(server);
                 }
@@ -262,7 +261,6 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
         this.getProxy().getPluginManager().registerListener(this, new CommandListener());
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());
-        this.getProxy().getPluginManager().registerListener(this, new ServerConnectListener());
         this.getProxy().getPluginManager().registerListener(this, new TabListener());
         this.getProxy().getPluginManager().registerListener(this, new PlayerInjectListener());
 
@@ -280,7 +278,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
         });
 
         if (CloudDriver.getInstance().getProxyConfig() == null) {
-            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getCurrentService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
+            CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getServiceManager().getCurrentService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
             System.out.println("[CloudBridge] Couldn't find ProxyConfig!");
         }
         System.out.println("[CloudBridge] Booted up in " + this.action.time() + "ms");
@@ -299,7 +297,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
     @Override
     public PropertyObject requestProperties() {
 
-        IService service = CloudDriver.getInstance().getCurrentService();
+        IService service = CloudDriver.getInstance().getServiceManager().getCurrentService();
         PropertyObject propertyObject = new PropertyObject();
 
         propertyObject.append("bungeeCord",

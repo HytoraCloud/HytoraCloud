@@ -64,10 +64,10 @@ public class NPCManager {
      * @param join > If update is on join
      */
     public void updateNPCS(Player player, boolean join) {
-        if (CloudDriver.getInstance().getCurrentService() == null) {
+        if (CloudDriver.getInstance().getServiceManager().getCurrentService() == null) {
             return;
         }
-        if (!CloudDriver.getInstance().getCurrentService().getGroup().isLobby()) {
+        if (!CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup().isLobby()) {
             return;
         }
         if (CloudDriver.getInstance().getBukkit().isNewVersion()) {

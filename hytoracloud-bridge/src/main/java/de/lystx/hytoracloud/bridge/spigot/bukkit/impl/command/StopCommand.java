@@ -15,7 +15,7 @@ public class StopCommand {
             player.sendMessage(CloudDriver.getInstance().getPrefix() +  "§cYou aren't allowed to perform this command!");
             return;
         }
-        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Stopping §c" + CloudDriver.getInstance().getCurrentService().getName() + "§8...");
+        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Stopping §c" + CloudDriver.getInstance().getServiceManager().getCurrentService().getName() + "§8...");
         BukkitBridge.getInstance().shutdown();
     }
 }

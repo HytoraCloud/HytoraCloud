@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
+import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.launcher.cloud.handler.player.CloudHandlerPlayerRequest;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.NetworkService;
@@ -139,8 +140,15 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().getNetworkConfig().update();
             CloudDriver.getInstance().getPermissionPool().update();
 
+            CloudDriver.getInstance().getServiceManager().sync(getInstance(GroupService.class).getGroups());
+
             //Sending network config and services and groups
-            CloudDriver.getInstance().sendPacket(reloadPacket());
+            CloudDriver.getInstance().sendPacket((new PacketOutGlobalInfo(
+                    CloudDriver.getInstance().getNetworkConfig(),
+                    CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
+                    CloudDriver.getInstance().getServiceManager().getCachedObjects(),
+                    CloudDriver.getInstance().getPlayerManager().getCachedObjects()
+            )));
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -200,7 +208,7 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerReload(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerShutdown(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerConfig());
-            CloudDriver.getInstance().registerPacketHandler(new CloudHandlerGroupUpdate(this));
+            CloudDriver.getInstance().registerPacketHandler(new CloudHandlerGroupUpdate());
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerTemplateCopy(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerPerms(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerMessage(this));
@@ -266,10 +274,10 @@ public class CloudSystem extends CloudProcess {
                 document.save();
 
                 //Creating Bungee-Group
-                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Bungee", new TemplateObject("Bungee", "default", true), ServiceType.PROXY, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, false, true, new PropertyObject(), new LinkedList<>()));
+                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Bungee", "default", ServiceType.PROXY, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, false, true, new PropertyObject(), new LinkedList<>()));
 
                 //Creating Lobby-Group
-                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Lobby", new TemplateObject("Lobby", "default", true), ServiceType.SPIGOT, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, true, true, new PropertyObject(), new LinkedList<>()));
+                this.getInstance(GroupService.class).createGroup(new ServiceGroupObject(UUID.randomUUID(), "Lobby", "default", ServiceType.SPIGOT, Utils.INTERNAL_RECEIVER, -1, 1, 512, 50, 100, false, true, true, new PropertyObject(), new LinkedList<>()));
 
                 if (!setup.getDatabase().equalsIgnoreCase("FILES")) {
                     this.getParent().getConsole().getLogger().sendMessage("INFO", "§2Cloud Setup was complete! Now Starting §aDatabaseSetup§2!");

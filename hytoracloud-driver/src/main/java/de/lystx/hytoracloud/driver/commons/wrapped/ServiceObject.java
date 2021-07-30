@@ -11,6 +11,9 @@ import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMem
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestTPS;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.SimpleQuery;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -19,6 +22,7 @@ import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -78,20 +82,16 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), ServiceState.LOBBY, (PropertyObject) JsonObject.serializable(), (ServiceGroupObject) group, false);
     }
 
-    public void setProperties(JsonObject<?> properties) {
+    public IQuery<ResponseStatus> setProperties(JsonObject<?> properties) {
         this.properties = (PropertyObject) properties;
-    }
-
-    public JsonObject<?> getProperties() {
-        return properties;
-    }
-
-    public IServiceGroup getGroup() {
-        return group;
-    }
-
-    public void setGroup(IServiceGroup group) {
-        this.group = (ServiceGroupObject) group;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("SERVICE_SET_PROPERTIES", ResponseStatus.SUCCESS);
+        }
+        DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_PROPERTIES", "CLOUD", ResponseStatus.class);
+        request.append("name", this.getName());
+        request.append("properties", properties.toString());
+        return request.execute();
     }
 
     @Override
@@ -99,9 +99,56 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
        return CloudDriver.getInstance().getServiceManager().getCachedGroups().stream().filter(iServiceGroup -> iServiceGroup.getName().equalsIgnoreCase(this.group.getName())).findFirst();
     }
 
-    @Override
-    public void addProperty(String key, JsonObject<?> data) {
+    public IQuery<ResponseStatus> addProperty(String key, JsonObject<?> data) {
         this.properties.append(key, data);
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("SERVICE_ADD_PROPERTY", ResponseStatus.SUCCESS);
+        }
+        DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_ADD_PROPERTY", "CLOUD", ResponseStatus.class);
+        request.append("name", this.getName());
+        request.append("key", key);
+        request.append("properties", data.toString());
+        return request.execute();
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("SERVICE_SET_AUTHENTICATED", ResponseStatus.SUCCESS);
+        }
+        DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_AUTHENTICATED", "CLOUD", ResponseStatus.class);
+        request.append("name", this.getName());
+        request.append("value", authenticated);
+        return request.execute();
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setState(ServiceState state) {
+        this.state = state;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("SERVICE_SET_STATE", ResponseStatus.SUCCESS);
+        }
+        DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_STATE", "CLOUD", ResponseStatus.class);
+        request.append("name", this.getName());
+        request.append("state", state.name());
+        return request.execute();
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setHost(String host) {
+        this.host = host;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("SERVICE_SET_HOST", ResponseStatus.SUCCESS);
+        }
+        DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_HOST", "CLOUD", ResponseStatus.class);
+        request.append("name", this.getName());
+        request.append("host", host);
+        return request.execute();
     }
 
     @Override
@@ -135,21 +182,21 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public PropertyObject requestInfo() {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
-            return CloudDriver.getInstance().getBridgeInstance().requestProperties();
+    public IQuery<PropertyObject> requestInfo() {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
+            return IQuery.dummy("SERVICE_GET_PROPERTIES", CloudDriver.getInstance().getBridgeInstance().requestProperties());
         } else {
-            PacketServiceInfo packetServiceInfo = new PacketServiceInfo(this.getName());
-            Component component = packetServiceInfo.toReply(CloudDriver.getInstance().getConnection());
-            return new PropertyObject(component.get("properties"));
+            DriverRequest<PropertyObject> request = DriverRequest.create("SERVICE_GET_PROPERTIES", this.getName(), PropertyObject.class);
+            return request.execute();
         }
     }
 
     @Override
     public PluginInfo[] getPlugins() {
+
         List<PluginInfo> pluginInfos = new LinkedList<>();
 
-        JsonArray array = this.requestInfo().getJsonArray("plugins");
+        JsonArray array = this.requestInfo().pullValue().getJsonArray("plugins");
 
         if (array != null) {
             for (JsonElement jsonElement : array) {
@@ -157,7 +204,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
                 pluginInfos.add(new PluginInfo(
                         jsonDocument.getString("name"),
-                        jsonDocument.getStringList("authors").toArray(new String[0]),
+                        jsonDocument.def(new LinkedList<>()).getStringList("authors").toArray(new String[0]),
                         jsonDocument.getString("version"),
                         jsonDocument.getString("main-class"),
                         jsonDocument.getString("website"),
@@ -173,16 +220,12 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public long getMemoryUsage() {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
-            return CloudDriver.getInstance().getBridgeInstance().loadMemoryUsage();
+    public IQuery<Long> getMemoryUsage() {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
+            return IQuery.dummy("SERVICE_GET_MEMORY", CloudDriver.getInstance().getBridgeInstance().loadMemoryUsage());
         } else {
-            PacketServiceMemoryUsage packet = new PacketServiceMemoryUsage(this.getName());
-            Component component = packet.toReply(CloudDriver.getInstance().getConnection());
-            if (component.reply().getMessage().equalsIgnoreCase("The request timed out")) {
-                return -1L;
-            }
-            return Long.parseLong(component.reply().getMessage());
+            DriverRequest<Long> request = DriverRequest.create("SERVICE_GET_MEMORY", this.getName(), Long.class);
+            return request.execute();
         }
     }
 
@@ -206,26 +249,24 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public String getTPS() {
+    public IQuery<String> getTPS() {
         if (this.group.getType() == ServiceType.PROXY) {
-            return "§cNo TPS for Proxy";
+            return IQuery.dummy("SERVICE_GET_TPS", "§cNo TPS for Proxy");
         }
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
-            return CloudDriver.getInstance().getBridgeInstance().loadTPS();
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
+            return IQuery.dummy("SERVICE_GET_TPS", CloudDriver.getInstance().getBridgeInstance().loadTPS());
         } else {
-            PacketRequestTPS packetRequestTPS = new PacketRequestTPS(this.getName());
-
-            Component component = packetRequestTPS.toReply(CloudDriver.getInstance().getConnection(), 3000);
-            String message = component.get("tps");
-
-            return message.equalsIgnoreCase("The request timed out") ? "§c???" : message;
+            DriverRequest<String> request = DriverRequest.create("SERVICE_GET_TPS", this.getName(), String.class);
+            return request.execute();
         }
     }
 
     @Override
     public void update() {
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
-            CloudDriver.getInstance().getServiceManager().updateService(this);
+            if (CloudDriver.getInstance().getServiceManager() != null) {
+                CloudDriver.getInstance().getServiceManager().updateService(this);
+            }
             return;
         }
         CloudDriver.getInstance().sendPacket(new PacketServiceUpdate(this));
@@ -263,6 +304,18 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return serverPinger;
     }
 
+    public JsonObject<?> getProperties() {
+        return properties;
+    }
+
+    public IServiceGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(IServiceGroup group) {
+        this.group = (ServiceGroupObject) group;
+    }
+
 
     @Override
     public String toString() {
@@ -273,7 +326,6 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     public String getLogUrl() {
         PacketInGetLog packet = new PacketInGetLog(this.getName());
         Component component = packet.toReply(CloudDriver.getInstance().getConnection());
-        String message = component.reply().getMessage();
         return component.reply().getMessage();
     }
 

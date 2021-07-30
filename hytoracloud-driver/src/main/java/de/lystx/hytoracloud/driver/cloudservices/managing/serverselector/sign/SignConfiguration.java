@@ -15,19 +15,14 @@ public class SignConfiguration implements Serializable {
     private static final long serialVersionUID = -4620016682091731021L;
 
     /**
-     * The scheduler tick for sign updating
-     */
-    private final int repeatingTick;
-
-    /**
      * The knockback config
      */
-    private final PropertyObject knockBackConfig;
+    private final KnockbackConfig knockBackConfig;
 
     /**
      * The loading animation
      */
-    private final List<SignLayout> loadingLayout;
+    private final SignAnimation loadingLayout;
 
     /**
      * The online sign layout
@@ -63,12 +58,13 @@ public class SignConfiguration implements Serializable {
         SignLayout loading3 = new SignLayout("LOADING", new String[]{"", "&8│ &bLoading... &8│", "&7%group% &8x &a⬛⬛⬛", ""}, "STAINED_CLAY", 14);
         SignLayout loading4 = new SignLayout("LOADING", new String[]{"", "&8│ &bLoading... &8│", "&7%group% &8x &7⬛⬛⬛", ""}, "STAINED_CLAY", 14);
 
-        return new SignConfiguration(20,
-                (PropertyObject) JsonObject.serializable()
-                .append("enabled", true)
-                .append("strength", 0.7)
-                .append("distance", 0.5)
-                .append("byPassPermission", "cloudsystem.signs.bypass")
-                ,Arrays.asList(loading1, loading2, loading3, loading4), online, full, maintenance);
+        return new SignConfiguration(
+                new KnockbackConfig(
+                        true,
+                        0.7,
+                        0.5,
+                        "cloudsystem.signs.bypass"
+                ),
+                new SignAnimation(20, loading1, loading2, loading3, loading4), online, full, maintenance);
     }
 }

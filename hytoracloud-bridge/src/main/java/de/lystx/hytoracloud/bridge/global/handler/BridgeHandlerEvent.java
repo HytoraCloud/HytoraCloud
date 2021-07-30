@@ -17,7 +17,7 @@ public class BridgeHandlerEvent implements PacketHandler {
         if (packet instanceof PacketCallEvent) {
             PacketCallEvent packetCallEvent = (PacketCallEvent)packet;
 
-            if (CloudDriver.getInstance().getCurrentService() != null && !packetCallEvent.getExcept().equalsIgnoreCase("null") && packetCallEvent.getExcept().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
+            if (CloudDriver.getInstance().getServiceManager().getCurrentService() != null && !packetCallEvent.getExcept().equalsIgnoreCase("null") && packetCallEvent.getExcept().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
                 return;
             }
 

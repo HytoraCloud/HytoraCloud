@@ -19,7 +19,7 @@ public class ProxyHandlerShutdown implements PacketHandler {
         }
         PacketOutStopServer packetOutStopServer = (PacketOutStopServer)packet;
         IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(packetOutStopServer.getService());
-        if (IService.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
+        if (IService.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
             for (de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer ICloudPlayer : CloudDriver.getInstance().getPlayerManager()) {
                 ICloudPlayer.kick(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getBukkitShutdown().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
             }

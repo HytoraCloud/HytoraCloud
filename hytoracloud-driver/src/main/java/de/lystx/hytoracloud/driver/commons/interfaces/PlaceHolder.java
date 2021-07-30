@@ -148,7 +148,7 @@ public interface PlaceHolder<V> {
 
                     input = input.replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()));
                     input = input.replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()));
-                    input = input.replace("%proxy%", CloudDriver.getInstance().getCurrentService().getName());
+                    input = input.replace("%proxy%", CloudDriver.getInstance().getServiceManager().getCurrentService().getName());
 
                     return input;
                 }

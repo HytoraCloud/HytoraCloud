@@ -20,7 +20,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void handleLogin(PlayerLoginEvent event) {
 
-        IService service = CloudDriver.getInstance().getCurrentService();
+        IService service = CloudDriver.getInstance().getServiceManager().getCurrentService();
         Player player = event.getPlayer();
         ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName());
 
@@ -34,8 +34,8 @@ public class PlayerJoinListener implements Listener {
             CloudDriver.getInstance().getScheduler().cancelTask(BukkitBridge.getInstance().getTaskId()); //Cancelling stop ask
         }
 
-        CloudDriver.getInstance().getCurrentService().update();
-        int percent = CloudDriver.getInstance().getCurrentService().getGroup().getNewServerPercent();
+        CloudDriver.getInstance().getServiceManager().getCurrentService().update();
+        int percent = CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup().getNewServerPercent();
 
         if (percent <= 100 && (((double) Bukkit.getOnlinePlayers().size()) / (double) Bukkit.getMaxPlayers()) * 100 >= percent) {
 

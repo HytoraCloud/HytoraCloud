@@ -66,7 +66,7 @@ public class PlayerNPCListener implements Listener {
                     return;
                 }
                 IService service = serviceMap.get(event.getSlot());
-                if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
+                if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
                     player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                     return;
                 }

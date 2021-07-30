@@ -3,9 +3,10 @@ package de.lystx.hytoracloud.driver.commons.wrapped;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketGroupMaintenanceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -14,10 +15,12 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -41,17 +44,17 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     /**
      * The template of this group
      */
-    private TemplateObject currentTemplate;
+    private String currentTemplate;
 
     /**
      * The type of this group (PROXY, SPIGOT)
      */
-    private ServiceType type;
+    private final ServiceType type;
 
     /**
      * The receiver this group runs on
      */
-    private String receiver;
+    private final String receiver;
 
     /**
      * How many servers may maximum be online
@@ -101,32 +104,18 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     /**
      * The templates of this group
      */
-    private List<TemplateObject> templates;
+    private final List<TemplateObject> templates;
 
     @Override
     public void update() {
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             CloudDriver.getInstance().getInstance(GroupService.class).updateGroup(this);
-            CloudDriver.getInstance().reload();
             return;
         }
         CloudDriver.getInstance().getConnection().sendPacket(new PacketInUpdateServiceGroup(this));
     }
 
-    public JsonObject<?> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(JsonObject<?> properties) {
-        this.properties = (PropertyObject) properties;
-    }
-
-    public List<ITemplate> getTemplates() {
-        List<ITemplate> copy = new LinkedList<>(this.templates);
-        copy.add(this.currentTemplate);
-        return copy;
-    }
-
+    @Override
     public int getMaxPlayers() {
         if (this.type == ServiceType.PROXY) {
             int proxies = getServices().size();
@@ -140,22 +129,44 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public void setCurrentTemplate(ITemplate currentTemplate) {
-        this.currentTemplate = (TemplateObject) currentTemplate;
+    public List<ITemplate> getTemplates() {
+        List<ITemplate> copy = new LinkedList<>(this.templates);
+        copy.add(this.getCurrentTemplate());
+        return copy;
     }
 
     @Override
-    public void setTemplates(List<ITemplate> templateObjects) {
-        this.templates = (List<TemplateObject>) currentTemplate;
+    public ITemplate getTemplate(String name) {
+        return this.getTemplates().stream().filter(template -> template.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     @Override
-    public void setMaintenance(boolean maintenance) {
-        this.maintenance = maintenance;
-        CloudDriver.getInstance().sendPacket(new PacketGroupMaintenanceUpdate(this.name, maintenance));
+    public IQuery<ITemplate> createTemplate(String name) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            TemplateObject template = new TemplateObject(this.name, name, true);
+            this.templates.add(template);
+            CloudDriver.getInstance().getTemplateManager().createTemplate(this, template);
+            this.update();
+            return IQuery.dummy("GROUP_CREATE_TEMPLATE", template);
+        }
+        DriverRequest<ITemplate> driverRequest = DriverRequest.create("GROUP_CREATE_TEMPLATE", "CLOUD", ITemplate.class);
+        driverRequest.append("name", this.name);
+        driverRequest.append("template", name);
+        return driverRequest.execute();
     }
 
+    @Override
+    public void deleteAllTemplates() {
+        for (ITemplate template : this.templates) {
+            Utils.deleteFolder(template.getDirectory());
+            template.getDirectory().delete();
+        }
+    }
 
+    @Override
+    public ITemplate getCurrentTemplate() {
+        return new TemplateObject(this.name, this.currentTemplate, true);
+    }
 
     @Override
     public void startNewService() {
@@ -189,13 +200,6 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
         }
         return CloudDriver.getInstance().getServiceManager().getCachedObjects().stream().filter(service -> service.getGroup().getName().equalsIgnoreCase(this.name)).collect(Collectors.toList());
     }
-    @Override
-    public void deleteAllTemplates() {
-        for (ITemplate template : this.templates) {
-            Utils.deleteFolder(template.getDirectory());
-            template.getDirectory().delete();
-        }
-    }
 
     @Override
     public boolean isProcessRightReceiver() {
@@ -208,6 +212,148 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
             return this.getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER);
         }
         return true;
+    }
+
+
+    @Override
+    public IQuery<ResponseStatus> setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
+
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_MAINTENANCE", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MAINTENANCE", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("maintenance", maintenance);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setTemplate(ITemplate currentTemplate) {
+        this.currentTemplate = currentTemplate.getName();
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_TEMPLATE", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_TEMPLATE", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("template", currentTemplate);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setProperties(JsonObject<PropertyObject> properties) {
+        this.properties = (PropertyObject) properties;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_PROPERTIES", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_PROPERTIES", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("properties", properties.toString());
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setLobby(boolean lobby) {
+        this.lobby = lobby;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_LOBBY", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_LOBBY", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("lobby", lobby);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setDynamic(boolean dynamic) {
+        this.dynamic = dynamic;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_DYNAMIC", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_DYNAMIC", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("dynamic", dynamic);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_MAX_PLAYERS", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MAX_PLAYERS", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("value", maxPlayers);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setNewServerPercent(int newServerPercent) {
+        this.newServerPercent = newServerPercent;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_PERCENT", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_PERCENT", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("value", newServerPercent);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setMaxServer(int maxServer) {
+        this.maxServer = maxServer;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_MAX_SERVERS", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MAX_SERVERS", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("value", maxServer);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setMinServer(int minServer) {
+        this.minServer = minServer;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_MIN_SERVERS", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MIN_SERVERS", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("value", minServer);
+            return request.execute();
+        }
+    }
+
+    @Override
+    public IQuery<ResponseStatus> setMemory(int memory) {
+        this.memory = memory;
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+            this.update();
+            return IQuery.dummy("GROUP_SET_MEMORY", ResponseStatus.SUCCESS);
+        } else {
+            DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MEMORY", "CLOUD", ResponseStatus.class);
+            request.append("name", this.getName());
+            request.append("value", memory);
+            return request.execute();
+        }
     }
 
     @Override

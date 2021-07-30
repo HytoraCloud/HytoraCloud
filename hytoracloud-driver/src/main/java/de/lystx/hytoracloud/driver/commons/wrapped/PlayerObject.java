@@ -108,7 +108,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     @Override
     public IQuery<Integer> getPing() {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            return new SimpleQuery<>("PLAYER_GET_PING", (int) CloudDriver.getInstance().getBridgeInstance().getPing(this.getUniqueId()));
+            return IQuery.dummy("PLAYER_GET_PING", (int) CloudDriver.getInstance().getBridgeInstance().getPing(this.getUniqueId()));
         }
         DriverRequest<Integer> request = DriverRequest.create("PLAYER_GET_PING", Integer.class);
         request.append("uniqueId", this.getUniqueId().toString());
@@ -123,7 +123,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
             request.append("uniqueId", this.getUniqueId().toString());
             return request.execute();
         } else {
-            return new SimpleQuery<>("PLAYER_GET_PERMISSIONGROUP", CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(this.getUniqueId()));
+            return IQuery.dummy("PLAYER_GET_PERMISSIONGROUP", CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(this.getUniqueId()));
         }
     }
 
@@ -135,7 +135,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
             request.append("name", name);
             return request.execute();
         } else {
-            return new SimpleQuery<>("PLAYER_GET_PROPERTY", CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name));
+            return IQuery.dummy("PLAYER_GET_PROPERTY", CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name));
         }
     }
 
@@ -147,7 +147,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
             request.append("name", name);
             return request.execute();
         } else {
-            return new SimpleQuery<>("PLAYER_GET_PROPERTY", CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name));
+            return IQuery.dummy("PLAYER_GET_PROPERTY", CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(this.getUniqueId()).getProperty(name));
         }
     }
 
@@ -250,7 +250,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     @Override
     public void sendMessage(ChatComponent chatComponent) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            if (CloudDriver.getInstance().getCurrentService().getGroup().getType() == ServiceType.PROXY) {
+            if (CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup().getType() == ServiceType.PROXY) {
                 CloudDriver.getInstance().getProxyBridge().sendComponent(this.getUniqueId(), chatComponent);
                 return;
             }
@@ -285,7 +285,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     public IQuery<Boolean> sendTabList(ChatComponent header, ChatComponent footer) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             CloudDriver.getInstance().getBridgeInstance().sendTabList(this.getUniqueId(), header, footer);
-            return new SimpleQuery<>("PLAYER_SEND_TABLIST", true);
+            return IQuery.dummy("PLAYER_SEND_TABLIST", true);
         } else {
             DriverRequest<Boolean> request = DriverRequest.create("PLAYER_SEND_TABLIST", "PROXY", Boolean.class);
             request.append("uniqueId", this.getUniqueId().toString());
@@ -328,7 +328,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
         }
         offlinePlayer.addProperty(name, jsonObject);
         offlinePlayer.update();
-        return new SimpleQuery<>("PLAYER_ADD_PROPERTY", true);
+        return IQuery.dummy("PLAYER_ADD_PROPERTY", true);
     }
 
     @Override
@@ -336,7 +336,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && CloudDriver.getInstance().getProxyBridge() != null) {
             CloudDriver.getInstance().getProxyBridge().fallbackPlayer(this.getUniqueId());
-            return new SimpleQuery<>("PLAYER_FALLBACK", true);
+            return IQuery.dummy("PLAYER_FALLBACK", true);
         }
 
         DriverRequest<Boolean> request = DriverRequest.create("PLAYER_FALLBACK", "PROXY", Boolean.class);
@@ -349,7 +349,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
 
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && CloudDriver.getInstance().getProxyBridge() != null) {
             CloudDriver.getInstance().getProxyBridge().connectPlayer(this.getUniqueId(), service.getName());
-            return new SimpleQuery<>("PLAYER_CONNECT_REQUEST", true);
+            return IQuery.dummy("PLAYER_CONNECT_REQUEST", true);
         }
 
         DriverRequest<Boolean> request = DriverRequest.create("PLAYER_CONNECT_REQUEST", this.getProxy().getName(), Boolean.class);
@@ -371,7 +371,7 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     public IQuery<Boolean> kick(String reason) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && CloudDriver.getInstance().getProxyBridge() != null) {
             CloudDriver.getInstance().getProxyBridge().kickPlayer(this.getUniqueId(), reason);
-            return new SimpleQuery<>("PLAYER_KICK", true);
+            return IQuery.dummy("PLAYER_KICK", true);
         }
         DriverRequest<Boolean> request = DriverRequest.create("PLAYER_KICK", "PROXY", Boolean.class);
         request.append("uniqueId", this.getUniqueId().toString());

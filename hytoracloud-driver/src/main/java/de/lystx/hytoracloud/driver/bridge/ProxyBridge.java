@@ -41,7 +41,7 @@ public interface ProxyBridge {
             event.setComponent(CloudErrors.LOGIN_PROXY.toString());
         } else {
             cachedPlayer = new PlayerObject(connection);
-            cachedPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
+            cachedPlayer.setProxy(CloudDriver.getInstance().getServiceManager().getCurrentService());
             cachedPlayer.update();
 
             if (CloudDriver.getInstance().getFallbackManager().getFallback(cachedPlayer) != null) {
@@ -132,7 +132,7 @@ public interface ProxyBridge {
             permissionGroup = cloudPlayer.getCachedPermissionGroup();
         }
         if (cloudPlayer == null || cloudPlayer.getService() == null) {
-            service = CloudDriver.getInstance().getCurrentService();
+            service = CloudDriver.getInstance().getServiceManager().getCurrentService();
         } else {
             service = cloudPlayer.getService();
         }
@@ -143,9 +143,9 @@ public interface ProxyBridge {
                 .replace("%id%", service.getId() + "")
                 .replace("%group%", service.getGroup().getName() + "")
                 .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
-                .replace("%receiver%", CloudDriver.getInstance().getCurrentService().getGroup().getReceiver())
+                .replace("%receiver%", CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup().getReceiver())
                 .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
-                .replace("%proxy%", CloudDriver.getInstance().getCurrentService().getName())
+                .replace("%proxy%", CloudDriver.getInstance().getServiceManager().getCurrentService().getName())
                 .replace("%service%", service.getName())
                 .replace("%server%", service.getName());
 

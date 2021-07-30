@@ -19,7 +19,7 @@ public class DefaultMinecraftManager implements IMinecraftManager {
 
     @Override
     public MinecraftInfo getInfo(IService service) {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && service.getName().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName())) {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && service.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
             return (MinecraftInfo) CloudDriver.getInstance().getBridgeInstance().loadExtras().get("info");
         }
 

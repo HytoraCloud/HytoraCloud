@@ -11,6 +11,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.networking.elements.component.Component;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -100,18 +101,10 @@ public class PlayerListener implements Listener {
 
         ProxiedPlayer player = event.getPlayer();
         Server playerServer = player.getServer();
-        ICloudPlayer iCloudPlayer = ICloudPlayer.dummy(player.getName(), player.getUniqueId());
+        ICloudPlayer cloudPlayer = ICloudPlayer.dummy(player.getName(), player.getUniqueId());
 
-        if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
-            IServiceGroup IServiceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(event.getTarget().getName().split("-")[0]);
-            if (IServiceGroup.isMaintenance() && (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
-                player.disconnect(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", IServiceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix()));
-                event.setCancelled(true);
-            }
-        }
-
-        if (playerServer == null) {
-            IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(iCloudPlayer);
+        if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY) || playerServer == null) {
+            IService fallback = CloudDriver.getInstance().getFallbackManager().getFallback(cloudPlayer);
             ServerInfo fallbackInfo = ProxyServer.getInstance().getServerInfo(fallback.getName());
 
             if (fallbackInfo == null) {
@@ -119,13 +112,18 @@ public class PlayerListener implements Listener {
                 return;
             }
             event.setTarget(fallbackInfo);
-
-            iCloudPlayer.setService(fallback);
-        } else {
-            iCloudPlayer.setService(CloudDriver.getInstance().getServiceManager().getCachedObject(event.getTarget().getName()));
         }
-        iCloudPlayer.setProxy(CloudDriver.getInstance().getCurrentService());
-        iCloudPlayer.update();
+        IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(event.getTarget().getName().split("-")[0]);
+        if (serviceGroup.isMaintenance() && (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
+
+            if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
+                player.disconnect(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+            } else {
+                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
+                player.sendMessage(new TextComponent(message));
+            }
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler

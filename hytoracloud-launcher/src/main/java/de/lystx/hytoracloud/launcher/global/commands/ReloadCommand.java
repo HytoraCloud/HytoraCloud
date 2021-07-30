@@ -2,6 +2,7 @@ package de.lystx.hytoracloud.launcher.global.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
@@ -16,6 +17,9 @@ public class ReloadCommand {
     @Command(name = "reload", description = "Reloads the network", aliases = {"rl"})
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
+
+            IService service = CloudDriver.getInstance().getServiceManager().getCachedObject("Lobby-1");
+            System.out.println(service.requestInfo().pullValue());
 
             sender.sendMessage("COMMAND", "§2Debug!");
             return;

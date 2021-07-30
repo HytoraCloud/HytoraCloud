@@ -7,8 +7,10 @@ import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 
 import java.io.Serializable;
@@ -52,7 +54,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param host the host
      */
-    void setHost(String host);
+    IQuery<ResponseStatus> setHost(String host);
 
     /**
      * The state of this service
@@ -64,7 +66,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param state the state
      */
-    void setState(ServiceState state);
+    IQuery<ResponseStatus> setState(ServiceState state);
 
     /**
      * The properties of this service to store values
@@ -76,7 +78,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param properties the properties
      */
-    void setProperties(JsonObject<?> properties);
+    IQuery<ResponseStatus> setProperties(JsonObject<?> properties);
 
     /**
      * The group of this service
@@ -108,7 +110,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param authenticated boolean
      */
-    void setAuthenticated(boolean authenticated);
+    IQuery<ResponseStatus> setAuthenticated(boolean authenticated);
 
     /**
      * Adds a property to this service
@@ -116,7 +118,7 @@ public interface IService extends Serializable, Identifiable {
      * @param key the name of the property
      * @param propertyObject the propertyObject
      */
-    void addProperty(String key, JsonObject<?> propertyObject);
+    IQuery<ResponseStatus> addProperty(String key, JsonObject<?> propertyObject);
 
     /**
      * Checks if Service is for example
@@ -149,7 +151,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @return properties
      */
-    JsonObject<?> requestInfo();
+    IQuery<PropertyObject> requestInfo();
 
     /**
      * Returns the Motd of this Service
@@ -175,7 +177,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @return tps in string with color
      */
-    String getTPS();
+    IQuery<String> getTPS();
 
     /**
      * Updates this Service
@@ -186,9 +188,9 @@ public interface IService extends Serializable, Identifiable {
     /**
      * Gets the usage of the service
      *
-     * @return memory as long
+     * @return memory as query
      */
-    long getMemoryUsage();
+    IQuery<Long> getMemoryUsage();
 
     /**
      * Stops this service

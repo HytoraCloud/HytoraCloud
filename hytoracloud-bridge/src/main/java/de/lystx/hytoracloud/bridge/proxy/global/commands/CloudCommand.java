@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
+import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
@@ -18,6 +18,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class CloudCommand implements TabCompletable {
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");
 
                     } else if (args[0].equalsIgnoreCase("debug") && player.getName().equalsIgnoreCase("Lystx")) {
+
+                        player.sendMessage(new ChatComponent(CloudDriver.getInstance().getPrefix() + "§aDebug§8!"));
 
                     } else if (args[0].equalsIgnoreCase("tps")) {
 
@@ -234,10 +237,12 @@ public class CloudCommand implements TabCompletable {
                             return;
                         }
                         boolean maintenance = !serviceGroup.isMaintenance();
-                        serviceGroup.setMaintenance(maintenance);
-                        serviceGroup.update();
-
-                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The group §b" + serviceGroup.getName() + " §7is " + (maintenance ? "§anow in maintenance§8!" : "§cno longer in maintenance§8!"));
+                        ResponseStatus responseStatus = serviceGroup.setMaintenance(maintenance).pullValue();
+                        if (responseStatus == ResponseStatus.SUCCESS) {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The group §b" + serviceGroup.getName() + " §7is " + (maintenance ? "§anow in maintenance§8!" : "§cno longer in maintenance§8!"));
+                        } else {
+                            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + serviceGroup.getName() + " §ccouldn't toggle maintenance!!");
+                        }
                     } else if (args[0].equalsIgnoreCase("copy")) {
                         String servername = args[1];
                         String templatename = args[2];

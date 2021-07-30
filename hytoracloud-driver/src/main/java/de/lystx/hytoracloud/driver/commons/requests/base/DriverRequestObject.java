@@ -36,7 +36,7 @@ public class DriverRequestObject<T> implements DriverRequest<T> {
     /**
      * The data of this document
      */
-    private final PropertyObject document;
+    private PropertyObject document;
 
     DriverRequestObject(String key) {
         this(key, new RandomString(5).next(), null, JsonObject.serializable());
@@ -89,6 +89,12 @@ public class DriverRequestObject<T> implements DriverRequest<T> {
     }
 
     @Override
+    public DriverRequest<T> json(JsonObject<?> jsonData) {
+        this.document = new PropertyObject(jsonData.toString());
+        return this;
+    }
+
+    @Override
     public DriverRequest<T> target(String target) {
         this.target = target;
         return this;
@@ -112,12 +118,11 @@ public class DriverRequestObject<T> implements DriverRequest<T> {
      */
     @Override
     public IQuery<T> execute() {
-        IQuery<T> IQuery = new SimpleQuery<>(this);
-
+        IQuery<T> simpleQuery = new SimpleQuery<>(this);
 
         CloudDriver.getInstance().getMessageManager().sendChannelMessage(CloudDriver.getInstance().getRequestManager().toMessage(this));
-        CloudDriver.getInstance().getRequestManager().addRequest(getId(), IQuery);
-        return IQuery;
+        CloudDriver.getInstance().getRequestManager().addRequest(this.id, simpleQuery);
+        return simpleQuery;
     }
 
 }

@@ -43,21 +43,29 @@ public class RequestManager {
 
                 DriverRequest<?> request = channelMessage.getDocument().get("request", DriverRequestObject.class);
 
-                for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
-                    if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("ALL")) {
-                        requestHandler.accept(request);
-                    } else if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
-                        if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("CLOUD")) {
+                if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+                    if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("CLOUD")) {
+                        for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
                             requestHandler.accept(request);
-                        } else {
-                            IQuery<?> comply = request.execute();
-                            request.createResponse(request.typeClass()).data(comply.pullValue()).send();
                         }
                     } else {
-                        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-                            if (request.getTarget() == null || request.getTarget().equalsIgnoreCase(CloudDriver.getInstance().getCurrentService().getName()) || request.getTarget().equalsIgnoreCase("PROXY") && CloudDriver.getInstance().getCurrentService().getGroup().getType() == ServiceType.PROXY || request.getTarget().equalsIgnoreCase("BUKKIT") && CloudDriver.getInstance().getCurrentService().getGroup().getType() == ServiceType.SPIGOT) {
-                                requestHandler.accept(request);
-                            }
+                        IQuery<?> comply = request.execute();
+                        request.createResponse(request.typeClass()).data(comply.pullValue()).send();
+                    }
+                    return;
+                }
+                if (CloudDriver.getInstance().getDriverType() == CloudType.RECEIVER) {
+                    if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("RECEIVER")) {
+                        for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
+                            requestHandler.accept(request);
+                        }
+                    }
+                    return;
+                }
+                if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
+                    if (request.getTarget() == null || request.getTarget().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName()) || request.getTarget().equalsIgnoreCase("PROXY") && CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup().getType() == ServiceType.PROXY || request.getTarget().equalsIgnoreCase("BUKKIT") && CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup().getType() == ServiceType.SPIGOT) {
+                        for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
+                            requestHandler.accept(request);
                         }
                     }
                 }
@@ -83,6 +91,12 @@ public class RequestManager {
                     response.data(document.getBoolean("data"));
                 } else if (aClass.equals(Integer.class) || aClass.equals(int.class)) {
                     response.data(document.getInteger("data"));
+                } else if (aClass.equals(Long.class) || aClass.equals(long.class)) {
+                    response.data(document.getLong("data"));
+                } else if (aClass.equals(Short.class) || aClass.equals(short.class)) {
+                    response.data(document.getShort("data"));
+                } else if (aClass.equals(Byte.class) || aClass.equals(byte.class)) {
+                    response.data(document.getByte("data"));
                 } else if (aClass.equals(Double.class) || aClass.equals(double.class)) {
                     response.data(document.getDouble("data"));
                 } else if (aClass.equals(Float.class) || aClass.equals(float.class)) {
@@ -111,13 +125,12 @@ public class RequestManager {
 
 
     /**
-     * Registers {@link DriverRequest}-handlers
+     * Registers {@link DriverRequest}-handler
      *
-     * @param requestHandlers the handlers
+     * @param requestHandler the handler
      */
-    @SafeVarargs
-    public final void registerRequestHandler(Consumer<DriverRequest<?>>... requestHandlers) {
-        this.requestHandlers.addAll(Arrays.asList(requestHandlers));
+    public final void registerRequestHandler(Consumer<DriverRequest<?>> requestHandler) {
+        this.requestHandlers.add(requestHandler);
     }
 
 

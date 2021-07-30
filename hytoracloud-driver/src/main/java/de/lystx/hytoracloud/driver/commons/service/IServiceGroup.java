@@ -4,8 +4,10 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 
 import java.io.Serializable;
@@ -18,8 +20,6 @@ public interface IServiceGroup extends Serializable, Identifiable {
      */
     ITemplate getCurrentTemplate();
 
-    void setCurrentTemplate(ITemplate currentTemplate);
-
     /**
      * A list of all templates
      *
@@ -27,7 +27,22 @@ public interface IServiceGroup extends Serializable, Identifiable {
      */
     List<ITemplate> getTemplates();
 
-    void setTemplates(List<ITemplate> templateObjects);
+    /**
+     * Gets an {@link ITemplate} by its name
+     *
+     * @param name the name of the template
+     * @return template or null if not found
+     */
+    ITemplate getTemplate(String name);
+
+    /**
+     * Creates an {@link ITemplate} for this group
+     * with a given name
+     *
+     * @param name the name
+     * @return query containing template or null if already existing
+     */
+    IQuery<ITemplate> createTemplate(String name);
 
     /**
      * Prepares a {@link ServiceBuilder}
@@ -43,77 +58,55 @@ public interface IServiceGroup extends Serializable, Identifiable {
      */
     ServiceType getType();
 
-    void setType(ServiceType type);
-
     /**
      * The receiver this group runs on
      */
     String getReceiver();
-
-    void setReceiver(String receiver);
 
     /**
      * How many servers may maximum be online
      */
     int getMaxServer();
 
-    void setMaxServer(int maxServer);
-
     /**
      * How many servers must minimum be online
      */
     int getMinServer();
-
-    void setMinServer(int minServer);
 
     /**
      * How much ram this group maximum may use
      */
     int getMemory();
 
-    void setMemory(int maxRam);
-
     /**
      * Maximum of players on a service of this group
      */
     int getMaxPlayers();
-
-    void setMaxPlayers(int maxPlayers);
 
     /**
      * The percent of online players to start a new service
      */
     int getNewServerPercent();
 
-    void setNewServerPercent(int percent);
-
     /**
      * If this group is in maintenance
      */
     boolean isMaintenance();
-
-    void setMaintenance(boolean maintenance);
 
     /**
      * If this group is a lobby group
      */
     boolean isLobby();
 
-    void setLobby(boolean lobby);
-
     /**
      * If this group is dynamic or static
      */
     boolean isDynamic();
 
-    void setDynamic(boolean dynamic);
-
     /**
      * The properties of this group to store extra values
      */
     JsonObject<?> getProperties();
-
-    void setProperties(JsonObject<?> properties);
 
     /**
      * Updates the {@link IServiceGroup} on all
@@ -163,4 +156,90 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @return boolean
      */
     boolean isProcessRightReceiver();
+
+    /**
+     * Sets the maintenance state of this group
+     *
+     * @param maintenance the boolean
+     * @return query response
+     */
+    IQuery<ResponseStatus> setMaintenance(boolean maintenance);
+
+    /**
+     * Sets the selected template of this group
+     *
+     * @param template the template
+     * @return query response
+     */
+    IQuery<ResponseStatus> setTemplate(ITemplate template);
+
+    /**
+     * Sets the lobby mode of this group
+     * if this group is a lobby-server or not
+     *
+     * @param lobby the boolean
+     * @return query response
+     */
+    IQuery<ResponseStatus> setLobby(boolean lobby);
+
+    /**
+     * Sets the dynamic mode of this group
+     * if this group is static or dynamic
+     *
+     * @param dynamic the boolean
+     * @return query response
+     */
+    IQuery<ResponseStatus> setDynamic(boolean dynamic);
+
+    /**
+     * Sets the properties of this group
+     *
+     * @param properties the properties
+     * @return query response
+     */
+    IQuery<ResponseStatus> setProperties(JsonObject<PropertyObject> properties);
+
+    /**
+     * Sets the maxPlayers of this group
+     *
+     * @param maxPlayers the maxPlayers
+     * @return query response
+     */
+    IQuery<ResponseStatus> setMaxPlayers(int maxPlayers);
+
+
+    /**
+     * Sets the maxServer amount of this group
+     * Use -1 for unlimited
+     *
+     * @param maxServer the maxPlayers
+     * @return query response
+     */
+    IQuery<ResponseStatus> setMaxServer(int maxServer);
+
+    /**
+     * Sets the minServer amount of this group
+     *
+     * @param minServer the minServer
+     * @return query response
+     */
+    IQuery<ResponseStatus> setMinServer(int minServer);
+
+
+    /**
+     * Sets the memory that is allowed to be used of this group
+     *
+     * @param memory the memory
+     * @return query response
+     */
+    IQuery<ResponseStatus> setMemory(int memory);
+
+    /**
+     * Sets the percentage to start a new {@link IService} of this group
+     *
+     * @param percent the percent
+     * @return query response
+     */
+    IQuery<ResponseStatus> setNewServerPercent(int percent);
+
 }

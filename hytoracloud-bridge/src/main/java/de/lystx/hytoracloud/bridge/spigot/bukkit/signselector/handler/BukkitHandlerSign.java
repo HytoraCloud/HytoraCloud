@@ -17,8 +17,8 @@ public class BukkitHandlerSign implements PacketHandler {
             PacketOutServerSelector info = (PacketOutServerSelector) packet;
 
             boolean b = false;
-            int repeatTick = ServerSelector.getInstance().getSignManager().getConfiguration().getRepeatingTick();
-            if (repeatTick != info.getConfiguration().getRepeatingTick()) {
+            int repeatTick = ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout().getRepeatingTick();
+            if (repeatTick != info.getConfiguration().getLoadingLayout().getRepeatingTick()) {
                 b = true;
             }
 

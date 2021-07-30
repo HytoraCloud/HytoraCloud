@@ -66,6 +66,8 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
         };
     }
 
+
+
     @Override
     public Response<ICloudPlayer> getObjectSync(String name) {
         PacketRequestPlayerNamed packet = new PacketRequestPlayerNamed(name);

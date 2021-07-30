@@ -16,7 +16,7 @@ public class BukkitHandlerGroupUpdate implements PacketHandler {
         if (packet instanceof PacketInUpdateServiceGroup) {
 
             PacketInUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketInUpdateServiceGroup) packet;
-            IServiceGroup group = CloudDriver.getInstance().getCurrentService().getGroup();
+            IServiceGroup group = CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup();
             IServiceGroup newGroup = packetPlayOutUpdateServiceGroup.getServiceGroup();
 
             if (newGroup.getName().equalsIgnoreCase(group.getName())) {
@@ -29,8 +29,6 @@ public class BukkitHandlerGroupUpdate implements PacketHandler {
                                 .replace("%group%", group.getName()));
                     }
                 }
-                CloudDriver.getInstance().getBukkit().setMaxPlayers(newGroup.getMaxPlayers());
-                CloudDriver.getInstance().getBukkit().update();
             }
         }
     }

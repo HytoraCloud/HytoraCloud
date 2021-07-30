@@ -13,6 +13,7 @@ import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -27,6 +28,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputServi
 
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -178,20 +180,20 @@ public class CloudBridge {
 
                 CloudDriver.getInstance().executeIf(() -> {
 
-                    IService service = CloudDriver.getInstance().getCurrentService();
+                    IService service = CloudDriver.getInstance().getServiceManager().getCurrentService();
                     System.out.println("[CloudBridge] Verifying Service '" + service.getName() + "' that it is fully set up!");
                     try {
-                        service.setAuthenticated(true);
                         if (service.getGroup().getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER)) {
                             service.setHost("127.0.0.1");
                         } else {
                             service.setHost(InetAddress.getLocalHost().getHostAddress());
                         }
-                        service.update();
+                        IQuery<ResponseStatus> status = service.setAuthenticated(true).setTimeOut(30, ResponseStatus.FAILED);
+                        System.out.println("[CloudBridge] Authentication for '" + service.getName() + "' executed: " + status.pullValue().name());
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
                     }
-                }, () -> CloudDriver.getInstance().getCurrentService() != null);
+                }, () -> CloudDriver.getInstance().getServiceManager().getCurrentService() != null);
 
 
             }

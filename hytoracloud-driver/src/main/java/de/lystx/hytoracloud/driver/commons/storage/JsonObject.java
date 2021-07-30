@@ -117,6 +117,22 @@ public interface JsonObject<V> extends Serializable {
     double getDouble(String key);
 
     /**
+     * Gets an value stored under a key as {@link Short}
+     *
+     * @param key the key
+     * @return object
+     */
+    short getShort(String key);
+
+    /**
+     * Gets an value stored under a key as {@link Byte}
+     *
+     * @param key the key
+     * @return object
+     */
+    byte getByte(String key);
+
+    /**
      * Gets an value stored under a key as {@link com.google.gson.JsonObject}
      *
      * @param key the key
@@ -139,6 +155,13 @@ public interface JsonObject<V> extends Serializable {
      * @return object
      */
     com.google.gson.JsonElement getElement(String key);
+
+    /**
+     * Returns the base of this object
+     *
+     * @return json element
+     */
+    com.google.gson.JsonElement getBase();
 
     /**
      * Gets an value stored under a key as an object you want
@@ -173,6 +196,16 @@ public interface JsonObject<V> extends Serializable {
      * @return list
      */
     <T> List<T> getList(String key, Class<T> tClass);
+
+    /**
+     * Returns a List full of custom objects
+     *
+     * @param key the key where the list is stored
+     * @param interfaceClass the class of the interface
+     * @param wrapperObjectClass the implementation class
+     * @return list
+     */
+    <T> List<T> getInterfaceList(String key, Class<T> interfaceClass, Class<? extends T> wrapperObjectClass);
 
     /**
      * Returns a list full of strings
@@ -281,4 +314,5 @@ public interface JsonObject<V> extends Serializable {
      * @return boolean
      */
     boolean isEmpty();
+
 }

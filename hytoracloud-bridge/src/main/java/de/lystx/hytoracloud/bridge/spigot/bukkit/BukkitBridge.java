@@ -156,7 +156,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         CloudDriver.getInstance().registerCommand(new StopCommand());
 
         //Start checking for players or stop server
-        CloudDriver.getInstance().executeIf(this::startStopTimer, () -> CloudDriver.getInstance().getCurrentService() != null);
+        CloudDriver.getInstance().executeIf(this::startStopTimer, () -> CloudDriver.getInstance().getServiceManager().getCurrentService() != null);
 
     }
 
@@ -172,7 +172,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     @Override
     public PropertyObject requestProperties() {
 
-        IService service = CloudDriver.getInstance().getCurrentService();
+        IService service = CloudDriver.getInstance().getServiceManager().getCurrentService();
 
         PropertyObject propertyObject = new PropertyObject();
 
@@ -429,7 +429,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
             if (cloudPlayer == null) {
                 player.kickPlayer(msg);
             } else {
-                IService fallback = CloudDriver.getInstance().getFallbackManager().getFallbackExcept(cloudPlayer, CloudDriver.getInstance().getCurrentService());
+                IService fallback = CloudDriver.getInstance().getFallbackManager().getFallbackExcept(cloudPlayer, CloudDriver.getInstance().getServiceManager().getCurrentService());
                 cloudPlayer.sendMessage(new ChatComponent(msg));
                 cloudPlayer.connect(fallback);
             }
@@ -446,7 +446,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
      * Shuts down the driver connection
      */
     public void shutdownDriver() {
-        CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getCurrentService().getName()));
+        CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getServiceManager().getCurrentService().getName()));
 
         try {
             CloudDriver.getInstance().getConnection().close();
@@ -478,7 +478,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
      * player being online
      */
     public void startStopTimer() {
-        IService currentService = CloudDriver.getInstance().getCurrentService();
+        IService currentService = CloudDriver.getInstance().getServiceManager().getCurrentService();
         if (currentService == null) {
             return;
         }

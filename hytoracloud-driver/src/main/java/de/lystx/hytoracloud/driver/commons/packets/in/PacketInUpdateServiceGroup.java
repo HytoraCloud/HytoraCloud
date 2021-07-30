@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.networking.elements.packet.Packet;
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class PacketInUpdateServiceGroup extends Packet implements Serializable {
+public class PacketInUpdateServiceGroup extends Packet {
 
     private ServiceGroupObject serviceGroup;
 

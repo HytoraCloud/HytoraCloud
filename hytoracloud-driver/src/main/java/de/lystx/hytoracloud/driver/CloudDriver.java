@@ -12,6 +12,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessen
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.DefaultFallbackManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.IFallbackManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.DefaultTemplateManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplateManager;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -24,6 +25,8 @@ import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
 import de.lystx.hytoracloud.driver.commons.requests.RequestManager;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.service.IDService;
 import de.lystx.hytoracloud.driver.commons.service.PortService;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
@@ -44,6 +47,7 @@ import de.lystx.hytoracloud.driver.bridge.IBukkit;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.log.Loggers;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.TicksPerSecond;
@@ -84,9 +88,7 @@ import java.util.function.Consumer;
         todo = {
                 "1.17 Support & Higher Java Versions",
                 "FIx TabList-Updating",
-                "Sign-Maintenance-Update",
-                "Check Velocity-Support",
-                "Fix example: Lobby-2 and Lobby-1 online, stopping Lobby-1 still having Lobby-2. On Connect BungeecOrd says: java.lang.IllegalStateException: Default server not defined"
+                "Check Velocity-Support"
         }
 )
 public class CloudDriver {
@@ -234,13 +236,13 @@ public class CloudDriver {
      * @param cloudEvent the event to call
      */
     public boolean callEvent(CloudEvent cloudEvent) {
-        if (this.getCurrentService() == null && this.driverType == CloudType.BRIDGE) {
+        if ((this.serviceManager == null || this.serviceManager.getCurrentService() == null)&& this.driverType == CloudType.BRIDGE) {
             return false;
         }
 
         if (this.driverType == CloudType.BRIDGE) {
             if (this.connection != null) {
-                this.connection.sendPacket(new PacketCallEvent(cloudEvent, this.getCurrentService().getName()));
+                this.connection.sendPacket(new PacketCallEvent(cloudEvent, this.serviceManager.getCurrentService().getName()));
             }
         } else {
             if (this.connection != null) {
@@ -326,6 +328,7 @@ public class CloudDriver {
      */
     public void sendPacket(Packet packet) {
         this.sendPacket(packet,  null);
+
     }
 
     /**
@@ -380,23 +383,6 @@ public class CloudDriver {
      */
 
     /**
-     * Returns the current {@link IService} the Driver is running on
-     * might be Lobby or Proxy whatever
-     *
-     * @return service
-     */
-    public IService getCurrentService() {
-        if (this.driverType != CloudType.BRIDGE) {
-            return null;
-        }
-        if (this.serviceManager == null) {
-            return null;
-        }
-        JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
-        return this.serviceManager.getCachedObject(jsonDocument.getString("server"));
-    }
-
-    /**
      * Gets the Host for {@link IService}s to connect to
      *
      * @return inetAddress
@@ -426,41 +412,11 @@ public class CloudDriver {
             return null;
         }
         NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
-        if (networkConfig == null || CloudDriver.getInstance().getCurrentService() == null) {
+        if (networkConfig == null || CloudDriver.getInstance().getServiceManager().getCurrentService() == null) {
             return ProxyConfig.defaultConfig();
         }
-        ProxyConfig proxyConfig = networkConfig.getProxyConfigs().get(CloudDriver.getInstance().getCurrentService().getGroup().getName());
+        ProxyConfig proxyConfig = networkConfig.getProxyConfigs().get(CloudDriver.getInstance().getServiceManager().getCurrentService().getGroup().getName());
         return proxyConfig == null ? ProxyConfig.defaultConfig() : proxyConfig;
-    }
-    
-    /*
-     * ======================================
-     *         Other Methods
-     * ======================================
-     */
-
-    public PacketOutGlobalInfo reloadPacket() {
-        return (new PacketOutGlobalInfo(
-                CloudDriver.getInstance().getNetworkConfig(),
-                CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
-                CloudDriver.getInstance().getServiceManager().getCachedObjects(),
-                CloudDriver.getInstance().getPlayerManager().getCachedObjects()
-        ));
-    }
-
-    /**
-     * Sets the network config and updates the port values
-     *
-     * @param networkConfig config
-     */
-    public void setNetworkConfig(NetworkConfig networkConfig) {
-        this.networkConfig = networkConfig;
-        try {
-            this.portService.setServerPort(networkConfig.getServerStartPort());
-            this.portService.setProxyPort(networkConfig.getProxyStartPort());
-        } catch (NullPointerException e) {
-            //Ignoring
-        }
     }
 
     /**
@@ -474,11 +430,33 @@ public class CloudDriver {
         if (this.driverType == CloudType.CLOUDSYSTEM) {
             return ServiceType.CLOUDSYSTEM;
         } else {
-            if (this.getCurrentService() == null) {
+            if (this.serviceManager == null || this.serviceManager.getCurrentService() == null) {
                 return ServiceType.NONE;
             } else {
-                return this.getCurrentService().getGroup().getType();
+                return this.serviceManager.getCurrentService().getGroup().getType();
             }
+        }
+    }
+
+    /*
+     * ======================================
+     *         Other Methods
+     * ======================================
+     */
+
+
+    /**
+     * Sets the network config and updates the port values
+     *
+     * @param networkConfig config
+     */
+    public void setNetworkConfig(NetworkConfig networkConfig) {
+        this.networkConfig = networkConfig;
+        try {
+            this.portService.setServerPort(networkConfig.getServerStartPort());
+            this.portService.setProxyPort(networkConfig.getProxyStartPort());
+        } catch (NullPointerException e) {
+            //Ignoring
         }
     }
 

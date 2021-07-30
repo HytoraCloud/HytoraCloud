@@ -2,7 +2,13 @@ package de.lystx.hytoracloud.driver.commons.requests.base;
 
 import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
 
+import java.util.function.Consumer;
+
 public interface IQuery<T> {
+
+    static <T> IQuery<T> dummy(String key, T value) {
+        return new SimpleQuery<>(key, value);
+    }
 
     /**
      * Sets the timeout of this request
@@ -12,6 +18,14 @@ public interface IQuery<T> {
      * @return current future
      */
     IQuery<T> setTimeOut(long ticks, T timeOutValue);
+
+    /**
+     * Adds a listener to this query
+     *
+     * @param listener the listener
+     * @return current future
+     */
+    IQuery<T> addFutureListener(Consumer<IQuery<T>> listener);
 
     /**
      * Checks if the {@link DriverRequest} was successful
