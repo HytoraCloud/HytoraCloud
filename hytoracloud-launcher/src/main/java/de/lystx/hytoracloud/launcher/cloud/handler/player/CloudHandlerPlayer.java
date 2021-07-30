@@ -6,8 +6,8 @@ import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketReques
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerNamed;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerUniqueId;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 
@@ -15,7 +15,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class CloudHandlerPlayer implements PacketHandler {
 
     @SneakyThrows
     @Override
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         ICloudPlayerManager playerManager = CloudDriver.getInstance().getPlayerManager();
 
         if (packet instanceof PacketUpdatePlayer) {

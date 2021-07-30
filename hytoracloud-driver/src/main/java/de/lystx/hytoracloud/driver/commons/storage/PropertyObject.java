@@ -112,6 +112,19 @@ public class PropertyObject implements JsonObject<PropertyObject> {
     }
 
     @Override
+    public float getFloat(String key) {
+        JsonDocument document = new JsonDocument(this.jsonString);
+        if (document.has(key)) {
+            return document.getInteger(key);
+        }
+
+        if (this.defaultValue != null) {
+            this.append(key, this.defaultValue);
+        }
+        return ((defaultValue != null && defaultValue instanceof Float) ? (Float) defaultValue : null);
+    }
+
+    @Override
     public long getLong(String key) {
         JsonDocument document = new JsonDocument(this.jsonString);
         if (document.has(key)) {
@@ -264,7 +277,7 @@ public class PropertyObject implements JsonObject<PropertyObject> {
 
     @Override
     public boolean has(String key) {
-        return new JsonDocument(this.getFile()).has(key);
+        return new JsonDocument(this.jsonString).has(key);
     }
 
     @Override

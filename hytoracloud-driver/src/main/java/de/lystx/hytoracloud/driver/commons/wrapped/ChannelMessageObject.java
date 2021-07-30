@@ -8,8 +8,8 @@ import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.component.RepliableComponent;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.RepliableComponent;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicReference;

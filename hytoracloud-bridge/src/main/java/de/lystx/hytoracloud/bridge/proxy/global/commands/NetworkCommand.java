@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import lombok.SneakyThrows;
 
 public class NetworkCommand {
@@ -30,7 +30,7 @@ public class NetworkCommand {
             player.sendMessage("  §8➜ §bLobby §8┃ §7" + CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceState.LOBBY).size());
 
             player.sendMessage("§8» §bGlobal§8:");
-            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + CloudDriver.getInstance().getResponse(new PacketRequestCloudTPS()).reply().getMessage());
+            player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + DriverRequest.create("CLOUD_GET_TPS", "CLOUD", String.class).execute().pullValue());
             player.sendMessage("§8§m--------------------------------------");
         } else {
             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYou aren't allowed to perform this command!");

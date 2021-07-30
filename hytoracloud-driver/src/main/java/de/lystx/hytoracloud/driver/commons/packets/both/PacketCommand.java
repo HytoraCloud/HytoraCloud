@@ -2,13 +2,11 @@ package de.lystx.hytoracloud.driver.commons.packets.both;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
-
-import java.io.Serializable;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketCommand extends HytoraPacket {
+public class PacketCommand extends Packet {
 
     private String service;
     private String command;

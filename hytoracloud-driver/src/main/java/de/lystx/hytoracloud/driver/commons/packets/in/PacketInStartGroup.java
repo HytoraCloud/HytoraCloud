@@ -5,23 +5,21 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
-
-import java.io.Serializable;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketInStartGroup extends HytoraPacket implements Serializable {
+public class PacketInStartGroup extends Packet  {
 
-    private IServiceGroup IServiceGroup;
+    private IServiceGroup serviceGroup;
 
     @Override
     public void write(Component component) {
-        component.put("s", IServiceGroup);
+        component.put("s", serviceGroup);
     }
 
     @Override
     public void read(Component component) {
-        IServiceGroup = (IServiceGroup) component.get("s");
+        serviceGroup = (IServiceGroup) component.get("s");
     }
 }

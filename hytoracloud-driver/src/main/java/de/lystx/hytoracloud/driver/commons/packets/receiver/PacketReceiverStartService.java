@@ -4,11 +4,11 @@ import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @AllArgsConstructor @Getter
-public class PacketReceiverStartService extends HytoraPacket {
+public class PacketReceiverStartService extends Packet {
 
     private IReceiver receiver;
     private IService service;

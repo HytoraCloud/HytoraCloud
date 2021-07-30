@@ -5,17 +5,14 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.BukkitItem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
 import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketPlaySound;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketSendTitle;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketTeleportPlayer;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.InventoryObject;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -128,50 +125,31 @@ public class BukkitHandlerCloudPlayer implements PacketHandler {
                     } catch (Exception e) {
                         driverRequest.createResponse().error(new DriverRequestException("An exception happened", 0x06, e.getClass())).send();
                     }
+                } else if (driverRequest.equalsIgnoreCase("PLAYER_SEND_TITLE")) {
+
+                    UUID uuid = UUID.fromString(document.getString("uniqueId"));
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player == null) {
+                        return;
+                    }
+                    player.sendTitle(document.getString("title"), document.getString("subtitle"));
+                    driverRequest.createResponse().data(true).send();
+
+                } else if (driverRequest.equalsIgnoreCase("PLAYER_PLAY_SOUND")) {
+                    UUID uuid = UUID.fromString(document.getString("uniqueId"));
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player == null) {
+                        return;
+                    }
+                    Sound sound = Sound.valueOf(document.getString("sound"));
+                    player.playSound(player.getLocation(), sound, document.getFloat("v1"), document.getFloat("v2"));
+                    driverRequest.createResponse().data(true).send();
                 }
             }
         });
     }
 
     @SneakyThrows
-    public void handle(HytoraPacket packet) {
-        if (packet instanceof PacketPlaySound) {
-            PacketPlaySound packetPlaySound = (PacketPlaySound)packet;
-            Player player = Bukkit.getPlayer(packetPlaySound.getName());
-            if (player == null) {
-                return;
-            }
-            Sound sound = Sound.valueOf(packetPlaySound.getSound());
-            player.playSound(player.getLocation(), sound, packetPlaySound.getV1(), packetPlaySound.getV2());
-
-        } else if (packet instanceof PacketTeleportPlayer) {
-            PacketTeleportPlayer teleportPlayer = (PacketTeleportPlayer)packet;
-            Player player = Bukkit.getPlayer(teleportPlayer.getUuid());
-            MinecraftLocation location = teleportPlayer.getLocation();
-            if (player == null || location == null) {
-                return;
-            }
-
-            player.teleport(
-                    new Location(
-                    Bukkit.getWorld(
-                            location.getWorld()
-                    ),
-                    location.getX(),
-                    location.getY(),
-                    location.getZ(),
-                    location.getYaw(),
-                    location.getPitch()
-                    )
-            );
-
-        } else if (packet instanceof PacketSendTitle) {
-            PacketSendTitle packetSendTitle = (PacketSendTitle)packet;
-            Player player = Bukkit.getPlayer(packetSendTitle.getName());
-            if (player == null) {
-                return;
-            }
-            player.sendTitle(packetSendTitle.getTitle(), packetSendTitle.getSubtitle());
-        }
+    public void handle(Packet packet) {
     }
 }

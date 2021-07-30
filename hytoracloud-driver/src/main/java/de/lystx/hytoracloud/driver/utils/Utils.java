@@ -63,6 +63,26 @@ public class Utils {
         }
     }
 
+
+    @SneakyThrows
+    public static Enum<?> getEnumByName(Class<?> enumType, String name) {
+
+        Method enumConstantDirectory = enumType.getClass().getDeclaredMethod("enumConstantDirectory");
+        enumConstantDirectory.setAccessible(true);
+
+        Map<String, Enum<?>> invoke = (Map<String, Enum<?>>) enumConstantDirectory.invoke(enumType);
+
+        Enum<?> result = invoke.get(name);
+        if (result != null) {
+            return result;
+        }
+        if (name == null) {
+            throw new NullPointerException("Name is null");
+        }
+        throw new IllegalArgumentException("No enum constant " + enumType.getCanonicalName() + "." + name);
+    }
+
+
     public static InetSocketAddress getAddress(String address) throws Exception {
         String[] split = address.split(":");
         String hostname = Arrays.stream(Arrays.copyOfRange(split, 0, split.length - 1)).collect(Collectors.joining(":"));

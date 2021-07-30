@@ -7,8 +7,8 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleServic
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.connection.HytoraConnection;
-import net.hytora.networking.elements.packet.EmptyPacket;
+import de.lystx.hytoracloud.networking.connection.NetworkConnection;
+import de.lystx.hytoracloud.networking.elements.packet.EmptyPacket;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class PacketRequestModules extends EmptyPacket {
 
 
     @Override
-    public void handle(HytoraConnection connection) {
+    public void handle(NetworkConnection connection) {
 
         List<IModule> modules = new LinkedList<>();
 

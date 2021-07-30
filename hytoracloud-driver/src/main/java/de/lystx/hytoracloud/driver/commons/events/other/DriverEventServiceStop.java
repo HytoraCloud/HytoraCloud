@@ -5,9 +5,14 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter @AllArgsConstructor
-public class DriverEventServiceStop extends CloudEvent {
+import java.io.Serializable;
+
+@Getter
+public class DriverEventServiceStop extends DriverEventService {
 
     private static final long serialVersionUID = -1109833014123476850L;
-    private final IService service;
+
+    public DriverEventServiceStop(IService service) {
+        super(service);
+    }
 }

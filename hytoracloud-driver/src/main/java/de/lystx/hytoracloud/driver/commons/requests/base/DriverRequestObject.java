@@ -111,13 +111,13 @@ public class DriverRequestObject<T> implements DriverRequest<T> {
      * @return future
      */
     @Override
-    public DriverRequestFuture<T> comply() {
-        DriverRequestFuture<T> driverRequestFuture = new DriverFutureObject<>(this);
+    public IQuery<T> execute() {
+        IQuery<T> IQuery = new SimpleQuery<>(this);
 
 
         CloudDriver.getInstance().getMessageManager().sendChannelMessage(CloudDriver.getInstance().getRequestManager().toMessage(this));
-        CloudDriver.getInstance().getRequestManager().addRequest(getId(), driverRequestFuture);
-        return driverRequestFuture;
+        CloudDriver.getInstance().getRequestManager().addRequest(getId(), IQuery);
+        return IQuery;
     }
 
 }

@@ -2,11 +2,11 @@ package de.lystx.hytoracloud.driver.commons.packets.in.request.other;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketRequestPlayerNamed extends HytoraPacket {
+public class PacketRequestPlayerNamed extends Packet {
 
     private String name;
 

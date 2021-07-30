@@ -5,14 +5,14 @@ package de.lystx.hytoracloud.driver.commons.packets;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.util.UUID;
 
 
 @Getter @AllArgsConstructor @NoArgsConstructor
-public class UUIDPacket extends HytoraPacket {
+public class UUIDPacket extends Packet {
 
     private UUID uuid;
 

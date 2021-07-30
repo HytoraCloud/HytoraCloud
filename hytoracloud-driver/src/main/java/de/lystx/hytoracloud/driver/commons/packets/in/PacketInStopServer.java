@@ -1,16 +1,14 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
-import de.lystx.hytoracloud.driver.commons.service.IService;
-
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 
 @AllArgsConstructor @Getter
-public class PacketInStopServer extends HytoraPacket  {
+public class PacketInStopServer extends Packet {
 
 
     private String service;

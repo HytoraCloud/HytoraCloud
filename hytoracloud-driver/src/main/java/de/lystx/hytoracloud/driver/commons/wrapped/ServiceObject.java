@@ -22,7 +22,7 @@ import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.io.IOException;
 import java.util.LinkedList;

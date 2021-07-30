@@ -2,13 +2,13 @@ package de.lystx.hytoracloud.driver.commons.packets.in.request.other;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.util.UUID;
 
 @Getter @AllArgsConstructor
-public class PacketRequestPlayerUniqueId extends HytoraPacket {
+public class PacketRequestPlayerUniqueId extends Packet {
 
     private UUID uniqueId;
 

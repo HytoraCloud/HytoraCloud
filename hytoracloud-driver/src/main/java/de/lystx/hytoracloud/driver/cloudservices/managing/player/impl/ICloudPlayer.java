@@ -4,7 +4,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequestFuture;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
@@ -15,6 +15,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandEx
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.uuid.NameChange;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -88,7 +89,7 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      *
      * @return response with the ping
      */
-    DriverRequestFuture<Integer> getPing();
+    IQuery<Integer> getPing();
 
     /**
      * Loads the player's property as {@link JsonObject}
@@ -97,7 +98,7 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      *
      * @return response with the property
      */
-    DriverRequestFuture<PropertyObject> getProperty(String name);
+    IQuery<PropertyObject> getProperty(String name);
 
     /**
      * Loads the player's property as {@link JsonObject}
@@ -106,7 +107,7 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      *
      * @return response with the property
      */
-    DriverRequestFuture<PropertyObject> getPropertySafely(String name);
+    IQuery<PropertyObject> getPropertySafely(String name);
 
     /**
      * Loads all {@link NameChange}s of this player
@@ -136,14 +137,14 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      *
      * @param message the message to send
      */
-    DriverRequestFuture<Boolean> sendActionbar(Object message);
+    IQuery<Boolean> sendActionbar(Object message);
 
     /**
      * Opens a {@link Inventory} to this player
      *
      * @param inventory the inventory to open
      */
-    DriverRequestFuture<Boolean> openInventory(Inventory inventory);
+    IQuery<Boolean> openInventory(Inventory inventory);
 
     /**
      * Sets the tabList of this player
@@ -151,7 +152,7 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      * @param header the header
      * @param footer the footer
      */
-    DriverRequestFuture<Boolean> sendTabList(ChatComponent header, ChatComponent footer);
+    IQuery<Boolean> sendTabList(ChatComponent header, ChatComponent footer);
 
     /**
      * Plays a sound for this player
@@ -159,7 +160,7 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      * @param v1 the first volume
      * @param v2 the second volume
      */
-    DriverRequestFuture<Boolean> playSound(Enum<?> sound, Float v1, Float v2);
+    IQuery<Boolean> playSound(Enum<?> sound, Float v1, Float v2);
 
     /**
      * Sends a title to this player
@@ -167,7 +168,7 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      * @param title the title
      * @param subtitle the subtitle
      */
-    DriverRequestFuture<Boolean> sendTitle(String title, String subtitle);
+    IQuery<Boolean> sendTitle(String title, String subtitle);
 
     /**
      * Gets the location of this player
@@ -175,14 +176,14 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      *
      * @return location
      */
-    DriverRequestFuture<MinecraftLocation> getLocation();
+    IQuery<MinecraftLocation> getLocation();
 
     /**
      * Teleports this player to a location
      *
      * @param location the location
      */
-    DriverRequestFuture<Boolean> teleport(MinecraftLocation location);
+    IQuery<Boolean> teleport(MinecraftLocation location);
 
     /**
      * Adds a property to this player
@@ -191,19 +192,19 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      * @param jsonObject the data
      * @return status
      */
-    DriverRequestFuture<Boolean> addProperty(String name, PropertyObject jsonObject);
+    IQuery<Boolean> addProperty(String name, PropertyObject jsonObject);
 
     /**
      * Fallbacks this player
      */
-    DriverRequestFuture<Boolean> fallback();
+    IQuery<Boolean> fallback();
 
     /**
      * Connects this player to a {@link IService}
      *
      * @param service the service to connect to
      */
-    DriverRequestFuture<Boolean> connect(IService service);
+    IQuery<Boolean> connect(IService service);
 
     /**
      * Connects this player to a random service
@@ -211,14 +212,23 @@ public interface ICloudPlayer extends Serializable, CommandExecutor, IPermission
      *
      * @param serviceGroup the group
      */
-    DriverRequestFuture<Boolean> connectRandom(IServiceGroup serviceGroup);
+    IQuery<Boolean> connectRandom(IServiceGroup serviceGroup);
 
     /**
      * Kicks this player from the network
      *
      * @param reason the reason for the kick
      */
-    DriverRequestFuture<Boolean> kick(String reason);
+    IQuery<Boolean> kick(String reason);
+
+    /**
+     * Gets the updated version of this player
+     * if in time between some actions the player got
+     * updated and the service or proxy is not the real one
+     *
+     * @return synced player
+     */
+    ICloudPlayer sync();
 
     /**
      * Easier method to get a {@link ICloudPlayer}

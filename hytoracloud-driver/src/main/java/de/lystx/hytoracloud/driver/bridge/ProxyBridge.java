@@ -1,17 +1,13 @@
 package de.lystx.hytoracloud.driver.bridge;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudErrors;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
 import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
@@ -125,40 +121,38 @@ public interface ProxyBridge {
      */
     default String formatTabList(ICloudPlayer cloudPlayer, String input) {
 
-        try {
-            IService service;
-            PermissionGroup permissionGroup;
-            if (cloudPlayer == null || cloudPlayer.getCachedPermissionGroup() == null) {
-                permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
-            } else {
-                permissionGroup = cloudPlayer.getCachedPermissionGroup();
-            }
-            if (cloudPlayer == null || cloudPlayer.getService() == null) {
-                service = CloudDriver.getInstance().getCurrentService();
-            } else {
-                service = cloudPlayer.getService();
-            }
-            return input
-                    .replace("&", "§")
-                    .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()))
-                    .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()))
-                    .replace("%id%", service.getId() + "")
-                    .replace("%group%", service.getGroup().getName() + "")
-                    .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
-                    .replace("%receiver%", CloudDriver.getInstance().getCurrentService().getGroup().getReceiver())
-                    .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
-                    .replace("%proxy%", CloudDriver.getInstance().getCurrentService().getName())
-                    .replace("%service%", service.getName())
-                    .replace("%server%", service.getName());
-
-        } catch (NullPointerException e) {
-            e.printStackTrace();
+        if (cloudPlayer != null) {
+            cloudPlayer = cloudPlayer.sync();
         }
-        return null;
+        IService service;
+        PermissionGroup permissionGroup;
+        if (cloudPlayer == null || cloudPlayer.getCachedPermissionGroup() == null) {
+            permissionGroup = new PermissionGroup("Player", 9999, "§7", "§7", "§7", "", new LinkedList<>(), new LinkedList<>(), new HashMap<>());
+        } else {
+            permissionGroup = cloudPlayer.getCachedPermissionGroup();
+        }
+        if (cloudPlayer == null || cloudPlayer.getService() == null) {
+            service = CloudDriver.getInstance().getCurrentService();
+        } else {
+            service = cloudPlayer.getService();
+        }
+        return input
+                .replace("&", "§")
+                .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()))
+                .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()))
+                .replace("%id%", service.getId() + "")
+                .replace("%group%", service.getGroup().getName() + "")
+                .replace("%rank%", permissionGroup == null ? "No group found" : permissionGroup.getName())
+                .replace("%receiver%", CloudDriver.getInstance().getCurrentService().getGroup().getReceiver())
+                .replace("%rank_color%", permissionGroup == null ? "§7" : permissionGroup.getDisplay())
+                .replace("%proxy%", CloudDriver.getInstance().getCurrentService().getName())
+                .replace("%service%", service.getName())
+                .replace("%server%", service.getName());
+
     }
 
     default void updateTabList(ICloudPlayer cloudPlayer, TabList tabList) {
-        if (!CloudDriver.getInstance().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
+        if (cloudPlayer == null || !CloudDriver.getInstance().getProxyConfig().isEnabled() || !tabList.isEnabled()) {
             return;
         }
 

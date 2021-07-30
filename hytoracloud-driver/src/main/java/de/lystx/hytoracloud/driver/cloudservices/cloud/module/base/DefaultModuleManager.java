@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestModules;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.util.LinkedList;
 import java.util.List;

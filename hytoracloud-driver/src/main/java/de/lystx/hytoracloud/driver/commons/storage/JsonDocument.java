@@ -121,9 +121,9 @@ public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage
             if (value instanceof JsonDocument) {
                 JsonDocument document = (JsonDocument) value;
                 this.jsonObject.add(key, document.getJsonObject());
-            } else if (value instanceof de.lystx.hytoracloud.driver.commons.storage.JsonObject) {
-                de.lystx.hytoracloud.driver.commons.storage.JsonObject<?> jsonObject = (de.lystx.hytoracloud.driver.commons.storage.JsonObject<?>) value;
-                this.jsonObject.add(key, parser.parse(jsonObject.toString()));
+            } else if (value instanceof PropertyObject) {
+                PropertyObject document = (PropertyObject) value;
+                this.jsonObject.add(key, parser.parse(document.toString()));
             } else {
                 this.jsonObject.add(key, GSON.toJsonTree(value));
             }
@@ -207,6 +207,19 @@ public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage
             return this.defaultValue != null && this.defaultValue instanceof Integer ? (Integer) this.defaultValue : -1;
         }
         return this.jsonObject.get(key).getAsInt();
+    }
+
+    @Override
+    public float getFloat(String key) {
+        if (!this.jsonObject.has(key)) {
+
+            if (this.defaultValue != null) {
+                this.append(key, this.defaultValue);
+            }
+
+            return this.defaultValue != null && this.defaultValue instanceof Float ? (Float) this.defaultValue : -1;
+        }
+        return this.jsonObject.get(key).getAsFloat();
     }
 
     @Override

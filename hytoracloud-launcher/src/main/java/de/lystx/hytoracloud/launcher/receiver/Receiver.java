@@ -23,12 +23,12 @@ import de.lystx.hytoracloud.launcher.receiver.impl.manager.ConfigService;
 import de.lystx.hytoracloud.launcher.receiver.impl.setup.ReceiverSetup;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.connection.client.ClientListener;
-import net.hytora.networking.connection.client.HytoraClient;
-import net.hytora.networking.elements.component.ComponentSender;
-import net.hytora.networking.elements.other.HytoraLogin;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.connection.client.ClientListener;
+import de.lystx.hytoracloud.networking.connection.client.NetworkClient;
+import de.lystx.hytoracloud.networking.elements.component.ComponentSender;
+import de.lystx.hytoracloud.networking.elements.other.NetworkLogin;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class Receiver extends CloudProcess {
     /**
      * The client connection
      */
-    private HytoraClient hytoraClient;
+    private NetworkClient networkClient;
 
     public Receiver() {
         super(CloudType.RECEIVER);
@@ -125,7 +125,7 @@ public class Receiver extends CloudProcess {
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("INFO", "§7Loading §6Receiver§f...");
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("§8");
 
-            (this.hytoraClient = new HytoraClient(receiver.getHost(), receiver.getPort())).login(new HytoraLogin(receiver.getName())).listener(new ClientListener() {
+            (this.networkClient = new NetworkClient(receiver.getHost(), receiver.getPort())).login(new NetworkLogin(receiver.getName())).listener(new ClientListener() {
                 @Override
                 public void onConnect(InetSocketAddress socketAddress) {
                     log("INFO", "§7Successfully §aconnected §7to §3Main-CloudInstance §h@ §b" + socketAddress.toString() + "§h!");
@@ -137,7 +137,7 @@ public class Receiver extends CloudProcess {
                     receiver.setAuthenticated(true);
                     receiver.update();
 
-                    new PacketReceiverLogin((ReceiverObject) receiver, authManager.getKey()).toReply(hytoraClient, component -> {
+                    new PacketReceiverLogin((ReceiverObject) receiver, authManager.getKey()).toReply(networkClient, component -> {
                         boolean allow = component.get("allowed");
                         String message = component.get("message");
 
@@ -153,7 +153,7 @@ public class Receiver extends CloudProcess {
                             sendPacket(new PacketReload());
                             getConnection().registerPacketHandler(new PacketHandler() {
                                 @Override
-                                public void handle(HytoraPacket packet) {
+                                public void handle(Packet packet) {
 
                                     if (packet instanceof PacketOutGlobalInfo) {
                                         PacketOutGlobalInfo globalInfo = (PacketOutGlobalInfo)packet;
@@ -180,7 +180,7 @@ public class Receiver extends CloudProcess {
                 public void onReceive(ComponentSender sender, Object object) {}
 
                 @Override
-                public void packetIn(HytoraPacket packet) {
+                public void packetIn(Packet packet) {
                     if (packet instanceof PacketShutdown) {
                         log("WARNING", "§cAttention!!!!!");
                         log("WARNING", "§cThe §eMain-CloudInstance §ccut the connection and now the Receiver won't work without it");
@@ -189,15 +189,15 @@ public class Receiver extends CloudProcess {
                 }
 
                 @Override
-                public void packetOut(HytoraPacket packet) {}
+                public void packetOut(Packet packet) {}
             }).createConnection();
 
             //Registering packet handler
-            this.hytoraClient.registerPacketHandler(new ReceiverHandlerRegister());
-            this.hytoraClient.registerPacketHandler(new ReceiverHandlerScreen());
-            this.hytoraClient.registerPacketHandler(new ReceiverHandlerActions());
+            this.networkClient.registerPacketHandler(new ReceiverHandlerRegister());
+            this.networkClient.registerPacketHandler(new ReceiverHandlerScreen());
+            this.networkClient.registerPacketHandler(new ReceiverHandlerActions());
 
-            CloudDriver.getInstance().setInstance("connection", this.hytoraClient);
+            CloudDriver.getInstance().setInstance("connection", this.networkClient);
         }
     }
 
@@ -215,7 +215,7 @@ public class Receiver extends CloudProcess {
             ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).setRunning(false);
             CloudDriver.getInstance().getServiceManager().shutdownAll(() -> {
                 log("WARNING", "§cShutting down §e'" + receiver.getName() + "'§c...");
-                this.hytoraClient.close();
+                this.networkClient.close();
                 this.getInstance(Scheduler.class).scheduleDelayedTask(() -> {
                     try {
                         FileUtils.deleteDirectory(this.getInstance(FileService.class).getDynamicServerDirectory());
@@ -231,8 +231,8 @@ public class Receiver extends CloudProcess {
     }
 
     @Override
-    public void sendPacket(HytoraPacket packet) {
-        this.hytoraClient.sendPacket(packet);
+    public void sendPacket(Packet packet) {
+        this.networkClient.sendPacket(packet);
     }
 
 }

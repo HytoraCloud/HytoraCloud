@@ -1,11 +1,11 @@
 
-import net.hytora.networking.connection.client.ClientListener;
-import net.hytora.networking.connection.client.HytoraClient;
-import net.hytora.networking.connection.server.HytoraServer;
-import net.hytora.networking.elements.component.ComponentSender;
-import net.hytora.networking.elements.other.HytoraLogin;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.connection.client.ClientListener;
+import de.lystx.hytoracloud.networking.connection.client.NetworkClient;
+import de.lystx.hytoracloud.networking.connection.server.NetworkServer;
+import de.lystx.hytoracloud.networking.elements.component.ComponentSender;
+import de.lystx.hytoracloud.networking.elements.other.NetworkLogin;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import packets.ExamplePacket;
 
 import java.net.InetSocketAddress;
@@ -18,13 +18,13 @@ public class PacketConnectionTest {
 
 
         //Creating server and client objects
-        HytoraServer hytoraServer = new HytoraServer(1401);
-        HytoraClient hytoraClient = new HytoraClient("127.0.0.1", 1401);
+        NetworkServer hytoraServer = new NetworkServer(1401);
+        NetworkClient networkClient = new NetworkClient("127.0.0.1", 1401);
 
         //Registering packet handler for incoming packets
         hytoraServer.registerPacketHandler(new PacketHandler() {
             @Override
-            public void handle(HytoraPacket packet) {
+            public void handle(Packet packet) {
                 if (packet instanceof ExamplePacket) {
                     ExamplePacket examplePacket = (ExamplePacket) packet;
 
@@ -37,7 +37,7 @@ public class PacketConnectionTest {
         hytoraServer.createConnection();
 
         //Connecting client with name "Lobby-1"
-        hytoraClient.listener(new ClientListener() {
+        networkClient.listener(new ClientListener() {
             @Override
             public void onConnect(InetSocketAddress socketAddress) {
 
@@ -59,19 +59,19 @@ public class PacketConnectionTest {
             }
 
             @Override
-            public void packetIn(HytoraPacket packet) {
+            public void packetIn(Packet packet) {
                 System.out.println("[IN] " + packet.getClass().getName());
             }
 
             @Override
-            public void packetOut(HytoraPacket packet) {
+            public void packetOut(Packet packet) {
                 System.out.println("[OUT] " + packet.getClass().getName());
             }
-        }).login(new HytoraLogin("Lobby-1")).createConnection();
+        }).login(new NetworkLogin("Lobby-1")).createConnection();
 
 
         ExamplePacket packet = new ExamplePacket("julheeg", 16);
-        hytoraClient.sendPacket(packet);
+        networkClient.sendPacket(packet);
 
     }
 }

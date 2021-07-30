@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 @Getter @AllArgsConstructor
 public class PacketServiceUpdate extends PacketCommunication {

@@ -1,13 +1,12 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.service;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketServiceMemoryUsage extends HytoraPacket {
+public class PacketServiceMemoryUsage extends Packet {
 
     private String service;
 

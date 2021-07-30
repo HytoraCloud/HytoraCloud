@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Getter @AllArgsConstructor
 public class DriverEventNetworkPing extends CloudEvent implements Serializable {
 
+    private static final long serialVersionUID = -7686220063541509128L;
     private final PlayerConnection connection;
 
 }

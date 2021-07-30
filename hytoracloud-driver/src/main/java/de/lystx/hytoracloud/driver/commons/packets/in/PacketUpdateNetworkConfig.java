@@ -1,16 +1,15 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class PacketUpdateNetworkConfig extends HytoraPacket implements Serializable {
+public class PacketUpdateNetworkConfig extends Packet {
 
     private NetworkConfig networkConfig;
 

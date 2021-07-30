@@ -1,13 +1,15 @@
 package de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
+import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.PendingConnection;
@@ -63,14 +65,16 @@ public class PlayerListener implements Listener {
         String message = event.getMessage();
         String player = ((ProxiedPlayer)event.getSender()).getName();
 
-        Component component = new Component();
-
-        component.put("key", "chat_event");
-        component.put("player", player);
-        component.put("message", message);
-        component.setChannel("cloud::main");
-
-        CloudDriver.getInstance().getConnection().sendComponent(component);
+        CloudDriver.getInstance().getMessageManager().sendChannelMessage(
+                IChannelMessage.builder()
+                        .channel("cloud::main")
+                        .key("PLAYER_CHAT_EVENT")
+                        .document(JsonObject.serializable()
+                                .append("message", message)
+                                .append("player", player)
+                        )
+                        .build()
+        );
 
     }
 

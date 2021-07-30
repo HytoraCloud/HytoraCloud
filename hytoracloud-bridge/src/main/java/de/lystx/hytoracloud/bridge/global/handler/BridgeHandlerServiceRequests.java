@@ -8,9 +8,9 @@ import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMem
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMinecraftInfo;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.Getter;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 import java.lang.management.ManagementFactory;
 
@@ -19,7 +19,7 @@ public class BridgeHandlerServiceRequests implements PacketHandler {
 
 
     @Override
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         if (CloudDriver.getInstance().getCurrentService() == null) {
             return;
         }

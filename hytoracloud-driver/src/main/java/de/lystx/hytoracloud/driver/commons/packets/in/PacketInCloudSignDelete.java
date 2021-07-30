@@ -3,11 +3,11 @@ package de.lystx.hytoracloud.driver.commons.packets.in;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketInCloudSignDelete extends HytoraPacket {
+public class PacketInCloudSignDelete extends Packet {
 
     private CloudSign cloudSign;
 

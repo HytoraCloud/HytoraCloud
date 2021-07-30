@@ -7,16 +7,16 @@ import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMin
 import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestTPS;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import lombok.AllArgsConstructor;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 @AllArgsConstructor
 public class CloudHandlerMemoryUsage implements PacketHandler {
 
     private final CloudSystem cloudSystem;
     
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
 
         if (packet instanceof PacketServiceMemoryUsage) {
 

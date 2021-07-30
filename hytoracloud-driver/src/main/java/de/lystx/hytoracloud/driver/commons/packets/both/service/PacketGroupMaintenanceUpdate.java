@@ -1,11 +1,9 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.service;
 
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.io.Serializable;
 

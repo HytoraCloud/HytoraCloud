@@ -20,7 +20,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import de.lystx.hytoracloud.launcher.global.InternalReceiver;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.elements.packet.response.Response;
+import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -183,6 +183,8 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
             return;
         }
         receiver.registerService(service);
+
+        CloudDriver.getInstance().callEvent(new DriverEventServiceRegister(service));
     }
 
     @Override
@@ -208,6 +210,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (this.getCachedObject(service.getName()) != null) {
             return;
         }
+        CloudDriver.getInstance().callEvent(new DriverEventServiceQueue(service));
 
         IReceiver receiver = service.getReceiver();
         if (receiver == null) {

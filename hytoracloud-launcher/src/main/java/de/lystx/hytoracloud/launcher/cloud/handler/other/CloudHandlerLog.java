@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -13,7 +13,7 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputServi
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -29,7 +29,7 @@ public class CloudHandlerLog implements PacketHandler {
     private final CloudSystem cloudSystem;
 
 
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         if (packet instanceof PacketInGetLog) {
             PacketInGetLog packetInGetLog = (PacketInGetLog)packet;
             IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(packetInGetLog.getService());

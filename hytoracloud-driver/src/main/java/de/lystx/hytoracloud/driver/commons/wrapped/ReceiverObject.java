@@ -8,9 +8,8 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.net.InetAddress;
 import java.util.List;

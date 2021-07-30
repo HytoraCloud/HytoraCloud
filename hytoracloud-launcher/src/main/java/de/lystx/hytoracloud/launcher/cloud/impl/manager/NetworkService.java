@@ -6,10 +6,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
-import net.hytora.networking.connection.server.HytoraServer;
-import net.hytora.networking.elements.component.RepliableComponent;
-
-import java.util.function.Consumer;
+import de.lystx.hytoracloud.networking.connection.server.NetworkServer;
 
 @Getter
 @ICloudServiceInfo(
@@ -22,11 +19,11 @@ import java.util.function.Consumer;
 )
 public class NetworkService implements ICloudService {
 
-    private final HytoraServer hytoraServer;
+    private final NetworkServer hytoraServer;
 
     public NetworkService() {
 
-        this.hytoraServer = new HytoraServer(CloudDriver.getInstance().getNetworkConfig().getPort());
+        this.hytoraServer = new NetworkServer(CloudDriver.getInstance().getNetworkConfig().getPort());
 
         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.hytoraServer);
         this.hytoraServer.createConnection();

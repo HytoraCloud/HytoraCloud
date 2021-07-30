@@ -5,9 +5,9 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestCloudTPS;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
@@ -17,7 +17,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfi
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.util.List;
 
@@ -30,7 +30,6 @@ public class CloudCommand implements TabCompletable {
             if (player.hasPermission("cloudsystem.command")) {
                 if (args.length == 1) {
 
-                    player.sendMessage(player.getLocation().pullValue().toString());
 
                     if (args[0].equalsIgnoreCase("rl") || args[0].equalsIgnoreCase("reload")) {
                         CloudDriver.getInstance().sendPacket(new PacketReload());
@@ -40,7 +39,8 @@ public class CloudCommand implements TabCompletable {
 
                     } else if (args[0].equalsIgnoreCase("tps")) {
 
-                        CloudDriver.getInstance().sendPacket(new PacketRequestCloudTPS(), response -> player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7CloudSystem TPS§8: §b" + response.reply().getMessage()));
+                        String tps = DriverRequest.create("CLOUD_GET_TPS", "CLOUD", String.class).execute().setTimeOut(20, "§cTimed out...").pullValue();
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7CloudSystem TPS§8: §b" + tps);
 
                     } else if (args[0].equalsIgnoreCase("ping")) {
 
@@ -77,9 +77,8 @@ public class CloudCommand implements TabCompletable {
                             return;
                         }
 
+                        group.startNewService();
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Trying to start a new service of group §a" + group.getName() + "§8...");
-
-                        CloudDriver.getInstance().sendPacket(new PacketInStartGroup(CloudDriver.getInstance().getServiceManager().getServiceGroup(groupname)));
 
                     } else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
 

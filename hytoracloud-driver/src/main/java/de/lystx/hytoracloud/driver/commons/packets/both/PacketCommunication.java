@@ -4,10 +4,8 @@ package de.lystx.hytoracloud.driver.commons.packets.both;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
-
-import java.io.Serializable;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 /**
  * This packet will be sent from
@@ -17,7 +15,7 @@ import java.io.Serializable;
  * Network...
  */
 @Getter @Setter
-public abstract class PacketCommunication extends HytoraPacket {
+public abstract class PacketCommunication extends Packet {
 
 
     private boolean sendBack;

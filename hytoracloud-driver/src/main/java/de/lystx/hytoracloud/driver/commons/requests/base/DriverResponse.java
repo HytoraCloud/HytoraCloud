@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.requests.base;
 
 import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 
 public interface DriverResponse<T> {
 

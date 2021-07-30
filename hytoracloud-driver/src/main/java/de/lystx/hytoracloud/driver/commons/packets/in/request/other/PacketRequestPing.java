@@ -4,13 +4,13 @@ package de.lystx.hytoracloud.driver.commons.packets.in.request.other;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.util.UUID;
 
 @AllArgsConstructor @Getter
-public class PacketRequestPing extends HytoraPacket {
+public class PacketRequestPing extends Packet {
 
     private UUID uuid;
     private String key;

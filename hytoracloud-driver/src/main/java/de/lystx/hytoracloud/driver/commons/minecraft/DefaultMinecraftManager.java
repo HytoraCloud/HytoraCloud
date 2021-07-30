@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMinecraftInfo;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 
 public class DefaultMinecraftManager implements IMinecraftManager {

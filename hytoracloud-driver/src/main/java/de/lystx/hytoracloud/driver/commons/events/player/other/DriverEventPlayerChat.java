@@ -1,14 +1,17 @@
 package de.lystx.hytoracloud.driver.commons.events.player.other;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor @Getter
-public class DriverEventPlayerChat extends CloudEvent {
+ @Getter
+public class DriverEventPlayerChat extends DriverEventPlayer {
 
-    private final ICloudPlayer player;
-
+    private static final long serialVersionUID = 5311219730205981453L;
     private final String message;
+
+    public DriverEventPlayerChat(ICloudPlayer player, String message) {
+        super(player);
+        this.message = message;
+    }
 }

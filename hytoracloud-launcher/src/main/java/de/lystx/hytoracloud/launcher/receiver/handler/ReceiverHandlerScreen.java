@@ -3,20 +3,16 @@ package de.lystx.hytoracloud.launcher.receiver.handler;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterService;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverScreenRequest;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 import java.util.LinkedList;
 
 public class ReceiverHandlerScreen implements PacketHandler {
 
     @Override
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         if (packet instanceof PacketReceiverScreenRequest) {
             PacketReceiverScreenRequest packetReceiverScreenRequest = (PacketReceiverScreenRequest)packet;
 

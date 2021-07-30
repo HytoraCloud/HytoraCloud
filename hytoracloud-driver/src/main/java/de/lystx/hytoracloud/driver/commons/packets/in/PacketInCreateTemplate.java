@@ -1,17 +1,14 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
-import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplateManager;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
-
-import java.io.Serializable;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketInCreateTemplate extends HytoraPacket {
+public class PacketInCreateTemplate extends Packet {
 
     private IServiceGroup IServiceGroup;
     private ITemplate template;

@@ -1,10 +1,10 @@
 
-import net.hytora.networking.connection.client.HytoraClient;
-import net.hytora.networking.connection.server.HytoraServer;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.component.RepliableComponent;
-import net.hytora.networking.elements.component.ComponentSender;
-import net.hytora.networking.elements.other.HytoraLogin;
+import de.lystx.hytoracloud.networking.connection.client.NetworkClient;
+import de.lystx.hytoracloud.networking.connection.server.NetworkServer;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.RepliableComponent;
+import de.lystx.hytoracloud.networking.elements.component.ComponentSender;
+import de.lystx.hytoracloud.networking.elements.other.NetworkLogin;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -17,8 +17,8 @@ public class ReplyConnectionTest {
 
 
         //Creating server and client objects
-        HytoraServer hytoraServer = new HytoraServer(1401);
-        HytoraClient hytoraClient = new HytoraClient("127.0.0.1", 1401);
+        NetworkServer hytoraServer = new NetworkServer(1401);
+        NetworkClient networkClient = new NetworkClient("127.0.0.1", 1401);
 
         //Registering channel listener for "example_channel"
         hytoraServer.registerChannelHandler("example_channel", new Consumer<RepliableComponent>() {
@@ -38,7 +38,7 @@ public class ReplyConnectionTest {
         hytoraServer.createConnection();
 
         //Connecting client with name "Lobby-1"
-        hytoraClient.login(new HytoraLogin("Lobby-1")).createConnection();
+        networkClient.login(new NetworkLogin("Lobby-1")).createConnection();
 
         //Creating example component
         Component component = new Component();
@@ -52,7 +52,7 @@ public class ReplyConnectionTest {
         });
 
         //Sending component
-        Component reply = hytoraClient.sendComponentToReply(component);
+        Component reply = networkClient.sendComponentToReply(component);
 
         System.out.println("[Client] Received Reply : " + reply.getMessage());
     }

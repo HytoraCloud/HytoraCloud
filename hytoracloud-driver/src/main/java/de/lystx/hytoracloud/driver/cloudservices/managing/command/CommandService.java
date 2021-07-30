@@ -49,6 +49,13 @@ public class CommandService implements ICloudService {
      * @param classObject the class to register
      */
     public void registerCommand(Object classObject) {
+        if (classObject.getClass().getAnnotation(Command.class) != null) {
+
+            Command annotation = classObject.getClass().getAnnotation(Command.class);
+            CommandInfo commandInfo = new CommandInfo(annotation.name(), annotation.description(), annotation.aliases(), annotation.usage());
+
+            return;
+        }
         for (Method declaredMethod : classObject.getClass().getDeclaredMethods()) {
             if (Arrays.asList(declaredMethod.getParameterTypes()).contains(CommandExecutor.class) && Arrays.asList(declaredMethod.getParameterTypes()).contains(String[].class) ) {
                 Command command = declaredMethod.getAnnotation(Command.class);

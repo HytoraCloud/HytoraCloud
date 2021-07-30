@@ -6,11 +6,11 @@ import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketInStartGroupWithProperties extends HytoraPacket {
+public class PacketInStartGroupWithProperties extends Packet {
 
     private IServiceGroup group;
     private PropertyObject properties;

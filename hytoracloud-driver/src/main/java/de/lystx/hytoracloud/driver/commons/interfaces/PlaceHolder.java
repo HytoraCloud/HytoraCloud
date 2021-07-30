@@ -22,17 +22,19 @@ public interface PlaceHolder<V> {
             new PlaceHolder<IService>() {
                 @Override
                 public String apply(IService service, String input) {
-                    input = input.replace("%service%", service.getName());
-                    input = input.replace("%server%", service.getName());
-                    input = input.replace("%id%", service.getId() + "");
-                    input = input.replace("%state%", service.getState().name());
-                    input = input.replace("%port%", service.getPort() + "");
-                    input = input.replace("%max_players%", service.getMaxPlayers() + "");
-                    input = input.replace("%online_players%", service.getPlayers().size() + "");
-                    input = input.replace("%max%", service.getMaxPlayers() + "");
-                    input = input.replace("%online%", service.getPlayers().size() + "");
-                    input = input.replace("%motd%", service.getMotd());
-                    input = input.replace("%group%", service.getGroup().getName());
+                    if (service != null) {
+                        input = input.replace("%service%", service.getName());
+                        input = input.replace("%server%", service.getName());
+                        input = input.replace("%id%", service.getId() + "");
+                        input = input.replace("%state%", service.getState().name());
+                        input = input.replace("%port%", service.getPort() + "");
+                        input = input.replace("%max_players%", service.getMaxPlayers() + "");
+                        input = input.replace("%online_players%", service.getPlayers().size() + "");
+                        input = input.replace("%max%", service.getMaxPlayers() + "");
+                        input = input.replace("%online%", service.getPlayers().size() + "");
+                        input = input.replace("%motd%", service.getMotd() == null ? "No_motd_found" : service.getMotd());
+                        input = input.replace("%group%", service.getGroup().getName());
+                    }
 
                     return input;
                 }
@@ -99,8 +101,8 @@ public interface PlaceHolder<V> {
                     input = input.replace("%player%", player.getName());
                     input = input.replace("%uuid%", player.getUniqueId().toString());
                     input = input.replace("%ip%", player.getIpAddress());
-                    input = input.replace("%rank", player.getPermissionGroup().getName());
-                    input = input.replace("%rank_color", player.getPermissionGroup().getDisplay());
+                    input = input.replace("%rank", player.getCachedPermissionGroup().getName());
+                    input = input.replace("%rank_color", player.getCachedPermissionGroup().getDisplay());
                     return input;
                 }
 
@@ -205,7 +207,8 @@ public interface PlaceHolder<V> {
                 }
             }
         }
-        return input.replace("&", "§");
+
+        return input.replace("%prefix%", CloudDriver.getInstance().getPrefix()).replace("&", "§");
     }
 
     /**

@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.commons.packets.in;
 
 
-import net.hytora.networking.elements.packet.EmptyPacket;
+import de.lystx.hytoracloud.networking.elements.packet.EmptyPacket;
 
 public class PacketShutdown extends EmptyPacket {
 

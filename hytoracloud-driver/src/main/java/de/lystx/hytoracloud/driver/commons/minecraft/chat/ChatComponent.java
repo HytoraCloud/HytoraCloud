@@ -11,6 +11,7 @@ import java.util.*;
 public class ChatComponent implements Serializable {
 
     private static final long serialVersionUID = 5453309721161616618L;
+
     /**
      * The message of this component
      */

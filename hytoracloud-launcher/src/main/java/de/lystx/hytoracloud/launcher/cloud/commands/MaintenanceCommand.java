@@ -27,10 +27,8 @@ public class MaintenanceCommand implements TabCompletable {
                     config.setMaintenance(false);
                     sender.sendMessage("INFO", "§9The network is no longer in §cmaintenance§9!");
                 }
-                CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
-                CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
-                CloudSystem.getInstance().getInstance(ConfigService.class).reload();
                 CloudDriver.getInstance().getNetworkConfig().update();
+                CloudDriver.getInstance().reload();
             } else if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("INFO", "§bWhitelisted Players§7:");
                 for (String whitelistedPlayer : config.getWhitelistedPlayers()) {
@@ -52,10 +50,8 @@ public class MaintenanceCommand implements TabCompletable {
                 }
                 whitelist.add(user);
                 config.setWhitelistedPlayers(whitelist);
-                CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
-                CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
-                CloudSystem.getInstance().getInstance(ConfigService.class).reload();
                 CloudDriver.getInstance().getNetworkConfig().update();
+                CloudDriver.getInstance().reload();
                 sender.sendMessage("COMMAND", "§7The player §a" + user + " §7was added to maintenance§8!");
             } else if (identifier.equalsIgnoreCase("remove")) {
                 if (!contains) {
@@ -64,10 +60,8 @@ public class MaintenanceCommand implements TabCompletable {
                 }
                 whitelist.remove(user);
                 config.setWhitelistedPlayers(whitelist);
-                CloudSystem.getInstance().getInstance(ConfigService.class).setNetworkConfig(config);
-                CloudSystem.getInstance().getInstance(ConfigService.class).shutdown();
-                CloudSystem.getInstance().getInstance(ConfigService.class).reload();
                 CloudDriver.getInstance().getNetworkConfig().update();
+                CloudDriver.getInstance().reload();
                 sender.sendMessage("COMMAND", "§7The player §a" + user + " §7was removed to maintenance§8!");
             } else {
                 sendUsage(sender);

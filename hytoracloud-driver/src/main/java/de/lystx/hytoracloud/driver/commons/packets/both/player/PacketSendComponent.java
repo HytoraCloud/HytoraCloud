@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.util.UUID;
 

@@ -3,7 +3,6 @@ package de.lystx.hytoracloud.driver.commons.requests.base;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
-import de.lystx.hytoracloud.driver.commons.wrapped.WrappedObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;

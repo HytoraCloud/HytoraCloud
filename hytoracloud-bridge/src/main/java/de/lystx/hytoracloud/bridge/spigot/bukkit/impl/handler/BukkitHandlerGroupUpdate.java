@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class BukkitHandlerGroupUpdate implements PacketHandler {
 
     
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         if (packet instanceof PacketInUpdateServiceGroup) {
 
             PacketInUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketInUpdateServiceGroup) packet;

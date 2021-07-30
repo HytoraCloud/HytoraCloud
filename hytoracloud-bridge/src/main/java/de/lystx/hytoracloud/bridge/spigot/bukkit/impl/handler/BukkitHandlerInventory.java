@@ -6,15 +6,15 @@ import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketInventoryUp
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.CloudPlayerInventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class BukkitHandlerInventory implements PacketHandler {
 
     
-    public void handle(HytoraPacket rawPacket) {
+    public void handle(Packet rawPacket) {
         if (rawPacket instanceof PacketInventoryUpdate) {
             PacketInventoryUpdate packetInventoryUpdate = (PacketInventoryUpdate)rawPacket;
             CloudPlayerInventory playerInventory = packetInventoryUpdate.getPlayerInventory();

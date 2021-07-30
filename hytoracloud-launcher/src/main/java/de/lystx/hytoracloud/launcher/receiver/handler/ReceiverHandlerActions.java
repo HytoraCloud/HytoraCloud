@@ -2,16 +2,15 @@ package de.lystx.hytoracloud.launcher.receiver.handler;
 
 import de.lystx.hytoracloud.driver.commons.packets.receiver.*;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 import java.lang.management.ManagementFactory;
 
 public class ReceiverHandlerActions implements PacketHandler {
 
     @Override
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
 
         if (packet instanceof PacketReceiverMemoryUsage) {
 

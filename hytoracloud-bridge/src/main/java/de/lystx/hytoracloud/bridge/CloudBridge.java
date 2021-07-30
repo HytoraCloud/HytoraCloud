@@ -1,12 +1,8 @@
 package de.lystx.hytoracloud.bridge;
 
 
-import de.lystx.hytoracloud.bridge.proxy.global.handler.ProxyHandlerConfig;
+import de.lystx.hytoracloud.bridge.proxy.global.handler.*;
 import de.lystx.hytoracloud.bridge.proxy.global.commands.*;
-import de.lystx.hytoracloud.bridge.proxy.global.handler.ProxyHandlerCloudPlayer;
-import de.lystx.hytoracloud.bridge.proxy.global.handler.ProxyHandlerRegister;
-import de.lystx.hytoracloud.bridge.proxy.global.handler.ProxyHandlerShutdown;
-import de.lystx.hytoracloud.bridge.proxy.global.handler.ProxyHandlerUnregister;
 import de.lystx.hytoracloud.bridge.global.manager.CloudBridgeDatabaseService;
 import de.lystx.hytoracloud.bridge.global.manager.CloudBridgeServiceManager;
 import de.lystx.hytoracloud.bridge.global.manager.CloudBridgePlayerManager;
@@ -14,9 +10,8 @@ import de.lystx.hytoracloud.bridge.global.handler.*;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerChat;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
+import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
@@ -35,14 +30,13 @@ import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import net.hytora.networking.connection.client.ClientListener;
-import net.hytora.networking.connection.client.HytoraClient;
-import net.hytora.networking.connection.client.HytoraClientOptions;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.component.ComponentSender;
-import net.hytora.networking.elements.component.RepliableComponent;
-import net.hytora.networking.elements.other.HytoraLogin;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.connection.client.ClientListener;
+import de.lystx.hytoracloud.networking.connection.client.NetworkClient;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.ComponentSender;
+import de.lystx.hytoracloud.networking.elements.component.RepliableComponent;
+import de.lystx.hytoracloud.networking.elements.other.NetworkLogin;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -50,6 +44,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @Getter @Setter
@@ -59,7 +54,7 @@ public class CloudBridge {
     private static CloudBridge instance;
 
     private final CloudDriver cloudDriver;
-    private final HytoraClient client;
+    private final NetworkClient client;
     private final BridgeInstance bridgeInstance;
     private final Map<InetSocketAddress, InetSocketAddress> addresses;
 
@@ -76,7 +71,7 @@ public class CloudBridge {
         CloudDriver.getInstance().setInstance("bridgeInstance", bridgeInstance);
 
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
-        this.client = new HytoraClient(jsonDocument.getString("host"), jsonDocument.getInteger("port"));
+        this.client = new NetworkClient(jsonDocument.getString("host"), jsonDocument.getInteger("port"));
 
         CloudDriver.getInstance().setInstance("connection", this.client);
         CloudDriver.getInstance().setInstance("driverType", CloudType.BRIDGE);
@@ -113,7 +108,6 @@ public class CloudBridge {
     public void setProxyBridge(ProxyBridge proxyBridge) {
         this.proxyBridge = proxyBridge;
 
-        CloudDriver.getInstance().getScheduler().scheduleRepeatingTaskAsync(() -> CloudBridge.getInstance().getProxyBridge().updateTabList(loadRandomTablist()), 0L, 5L);
         CloudDriver.getInstance().setInstance("proxyBridge", proxyBridge);
 
         //NetworkHandler
@@ -134,27 +128,8 @@ public class CloudBridge {
         CloudDriver.getInstance().registerCommand(new WhereIsCommand());
         CloudDriver.getInstance().registerCommand(new NetworkCommand());
 
+        CloudDriver.getInstance().getMessageManager().registerChannel("cloud::main", new ProxyHandlerMessage());
 
-        CloudDriver.getInstance().getConnection().registerChannelHandler("cloud::main", new Consumer<RepliableComponent>() {
-            @Override
-            public void accept(RepliableComponent repliableComponent) {
-
-                Component component = repliableComponent.getComponent();
-                ComponentSender sender = repliableComponent.getSender();
-
-                if (component.has("key") && component.get("key").equals("chat_event")) {
-
-                    String player = component.get("player");
-                    String message = component.get("message");
-
-                    ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player);
-
-                    DriverEventPlayerChat playerChat = new DriverEventPlayerChat(cloudPlayer, message);
-                    CloudDriver.getInstance().callEvent(playerChat);
-
-                }
-            }
-        });
     }
 
     /**
@@ -232,7 +207,7 @@ public class CloudBridge {
             }
 
             @Override
-            public void packetIn(HytoraPacket packet) {
+            public void packetIn(Packet packet) {
                 if (packet instanceof PacketOutUpdateTabList) {
                     if (CloudBridge.getInstance().getProxyBridge() == null) {
                         return;
@@ -242,10 +217,10 @@ public class CloudBridge {
             }
 
             @Override
-            public void packetOut(HytoraPacket packet) {
+            public void packetOut(Packet packet) {
 
             }
-        }).login(new HytoraLogin(jsonDocument.getString("server"))).options(new HytoraClientOptions().setDebug(true)).createConnection();
+        }).login(new NetworkLogin(jsonDocument.getString("server"))).createConnection();
 
 
     }
@@ -302,5 +277,45 @@ public class CloudBridge {
             tabList = tabLists.get(this.tabInit);
         }
         return tabList;
+    }
+
+
+    /**
+     * Notifies all Players
+     * on the Network if they have the permission to
+     * get notified and if they have enabled it
+     *
+     * @param state the state
+     * @param service the service
+     */
+    public void sendNotification(int state, IService service) {
+        Map<String, UUID> playerInfos = CloudBridge.getInstance().getProxyBridge().getPlayerInfos();
+        for (String name : playerInfos.keySet()) {
+            UUID uniqueId = playerInfos.get(name);
+
+            if (!CloudDriver.getInstance().getPermissionPool().hasPermission(uniqueId, "cloudsystem.notify")) {
+                return;
+            }
+            OfflinePlayer offlinePlayer = CloudDriver.getInstance().getPermissionPool().getCachedObject(uniqueId);
+            if (offlinePlayer == null || !offlinePlayer.isNotifyServerStart()) {
+                return;
+            }
+
+            String message = null;
+            switch (state){
+                case 1:
+                    message = PlaceHolder.apply(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServiceQueued(), service);
+                    break;
+                case 2:
+                    message = PlaceHolder.apply(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServiceStop(), service);
+                    break;
+                case 3:
+                    message = PlaceHolder.apply(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getServiceConnected(), service);
+                    break;
+
+            }
+            CloudBridge.getInstance().getProxyBridge().messagePlayer(uniqueId, message);
+        }
+
     }
 }

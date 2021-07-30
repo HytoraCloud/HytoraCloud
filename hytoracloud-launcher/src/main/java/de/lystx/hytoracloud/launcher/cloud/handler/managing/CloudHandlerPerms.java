@@ -8,8 +8,8 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionS
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 @Getter @AllArgsConstructor
 public class CloudHandlerPerms implements PacketHandler {
@@ -17,7 +17,7 @@ public class CloudHandlerPerms implements PacketHandler {
     private final CloudSystem cloudSystem;
 
 
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         if (packet instanceof PacketUpdatePermissionPool) {
             PacketUpdatePermissionPool packetUpdatePermissionPool = (PacketUpdatePermissionPool)packet;
             PermissionPool permissionPool = packetUpdatePermissionPool.getPermissionPool();

@@ -16,6 +16,8 @@ import java.io.Serializable;
 @Setter @Getter
 public class CloudEvent implements Serializable {
 
+    private static final long serialVersionUID = 6838731451414804041L;
+
     /**
      * If the event is cancelled or not
      */

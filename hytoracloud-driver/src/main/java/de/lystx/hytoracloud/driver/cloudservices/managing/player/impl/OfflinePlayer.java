@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
@@ -154,7 +155,7 @@ public class OfflinePlayer implements Serializable, IPermissionUser {
     }
 
     @Override
-    public PermissionGroup getPermissionGroup() {
+    public IQuery<PermissionGroup> getPermissionGroup() {
         throw new UnsupportedOperationException("Not available for OfflinePlayer");
     }
 

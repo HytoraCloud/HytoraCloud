@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.cloudservices.global.messenger;
 
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.io.Serializable;
 

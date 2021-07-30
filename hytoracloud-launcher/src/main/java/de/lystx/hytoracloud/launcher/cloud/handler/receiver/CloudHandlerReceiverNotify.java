@@ -2,26 +2,17 @@ package de.lystx.hytoracloud.launcher.cloud.handler.receiver;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
-import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverLogin;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverNotifyStart;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverNotifyStop;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverScreenCache;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
 import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.server.CloudSideServiceManager;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 public class CloudHandlerReceiverNotify implements PacketHandler {
     @Override
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
 
         if (packet instanceof PacketReceiverNotifyStart) {
 

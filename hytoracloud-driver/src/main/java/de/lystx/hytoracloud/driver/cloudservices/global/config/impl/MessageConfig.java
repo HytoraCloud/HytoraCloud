@@ -17,14 +17,19 @@ public class MessageConfig implements Serializable {
     private final String prefix;
 
     /**
-     * When a server starts
+     * When a server is queued
      */
-    private final String serviceStart;
+    private final String serviceQueued;
 
     /**
      * When a server stops
      */
     private final String serviceStop;
+
+    /**
+     * When a server is connected
+     */
+    private final String serviceConnected;
 
     /**
      * When you're executing "/hub" but

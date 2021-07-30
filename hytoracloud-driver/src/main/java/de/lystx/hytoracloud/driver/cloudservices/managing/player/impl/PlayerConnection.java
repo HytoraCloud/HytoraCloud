@@ -1,8 +1,5 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketKickPlayer;
-import de.lystx.hytoracloud.driver.CloudDriver;
-
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,14 +45,5 @@ public class PlayerConnection implements Serializable {
      * If its legacy or not
      */
     private final boolean legacyMode;
-
-    /**
-     * Closes connection
-     *
-     * @param reason the reason for the disconnect
-     */
-    public void disconnect(String reason) {
-        CloudDriver.getInstance().getConnection().sendPacket(new PacketKickPlayer(this.uniqueId, reason));
-    }
 
 }

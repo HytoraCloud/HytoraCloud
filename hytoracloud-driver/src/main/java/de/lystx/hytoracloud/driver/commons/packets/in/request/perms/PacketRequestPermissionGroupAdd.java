@@ -5,14 +5,14 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.util.UUID;
 
 
 @AllArgsConstructor @Getter
-public class PacketRequestPermissionGroupAdd extends HytoraPacket {
+public class PacketRequestPermissionGroupAdd extends Packet {
 
     private UUID playerUUID;
     private String group;

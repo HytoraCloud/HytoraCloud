@@ -1,10 +1,11 @@
 package de.lystx.hytoracloud.bridge.proxy.bungeecord;
 
+import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.other.TabListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerInjectListener;
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.cloud.CloudListener;
+import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.CommandListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerListener;
@@ -66,7 +67,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
                 @Override
                 public NetworkHandler getNetworkHandler() {
-                    return new CloudListener();
+                    return new NotifyListener();
                 }
 
                 @Override
@@ -262,6 +263,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerKickListener());
         this.getProxy().getPluginManager().registerListener(this, new ServerConnectListener());
+        this.getProxy().getPluginManager().registerListener(this, new TabListener());
         this.getProxy().getPluginManager().registerListener(this, new PlayerInjectListener());
 
         CloudDriver.getInstance().getMessageManager().registerChannel("smart-proxy", new Consumer<IChannelMessage>() {
@@ -346,7 +348,6 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
         if (player == null) {
             return;
         }
-
         player.setTabHeader(
                 fromCloud(header),
                 fromCloud(footer)

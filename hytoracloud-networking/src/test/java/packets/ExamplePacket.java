@@ -3,11 +3,11 @@ package packets;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor @NoArgsConstructor
-public class ExamplePacket extends HytoraPacket {
+public class ExamplePacket extends Packet {
 
     private String name;
     private int age;

@@ -1,14 +1,13 @@
 package de.lystx.hytoracloud.driver.cloudservices.global.messenger;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import lombok.Getter;
-import net.hytora.networking.connection.HytoraConnection;
-import net.hytora.networking.connection.client.HytoraClient;
-import net.hytora.networking.connection.server.HytoraServer;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.component.RepliableComponent;
+import de.lystx.hytoracloud.networking.connection.NetworkConnection;
+import de.lystx.hytoracloud.networking.connection.client.NetworkClient;
+import de.lystx.hytoracloud.networking.connection.server.NetworkServer;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.RepliableComponent;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -57,13 +56,13 @@ public class DefaultChannelMessenger implements IChannelMessenger {
             component.setReceiver("ALL");
         }
 
-        HytoraConnection connection = CloudDriver.getInstance().getConnection();
-        if (connection instanceof HytoraClient) {
-            HytoraClient client = (HytoraClient)connection;
+        NetworkConnection connection = CloudDriver.getInstance().getConnection();
+        if (connection instanceof NetworkClient) {
+            NetworkClient client = (NetworkClient)connection;
             component.setReceiver("SERVER");
             client.sendComponent(component);
         } else {
-            HytoraServer server = (HytoraServer) connection;
+            NetworkServer server = (NetworkServer) connection;
             if (receiver != null) {
                 server.sendObject(component, receiver.getName());
             } else {

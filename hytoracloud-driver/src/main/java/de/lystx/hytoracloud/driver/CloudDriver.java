@@ -59,10 +59,10 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.lib.LibraryService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.uuid.UUIDPool;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.connection.HytoraConnection;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.connection.NetworkConnection;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.LoggerFactory;
 
@@ -82,10 +82,11 @@ import java.util.function.Consumer;
         lowestSupportVersion = "1.8",
         highestSupportVersion = "1.16.5",
         todo = {
-                "1.17 Support",
-                "Higher Java Versions",
+                "1.17 Support & Higher Java Versions",
                 "FIx TabList-Updating",
-                "Implement more DriverRequest"
+                "Sign-Maintenance-Update",
+                "Check Velocity-Support",
+                "Fix example: Lobby-2 and Lobby-1 online, stopping Lobby-1 still having Lobby-2. On Connect BungeecOrd says: java.lang.IllegalStateException: Default server not defined"
         }
 )
 public class CloudDriver {
@@ -107,7 +108,7 @@ public class CloudDriver {
     private DriverParent parent; //The driver parent for console and stuff
     private ProxyBridge proxyBridge; //The proxy bridge for player and proxy management
     private BridgeInstance bridgeInstance; //The bridge instance for service side management
-    private HytoraConnection connection; //The current Executor for sending Packets and requests
+    private NetworkConnection connection; //The current Executor for sending Packets and requests
     private IBukkit bukkit; //The provided bukkit features
 
     @Setter
@@ -233,9 +234,10 @@ public class CloudDriver {
      * @param cloudEvent the event to call
      */
     public boolean callEvent(CloudEvent cloudEvent) {
-        if (this.getCurrentService() == null) {
+        if (this.getCurrentService() == null && this.driverType == CloudType.BRIDGE) {
             return false;
         }
+
         if (this.driverType == CloudType.BRIDGE) {
             if (this.connection != null) {
                 this.connection.sendPacket(new PacketCallEvent(cloudEvent, this.getCurrentService().getName()));
@@ -322,7 +324,7 @@ public class CloudDriver {
      * Without consumer to call back
      * @param packet the packet to send
      */
-    public void sendPacket(HytoraPacket packet) {
+    public void sendPacket(Packet packet) {
         this.sendPacket(packet,  null);
     }
 
@@ -340,7 +342,7 @@ public class CloudDriver {
      * @param packet the packet to send
      * @param consumer the consumer to accept the response
      */
-    public void sendPacket(HytoraPacket packet, Consumer<Component> consumer) {
+    public void sendPacket(Packet packet, Consumer<Component> consumer) {
         if (consumer == null) {
             this.connection.sendPacket(packet);
         } else {
@@ -350,24 +352,24 @@ public class CloudDriver {
     }
 
     /**
-     * Transfers a {@link HytoraPacket} to a {@link Component}
+     * Transfers a {@link Packet} to a {@link Component}
      * with default timeOut of 3000ms
      *
      * @param packet the packet
      * @return response
      */
-    public Component getResponse(HytoraPacket packet) {
+    public Component getResponse(Packet packet) {
         return this.getResponse(packet, 3000);
     }
 
     /**
-     * Transfers a {@link HytoraPacket} to a {@link Component}
+     * Transfers a {@link Packet} to a {@link Component}
      *
      * @param responsePacket the packet
      * @param timeOut the timeout
      * @return response
      */
-    public Component getResponse(HytoraPacket responsePacket, int timeOut) {
+    public Component getResponse(Packet responsePacket, int timeOut) {
         return responsePacket.toReply(connection, timeOut);
     }
     

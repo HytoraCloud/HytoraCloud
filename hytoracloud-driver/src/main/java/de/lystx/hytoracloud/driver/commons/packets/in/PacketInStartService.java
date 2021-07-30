@@ -7,11 +7,11 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketInStartService extends HytoraPacket {
+public class PacketInStartService extends Packet {
 
     private IService service;
     private JsonObject<?> properties;

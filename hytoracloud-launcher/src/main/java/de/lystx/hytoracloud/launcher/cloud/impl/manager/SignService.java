@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignConfiguration;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import lombok.Getter;
 
 import java.io.File;
@@ -56,7 +57,12 @@ public class SignService implements ICloudService {
         if (!this.layOutFile.exists()) {
             this.configuration = SignConfiguration.createDefault();
 
-            new JsonDocument(this.layOutFile).append(this.configuration).save();
+            JsonObject<?> jsonObject = JsonObject.gson();
+            jsonObject.append(this.configuration);
+            jsonObject.remove("knockBackConfig");
+            jsonObject.append("knockBackConfig", this.configuration.getKnockBackConfig());
+
+            jsonObject.save(this.layOutFile);
         } else {
             this.configuration = new JsonDocument(this.layOutFile).getAs(SignConfiguration.class);
         }

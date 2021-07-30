@@ -15,7 +15,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.elements.packet.response.Response;
+import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

@@ -9,7 +9,7 @@ import de.lystx.hytoracloud.launcher.cloud.commands.CreateCommand;
 import de.lystx.hytoracloud.launcher.global.CloudProcess;
 import de.lystx.hytoracloud.launcher.global.commands.DeleteCommand;
 import de.lystx.hytoracloud.launcher.global.commands.DownloadCommand;
-import net.hytora.networking.connection.server.HytoraServer;
+import de.lystx.hytoracloud.networking.connection.server.NetworkServer;
 
 public class Manager extends CloudProcess {
 
@@ -39,7 +39,7 @@ public class Manager extends CloudProcess {
         this.getParent().getConsole().getLogger().sendMessage("INFO", "§7Welcome to the §aManager§h!");
         this.getParent().getConsole().getLogger().sendMessage("INFO", "§7No §bServices §7are going to start and you can peacefully manage all of your groups or anything else!");
 
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", new HytoraServer(0));
+        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", new NetworkServer(0));
     }
 
 

@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
 import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverScreenRequest;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.util.*;
 

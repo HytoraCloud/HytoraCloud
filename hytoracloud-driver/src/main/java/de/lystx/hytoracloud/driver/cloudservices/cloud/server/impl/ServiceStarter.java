@@ -152,20 +152,21 @@ public class ServiceStarter {
                 return;
             }
             IFileModule fileModule = (IFileModule)module;
+            FileUtils.copyFile(fileModule.getFile(), new File(this.modulesDirectory, fileModule.getFile().getName()));
             switch (module.getCopyType()) {
-                case COPY_ALL:
-                    FileUtils.copyFile(fileModule.getFile(), new File(this.modulesDirectory, fileModule.getFile().getName()));
+                case ALL:
+                    FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
                     break;
-                case COPY_BUNGEE:
+                case PROXY:
                     if (service.getGroup().getType().equals(ServiceType.PROXY)) {
-                        FileUtils.copyFile(fileModule.getFile(), new File(this.modulesDirectory, fileModule.getFile().getName()));
+                        FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
                     }
                     break;
-                case COPY_SPIGOT:
+                case BUKKIT:
                     if (service.getGroup().getType().equals(ServiceType.SPIGOT)) {
-                        FileUtils.copyFile(fileModule.getFile(), new File(this.modulesDirectory, fileModule.getFile().getName()));
+                        FileUtils.copyFile(fileModule.getFile(), new File(this.pluginsDirectory, fileModule.getFile().getName()));
                     }
-                case COPY_NOT:
+                case NOT:
                     break;
             }
 

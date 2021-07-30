@@ -7,11 +7,12 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
-@AllArgsConstructor @Getter
-public class DriverEventPlayerQuit extends CloudEvent implements Serializable {
+@Getter
+public class DriverEventPlayerQuit extends DriverEventPlayer {
 
-    /**
-     * The joined player
-     */
-    private final ICloudPlayer player;
+    private static final long serialVersionUID = 6318013271660671240L;
+
+    public DriverEventPlayerQuit(ICloudPlayer player) {
+        super(player);
+    }
 }

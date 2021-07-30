@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.Permis
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 @NoArgsConstructor @Getter @AllArgsConstructor
 public class PacketUpdatePermissionPool extends PacketCommunication {

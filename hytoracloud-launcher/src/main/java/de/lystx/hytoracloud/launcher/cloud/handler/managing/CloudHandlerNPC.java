@@ -6,12 +6,12 @@ import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.NPCService;
 
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCDelete;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 @AllArgsConstructor @Getter
 public class CloudHandlerNPC implements PacketHandler {
@@ -19,7 +19,7 @@ public class CloudHandlerNPC implements PacketHandler {
     private final CloudDriver cloudDriver;
 
     @SneakyThrows
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         NPCService npcService = this.cloudDriver.getInstance(NPCService.class);
         if (packet instanceof PacketInNPCCreate) {
 

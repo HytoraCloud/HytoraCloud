@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.driver.commons.packets.both;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.component.Component;
 
 import java.io.Serializable;
 

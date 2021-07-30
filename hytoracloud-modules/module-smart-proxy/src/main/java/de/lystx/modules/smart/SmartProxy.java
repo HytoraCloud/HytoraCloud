@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
         version = "1.0",
         website = "https://hytora.cloud",
         main = SmartProxy.class,
-        copyType = ModuleCopyType.COPY_NOT,
+        copyType = ModuleCopyType.NOT,
         allowedTypes = ServiceType.CLOUDSYSTEM
 )
 
@@ -58,7 +58,6 @@ public class SmartProxy extends DriverModule {
      */
     private boolean enabled;
 
-    //Packet registry and network stuff
     /**
      * All registered {@link MinecraftPacket}s
      */

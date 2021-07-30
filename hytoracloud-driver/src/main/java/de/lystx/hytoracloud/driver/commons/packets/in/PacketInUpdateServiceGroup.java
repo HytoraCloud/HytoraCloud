@@ -4,13 +4,13 @@ import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.io.Serializable;
 
 @Getter @AllArgsConstructor
-public class PacketInUpdateServiceGroup extends HytoraPacket implements Serializable {
+public class PacketInUpdateServiceGroup extends Packet implements Serializable {
 
     private ServiceGroupObject serviceGroup;
 

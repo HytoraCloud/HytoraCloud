@@ -1,16 +1,15 @@
 package de.lystx.hytoracloud.driver.commons.packets.both.player;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommunication;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 
 @Getter @AllArgsConstructor @Setter
-public class PacketUpdatePlayer extends HytoraPacket {
+public class PacketUpdatePlayer extends Packet {
 
     private ICloudPlayer cloudPlayer;
 

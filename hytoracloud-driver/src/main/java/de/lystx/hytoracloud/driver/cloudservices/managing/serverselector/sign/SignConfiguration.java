@@ -65,10 +65,10 @@ public class SignConfiguration implements Serializable {
 
         return new SignConfiguration(20,
                 (PropertyObject) JsonObject.serializable()
-                    .append("enabled", true)
-                    .append("strength", 0.7)
-                    .append("distance", 0.5)
-                    .append("byPassPermission", "cloudsystem.signs.bypass")
+                .append("enabled", true)
+                .append("strength", 0.7)
+                .append("distance", 0.5)
+                .append("byPassPermission", "cloudsystem.signs.bypass")
                 ,Arrays.asList(loading1, loading2, loading3, loading4), online, full, maintenance);
     }
 }

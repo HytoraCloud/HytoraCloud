@@ -83,7 +83,7 @@ public interface DriverRequest<T> {
      *
      * @return future request
      */
-    DriverRequestFuture<T> comply();
+    IQuery<T> execute();
 
     /**
      * The id to identify this request

@@ -9,9 +9,9 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
+import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.bridge.proxy.velocity.listener.cloud.CloudListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.player.*;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerConnectListener;
@@ -72,7 +72,7 @@ public class VelocityBridge implements BridgeInstance {
 
                 @Override
                 public NetworkHandler getNetworkHandler() {
-                    return new CloudListener();
+                    return new NotifyListener();
                 }
 
                 @Override

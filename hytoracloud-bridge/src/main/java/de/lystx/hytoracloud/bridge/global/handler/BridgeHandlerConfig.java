@@ -3,10 +3,8 @@ package de.lystx.hytoracloud.bridge.global.handler;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -17,7 +15,7 @@ public class BridgeHandlerConfig implements PacketHandler {
 
     
     @SneakyThrows
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo packetOutGlobalInfo = ((PacketOutGlobalInfo) packet);
 

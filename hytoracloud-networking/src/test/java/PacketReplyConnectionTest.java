@@ -1,12 +1,12 @@
 
-import net.hytora.networking.connection.HytoraConnection;
-import net.hytora.networking.connection.client.HytoraClient;
-import net.hytora.networking.connection.server.HytoraServer;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.other.HytoraLogin;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.networking.connection.NetworkConnection;
+import de.lystx.hytoracloud.networking.connection.client.NetworkClient;
+import de.lystx.hytoracloud.networking.connection.server.NetworkServer;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.other.NetworkLogin;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import packets.ExamplePacket;
 
 
@@ -17,13 +17,13 @@ public class PacketReplyConnectionTest {
 
 
         //Creating server and client objects
-        HytoraServer hytoraServer = new HytoraServer(1401);
-        HytoraClient hytoraClient = new HytoraClient("127.0.0.1", 1401);
+        NetworkServer hytoraServer = new NetworkServer(1401);
+        NetworkClient networkClient = new NetworkClient("127.0.0.1", 1401);
 
         //Registering packet handler for incoming packets
         hytoraServer.registerPacketHandler(new PacketHandler() {
             @Override
-            public void handle(HytoraPacket packet) {
+            public void handle(Packet packet) {
                 if (packet instanceof ExamplePacket) {
 
                     //Replying to this packet
@@ -42,22 +42,22 @@ public class PacketReplyConnectionTest {
         hytoraServer.createConnection();
 
         //Connecting client with name "Lobby-1"
-        hytoraClient.login(new HytoraLogin("Lobby-1")).createConnection();
+        networkClient.login(new NetworkLogin("Lobby-1")).createConnection();
 
 
         ExamplePacket packet = new ExamplePacket("julheeg", 16);
 
         //Getting a reply component of the packet
-        Component component = packet.toReply(hytoraClient);
+        Component component = packet.toReply(networkClient);
 
         /**
-         * If you use {@link HytoraPacket#reply(ResponseStatus, String)}
+         * If you use {@link Packet#reply(ResponseStatus, String)}
          * you will be able to use {@link Component#reply()} to get
          * the status and the message of the reply you replied with
-         * but if you use {@link HytoraPacket#reply(Component)} or
+         * but if you use {@link Packet#reply(Component)} or
          * reply with a component in general you wont be able to
          * use the {@link Component#reply()} and just have to work
-         * with the component object you get from {@link HytoraPacket#toReply(HytoraConnection)}
+         * with the component object you get from {@link Packet#toReply(NetworkConnection)}
          */
         Component.Reply reply = component.reply();
 

@@ -88,9 +88,6 @@ public class InternalReceiver implements IReceiver {
             return;
         }
 
-        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
-            CloudDriver.getInstance().callEvent(new DriverEventServiceQueue(service));
-        }
 
         if (service.getPort() <= 0) {
             int port = service.getGroup().getType().equals(ServiceType.PROXY) ? CloudDriver.getInstance().getPortService().getFreeProxyPort() : CloudDriver.getInstance().getPortService().getFreePort();

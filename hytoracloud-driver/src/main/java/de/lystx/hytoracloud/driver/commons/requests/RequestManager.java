@@ -6,14 +6,18 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequestFuture;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverResponse;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverResponseObject;
+import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverFutureObject;
+import de.lystx.hytoracloud.driver.commons.requests.base.SimpleQuery;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequestObject;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.utils.Utils;
+import lombok.SneakyThrows;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -22,7 +26,7 @@ public class RequestManager {
     /**
      * All stored futures with their ids
      */
-    private final Map<String, DriverRequestFuture<?>> futures;
+    private final Map<String, IQuery<?>> futures;
 
     /**
      * Request handlers for api request-response
@@ -42,12 +46,11 @@ public class RequestManager {
                 for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
                     if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("ALL")) {
                         requestHandler.accept(request);
-                    }
-                    if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
+                    } else if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
                         if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("CLOUD")) {
                             requestHandler.accept(request);
                         } else {
-                            DriverRequestFuture<?> comply = request.comply();
+                            IQuery<?> comply = request.execute();
                             request.createResponse(request.typeClass()).data(comply.pullValue()).send();
                         }
                     } else {
@@ -65,11 +68,36 @@ public class RequestManager {
 
         CloudDriver.getInstance().getMessageManager().registerChannel("API_RESPONSES", new Consumer<IChannelMessage>() {
 
-            @Override
+            @Override @SneakyThrows
             public void accept(IChannelMessage channelMessage) {
-                DriverResponse<?> response = channelMessage.getDocument().get("response", DriverResponseObject.class);
+                JsonObject<?> document = channelMessage.getDocument().getObject("response");
+                DriverResponse<?> response = new DriverResponseObject<>();
+                response.id(document.getString("id"));
+                response.success(document.getBoolean("success"));
+                response.error(document.getElement("error").isJsonNull() ? null : document.get("error", DriverRequestException.class));
+                response.typeClass(Class.forName(document.getString("typeClass")));
 
-                DriverFutureObject<?> future = (DriverFutureObject<?>) retrieveFuture(response.getId());
+                Class<?> aClass = response.typeClass();
+
+                if (aClass.equals(Boolean.class) || aClass.equals(boolean.class)) {
+                    response.data(document.getBoolean("data"));
+                } else if (aClass.equals(Integer.class) || aClass.equals(int.class)) {
+                    response.data(document.getInteger("data"));
+                } else if (aClass.equals(Double.class) || aClass.equals(double.class)) {
+                    response.data(document.getDouble("data"));
+                } else if (aClass.equals(Float.class) || aClass.equals(float.class)) {
+                    response.data(document.getFloat("data"));
+                } else if (aClass.equals(UUID.class)) {
+                    response.data(UUID.fromString(document.getString("data")));
+                } else if (aClass.equals(String.class)) {
+                    response.data(document.getString("data"));
+                } else if (Enum.class.isAssignableFrom(aClass)) {
+                    response.data(Utils.getEnumByName(aClass, document.getString("data")));
+                } else {
+                    response.data(document.get("data", aClass));
+                }
+
+                SimpleQuery<?> future = (SimpleQuery<?>) retrieveFuture(response.getId());
                 if (future == null) {
                     return;
                 }
@@ -94,30 +122,30 @@ public class RequestManager {
 
 
     /**
-     * Adds a {@link DriverRequestFuture} to the cache with a given id
+     * Adds a {@link IQuery} to the cache with a given id
      *
      * @param id the id of the request
      * @param future the future
      */
-    public void addRequest(String id, DriverRequestFuture<?> future) {
+    public void addRequest(String id, IQuery<?> future) {
         futures.put(id, future);
     }
 
     /**
-     * Gets an {@link DriverRequestFuture} from cache
+     * Gets an {@link IQuery} from cache
      * and then automatically removes it from cache
      *
      * @param id the id
      * @return future or null
      */
-    public DriverRequestFuture<?> retrieveFuture(String id) {
-        DriverRequestFuture<?> future = futures.get(id);
+    public IQuery<?> retrieveFuture(String id) {
+        IQuery<?> future = futures.get(id);
         futures.remove(id);
         return future;
     }
 
     /**
-     * Transforms an {@link DriverRequestFuture} to a {@link IChannelMessage}
+     * Transforms an {@link IQuery} to a {@link IChannelMessage}
      * to be able to communicate around the network
      *
      * @param request the request

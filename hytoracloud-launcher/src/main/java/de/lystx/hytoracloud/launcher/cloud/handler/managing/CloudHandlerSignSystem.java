@@ -5,8 +5,8 @@ import de.lystx.hytoracloud.launcher.cloud.impl.manager.SignService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -15,7 +15,7 @@ public class CloudHandlerSignSystem implements PacketHandler {
     private final CloudDriver cloudDriver;
 
     @Override
-    public void handle(HytoraPacket packet) {
+    public void handle(Packet packet) {
 
         if (packet instanceof PacketInCloudSignCreate) {
 

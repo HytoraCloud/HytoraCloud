@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.player;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public interface IPermissionUser extends Identifiable {
@@ -31,7 +31,7 @@ public interface IPermissionUser extends Identifiable {
      *
      * @return response containing permissionGroup
      */
-    PermissionGroup getPermissionGroup();
+    IQuery<PermissionGroup> getPermissionGroup();
 
     /**
      * Gets the {@link PermissionGroup} with the lowest ID (the highest ranked group)

@@ -93,6 +93,14 @@ public interface JsonObject<V> extends Serializable {
     long getLong(String key);
 
     /**
+     * Gets an value stored under a key as {@link Float}
+     *
+     * @param key the key
+     * @return object
+     */
+    float getFloat(String key);
+
+    /**
      * Gets an value stored under a key as {@link Boolean}
      *
      * @param key the key

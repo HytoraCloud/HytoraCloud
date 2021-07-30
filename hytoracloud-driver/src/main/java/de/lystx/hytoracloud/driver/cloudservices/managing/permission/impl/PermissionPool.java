@@ -16,7 +16,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePla
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import net.hytora.networking.elements.packet.response.Response;
+import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;

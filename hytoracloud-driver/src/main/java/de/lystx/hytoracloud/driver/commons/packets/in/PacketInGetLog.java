@@ -4,8 +4,8 @@ package de.lystx.hytoracloud.driver.commons.packets.in;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 import java.io.Serializable;
 
@@ -16,7 +16,7 @@ import java.io.Serializable;
  * and return the link of it
  */
 @Getter @AllArgsConstructor
-public class PacketInGetLog extends HytoraPacket implements Serializable {
+public class PacketInGetLog extends Packet implements Serializable {
 
     private String service;
 

@@ -1,30 +1,44 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroup;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroupAdd;
 import de.lystx.hytoracloud.driver.commons.packets.in.request.perms.PacketRequestPermissionGroupGet;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.property.PacketRequestAddProperty;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
-import net.hytora.networking.elements.packet.HytoraPacket;
-import net.hytora.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 
-@AllArgsConstructor @Getter
+@Getter
 public class CloudHandlerRequest implements PacketHandler {
 
     private final CloudSystem cloudSystem;
 
-    public void handle(HytoraPacket packet) {
+    public CloudHandlerRequest(CloudSystem cloudSystem) {
+        this.cloudSystem = cloudSystem;
+
+        CloudDriver.getInstance().getRequestManager().registerRequestHandler(new Consumer<DriverRequest<?>>() {
+            @Override
+            public void accept(DriverRequest<?> driverRequest) {
+                if (driverRequest.equalsIgnoreCase("CLOUD_GET_TPS")) {
+                    driverRequest.createResponse().data(new NetworkInfo().formatTps(CloudDriver.getInstance().getTicksPerSecond().getTPS())).send();
+                }
+            }
+        });
+    }
+
+    public void handle(Packet packet) {
         if (packet instanceof PacketRequestPermissionGroupAdd) {
 
             PacketRequestPermissionGroupAdd packetRequestPermissionGroupAdd = (PacketRequestPermissionGroupAdd) packet;
@@ -60,31 +74,6 @@ public class CloudHandlerRequest implements PacketHandler {
                 return;
             }
             packet.reply(component -> component.put("group", offlinePlayer.getHighestPermissionGroup()));
-
-        } else if (packet instanceof PacketRequestAddProperty) {
-            try {
-                PacketRequestAddProperty packetRequestAddProperty = (PacketRequestAddProperty)packet;
-                OfflinePlayer offlinePlayer = CloudDriver.getInstance().getPlayerManager().getOfflinePlayer(packetRequestAddProperty.getPlayerUUID());
-
-                offlinePlayer.addProperty(packetRequestAddProperty.getName(), packetRequestAddProperty.getProperty());
-                offlinePlayer.update();
-                packet.reply(ResponseStatus.SUCCESS);
-            } catch (Exception e) {
-                packet.reply(ResponseStatus.FAILED);
-            }
-
-        } else if (packet instanceof PacketRequestPermissionGroup) {
-
-            PacketRequestPermissionGroup packetRequestPermissionGroup = (PacketRequestPermissionGroup)packet;
-            UUID name = packetRequestPermissionGroup.getUuid();
-
-            PermissionGroup permissionGroup = CloudDriver.getInstance().getPermissionPool().getHighestPermissionGroup(name);
-
-            if (permissionGroup != null) {
-                packet.reply(component -> component.put("group", permissionGroup));
-            } else {
-                packet.reply(ResponseStatus.FAILED);
-            }
 
         }
     }

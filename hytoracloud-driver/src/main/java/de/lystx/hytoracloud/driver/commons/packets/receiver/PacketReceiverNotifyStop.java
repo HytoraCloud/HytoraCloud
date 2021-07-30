@@ -3,11 +3,11 @@ package de.lystx.hytoracloud.driver.commons.packets.receiver;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.hytora.networking.elements.component.Component;
-import net.hytora.networking.elements.packet.HytoraPacket;
+import de.lystx.hytoracloud.networking.elements.component.Component;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
 @Getter @AllArgsConstructor
-public class PacketReceiverNotifyStop extends HytoraPacket {
+public class PacketReceiverNotifyStop extends Packet {
 
     private IService service;
 

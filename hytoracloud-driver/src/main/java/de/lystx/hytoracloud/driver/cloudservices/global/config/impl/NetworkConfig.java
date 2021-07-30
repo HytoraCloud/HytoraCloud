@@ -98,8 +98,9 @@ public class NetworkConfig implements Serializable {
                 new LinkedList<>(),
                 new MessageConfig(
                         "§8» §bCloud §8┃ §7",
-                        "%prefix%§7The server §a%server% §7is now starting§8...",
+                        "%prefix%§7The server §e%server% §7is now queued§8...",
                         "%prefix%§7The server §c%server% §7is now stopping§8...",
+                        "%prefix%§7The server §a%server% §7is now connected§8!",
                         "%prefix%§cYou are already on a Lobby-Server!",
                         "%prefix%§cNo Lobby-Server could be found!",
                         "%prefix%§cThe network is not available for you at this time",
@@ -122,13 +123,12 @@ public class NetworkConfig implements Serializable {
      * to sync it all over the network
      */
     public void update() {
-        if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
-            CloudDriver.getInstance().sendPacket(new PacketUpdateNetworkConfig(this));
-        } else {
+        if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             ConfigService instance = CloudDriver.getInstance().getInstance(ConfigService.class);
             instance.setNetworkConfig(this);
             instance.shutdown();
             instance.reload();
         }
+        CloudDriver.getInstance().sendPacket(new PacketUpdateNetworkConfig(this));
     }
 }
