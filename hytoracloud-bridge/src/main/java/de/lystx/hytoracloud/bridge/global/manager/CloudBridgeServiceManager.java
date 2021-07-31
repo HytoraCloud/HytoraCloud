@@ -2,21 +2,18 @@ package de.lystx.hytoracloud.bridge.global.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
-import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
+import de.lystx.hytoracloud.driver.commons.packets.in.*;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartService;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.ObjectServiceManager;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -25,7 +22,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Getter @Setter
-public class CloudBridgeServiceManager implements IServiceManager {
+public class CloudBridgeServiceManager implements ObjectServiceManager {
 
     /**
      * All cached services
@@ -160,22 +157,28 @@ public class CloudBridgeServiceManager implements IServiceManager {
         return this.cachedObjects.stream().filter(service -> service.getUniqueId().equals(uniqueId)).findFirst().orElse(null);
     }
 
-    @Override @ScheduledForVersion("1.9")
+    @Override
     public void getObjectAsync(String name, Consumer<IService> consumer) {
+        consumer.accept(this.getObjectSync(name).pullValue());
     }
 
-    @Override @ScheduledForVersion("1.9")
+    @Override
     public void getObjectAsync(UUID uniqueId, Consumer<IService> consumer) {
+        consumer.accept(this.getObjectSync(uniqueId).pullValue());
     }
 
-    @Override @ScheduledForVersion("1.9")
-    public Response<IService> getObjectSync(String name) {
-        return null;
+    @Override
+    public DriverQuery<IService> getObjectSync(String name) {
+        DriverRequest<IService> request = DriverRequest.create("SERVICE_GET_SYNC_NAME", "CLOUD", IService.class);
+        request.append("name", name);
+        return request.execute();
     }
 
-    @Override @ScheduledForVersion("1.9")
-    public Response<IService> getObjectSync(UUID uniqueId) {
-        return null;
+    @Override
+    public DriverQuery<IService> getObjectSync(UUID uniqueId) {
+        DriverRequest<IService> request = DriverRequest.create("SERVICE_GET_SYNC_UUID", "CLOUD", IService.class);
+        request.append("uniqueId", uniqueId);
+        return request.execute();
     }
 
     @NotNull
@@ -183,7 +186,6 @@ public class CloudBridgeServiceManager implements IServiceManager {
     public Iterator<IService> iterator() {
         return this.getCachedObjects().iterator();
     }
-
 
     @Override
     public void unregisterService(IService service) {
@@ -228,8 +230,9 @@ public class CloudBridgeServiceManager implements IServiceManager {
         CloudDriver.getInstance().sendPacket(new PacketInStopServer(service.getName()));
     }
 
-    @Override @ScheduledForVersion("1.9")
+    @Override
     public void stopServiceForcibly(IService service) {
+        CloudDriver.getInstance().sendPacket(new PacketInStopServerForcibly(service.getName()));
     }
 
     @Override

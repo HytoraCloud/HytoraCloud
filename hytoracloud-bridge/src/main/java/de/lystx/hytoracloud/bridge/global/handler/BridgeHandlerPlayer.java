@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.global.handler;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUpdatePlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ObjectCloudPlayerManager;
 import de.lystx.hytoracloud.networking.elements.packet.Packet;
 import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
@@ -15,7 +15,7 @@ public class BridgeHandlerPlayer implements PacketHandler {
     @Override
     public void handle(Packet packet) {
 
-        ICloudPlayerManager playerManager = CloudDriver.getInstance().getPlayerManager();
+        ObjectCloudPlayerManager playerManager = CloudDriver.getInstance().getPlayerManager();
 
         if (packet instanceof PacketUpdatePlayer) {
 

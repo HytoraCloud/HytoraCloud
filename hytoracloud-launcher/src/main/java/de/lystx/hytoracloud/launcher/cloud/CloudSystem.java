@@ -1,5 +1,7 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
+import de.lystx.hytoracloud.driver.commons.events.network.DriverEventReload;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
@@ -161,6 +163,7 @@ public class CloudSystem extends CloudProcess {
     public void reload() {
         super.reload();
         this.sendPacket(new PacketOutUpdateTabList());
+        CloudDriver.getInstance().callEvent(new DriverEventReload());
 
         CloudDriver.getInstance().getInstance(GroupService.class).reload();
         CloudDriver.getInstance().getInstance(ConfigService.class).reload();

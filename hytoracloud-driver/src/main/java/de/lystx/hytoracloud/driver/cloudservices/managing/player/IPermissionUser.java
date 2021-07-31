@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.cloudservices.managing.player;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 
 import java.util.List;
 
@@ -31,28 +31,21 @@ public interface IPermissionUser extends Identifiable {
      *
      * @return response containing permissionGroup
      */
-    IQuery<PermissionGroup> getPermissionGroup();
-
-    /**
-     * Gets the {@link PermissionGroup} with the lowest ID (the highest ranked group)
-     *
-     * @return group sorted by id
-     */
-    PermissionGroup getHighestPermissionGroup();
+    DriverQuery<PermissionGroup> getPermissionGroup();
 
     /**
      * Adds a permission to the user
      *
      * @param permission the permission
      */
-    void addPermission(String permission);
+    DriverQuery<Boolean> addPermission(String permission);
 
     /**
      * Removes a permission from the user
      *
      * @param permission the permission
      */
-    void removePermission(String permission);
+    DriverQuery<Boolean> removePermission(String permission);
 
     /**
      * Lists all permissions the user has
@@ -91,7 +84,7 @@ public interface IPermissionUser extends Identifiable {
      *
      * @param permissionGroup the group to be removed
      */
-    void removePermissionGroup(PermissionGroup permissionGroup);
+    DriverQuery<PermissionGroup> removePermissionGroup(PermissionGroup permissionGroup);
 
     /**
      * Adds a {@link PermissionGroup} to the user for a given timeUnit
@@ -100,7 +93,7 @@ public interface IPermissionUser extends Identifiable {
      * @param time the time (e.g. "1")
      * @param unit the unit (e.g. "month")
      */
-    void addPermissionGroup(PermissionGroup permissionGroup, int time, PermissionValidity unit);
+    DriverQuery<PermissionGroup> addPermissionGroup(PermissionGroup permissionGroup, int time, PermissionValidity unit);
 
     /**
      * Updates and performs all changes
@@ -112,7 +105,7 @@ public interface IPermissionUser extends Identifiable {
      *
      * @param permissionGroup the group to be added
      */
-    default void addPermissionGroup(PermissionGroup permissionGroup) {
-        this.addPermissionGroup(permissionGroup, -1, PermissionValidity.LIFETIME);
+    default DriverQuery<PermissionGroup> addPermissionGroup(PermissionGroup permissionGroup) {
+        return this.addPermissionGroup(permissionGroup, -1, PermissionValidity.LIFETIME);
     }
 }

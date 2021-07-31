@@ -85,7 +85,7 @@ public class PlayerListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         ServerInfo server = event.getServer().getInfo();
 
-        ICloudPlayer iCloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
+        ICloudPlayer iCloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUniqueId());
         IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(server.getName());
 
         if (iCloudPlayer == null || service == null) {
@@ -129,7 +129,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player.getName());
+        ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName());
 
         CloudBridge.getInstance().getProxyBridge().playerQuit(cloudPlayer);
     }

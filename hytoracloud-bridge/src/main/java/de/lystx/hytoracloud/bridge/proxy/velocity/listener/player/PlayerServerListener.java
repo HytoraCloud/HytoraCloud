@@ -24,7 +24,7 @@ public class PlayerServerListener {
         Player player = event.getPlayer();
         RegisteredServer server = event.getServer();
 
-        ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
+        ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUniqueId());
         IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(server.getServerInfo().getName());
 
         CloudBridge.getInstance().getProxyBridge().onServerConnect(cloudPlayer, IService);

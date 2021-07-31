@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ObjectCloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -20,7 +20,7 @@ public class PlayerCommand {
 
     @Command(name = "player", description = "Manages players on the network", aliases = "players")
     public void execute(CommandExecutor sender, String[] args) {
-        ICloudPlayerManager ps = CloudDriver.getInstance().getPlayerManager();
+        ObjectCloudPlayerManager ps = CloudDriver.getInstance().getPlayerManager();
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
                 if (ps.getCachedObjects().isEmpty()) {

@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.launcher.cloud.handler.group;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
+
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.TemplateObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -34,7 +34,7 @@ public class CloudHandlerGroupUpdate implements PacketHandler {
 
                         driverRequest.createResponse().data(ResponseStatus.SUCCESS).send();
                     } catch (Exception e) {
-                        driverRequest.createResponse().error(new DriverRequestException("An exception occured", 0x09, e.getClass())).data(ResponseStatus.FAILED).send();
+                        driverRequest.createResponse().exception(e).data(ResponseStatus.FAILED).send();
                     }
 
                 } else if (driverRequest.equalsIgnoreCase("GROUP_SET_TEMPLATE")) {

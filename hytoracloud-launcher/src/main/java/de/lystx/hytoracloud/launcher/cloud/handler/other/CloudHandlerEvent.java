@@ -23,7 +23,7 @@ public class CloudHandlerEvent implements PacketHandler {
                 return;
             }
 
-            CloudDriver.getInstance().getEventService().callEvent(packetCallEvent.getCloudEvent());
+            CloudDriver.getInstance().getEventManager().callEvent(packetCallEvent.getCloudEvent());
         }
     }
 }

@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.command;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandUsage;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
@@ -16,6 +17,7 @@ import lombok.Setter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 @ICloudServiceInfo(
@@ -96,7 +98,6 @@ public class CommandService implements ICloudService {
             }
         }
     }
-
     /**
      * Executes command
      *

@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.driver.utils;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBar;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.progressbar.ProgressBarStyle;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import io.netty.buffer.ByteBuf;
 import lombok.SneakyThrows;
 import org.apache.http.Header;

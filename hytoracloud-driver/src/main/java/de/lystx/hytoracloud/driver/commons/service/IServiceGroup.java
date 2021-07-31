@@ -4,7 +4,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
@@ -42,7 +42,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param name the name
      * @return query containing template or null if already existing
      */
-    IQuery<ITemplate> createTemplate(String name);
+    DriverQuery<ITemplate> createTemplate(String name);
 
     /**
      * Prepares a {@link ServiceBuilder}
@@ -163,7 +163,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param maintenance the boolean
      * @return query response
      */
-    IQuery<ResponseStatus> setMaintenance(boolean maintenance);
+    DriverQuery<ResponseStatus> setMaintenance(boolean maintenance);
 
     /**
      * Sets the selected template of this group
@@ -171,7 +171,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param template the template
      * @return query response
      */
-    IQuery<ResponseStatus> setTemplate(ITemplate template);
+    DriverQuery<ResponseStatus> setTemplate(ITemplate template);
 
     /**
      * Sets the lobby mode of this group
@@ -180,7 +180,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param lobby the boolean
      * @return query response
      */
-    IQuery<ResponseStatus> setLobby(boolean lobby);
+    DriverQuery<ResponseStatus> setLobby(boolean lobby);
 
     /**
      * Sets the dynamic mode of this group
@@ -189,7 +189,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param dynamic the boolean
      * @return query response
      */
-    IQuery<ResponseStatus> setDynamic(boolean dynamic);
+    DriverQuery<ResponseStatus> setDynamic(boolean dynamic);
 
     /**
      * Sets the properties of this group
@@ -197,7 +197,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param properties the properties
      * @return query response
      */
-    IQuery<ResponseStatus> setProperties(JsonObject<PropertyObject> properties);
+    DriverQuery<ResponseStatus> setProperties(JsonObject<PropertyObject> properties);
 
     /**
      * Sets the maxPlayers of this group
@@ -205,7 +205,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param maxPlayers the maxPlayers
      * @return query response
      */
-    IQuery<ResponseStatus> setMaxPlayers(int maxPlayers);
+    DriverQuery<ResponseStatus> setMaxPlayers(int maxPlayers);
 
 
     /**
@@ -215,7 +215,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param maxServer the maxPlayers
      * @return query response
      */
-    IQuery<ResponseStatus> setMaxServer(int maxServer);
+    DriverQuery<ResponseStatus> setMaxServer(int maxServer);
 
     /**
      * Sets the minServer amount of this group
@@ -223,7 +223,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param minServer the minServer
      * @return query response
      */
-    IQuery<ResponseStatus> setMinServer(int minServer);
+    DriverQuery<ResponseStatus> setMinServer(int minServer);
 
 
     /**
@@ -232,7 +232,7 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param memory the memory
      * @return query response
      */
-    IQuery<ResponseStatus> setMemory(int memory);
+    DriverQuery<ResponseStatus> setMemory(int memory);
 
     /**
      * Sets the percentage to start a new {@link IService} of this group
@@ -240,6 +240,6 @@ public interface IServiceGroup extends Serializable, Identifiable {
      * @param percent the percent
      * @return query response
      */
-    IQuery<ResponseStatus> setNewServerPercent(int percent);
+    DriverQuery<ResponseStatus> setNewServerPercent(int percent);
 
 }

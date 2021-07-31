@@ -1,18 +1,18 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
 
 
-
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -122,24 +122,11 @@ public class OfflinePlayer implements Serializable, IPermissionUser {
     }
 
     /**
-     * Returns highest Group of player
-     * @return (group sorted by IDS)
-     */
-    public PermissionGroup getHighestPermissionGroup() {
-        try {
-            List<PermissionGroup> list = this.getPermissionGroups();
-            list.sort(Comparator.comparingInt(PermissionGroup::getId));
-            return list.isEmpty() ? null : list.get(0);
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
-
-    /**
      * Updates this data
      */
     public void update() {
-        CloudDriver.getInstance().getPermissionPool().updatePlayer(this);
+        CloudDriver.getInstance().getPermissionPool().update(this);
+        CloudDriver.getInstance().getPermissionPool().update();
         CloudDriver.getInstance().getPermissionPool().update();
     }
 
@@ -155,18 +142,23 @@ public class OfflinePlayer implements Serializable, IPermissionUser {
     }
 
     @Override
-    public IQuery<PermissionGroup> getPermissionGroup() {
-        throw new UnsupportedOperationException("Not available for OfflinePlayer");
+    public DriverQuery<PermissionGroup> getPermissionGroup() {
+        return DriverQuery.dummy("PLAYER_GET_PERMISSIONGROUP", this.getCachedPermissionGroup());
     }
 
+    @SneakyThrows
     @Override
-    public void addPermission(String permission) {
+    public DriverQuery<Boolean> addPermission(String permission) {
         CloudDriver.getInstance().getPermissionPool().addPermissionToUser(this.getUniqueId(), permission);
+        CloudDriver.getInstance().getPermissionPool().update();
+        return DriverQuery.dummy("PLAYER_ADD_PERMISSION", true);
     }
 
     @Override
-    public void removePermission(String permission) {
+    public DriverQuery<Boolean> removePermission(String permission) {
         CloudDriver.getInstance().getPermissionPool().removePermissionFromUser(this.getUniqueId(), permission);
+        CloudDriver.getInstance().getPermissionPool().update();
+        return DriverQuery.dummy("PLAYER_REMOVE_PERMISSION", true);
     }
 
     @Override
@@ -180,13 +172,15 @@ public class OfflinePlayer implements Serializable, IPermissionUser {
     }
 
     @Override
-    public void removePermissionGroup(PermissionGroup permissionGroup) {
+    public DriverQuery<PermissionGroup> removePermissionGroup(PermissionGroup permissionGroup) {
         CloudDriver.getInstance().getPermissionPool().removePermissionGroupFromUser(this.getUniqueId(), permissionGroup);
+        return DriverQuery.dummy("PLAYER_REMOVE_GROUP", permissionGroup);
     }
 
     @Override
-    public void addPermissionGroup(PermissionGroup permissionGroup, int time, PermissionValidity unit) {
+    public DriverQuery<PermissionGroup> addPermissionGroup(PermissionGroup permissionGroup, int time, PermissionValidity unit) {
         CloudDriver.getInstance().getPermissionPool().addPermissionGroupToUser(this.getUniqueId(), permissionGroup, time, unit);
+        return DriverQuery.dummy("PLAYER_ADD_GROUP", permissionGroup);
     }
 
 }

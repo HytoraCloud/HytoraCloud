@@ -6,7 +6,6 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
 import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.InventoryObject;
 import de.lystx.hytoracloud.networking.elements.packet.Packet;
@@ -82,7 +81,7 @@ public class BukkitHandlerCloudPlayer implements PacketHandler {
                         sendPacket.invoke(playerConnection, packetPlayOutChat);
                         driverRequest.createResponse(Boolean.class).data(true).send();
                     } catch (Exception ex) {
-                        driverRequest.createResponse(Boolean.class).error(new DriverRequestException(ex.getMessage(), 0x00, ex.getClass())).data(false).send();
+                        driverRequest.createResponse(Boolean.class).exception(ex).data(false).send();
                     }
                 } else if (driverRequest.getKey().equalsIgnoreCase("PLAYER_OPEN_INVENTORY")) {
 
@@ -112,7 +111,7 @@ public class BukkitHandlerCloudPlayer implements PacketHandler {
                         bukkitPlayer.teleport(location1);
                         driverRequest.createResponse().data(true).send();
                     } catch (Exception e) {
-                        driverRequest.createResponse().error(new DriverRequestException("An exception happened", 0x05, e.getClass())).send();
+                        driverRequest.createResponse().exception(e).send();
                     }
                 } else if (driverRequest.equalsIgnoreCase("PLAYER_GET_LOCATION")) {
                     UUID uuid = UUID.fromString(document.getString("uniqueId"));
@@ -123,7 +122,7 @@ public class BukkitHandlerCloudPlayer implements PacketHandler {
                     try {
                         driverRequest.createResponse().data(BukkitBridge.getInstance().toLocation(bukkitPlayer.getLocation())).send();
                     } catch (Exception e) {
-                        driverRequest.createResponse().error(new DriverRequestException("An exception happened", 0x06, e.getClass())).send();
+                        driverRequest.createResponse().exception(e).send();
                     }
                 } else if (driverRequest.equalsIgnoreCase("PLAYER_SEND_TITLE")) {
 

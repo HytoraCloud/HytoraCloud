@@ -18,6 +18,7 @@ import java.util.*;
 @Getter @Setter
 public class Console extends Thread implements CommandExecutor {
 
+    private static final long serialVersionUID = -8861713865106965174L;
     private LoggerService logger;
     private CommandService commandManager;
     private final String buffer;
@@ -87,11 +88,6 @@ public class Console extends Thread implements CommandExecutor {
     @Override
     public UUID getUniqueId() {
         throw new UnsupportedOperationException("Console doesn't support : UUID" );
-    }
-
-    @Override
-    public void setUniqueId(UUID uniqueId) {
-        throw new UnsupportedOperationException("Not available for CloudConsole");
     }
 
     @Override

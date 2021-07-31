@@ -23,7 +23,7 @@ public class PlayerLoginListener {
         DisconnectEvent.LoginStatus loginStatus = event.getLoginStatus();
         Player player = event.getPlayer();
 
-        ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
+        ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUniqueId());
 
         if (cloudPlayer == null) {
             return;

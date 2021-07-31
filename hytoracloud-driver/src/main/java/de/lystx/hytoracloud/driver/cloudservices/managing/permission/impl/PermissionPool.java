@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.interfaces.IPool;
+import de.lystx.hytoracloud.driver.commons.interfaces.ObjectPool;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupReceive;
 import de.lystx.hytoracloud.driver.commons.events.player.permissions.DriverEventPlayerGroupRemove;
 import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
@@ -13,10 +13,10 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.permission.PermissionS
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.IPermissionUser;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Getter @Setter
-public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
+public class PermissionPool implements Serializable, ObjectPool<OfflinePlayer> {
 
     private static final long serialVersionUID = -501568977137292070L;
 
@@ -132,7 +132,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
         offlinePlayer.setPermissionEntries(permissionEntries); //Updating the entries
 
         //Updating player and calling event
-        this.updatePlayer(offlinePlayer);
+        this.update(offlinePlayer);
         CloudDriver.getInstance().callEvent(new DriverEventPlayerGroupRemove(this.getNameByUUID(uniqueId), group));
     }
 
@@ -168,7 +168,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
         offlinePlayer.setPermissionEntries(permissionEntries); //Set entries again
 
         //Adding data back to cache and calling event
-        this.updatePlayer(offlinePlayer);
+        this.update(offlinePlayer);
         CloudDriver.getInstance().callEvent(new DriverEventPlayerGroupReceive(getNameByUUID(uniqueId), group, time, validity));
     }
 
@@ -333,7 +333,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
         if (offlinePlayer != null) {
             if (offlinePlayer.getPermissionEntries().isEmpty()) {
                 offlinePlayer.getPermissionEntries().add(new PermissionEntry(this.getDefaultPermissionGroup().getName(), ""));
-                this.updatePlayer(offlinePlayer);
+                this.update(offlinePlayer);
                 this.update();
             }
         } else {
@@ -366,7 +366,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
 
         //If a rank has been removed (something changed) we have to update to make all changes sync over the network
         if (changedSomething) {
-            this.updatePlayer(orDefault); //Updating the player
+            this.update(orDefault); //Updating the player
             this.update(); //Updating the whole pool
         }
 
@@ -443,19 +443,18 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
      * @param add if it should be added or removed
      */
     public void setPermissionToUser(UUID uniqueId, String permission, boolean add) {
-        OfflinePlayer data = this.getCachedObject(uniqueId);
-        if (data == null) {
+        OfflinePlayer offlinePlayer = this.getCachedObject(uniqueId);
+        if (offlinePlayer == null) {
             return;
         }
-        this.cachedObjects.remove(data);
-        List<String> permissions = data.getExclusivePermissions();
+        List<String> permissions = offlinePlayer.getExclusivePermissions();
         if (add) {
             permissions.add(permission);
         } else {
             permissions.remove(permission);
         }
-        data.setPermissions(permissions);
-        this.cachedObjects.add(data);
+        offlinePlayer.setPermissions(permissions);
+        this.update(offlinePlayer);
     }
 
     /**
@@ -483,7 +482,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
      *
      * @param offlinePlayer the player
      */
-    public void updatePlayer(OfflinePlayer offlinePlayer) {
+    public void update(OfflinePlayer offlinePlayer) {
         if (offlinePlayer == null) {
             return;
         }
@@ -495,8 +494,7 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
         try {
             this.cachedObjects.set(this.cachedObjects.indexOf(oldOfflinePlayer), offlinePlayer);
         } catch (IndexOutOfBoundsException e) {
-            this.cachedObjects.remove(oldOfflinePlayer);
-            this.cachedObjects.add(offlinePlayer);
+            //Ignoring exception
         }
     }
 
@@ -537,12 +535,12 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
     }
 
     @Override @ScheduledForVersion("STABLE-1.9")
-    public Response<OfflinePlayer> getObjectSync(String name) {
+    public DriverQuery<OfflinePlayer> getObjectSync(String name) {
         return null;
     }
 
     @Override @ScheduledForVersion("STABLE-1.9")
-    public Response<OfflinePlayer> getObjectSync(UUID uniqueId) {
+    public DriverQuery<OfflinePlayer> getObjectSync(UUID uniqueId) {
         return null;
     }
 
@@ -596,6 +594,6 @@ public class PermissionPool implements Serializable, IPool<OfflinePlayer> {
     @NotNull
     @Override
     public Iterator<OfflinePlayer> iterator() {
-        return null;
+        return this.getCachedObjects().iterator();
     }
 }

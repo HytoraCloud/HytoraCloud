@@ -3,10 +3,8 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutPing;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
@@ -16,10 +14,12 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCom
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.networking.elements.component.Component;
 import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CloudCommand implements TabCompletable {
@@ -30,15 +30,11 @@ public class CloudCommand implements TabCompletable {
             ICloudPlayer player = (ICloudPlayer)commandSender;
             if (player.hasPermission("cloudsystem.command")) {
                 if (args.length == 1) {
-
-
                     if (args[0].equalsIgnoreCase("rl") || args[0].equalsIgnoreCase("reload")) {
                         CloudDriver.getInstance().sendPacket(new PacketReload());
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The CloudSystem was §areloaded§8!");
 
                     } else if (args[0].equalsIgnoreCase("debug") && player.getName().equalsIgnoreCase("Lystx")) {
-
-                        player.sendMessage(new ChatComponent(CloudDriver.getInstance().getPrefix() + "§aDebug§8!"));
 
                     } else if (args[0].equalsIgnoreCase("tps")) {
 
@@ -47,10 +43,9 @@ public class CloudCommand implements TabCompletable {
 
                     } else if (args[0].equalsIgnoreCase("ping")) {
 
-                        PacketOutPing packet = new PacketOutPing();
-                        Component component = packet.toReply(CloudDriver.getInstance().getConnection());
+                        DriverRequest<Long> request = DriverRequest.create("CLOUD_GET_PING", "CLOUD", Long.class);
 
-                        long ms = component.get("ms");
+                        long ms = request.execute().pullValue();
                         long end = System.currentTimeMillis() - ms;
 
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Ping of §bHytoraCloud §7is §a" + end + "ms§8!");
@@ -141,7 +136,7 @@ public class CloudCommand implements TabCompletable {
                             }
                             boolean change = !playerData.isNotifyServerStart();
                             playerData.setNotifyServerStart(change);
-                            CloudDriver.getInstance().getPermissionPool().updatePlayer(playerData);
+                            CloudDriver.getInstance().getPermissionPool().update(playerData);
                             CloudDriver.getInstance().getPermissionPool().update();
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + (change ? "§7You will §anow receive §7Server notifications§8!" : "§7You will §cno longer receive §7Server notifications§8!"));
                         } else {
@@ -317,21 +312,25 @@ public class CloudCommand implements TabCompletable {
 
     @Override
     public List<String> onTabComplete(CloudDriver cloudDriver, String[] args) {
-        if (args[0].equalsIgnoreCase("list")) {
-            return ImmutableList.of("group", "proxy", "server", "maintenance");
-        } else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("log")) {
-            return Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedObjects());
-        } else if (args[0].equalsIgnoreCase("stopGroup") || args[0].equalsIgnoreCase("run") || args[0].equalsIgnoreCase("tps")) {
-            return Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedGroups());
-        } else if (args[0].equalsIgnoreCase("maintenance")) {
-            if (args.length == 2) {
+        if (args.length == 1) {
+            if (args[0].equalsIgnoreCase("list")) {
+                return ImmutableList.of("maintenance");
+            } else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("log")) {
+                return Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedObjects());
+            } else if (args[0].equalsIgnoreCase("stopGroup") || args[0].equalsIgnoreCase("run") || args[0].equalsIgnoreCase("tps")) {
+                return Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedGroups());
+            }
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("maintenance")) {
                 List<String> groups = Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedGroups());
                 groups.add("switch");
                 return groups;
-            } else if (args.length == 3) {
-                return ImmutableList.of("true", "false");
             }
+        } else if (args.length == 3) {
+            return ImmutableList.of("true", "false");
+        } else if (args.length == 0) {
+            return ImmutableList.of("list", "tps", "ver", "shutdown", "rl", "maintenance", "run", "stop", "stopGroup", "copy", "log", "toggle", "stats");
         }
-        return ImmutableList.of("list", "tps", "ver", "shutdown", "rl", "maintenance", "run", "stop", "stopGroup", "copy", "log", "toggle", "stats");
+        return new ArrayList<>();
     }
 }

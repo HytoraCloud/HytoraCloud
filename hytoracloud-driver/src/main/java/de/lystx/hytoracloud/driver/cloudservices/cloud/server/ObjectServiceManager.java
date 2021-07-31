@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.cloudservices.cloud.server;
 
-import de.lystx.hytoracloud.driver.commons.interfaces.IPool;
+import de.lystx.hytoracloud.driver.commons.interfaces.ObjectPool;
 import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 
 import java.util.List;
 
-public interface IServiceManager extends IPool<IService> {
+public interface ObjectServiceManager extends ObjectPool<IService> {
 
     /**
      * Updates a {@link IServiceGroup}

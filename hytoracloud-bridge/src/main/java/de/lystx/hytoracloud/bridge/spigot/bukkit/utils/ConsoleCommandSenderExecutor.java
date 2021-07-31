@@ -44,13 +44,5 @@ public class ConsoleCommandSenderExecutor implements ConsoleExecutor {
         return UUID.randomUUID();
     }
 
-    @Override
-    public void setUniqueId(UUID uniqueId) {
 
-    }
-
-    @Override
-    public void setName(String name) {
-
-    }
 }

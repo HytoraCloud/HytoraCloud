@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -20,7 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -121,7 +120,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
             int proxies = getServices().size();
             int maxPlayers = CloudDriver.getInstance().getNetworkConfig().getMaxPlayers();
 
-            return maxPlayers / proxies;
+            try {
+                return maxPlayers / proxies;
+            } catch (java.lang.ArithmeticException e) {
+                return maxPlayers;
+            }
         } else {
             return maxPlayers;
         }
@@ -141,13 +144,13 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ITemplate> createTemplate(String name) {
+    public DriverQuery<ITemplate> createTemplate(String name) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             TemplateObject template = new TemplateObject(this.name, name, true);
             this.templates.add(template);
             CloudDriver.getInstance().getTemplateManager().createTemplate(this, template);
             this.update();
-            return IQuery.dummy("GROUP_CREATE_TEMPLATE", template);
+            return DriverQuery.dummy("GROUP_CREATE_TEMPLATE", template);
         }
         DriverRequest<ITemplate> driverRequest = DriverRequest.create("GROUP_CREATE_TEMPLATE", "CLOUD", ITemplate.class);
         driverRequest.append("name", this.name);
@@ -216,12 +219,12 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
 
 
     @Override
-    public IQuery<ResponseStatus> setMaintenance(boolean maintenance) {
+    public DriverQuery<ResponseStatus> setMaintenance(boolean maintenance) {
         this.maintenance = maintenance;
 
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_MAINTENANCE", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_MAINTENANCE", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MAINTENANCE", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -231,11 +234,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setTemplate(ITemplate currentTemplate) {
+    public DriverQuery<ResponseStatus> setTemplate(ITemplate currentTemplate) {
         this.currentTemplate = currentTemplate.getName();
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_TEMPLATE", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_TEMPLATE", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_TEMPLATE", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -245,11 +248,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setProperties(JsonObject<PropertyObject> properties) {
+    public DriverQuery<ResponseStatus> setProperties(JsonObject<PropertyObject> properties) {
         this.properties = (PropertyObject) properties;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_PROPERTIES", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_PROPERTIES", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_PROPERTIES", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -259,11 +262,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setLobby(boolean lobby) {
+    public DriverQuery<ResponseStatus> setLobby(boolean lobby) {
         this.lobby = lobby;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_LOBBY", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_LOBBY", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_LOBBY", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -273,11 +276,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setDynamic(boolean dynamic) {
+    public DriverQuery<ResponseStatus> setDynamic(boolean dynamic) {
         this.dynamic = dynamic;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_DYNAMIC", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_DYNAMIC", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_DYNAMIC", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -287,11 +290,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setMaxPlayers(int maxPlayers) {
+    public DriverQuery<ResponseStatus> setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_MAX_PLAYERS", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_MAX_PLAYERS", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MAX_PLAYERS", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -301,11 +304,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setNewServerPercent(int newServerPercent) {
+    public DriverQuery<ResponseStatus> setNewServerPercent(int newServerPercent) {
         this.newServerPercent = newServerPercent;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_PERCENT", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_PERCENT", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_PERCENT", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -315,11 +318,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setMaxServer(int maxServer) {
+    public DriverQuery<ResponseStatus> setMaxServer(int maxServer) {
         this.maxServer = maxServer;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_MAX_SERVERS", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_MAX_SERVERS", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MAX_SERVERS", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -329,11 +332,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setMinServer(int minServer) {
+    public DriverQuery<ResponseStatus> setMinServer(int minServer) {
         this.minServer = minServer;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_MIN_SERVERS", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_MIN_SERVERS", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MIN_SERVERS", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());
@@ -343,11 +346,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
-    public IQuery<ResponseStatus> setMemory(int memory) {
+    public DriverQuery<ResponseStatus> setMemory(int memory) {
         this.memory = memory;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("GROUP_SET_MEMORY", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("GROUP_SET_MEMORY", ResponseStatus.SUCCESS);
         } else {
             DriverRequest<ResponseStatus> request = DriverRequest.create("GROUP_SET_MEMORY", "CLOUD", ResponseStatus.class);
             request.append("name", this.getName());

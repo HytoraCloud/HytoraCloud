@@ -6,13 +6,11 @@ import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.DefaultModuleManager;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModuleManager;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.DefaultChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessenger;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.DefaultFallbackManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.IFallbackManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.DefaultTemplateManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplateManager;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -21,13 +19,10 @@ import de.lystx.hytoracloud.driver.commons.minecraft.DefaultMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.minecraft.IMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReloadService;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
 import de.lystx.hytoracloud.driver.commons.requests.RequestManager;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.service.IDService;
 import de.lystx.hytoracloud.driver.commons.service.PortService;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
@@ -36,7 +31,7 @@ import de.lystx.hytoracloud.driver.commons.packets.both.PacketLogMessage;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.IEventService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.IEventManager;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.DefaultServiceRegistry;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.IServiceRegistry;
 import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
@@ -46,16 +41,15 @@ import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyC
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabaseManager;
 import de.lystx.hytoracloud.driver.bridge.IBukkit;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ObjectCloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.ObjectServiceManager;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.log.Loggers;
 import de.lystx.hytoracloud.driver.commons.minecraft.other.TicksPerSecond;
 import de.lystx.hytoracloud.driver.utils.CloudRunnable;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.MessageConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventService;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventManager;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.CloudEvent;
@@ -88,7 +82,9 @@ import java.util.function.Consumer;
         highestSupportVersion = "1.16.5",
         todo = {
                 "1.17 Support & Higher Java Versions",
-                "Check Velocity-Support"
+                "Check Velocity-Support",
+                "Fix TabList updating",
+                "[Information] TabCompletion is beta!"
         }
 )
 public class CloudDriver {
@@ -118,14 +114,14 @@ public class CloudDriver {
     private NetworkConfig networkConfig; //The network config of this instance
 
     //Non-Final managers
-    private ICloudPlayerManager playerManager; //Manages all players
+    private ObjectCloudPlayerManager playerManager; //Manages all players
     private IDatabaseManager databaseManager; //Manages database-entries
-    private IServiceManager serviceManager; //Manages services
+    private ObjectServiceManager serviceManager; //Manages services
 
     //Final managers
     private final IReceiverManager receiverManager; //Manages receivers
     private final IServiceRegistry serviceRegistry; //Manages cloud-service-instances
-    private final IEventService eventService; //Manages events
+    private final IEventManager eventManager; //Manages events
     private final IFallbackManager fallbackManager; //For fallback managing
     private final ITemplateManager templateManager; //Manages templates
     private final IModuleManager moduleManager; //Manage modules info
@@ -146,7 +142,7 @@ public class CloudDriver {
 
         //Setting default interface implementations
         this.serviceRegistry = new DefaultServiceRegistry();
-        this.eventService = new DefaultEventService();
+        this.eventManager = new DefaultEventManager();
         this.receiverManager = new DefaultReceiverManager();
         this.fallbackManager = new DefaultFallbackManager();
         this.templateManager = new DefaultTemplateManager();
@@ -249,7 +245,7 @@ public class CloudDriver {
                 this.connection.sendPacket(new PacketCallEvent(cloudEvent, "cloud"));
             }
         }
-        return this.eventService.callEvent(cloudEvent);
+        return this.eventManager.callEvent(cloudEvent);
     }
 
     /*

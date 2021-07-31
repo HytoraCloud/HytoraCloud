@@ -18,7 +18,7 @@ public class ServerKickListener implements Listener {
         try {
             ServerInfo serverInfo = event.getPlayer().getServer().getInfo();
 
-            ICloudPlayer cloudPlayer = ICloudPlayer.fromName(event.getPlayer().getName());
+            ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(event.getPlayer().getName());
             IService service = serverInfo == null ? null : CloudDriver.getInstance().getServiceManager().getCachedObject(serverInfo.getName());
 
             event.setCancelled(CloudBridge.getInstance().getProxyBridge().onServerKick(cloudPlayer, service));

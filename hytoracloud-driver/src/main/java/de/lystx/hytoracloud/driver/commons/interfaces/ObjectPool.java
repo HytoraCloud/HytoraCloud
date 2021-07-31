@@ -1,14 +1,13 @@
 package de.lystx.hytoracloud.driver.commons.interfaces;
 
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.networking.elements.packet.response.Response;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface IPool<V extends Identifiable> extends Iterable<V> {
+public interface ObjectPool<V extends Identifiable> extends Iterable<V> {
 
     /**
      * Loads a list of all cached objects
@@ -66,7 +65,7 @@ public interface IPool<V extends Identifiable> extends Iterable<V> {
      * @param name the name
      * @return response or null if timed out
      */
-    Response<V> getObjectSync(String name);
+    DriverQuery<V> getObjectSync(String name);
 
     /**
      * Loads an {@link Optional} for the object
@@ -95,5 +94,5 @@ public interface IPool<V extends Identifiable> extends Iterable<V> {
      * @param uniqueId the uuid
      * @return response or null if timed out
      */
-    Response<V> getObjectSync(UUID uniqueId);
+    DriverQuery<V> getObjectSync(UUID uniqueId);
 }

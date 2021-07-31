@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.services;
 
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServerForcibly;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
@@ -28,6 +29,18 @@ public class CloudHandlerStop implements PacketHandler {
                     cloudSystem.getScreenPrinter().quitCurrentScreen();
                 }
                 CloudDriver.getInstance().getServiceManager().stopService(cachedObject);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        } else if (packet instanceof PacketInStopServerForcibly) {
+
+            PacketInStopServerForcibly packetInStopServer = (PacketInStopServerForcibly)packet;
+            try {
+                IService cachedObject = serviceManager.getCachedObject(packetInStopServer.getService());
+                if (cloudSystem.getScreenPrinter().getScreen() != null && cloudSystem.getScreenPrinter().getScreen().getServiceName().equalsIgnoreCase(cachedObject.getName())) {
+                    cloudSystem.getScreenPrinter().quitCurrentScreen();
+                }
+                CloudDriver.getInstance().getServiceManager().stopServiceForcibly(cachedObject);
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }

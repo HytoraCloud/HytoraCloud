@@ -91,7 +91,7 @@ public interface DriverRequest<T> {
      *
      * @return future request
      */
-    IQuery<T> execute();
+    DriverQuery<T> execute();
 
     /**
      * The id to identify this request

@@ -1,17 +1,12 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
-import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.bridge.IBukkit;
-import de.lystx.hytoracloud.driver.utils.Reflections;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 
-import java.lang.reflect.Field;
 
 @Getter @Setter
-public class DefaultBukkit implements IBukkit {
+public class BukkitObject implements IBukkit {
 
     /**
      * The version
@@ -76,7 +71,7 @@ public class DefaultBukkit implements IBukkit {
         return !version.startsWith("v1_8");
     }
 
-    public DefaultBukkit() {
+    public BukkitObject() {
     }
 
 }

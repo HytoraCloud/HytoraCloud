@@ -2,7 +2,6 @@ package de.lystx.hytoracloud.driver.commons.requests.base;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
-import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,7 +23,7 @@ public class DriverResponseObject<T> implements DriverResponse<T> {
     /**
      * The error
      */
-    private DriverRequestException error;
+    private Throwable exception;
 
     /**
      * The data
@@ -71,14 +70,9 @@ public class DriverResponseObject<T> implements DriverResponse<T> {
         return this;
     }
 
-    /**
-     * Sets the error of this response
-     *
-     * @param error the error
-     * @return current response
-     */
-    public DriverResponseObject<T> error(DriverRequestException error) {
-        this.error = error;
+    @Override
+    public DriverResponse<T> exception(Throwable throwable) {
+        this.exception = throwable;
         this.success = false;
         return this;
     }

@@ -5,8 +5,8 @@ import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputServi
 import de.lystx.hytoracloud.driver.commons.events.other.*;
 import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
-import de.lystx.hytoracloud.driver.commons.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.service.*;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
@@ -16,11 +16,10 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.cloudservices.cloud.server.ObjectServiceManager;
 import de.lystx.hytoracloud.launcher.global.InternalReceiver;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.networking.elements.packet.response.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
         },
         version = 1.5
 )
-public class CloudSideServiceManager implements ICloudService, IServiceManager, NetworkHandler {
+public class CloudSideServiceManager implements ICloudService, ObjectServiceManager, NetworkHandler {
 
     /**
      * All cached {@link IService}s
@@ -421,22 +420,24 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         return this.cachedObjects.stream().filter(service -> service.getUniqueId().equals(uniqueId)).findFirst().orElse(null);
     }
 
-    @Override @ScheduledForVersion("1.9")
+    @Override
     public void getObjectAsync(String name, Consumer<IService> consumer) {
+        consumer.accept(this.getCachedObject(name));
     }
 
-    @Override @ScheduledForVersion("1.9")
+    @Override
     public void getObjectAsync(UUID uniqueId, Consumer<IService> consumer) {
+        consumer.accept(this.getCachedObject(uniqueId));
     }
 
-    @Override @ScheduledForVersion("1.9")
-    public Response<IService> getObjectSync(String name) {
-        return null;
+    @Override
+    public DriverQuery<IService> getObjectSync(String name) {
+        return DriverQuery.dummy("SERVICE_GET_SYNC_NAME", this.getCachedObject(name));
     }
 
-    @Override @ScheduledForVersion("1.9")
-    public Response<IService> getObjectSync(UUID uniqueId) {
-        return null;
+    @Override
+    public DriverQuery<IService> getObjectSync(UUID uniqueId) {
+        return DriverQuery.dummy("SERVICE_GET_SYNC_UUID", this.getCachedObject(uniqueId));
     }
 
     @Override

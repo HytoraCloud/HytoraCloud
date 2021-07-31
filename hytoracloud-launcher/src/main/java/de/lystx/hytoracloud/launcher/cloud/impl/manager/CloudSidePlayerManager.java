@@ -5,13 +5,11 @@ import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabase;
 import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ObjectCloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.*;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.networking.elements.component.Component;
-import de.lystx.hytoracloud.networking.elements.packet.response.Response;
-import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -27,7 +25,7 @@ import java.util.function.Consumer;
         },
         version = 1.4
 )
-public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManager {
+public class CloudSidePlayerManager implements ICloudService, ObjectCloudPlayerManager {
 
     private List<ICloudPlayer> cachedObjects;
     private final IDatabase database;
@@ -62,7 +60,7 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
 
             this.database.saveEntry(cloudPlayer.getUniqueId(), information);
 
-            CloudDriver.getInstance().getPermissionPool().updatePlayer(information);
+            CloudDriver.getInstance().getPermissionPool().update(information);
             CloudDriver.getInstance().getPermissionPool().update();
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -130,43 +128,13 @@ public class CloudSidePlayerManager implements ICloudService, ICloudPlayerManage
     }
 
     @Override
-    public Response<ICloudPlayer> getObjectSync(String name) {
-        return new Response<ICloudPlayer>() {
-            @Override
-            public ICloudPlayer get() {
-                return getCachedObject(name);
-            }
-
-            @Override
-            public Component getComponent() {
-                return new Component();
-            }
-
-            @Override
-            public ResponseStatus getStatus() {
-                return ResponseStatus.SUCCESS;
-            }
-        };
+    public DriverQuery<ICloudPlayer> getObjectSync(String name) {
+        return DriverQuery.dummy("PLAYER_GET_SYNC_NAME", this.getCachedObject(name));
     }
 
     @Override
-    public Response<ICloudPlayer> getObjectSync(UUID uniqueId) {
-        return new Response<ICloudPlayer>() {
-            @Override
-            public ICloudPlayer get() {
-                return getCachedObject(uniqueId);
-            }
-
-            @Override
-            public Component getComponent() {
-                return new Component();
-            }
-
-            @Override
-            public ResponseStatus getStatus() {
-                return ResponseStatus.SUCCESS;
-            }
-        };
+    public DriverQuery<ICloudPlayer> getObjectSync(UUID uniqueId) {
+        return DriverQuery.dummy("PLAYER_GET_SYNC_NAME", this.getCachedObject(uniqueId));
     }
 
     @NotNull

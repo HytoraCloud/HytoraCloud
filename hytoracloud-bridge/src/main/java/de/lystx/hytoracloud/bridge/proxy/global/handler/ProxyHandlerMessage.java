@@ -22,7 +22,7 @@ public class ProxyHandlerMessage implements Consumer<IChannelMessage> {
             String player = document.getString("player");
             String message = document.getString("message");
 
-            ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player);
+            ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player);
 
             DriverEventPlayerChat playerChat = new DriverEventPlayerChat(cloudPlayer, message);
             CloudDriver.getInstance().callEvent(playerChat);

@@ -23,6 +23,18 @@ public class DriverRequestException extends RuntimeException {
      */
     private final String parentClass;
 
+    public DriverRequestException(Throwable throwable) {
+        this.parentClass = throwable.getClass().getName();
+        this.message = throwable.getMessage();
+        this.code = 0x00;
+    }
+
+    public DriverRequestException(String message) {
+        super(message);
+        this.message = message;
+        this.code = 0x00;
+        this.parentClass = DriverRequestException.class.getName();
+    }
 
     public DriverRequestException(String message, int code, Class<? extends Exception> parentClass) {
         super(message);

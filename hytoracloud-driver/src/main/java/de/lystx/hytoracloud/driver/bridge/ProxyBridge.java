@@ -4,6 +4,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudErrors;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
 import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
 import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
@@ -40,8 +41,7 @@ public interface ProxyBridge {
             event.setCancelled(true);
             event.setComponent(CloudErrors.LOGIN_PROXY.toString());
         } else {
-            cachedPlayer = new PlayerObject(connection);
-            cachedPlayer.setProxy(CloudDriver.getInstance().getServiceManager().getCurrentService());
+            cachedPlayer = new PlayerObject(connection, CloudDriver.getInstance().getServiceManager().getCurrentService().getName());
             cachedPlayer.update();
 
             if (CloudDriver.getInstance().getFallbackManager().getFallback(cachedPlayer) != null) {
@@ -195,15 +195,9 @@ public interface ProxyBridge {
      * Updates the {@link TabList} for all players
      */
    default void updateTabList(TabList tabList) {
-
-       for (ICloudPlayer cloudPlayer : CloudDriver.getInstance().getPlayerManager()) {
+       for (ICloudPlayer cloudPlayer : CloudDriver.getInstance().getPlayerManager().getCachedObjects()) {
            updateTabList(cloudPlayer, tabList);
        }
-       CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
-           for (ICloudPlayer cloudPlayer : CloudDriver.getInstance().getPlayerManager()) {
-               updateTabList(cloudPlayer, tabList);
-           }
-       }, 20L);
    }
 
     /**
@@ -230,16 +224,11 @@ public interface ProxyBridge {
      * @param service the service
      */
     default void onServerConnect(ICloudPlayer cloudPlayer, IService service) {
-        cloudPlayer.setService(service);
-        cloudPlayer.update();
+        PlayerObject playerObject = (PlayerObject) cloudPlayer;
+        playerObject.setService(service);
+        playerObject.update();
+        CloudDriver.getInstance().callEvent(new DriverEventPlayerServerChange(playerObject, service));
     }
-
-    /**
-     * Gets the current {@link NetworkHandler}
-     *
-     * @return network handler
-     */
-    NetworkHandler getNetworkHandler();
 
     /**
      * Gets the ping of a player

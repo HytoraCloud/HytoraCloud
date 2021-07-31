@@ -29,7 +29,7 @@ public class PlayerSignListener implements Listener {
 
         Sign sign = (Sign) event.getClickedBlock().getState();
         Player player = event.getPlayer();
-        ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
+        ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUniqueId());
         CloudSign cloudSign = ServerSelector.getInstance().getSignManager().getSignUpdater().getCloudSign(sign.getLocation());
 
         if (cloudPlayer != null && cloudSign != null && event.getAction() == Action.RIGHT_CLICK_BLOCK) {

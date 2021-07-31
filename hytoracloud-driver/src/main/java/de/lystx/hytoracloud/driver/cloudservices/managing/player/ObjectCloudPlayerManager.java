@@ -1,13 +1,13 @@
 package de.lystx.hytoracloud.driver.cloudservices.managing.player;
 
-import de.lystx.hytoracloud.driver.commons.interfaces.IPool;
+import de.lystx.hytoracloud.driver.commons.interfaces.ObjectPool;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ICloudPlayerManager extends IPool<ICloudPlayer> {
+public interface ObjectCloudPlayerManager extends ObjectPool<ICloudPlayer> {
 
     /**
      * Gets a list of all {@link OfflinePlayer}s from cache

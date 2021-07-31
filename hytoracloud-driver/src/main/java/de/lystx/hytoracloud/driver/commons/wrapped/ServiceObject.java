@@ -6,14 +6,10 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceInfo;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceMemoryUsage;
 import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.commons.packets.in.PacketInGetLog;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestTPS;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
-import de.lystx.hytoracloud.driver.commons.requests.base.SimpleQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
@@ -84,11 +80,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), ServiceState.LOBBY, (PropertyObject) JsonObject.serializable(), (ServiceGroupObject) group, false);
     }
 
-    public IQuery<ResponseStatus> setProperties(JsonObject<?> properties) {
+    public DriverQuery<ResponseStatus> setProperties(JsonObject<?> properties) {
         this.properties = (PropertyObject) properties;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("SERVICE_SET_PROPERTIES", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("SERVICE_SET_PROPERTIES", ResponseStatus.SUCCESS);
         }
         DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_PROPERTIES", "CLOUD", ResponseStatus.class);
         request.append("name", this.getName());
@@ -101,11 +97,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
        return CloudDriver.getInstance().getServiceManager().getCachedGroups().stream().filter(iServiceGroup -> iServiceGroup.getName().equalsIgnoreCase(this.group.getName())).findFirst();
     }
 
-    public IQuery<ResponseStatus> addProperty(String key, JsonObject<?> data) {
+    public DriverQuery<ResponseStatus> addProperty(String key, JsonObject<?> data) {
         this.properties.append(key, data);
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("SERVICE_ADD_PROPERTY", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("SERVICE_ADD_PROPERTY", ResponseStatus.SUCCESS);
         }
         DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_ADD_PROPERTY", "CLOUD", ResponseStatus.class);
         request.append("name", this.getName());
@@ -115,11 +111,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public IQuery<ResponseStatus> setAuthenticated(boolean authenticated) {
+    public DriverQuery<ResponseStatus> setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("SERVICE_SET_AUTHENTICATED", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("SERVICE_SET_AUTHENTICATED", ResponseStatus.SUCCESS);
         }
         DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_AUTHENTICATED", "CLOUD", ResponseStatus.class);
         request.append("name", this.getName());
@@ -128,11 +124,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public IQuery<ResponseStatus> setState(ServiceState state) {
+    public DriverQuery<ResponseStatus> setState(ServiceState state) {
         this.state = state;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("SERVICE_SET_STATE", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("SERVICE_SET_STATE", ResponseStatus.SUCCESS);
         }
         DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_STATE", "CLOUD", ResponseStatus.class);
         request.append("name", this.getName());
@@ -141,11 +137,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public IQuery<ResponseStatus> setHost(String host) {
+    public DriverQuery<ResponseStatus> setHost(String host) {
         this.host = host;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
-            return IQuery.dummy("SERVICE_SET_HOST", ResponseStatus.SUCCESS);
+            return DriverQuery.dummy("SERVICE_SET_HOST", ResponseStatus.SUCCESS);
         }
         DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_SET_HOST", "CLOUD", ResponseStatus.class);
         request.append("name", this.getName());
@@ -160,10 +156,6 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     public String getName() {
         return this.group.getName() + "-" + this.id;
-    }
-
-    @Override
-    public void setName(String name) {
     }
 
     @Override
@@ -184,9 +176,9 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public IQuery<PropertyObject> requestInfo() {
+    public DriverQuery<PropertyObject> requestInfo() {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
-            return IQuery.dummy("SERVICE_GET_PROPERTIES", CloudDriver.getInstance().getBridgeInstance().requestProperties());
+            return DriverQuery.dummy("SERVICE_GET_PROPERTIES", CloudDriver.getInstance().getBridgeInstance().requestProperties());
         } else {
             DriverRequest<PropertyObject> request = DriverRequest.create("SERVICE_GET_PROPERTIES", this.getName(), PropertyObject.class);
             return request.execute();
@@ -222,9 +214,9 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public IQuery<Long> getMemoryUsage() {
+    public DriverQuery<Long> getMemoryUsage() {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
-            return IQuery.dummy("SERVICE_GET_MEMORY", CloudDriver.getInstance().getBridgeInstance().loadMemoryUsage());
+            return DriverQuery.dummy("SERVICE_GET_MEMORY", CloudDriver.getInstance().getBridgeInstance().loadMemoryUsage());
         } else {
             DriverRequest<Long> request = DriverRequest.create("SERVICE_GET_MEMORY", this.getName(), Long.class);
             return request.execute();
@@ -260,12 +252,12 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public IQuery<String> getTPS() {
+    public DriverQuery<String> getTPS() {
         if (this.group.getType() == ServiceType.PROXY) {
-            return IQuery.dummy("SERVICE_GET_TPS", "§cNo TPS for Proxy");
+            return DriverQuery.dummy("SERVICE_GET_TPS", "§cNo TPS for Proxy");
         }
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getCurrentService().getName())) {
-            return IQuery.dummy("SERVICE_GET_TPS", CloudDriver.getInstance().getBridgeInstance().loadTPS());
+            return DriverQuery.dummy("SERVICE_GET_TPS", CloudDriver.getInstance().getBridgeInstance().loadTPS());
         } else {
             DriverRequest<String> request = DriverRequest.create("SERVICE_GET_TPS", this.getName(), String.class);
             return request.execute();

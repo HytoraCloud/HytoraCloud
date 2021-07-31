@@ -4,10 +4,13 @@ import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestExcep
 
 import java.util.function.Consumer;
 
-public interface IQuery<T> {
+public interface DriverQuery<T> {
 
-    static <T> IQuery<T> dummy(String key, T value) {
-        return new SimpleQuery<>(key, value);
+    static <T> DriverQuery<T> dummy(String key) {
+        return dummy(key, null);
+    }
+    static <T> DriverQuery<T> dummy(String key, T value) {
+        return new DriverQueryObject<>(key, value);
     }
 
     /**
@@ -17,7 +20,7 @@ public interface IQuery<T> {
      * @param timeOutValue the value
      * @return current future
      */
-    IQuery<T> setTimeOut(long ticks, T timeOutValue);
+    DriverQuery<T> setTimeOut(long ticks, T timeOutValue);
 
     /**
      * Adds a listener to this query
@@ -25,7 +28,7 @@ public interface IQuery<T> {
      * @param listener the listener
      * @return current future
      */
-    IQuery<T> addFutureListener(Consumer<IQuery<T>> listener);
+    DriverQuery<T> addFutureListener(Consumer<DriverQuery<T>> listener);
 
     /**
      * Checks if the {@link DriverRequest} was successful
@@ -43,25 +46,24 @@ public interface IQuery<T> {
     boolean isCompleted();
 
     /**
-     * If there was an {@link DriverRequestException} in the request
+     * If there was an {@link Throwable} in the request
      * it will be returned otherwise it will return null
      *
      * @return error
      */
-    DriverRequestException getError();
+    Throwable getError();
 
     /**
      * This pulls the response and stops the current thread until
      * a value is returned so the thread can go on an will be started again
      *
      * @return The response to this request
-     * @throws DriverRequestException if api is not received or send back
      */
     T pullValue() throws DriverRequestException;
 
     /**
      * Gets the {@link DriverRequest} that belongs
-     * to this {@link IQuery}
+     * to this {@link DriverQuery}
      *
      * @return request
      */

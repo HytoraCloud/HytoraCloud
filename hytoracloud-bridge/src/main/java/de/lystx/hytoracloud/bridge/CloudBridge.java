@@ -7,13 +7,15 @@ import de.lystx.hytoracloud.bridge.global.manager.CloudBridgeDatabaseService;
 import de.lystx.hytoracloud.bridge.global.manager.CloudBridgeServiceManager;
 import de.lystx.hytoracloud.bridge.global.manager.CloudBridgePlayerManager;
 import de.lystx.hytoracloud.bridge.global.handler.*;
+import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
+import de.lystx.hytoracloud.bridge.proxy.global.listener.TabListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutUpdateTabList;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.service.IService;
@@ -34,9 +36,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import de.lystx.hytoracloud.networking.connection.client.ClientListener;
 import de.lystx.hytoracloud.networking.connection.client.NetworkClient;
-import de.lystx.hytoracloud.networking.elements.component.Component;
 import de.lystx.hytoracloud.networking.elements.component.ComponentSender;
-import de.lystx.hytoracloud.networking.elements.component.RepliableComponent;
 import de.lystx.hytoracloud.networking.elements.other.NetworkLogin;
 import de.lystx.hytoracloud.networking.elements.packet.Packet;
 
@@ -47,7 +47,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudBridge {
@@ -112,8 +111,9 @@ public class CloudBridge {
 
         CloudDriver.getInstance().setInstance("proxyBridge", proxyBridge);
 
-        //NetworkHandler
-        CloudDriver.getInstance().registerNetworkHandler(proxyBridge.getNetworkHandler());
+        //EventHandler
+        CloudDriver.getInstance().getEventManager().registerListener(new NotifyListener());
+        CloudDriver.getInstance().getEventManager().registerListener(new TabListener());
 
         //PacketHandler
         CloudDriver.getInstance().registerPacketHandler(new ProxyHandlerCloudPlayer());
@@ -189,7 +189,7 @@ public class CloudBridge {
                         } else {
                             service.setHost(InetAddress.getLocalHost().getHostAddress());
                         }
-                        IQuery<ResponseStatus> status = service.setAuthenticated(true).setTimeOut(30, ResponseStatus.FAILED);
+                        DriverQuery<ResponseStatus> status = service.setAuthenticated(true).setTimeOut(30, ResponseStatus.FAILED);
                         System.out.println("[CloudBridge] Authentication for '" + service.getName() + "' executed: " + status.pullValue().name());
                     } catch (UnknownHostException e) {
                         e.printStackTrace();

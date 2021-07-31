@@ -4,20 +4,16 @@ import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerInject
 import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.CommandListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerKickListener;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
 import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
-import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.PlayerConnection;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.events.EventResult;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
-import de.lystx.hytoracloud.driver.commons.interfaces.NetworkHandler;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
@@ -65,34 +61,8 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
             ProxyServer.getInstance().getPluginManager().registerListener(this, new ProxyPingListener());
 
+
             CloudBridge.getInstance().setProxyBridge(new ProxyBridge() {
-
-                @Override
-                public NetworkHandler getNetworkHandler() {
-                    return new NotifyListener();
-                }
-
-                @Override
-                public void onServerConnect(ICloudPlayer cloudPlayer, IService service) {
-                    ProxyBridge.super.onServerConnect(cloudPlayer, service);
-
-                    CloudDriver.getInstance().reload(CloudDriver.getInstance().getServiceManager().getCurrentService());
-                }
-
-                @Override
-                public void playerQuit(ICloudPlayer player) {
-                    ProxyBridge.super.playerQuit(player);
-
-                    CloudDriver.getInstance().reload(CloudDriver.getInstance().getServiceManager().getCurrentService());
-                }
-
-                @Override
-                public EventResult playerLogin(PlayerConnection connection) {
-                    CloudDriver.getInstance().reload(CloudDriver.getInstance().getServiceManager().getCurrentService());
-                    return ProxyBridge.super.playerLogin(connection);
-                }
-
-
 
                 @Override
                 public int getPing(UUID uniqueId) {
@@ -136,7 +106,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
                         return;
                     }
 
-                    ICloudPlayer cloudPlayer = ICloudPlayer.fromUUID(player.getUniqueId());
+                    ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUniqueId());
 
                     if (cloudPlayer == null) {
                         return;

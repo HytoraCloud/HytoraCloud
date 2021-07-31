@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command.ServiceCommand;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command.StopCommand;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
-import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.DefaultBukkit;
+import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.BukkitObject;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.NametagManager;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler.*;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerChatListener;
@@ -81,7 +81,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         }
 
 
-        CloudDriver.getInstance().setInstance("bukkit", new DefaultBukkit());
+        CloudDriver.getInstance().setInstance("bukkit", new BukkitObject());
         CloudDriver.getInstance().getBukkit().setVersion(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
 
         //Initializing Objects
@@ -425,7 +425,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         int count = Bukkit.getOnlinePlayers().size();
         for (Player player : Bukkit.getOnlinePlayers()) {
 
-            ICloudPlayer cloudPlayer = ICloudPlayer.fromName(player.getName());
+            ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName());
             if (cloudPlayer == null) {
                 player.kickPlayer(msg);
             } else {

@@ -15,20 +15,20 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @Getter
-public class DefaultEventService implements IEventService {
+public class DefaultEventManager implements IEventManager {
 
     /**
      * All cached registered classes
      */
     private final Map<Object, List<HandlerMethod<EventMarker>>> registeredClasses;
 
-    public DefaultEventService() {
+    public DefaultEventManager() {
         this.registeredClasses = new HashMap<>();
-        this.registerEvent(new DefaultListener());
+        this.registerListener(new DefaultListener());
     }
 
     @Override
-    public void registerEvent(EventListener listener) {
+    public void registerListener(EventListener listener) {
         List<HandlerMethod<EventMarker>> handlerMethods = new ArrayList<>();
 
         for (Method m : listener.getClass().getDeclaredMethods()) {
@@ -47,7 +47,7 @@ public class DefaultEventService implements IEventService {
     }
 
     @Override
-    public void unregister(EventListener listener) {
+    public void unregisterListener(EventListener listener) {
         registeredClasses.remove(listener);
     }
 

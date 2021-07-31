@@ -17,7 +17,23 @@ public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage
     /**
      * Gson constant to (de-)serialize Objects
      */
-    public static final Gson GSON = (new GsonBuilder()).serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
+    public static final Gson GSON = (new GsonBuilder())
+            .serializeNulls()
+            .setPrettyPrinting()
+            .disableHtmlEscaping()
+            .registerTypeHierarchyAdapter(PropertyObject.class, new JsonDeserializer<PropertyObject>() {
+                @Override
+                public PropertyObject deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                    return new PropertyObject(jsonElement.toString());
+                }
+            })
+            .registerTypeAdapter(PropertyObject.class, new JsonSerializer<PropertyObject>() {
+                @Override
+                public JsonElement serialize(PropertyObject propertyObject, Type type, JsonSerializationContext jsonSerializationContext) {
+                    return new JsonParser().parse(propertyObject.toString());
+                }
+            })
+            .create();
 
     /**
      * The file of this document

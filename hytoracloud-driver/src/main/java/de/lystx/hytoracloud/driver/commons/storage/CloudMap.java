@@ -92,4 +92,9 @@ public class CloudMap<K, V> extends HashMap<K, V> {
     public <T> T getObject(String key) {
         return (T) this.get(key);
     }
+
+    @Override
+    public String toString() {
+        return JsonDocument.toString(this);
+    }
 }

@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.networking.elements.packet.Packet;
@@ -62,7 +62,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param host the host
      */
-    IQuery<ResponseStatus> setHost(String host);
+    DriverQuery<ResponseStatus> setHost(String host);
 
     /**
      * The state of this service
@@ -74,7 +74,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param state the state
      */
-    IQuery<ResponseStatus> setState(ServiceState state);
+    DriverQuery<ResponseStatus> setState(ServiceState state);
 
     /**
      * The properties of this service to store values
@@ -86,7 +86,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param properties the properties
      */
-    IQuery<ResponseStatus> setProperties(JsonObject<?> properties);
+    DriverQuery<ResponseStatus> setProperties(JsonObject<?> properties);
 
     /**
      * The group of this service
@@ -118,7 +118,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @param authenticated boolean
      */
-    IQuery<ResponseStatus> setAuthenticated(boolean authenticated);
+    DriverQuery<ResponseStatus> setAuthenticated(boolean authenticated);
 
     /**
      * Adds a property to this service
@@ -126,7 +126,7 @@ public interface IService extends Serializable, Identifiable {
      * @param key the name of the property
      * @param propertyObject the propertyObject
      */
-    IQuery<ResponseStatus> addProperty(String key, JsonObject<?> propertyObject);
+    DriverQuery<ResponseStatus> addProperty(String key, JsonObject<?> propertyObject);
 
     /**
      * Checks if Service is for example
@@ -159,7 +159,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @return properties
      */
-    IQuery<PropertyObject> requestInfo();
+    DriverQuery<PropertyObject> requestInfo();
 
     /**
      * Returns the Motd of this Service
@@ -185,7 +185,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @return tps in string with color
      */
-    IQuery<String> getTPS();
+    DriverQuery<String> getTPS();
 
     /**
      * Updates this Service
@@ -198,7 +198,7 @@ public interface IService extends Serializable, Identifiable {
      *
      * @return memory as query
      */
-    IQuery<Long> getMemoryUsage();
+    DriverQuery<Long> getMemoryUsage();
 
     /**
      * Stops this service

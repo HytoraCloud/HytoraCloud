@@ -6,18 +6,16 @@ import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverResponse;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverResponseObject;
-import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.commons.requests.base.SimpleQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQueryObject;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequestObject;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.utils.Utils;
 import lombok.SneakyThrows;
 
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -26,7 +24,7 @@ public class RequestManager {
     /**
      * All stored futures with their ids
      */
-    private final Map<String, IQuery<?>> futures;
+    private final Map<String, DriverQuery<?>> futures;
 
     /**
      * Request handlers for api request-response
@@ -49,7 +47,7 @@ public class RequestManager {
                             requestHandler.accept(request);
                         }
                     } else {
-                        IQuery<?> comply = request.execute();
+                        DriverQuery<?> comply = request.execute();
                         request.createResponse(request.typeClass()).data(comply.pullValue()).send();
                     }
                     return;
@@ -81,9 +79,8 @@ public class RequestManager {
                 JsonObject<?> document = channelMessage.getDocument().getObject("response");
                 DriverResponse<?> response = new DriverResponseObject<>();
                 response.id(document.getString("id"));
-                response.success(document.getBoolean("success"));
-                response.error(document.getElement("error").isJsonNull() ? null : document.get("error", DriverRequestException.class));
                 response.typeClass(Class.forName(document.getString("typeClass")));
+                response.success(document.getBoolean("success"));
 
                 Class<?> aClass = response.typeClass();
 
@@ -111,7 +108,18 @@ public class RequestManager {
                     response.data(document.get("data", aClass));
                 }
 
-                SimpleQuery<?> future = (SimpleQuery<?>) retrieveFuture(response.getId());
+                String exceptionClass = document.getString("exceptionClass");
+                if (!exceptionClass.equalsIgnoreCase("None")) {
+                    if (document.getElement("exception").isJsonNull()) {
+                        response.exception(null);
+                    } else {
+                        Class<?> exClass = Class.forName(exceptionClass);
+                        Object exception = document.get("exception", exClass);
+                        response.exception((Throwable) exception);
+                    }
+                }
+
+                DriverQueryObject<?> future = (DriverQueryObject<?>) retrieveFuture(response.getId());
                 if (future == null) {
                     return;
                 }
@@ -135,30 +143,30 @@ public class RequestManager {
 
 
     /**
-     * Adds a {@link IQuery} to the cache with a given id
+     * Adds a {@link DriverQuery} to the cache with a given id
      *
      * @param id the id of the request
      * @param future the future
      */
-    public void addRequest(String id, IQuery<?> future) {
+    public void addRequest(String id, DriverQuery<?> future) {
         futures.put(id, future);
     }
 
     /**
-     * Gets an {@link IQuery} from cache
+     * Gets an {@link DriverQuery} from cache
      * and then automatically removes it from cache
      *
      * @param id the id
      * @return future or null
      */
-    public IQuery<?> retrieveFuture(String id) {
-        IQuery<?> future = futures.get(id);
+    public DriverQuery<?> retrieveFuture(String id) {
+        DriverQuery<?> future = futures.get(id);
         futures.remove(id);
         return future;
     }
 
     /**
-     * Transforms an {@link IQuery} to a {@link IChannelMessage}
+     * Transforms an {@link DriverQuery} to a {@link IChannelMessage}
      * to be able to communicate around the network
      *
      * @param request the request
@@ -182,6 +190,18 @@ public class RequestManager {
      * @return message
      */
     public IChannelMessage toMessage(DriverResponse<?> response) {
-        return IChannelMessage.builder().channel("API_RESPONSES").document(JsonObject.gson().append("response", response)).build();
+        JsonObject<JsonDocument> jsonObject = JsonObject.gson();
+        jsonObject.append("response",
+                JsonObject.gson()
+                    .append("id", response.getId())
+                    .append("success", response.isSuccess())
+                    .append("data", response.getData())
+                    .append("typeClass", response.typeClass().getName())
+                    .append("exception", response.getException())
+                    .append("exceptionClass", response.getException() == null ? "None" : response.getException().getClass().getName())
+
+        );
+
+        return IChannelMessage.builder().channel("API_RESPONSES").document(jsonObject).build();
     }
 }

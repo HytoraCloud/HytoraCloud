@@ -17,6 +17,11 @@ public interface BridgeInstance {
     void bootstrap();
 
     /**
+     * Stops this instance
+     */
+    void shutdown();
+
+    /**
      * Executes a console command
      *
      * @param command the command
@@ -67,11 +72,6 @@ public interface BridgeInstance {
     default String loadTPS() {
         return "§c???";
     }
-
-    /**
-     * Stops this instance
-     */
-    void shutdown();
 
     /**
      * The type of the bridge instance

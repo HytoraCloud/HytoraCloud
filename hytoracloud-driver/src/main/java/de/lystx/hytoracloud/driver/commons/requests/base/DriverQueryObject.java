@@ -3,10 +3,9 @@ package de.lystx.hytoracloud.driver.commons.requests.base;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import lombok.Getter;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 @Getter
-public class SimpleQuery<T> implements IQuery<T> {
+public class DriverQueryObject<T> implements DriverQuery<T> {
 
     private static final long serialVersionUID = -4424743782381022342L;
 
@@ -36,7 +35,7 @@ public class SimpleQuery<T> implements IQuery<T> {
     /**
      * All listeners
      */
-    private final List<Consumer<IQuery<T>>> driverResponses;
+    private final List<Consumer<DriverQuery<T>>> driverResponses;
 
     /**
      * The response if set
@@ -46,7 +45,7 @@ public class SimpleQuery<T> implements IQuery<T> {
     /**
      * The error
      */
-    private volatile DriverRequestException error;
+    private volatile Throwable error;
 
     /**
      * If completed yet
@@ -73,13 +72,13 @@ public class SimpleQuery<T> implements IQuery<T> {
      */
     private T timeOutValue;
 
-    SimpleQuery(String typeDummy, T dummy) {
+    DriverQueryObject(String typeDummy, T dummy) {
         this(new DriverRequestObject<>(typeDummy));
 
         this.dummyObject = dummy;
     }
 
-    SimpleQuery(DriverRequest<T> request) {
+    DriverQueryObject(DriverRequest<T> request) {
         this.request = request;
         this.countDownLatches = new ArrayList<>();
         this.timeOut = -1;
@@ -87,7 +86,7 @@ public class SimpleQuery<T> implements IQuery<T> {
     }
 
     @Override
-    public IQuery<T> addFutureListener(Consumer<IQuery<T>> listener) {
+    public DriverQuery<T> addFutureListener(Consumer<DriverQuery<T>> listener) {
         this.driverResponses.add(listener);
         return this;
     }
@@ -113,11 +112,11 @@ public class SimpleQuery<T> implements IQuery<T> {
         if (success) {
             return response;
         }
-        throw getError() == null ? new DriverRequestException("The request timed out and no error was provided!", 0x99, NullPointerException.class) : getError();
+        throw getError() == null ? new DriverRequestException("The request timed out and no error was provided!") : new DriverRequestException(getError());
     }
 
     @Override
-    public IQuery<T> setTimeOut(long timeOut, T timeOutValue) {
+    public DriverQuery<T> setTimeOut(long timeOut, T timeOutValue) {
         this.timeOut = timeOut;
         this.timeOutValue = timeOutValue;
         return this;
@@ -130,6 +129,10 @@ public class SimpleQuery<T> implements IQuery<T> {
      */
     public void completeFuture(DriverResponse<?> response) {
 
+        if (this.completed) {
+            return;
+        }
+
         this.driverResponse = response;
         this.completed = true;
         this.success = response.isSuccess();
@@ -137,9 +140,9 @@ public class SimpleQuery<T> implements IQuery<T> {
         if (response.isSuccess()) {
             this.response = (T) response.getData();
         } else {
-            this.error = response.getError();
+            this.error = response.getException();
         }
-        for (Consumer<IQuery<T>> driverRespons : this.driverResponses) {
+        for (Consumer<DriverQuery<T>> driverRespons : this.driverResponses) {
             driverRespons.accept(this);
         }
         for (CountDownLatch latch : countDownLatches) {

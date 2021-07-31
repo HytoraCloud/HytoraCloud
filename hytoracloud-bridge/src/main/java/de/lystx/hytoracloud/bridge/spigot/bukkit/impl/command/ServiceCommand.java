@@ -44,10 +44,6 @@ public class ServiceCommand {
     )
     public void execute(CommandExecutor sender, String[] args) {
         if (sender instanceof ConsoleExecutor) {
-            IService service = CloudDriver.getInstance().getServiceManager().getCachedObject("Bungee-1");
-
-            sender.sendMessage(service.getMemoryUsage().pullValue() + "/" + service.getGroup().getMemory());
-
             return;
         }
         if (sender instanceof ICloudPlayer) {
@@ -203,7 +199,7 @@ public class ServiceCommand {
                                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7You set the ServiceState of this service to " + state.getColor() + state.name());
                             } else {
                                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cCouldn't set ServiceState to §e" + state.name() + "§c!");
-                                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cException: §e" + query.getError().getParentClass().getName());
+                                player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cException: §e" + query.getError().getClass().getName());
                             }
                         });
                     } else {

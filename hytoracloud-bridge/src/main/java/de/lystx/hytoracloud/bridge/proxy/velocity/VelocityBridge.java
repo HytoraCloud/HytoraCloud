@@ -71,11 +71,6 @@ public class VelocityBridge implements BridgeInstance {
             CloudBridge.getInstance().setProxyBridge(new ProxyBridge() {
 
                 @Override
-                public NetworkHandler getNetworkHandler() {
-                    return new NotifyListener();
-                }
-
-                @Override
                 public int getPing(UUID uniqueId) {
 
                     Player player = server.getPlayer(uniqueId).orElse(null);

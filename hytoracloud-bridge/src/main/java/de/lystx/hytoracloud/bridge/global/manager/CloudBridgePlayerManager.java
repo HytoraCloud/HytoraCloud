@@ -1,17 +1,14 @@
 package de.lystx.hytoracloud.bridge.global.manager;
 
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerNamed;
-import de.lystx.hytoracloud.driver.commons.packets.in.request.other.PacketRequestPlayerUniqueId;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.cloudservices.managing.player.ObjectCloudPlayerManager;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.OfflinePlayer;
 
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.networking.elements.component.Component;
-import de.lystx.hytoracloud.networking.elements.packet.response.Response;
-import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -19,7 +16,7 @@ import java.util.function.Consumer;
 
 
 @Setter @Getter
-public class CloudBridgePlayerManager implements ICloudPlayerManager {
+public class CloudBridgePlayerManager implements ObjectCloudPlayerManager {
 
     private List<ICloudPlayer> cachedObjects;
 
@@ -43,62 +40,32 @@ public class CloudBridgePlayerManager implements ICloudPlayerManager {
     }
 
     @Override
-    public Response<ICloudPlayer> getObjectSync(UUID uniqueId) {
+    public DriverQuery<ICloudPlayer> getObjectSync(UUID uniqueId) {
 
-        PacketRequestPlayerUniqueId packet = new PacketRequestPlayerUniqueId(uniqueId);
-        Component component = packet.toReply(CloudDriver.getInstance().getConnection());
+        DriverRequest<ICloudPlayer> request = DriverRequest.create("PLAYER_GET_SYNC_UUID", "CLOUD", ICloudPlayer.class);
+        request.append("uniqueId", uniqueId);
 
-        return new Response<ICloudPlayer>() {
-            @Override
-            public ICloudPlayer get() {
-                return component.get("player");
-            }
-
-            @Override
-            public Component getComponent() {
-                return component;
-            }
-
-            @Override
-            public ResponseStatus getStatus() {
-                return ResponseStatus.SUCCESS;
-            }
-        };
+        return request.execute();
     }
 
 
 
     @Override
-    public Response<ICloudPlayer> getObjectSync(String name) {
-        PacketRequestPlayerNamed packet = new PacketRequestPlayerNamed(name);
-        Component component = packet.toReply(CloudDriver.getInstance().getConnection());
+    public DriverQuery<ICloudPlayer> getObjectSync(String name) {
+        DriverRequest<ICloudPlayer> request = DriverRequest.create("PLAYER_GET_SYNC_NAME", "CLOUD", ICloudPlayer.class);
+        request.append("name", name);
 
-        return new Response<ICloudPlayer>() {
-            @Override
-            public ICloudPlayer get() {
-                return component.get("player");
-            }
-
-            @Override
-            public Component getComponent() {
-                return component;
-            }
-
-            @Override
-            public ResponseStatus getStatus() {
-                return ResponseStatus.SUCCESS;
-            }
-        };
+        return request.execute();
     }
 
     @Override
     public void getObjectAsync(String name, Consumer<ICloudPlayer> consumer) {
-        CloudDriver.getInstance().getExecutorService().execute(() -> consumer.accept(this.getObjectSync(name).get()));
+        CloudDriver.getInstance().getExecutorService().execute(() -> consumer.accept(this.getObjectSync(name).pullValue()));
     }
 
     @Override
     public void getObjectAsync(UUID uniqueId, Consumer<ICloudPlayer> consumer) {
-        CloudDriver.getInstance().getExecutorService().execute(() -> consumer.accept(this.getObjectSync(uniqueId).get()));
+        CloudDriver.getInstance().getExecutorService().execute(() -> consumer.accept(this.getObjectSync(uniqueId).pullValue()));
     }
 
     @Override

@@ -1,8 +1,5 @@
 package de.lystx.hytoracloud.driver.commons.requests.base;
 
-import de.lystx.hytoracloud.driver.commons.requests.exception.DriverRequestException;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-
 public interface DriverResponse<T> {
 
     /**
@@ -53,7 +50,7 @@ public interface DriverResponse<T> {
      *
      * @return exception
      */
-    DriverRequestException getError();
+    Throwable getException();
 
     /**
      * Sets the id of this response
@@ -66,10 +63,10 @@ public interface DriverResponse<T> {
     /**
      * Sets the error of this response
      *
-     * @param error the error
+     * @param throwable the error
      * @return current response
      */
-    DriverResponse<T> error(DriverRequestException error);
+    DriverResponse<T> exception(Throwable throwable);
 
     /**
      * Sets the success-state of this response
