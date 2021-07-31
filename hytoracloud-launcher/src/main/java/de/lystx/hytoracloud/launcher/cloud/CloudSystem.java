@@ -1,6 +1,9 @@
 package de.lystx.hytoracloud.launcher.cloud;
 
+import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketUpdatePermissionPool;
+import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.launcher.cloud.handler.player.CloudHandlerPlayerRequest;
 import de.lystx.hytoracloud.launcher.cloud.impl.manager.NetworkService;
@@ -114,6 +117,43 @@ public class CloudSystem extends CloudProcess {
 
         this.authManager.createKey();
         this.bootstrap();
+
+    }
+
+    @Override
+    public void reload(IService service) {
+        service.sendPacket(new PacketOutUpdateTabList());
+        CloudDriver.getInstance().getInstance(GroupService.class).reload();
+        CloudDriver.getInstance().getInstance(ConfigService.class).reload();
+
+        SignService signService = CloudDriver.getInstance().getInstance(SignService.class);
+        NPCService npcService = CloudDriver.getInstance().getInstance(NPCService.class);
+
+        if (signService == null || npcService == null) {
+            return;
+        }
+
+        service.sendPacket(new PacketOutServerSelector(signService.getCloudSigns(), signService.getConfiguration(), npcService.getNPCConfig(), npcService.toMetas()));
+
+        try {
+
+            //Sending config and permission pool
+            service.sendPacket(new PacketUpdateNetworkConfig(CloudDriver.getInstance().getNetworkConfig()));
+            service.sendPacket(new PacketUpdatePermissionPool(CloudDriver.getInstance().getPermissionPool()));
+
+            CloudDriver.getInstance().getServiceManager().sync(getInstance(GroupService.class).getGroups());
+
+            //Sending network config and services and groups
+            service.sendPacket((new PacketOutGlobalInfo(
+                    CloudDriver.getInstance().getNetworkConfig(),
+                    CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
+                    CloudDriver.getInstance().getServiceManager().getCachedObjects(),
+                    CloudDriver.getInstance().getPlayerManager().getCachedObjects()
+            )));
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
     }
 

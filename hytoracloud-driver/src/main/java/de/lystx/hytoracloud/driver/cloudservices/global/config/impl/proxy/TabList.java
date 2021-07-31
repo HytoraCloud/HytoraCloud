@@ -4,10 +4,11 @@ package de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter @AllArgsConstructor
+@Getter @AllArgsConstructor @Setter
 public class TabList implements Serializable {
 
     private static final long serialVersionUID = -3372478432974039029L;
@@ -19,11 +20,11 @@ public class TabList implements Serializable {
     /**
      * The header
      */
-    private final String[] headerLines;
+    private String[] headerLines;
 
     /**
      * The footer
      */
-    private final String[] footerLines;
+    private String[] footerLines;
 
 }

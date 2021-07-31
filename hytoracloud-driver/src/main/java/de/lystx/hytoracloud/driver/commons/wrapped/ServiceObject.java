@@ -22,6 +22,8 @@ import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.networking.connection.NetworkConnection;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -238,6 +240,15 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
             return CloudDriver.getInstance().getProxyConfig().getMotdNormal().get(0).getFirstLine();
         }
         return this.ping().getMotd();
+    }
+
+    @Override
+    public void sendPacket(Packet packet) {
+        NetworkConnection connection = CloudDriver.getInstance().getConnection();
+
+        Component component = connection.packetToComponent(packet);
+        component.setReceiver(this.getName());
+        connection.sendComponent(component);
     }
 
     @Override

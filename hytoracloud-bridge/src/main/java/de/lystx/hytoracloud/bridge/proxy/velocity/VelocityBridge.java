@@ -87,11 +87,6 @@ public class VelocityBridge implements BridgeInstance {
                 }
 
                 @Override
-                public void onServerConnect(ICloudPlayer cloudPlayer, IService service) {
-                    cloudPlayer.setService(service);
-                    cloudPlayer.update();
-                }
-                @Override
                 public void kickPlayer(UUID uniqueId, String reason) {
 
                     Player player = server.getPlayer(uniqueId).orElse(null);

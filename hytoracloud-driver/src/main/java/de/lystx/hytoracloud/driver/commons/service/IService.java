@@ -10,6 +10,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.impl.ICloudPlay
 import de.lystx.hytoracloud.driver.commons.requests.base.IQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.networking.elements.packet.Packet;
 import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 
 
@@ -25,6 +26,13 @@ public interface IService extends Serializable, Identifiable {
      * The ID of this service
      */
     int getId();
+
+    /**
+     * Sends a {@link Packet} to only this {@link IService}
+     *
+     * @param packet the packet
+     */
+    void sendPacket(Packet packet);
 
     /**
      * Gets the {@link IReceiver} of this service

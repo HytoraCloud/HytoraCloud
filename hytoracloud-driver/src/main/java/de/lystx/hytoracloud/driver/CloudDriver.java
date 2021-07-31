@@ -20,6 +20,7 @@ import de.lystx.hytoracloud.driver.commons.interfaces.*;
 import de.lystx.hytoracloud.driver.commons.minecraft.DefaultMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.minecraft.IMinecraftManager;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketReloadService;
 import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
@@ -87,7 +88,6 @@ import java.util.function.Consumer;
         highestSupportVersion = "1.16.5",
         todo = {
                 "1.17 Support & Higher Java Versions",
-                "FIx TabList-Updating",
                 "Check Velocity-Support"
         }
 )
@@ -578,6 +578,14 @@ public class CloudDriver {
      * ======================================
      */
 
+    /**
+     * Reloads a certain {@link IService}
+     */
+    public void reload(IService service) {
+        if (this.driverType == CloudType.BRIDGE) {
+            this.sendPacket(new PacketReloadService(service));
+        }
+    }
     /**
      * Raw method to reload
      */

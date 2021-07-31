@@ -132,6 +132,7 @@ public class CloudBridge {
 
         CloudDriver.getInstance().getMessageManager().registerChannel("cloud::main", new ProxyHandlerMessage());
 
+
     }
 
     /**

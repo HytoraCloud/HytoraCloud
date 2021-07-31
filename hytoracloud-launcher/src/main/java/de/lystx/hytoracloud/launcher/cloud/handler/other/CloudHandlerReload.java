@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.launcher.cloud.handler.other;
 
+import de.lystx.hytoracloud.driver.commons.packets.both.PacketReloadService;
 import de.lystx.hytoracloud.launcher.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
 
@@ -18,6 +19,9 @@ public class CloudHandlerReload implements PacketHandler {
     public void handle(Packet packet) {
         if (packet instanceof PacketReload) {
             this.cloudSystem.reload();
+        } else if (packet instanceof PacketReloadService) {
+            PacketReloadService packetReloadService = (PacketReloadService)packet;
+            this.cloudSystem.reload(packetReloadService.getService());
         }
     }
 }

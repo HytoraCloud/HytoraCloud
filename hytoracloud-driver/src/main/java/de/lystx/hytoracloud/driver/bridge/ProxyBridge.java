@@ -195,9 +195,15 @@ public interface ProxyBridge {
      * Updates the {@link TabList} for all players
      */
    default void updateTabList(TabList tabList) {
+
        for (ICloudPlayer cloudPlayer : CloudDriver.getInstance().getPlayerManager()) {
            updateTabList(cloudPlayer, tabList);
        }
+       CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
+           for (ICloudPlayer cloudPlayer : CloudDriver.getInstance().getPlayerManager()) {
+               updateTabList(cloudPlayer, tabList);
+           }
+       }, 20L);
    }
 
     /**
@@ -223,8 +229,10 @@ public interface ProxyBridge {
      * @param cloudPlayer the player
      * @param service the service
      */
-    void onServerConnect(ICloudPlayer cloudPlayer, IService service);
-
+    default void onServerConnect(ICloudPlayer cloudPlayer, IService service) {
+        cloudPlayer.setService(service);
+        cloudPlayer.update();
+    }
 
     /**
      * Gets the current {@link NetworkHandler}
