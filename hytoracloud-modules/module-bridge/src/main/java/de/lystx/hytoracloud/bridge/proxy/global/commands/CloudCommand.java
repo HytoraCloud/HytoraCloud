@@ -235,8 +235,7 @@ public class CloudCommand implements TabCompletable {
                             }
 
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Trying to start §b" + id + " §7new services of group §a" + group.getName() + "§8...");
-
-                            for (int i = 0; i < id; i++) CloudDriver.getInstance().getServiceManager().startService(group);
+                            group.startNewService(id);
                         } catch (NumberFormatException e) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cPlease provide a valid number!");
                         }

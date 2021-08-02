@@ -22,12 +22,12 @@ public class CloudHandlerStart implements PacketHandler {
         if (packet instanceof PacketInStartGroup) {
             PacketInStartGroup packetInStartGroup = (PacketInStartGroup) packet;
             IServiceGroup group = packetInStartGroup.getServiceGroup();
-            IServiceGroup get = this.cloudSystem.getInstance(GroupService.class).getGroup(group.getName());
-            if (get == null) {
-                cloudSystem.getParent().getConsole().getLogger().sendMessage("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
+            IServiceGroup syncedGroup = group.sync();
+            if (syncedGroup == null) {
+                cloudSystem.log("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
                 return;
             }
-            CloudDriver.getInstance().getServiceManager().startService(get);
+            CloudDriver.getInstance().getServiceManager().startService(syncedGroup);
         } else if (packet instanceof PacketInStartGroupWithProperties) {
             PacketInStartGroupWithProperties packetPlayInStartGroup = (PacketInStartGroupWithProperties) packet;
             IServiceGroup group = packetPlayInStartGroup.getGroup();

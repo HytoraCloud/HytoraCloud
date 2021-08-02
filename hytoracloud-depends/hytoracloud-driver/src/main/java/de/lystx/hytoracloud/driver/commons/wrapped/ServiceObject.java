@@ -17,7 +17,7 @@ import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.ServicePing;
 import de.lystx.hytoracloud.driver.commons.service.ServiceInfo;
 import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
@@ -92,7 +92,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     @Override
     public JsonObject<?> getProperties() {
         try {
-            return properties;
+            return properties == null ? JsonObject.serializable() : properties;
         } catch (NullPointerException e) {
             return JsonObject.serializable();
         }
@@ -100,7 +100,7 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public void setCachedProperties(JsonObject<?> properties) {
-        this.properties = (PropertyObject) properties;
+        this.properties = new PropertyObject(properties.toString());
     }
 
     @Override
@@ -215,6 +215,11 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return request.execute();
     }
 
+    @Override
+    public IService sync() {
+        return CloudDriver.getInstance().getServiceManager().getCachedObject(this.getName());
+    }
+
     //============================================
     // PLAYER MANAGEMENT
 
@@ -234,8 +239,8 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     // GLOBAL INFO MANAGEMENT
 
     @Override
-    public DriverQuery<ResponseStatus> verify(String host, boolean verified, ServiceState state, JsonObject<?> properties) {
-        DriverRequest<ResponseStatus> request = DriverRequest.create("SERVICE_VERIFYY", "CLOUD", ResponseStatus.class);
+    public DriverQuery<IService> verify(String host, boolean verified, ServiceState state, JsonObject<?> properties) {
+        DriverRequest<IService> request = DriverRequest.create("SERVICE_VERIFYY", "CLOUD", IService.class);
         request.append("name", this.getName());
         request.append("host", host);
         request.append("verified", verified);
@@ -403,22 +408,22 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
      * This pings the current Service
      * to get all Data of it
      */
-    private ServerPinger ping() {
+    private ServicePing ping() {
 
-        ServerPinger serverPinger = new ServerPinger();
+        ServicePing servicePing = new ServicePing();
         if (this.getHost() == null) {
-            return serverPinger;
+            return servicePing;
         }
         try {
-            serverPinger.pingServer(this.getHost(), this.port, 20);
+            servicePing.pingServer(this.getHost(), this.port, 20);
         } catch (Exception e) {
             try {
-                serverPinger.pingServer(this.getHost(), this.port, 200);
+                servicePing.pingServer(this.getHost(), this.port, 200);
             } catch (IOException ioException) {
                 //Ignoring
             }
         };
-        return serverPinger;
+        return servicePing;
     }
 
     public IServiceGroup getGroup() {

@@ -92,6 +92,7 @@ public class DriverQueryObject<T> implements DriverQuery<T> {
 
     @Override
     public T pullValue() throws DriverRequestException {
+        System.out.println("PULLING " + request.getKey() + "(" + request.typeClass() + ")");
         CountDownLatch latch = new CountDownLatch(1);
         this.countDownLatches.add(latch);
         if (this.dummyObject != null) {

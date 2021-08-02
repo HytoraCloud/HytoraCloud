@@ -6,6 +6,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.Offlin
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.IPermissionUser;
 import de.lystx.hytoracloud.driver.commons.enums.versions.MinecraftProtocol;
+import de.lystx.hytoracloud.driver.commons.interfaces.Syncable;
 import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
@@ -20,7 +21,7 @@ import de.lystx.hytoracloud.driver.utils.NameChange;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ICloudPlayer extends CommandExecutor, IPermissionUser {
+public interface ICloudPlayer extends CommandExecutor, Syncable<ICloudPlayer>, IPermissionUser {
 
     /**
      * Gets the {@link IService} of this player
@@ -230,15 +231,6 @@ public interface ICloudPlayer extends CommandExecutor, IPermissionUser {
      * @return boolean
      */
     boolean isOnline();
-
-    /**
-     * Gets the updated version of this player
-     * if in time between some actions the player got
-     * updated and the service or proxy is not the real one
-     *
-     * @return synced player
-     */
-    ICloudPlayer sync();
 
     /**
      * Creates a dummy {@link ICloudPlayer} just to test stuff

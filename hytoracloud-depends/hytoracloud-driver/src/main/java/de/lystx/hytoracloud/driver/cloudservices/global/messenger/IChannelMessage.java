@@ -80,13 +80,6 @@ public interface IChannelMessage extends Serializable {
     Component toComponent();
 
     /**
-     * Sends a query and awaits a {@link IChannelMessage} as response
-     *
-     * @return the response
-     */
-    IChannelMessage sendQuery();
-
-    /**
      * Replies with a given message
      *
      * @param message the message

@@ -117,7 +117,6 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     @Override
     public void onDisable() {
         this.serverSelector.shutdown();
-
         try {
             CloudDriver.getInstance().getConnection().close();
         } catch (IOException e) {
@@ -143,7 +142,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerShutdown());
         CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerGroupUpdate());
         CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerCloudPlayer());
-        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerTPS());
+        CloudDriver.getInstance().registerPacketHandler(new BukkitHandlerRequest());
 
         //Registering Events
         this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);

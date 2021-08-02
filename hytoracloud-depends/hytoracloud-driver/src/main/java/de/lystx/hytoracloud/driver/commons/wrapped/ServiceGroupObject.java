@@ -177,6 +177,11 @@ public class ServiceGroupObject extends WrappedObject<IServiceGroup, ServiceGrou
     }
 
     @Override
+    public IServiceGroup sync() {
+        return CloudDriver.getInstance().getInstance(GroupService.class) == null ? null : CloudDriver.getInstance().getInstance(GroupService.class).getGroup(this.name);
+    }
+
+    @Override
     public void startNewService() {
         CloudDriver.getInstance().getServiceManager().startService(this);
     }

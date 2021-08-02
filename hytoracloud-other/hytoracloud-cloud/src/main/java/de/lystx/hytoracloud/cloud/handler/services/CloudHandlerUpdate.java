@@ -57,6 +57,7 @@ public class CloudHandlerUpdate implements PacketHandler {
                             driverRequest.createResponse().data(ResponseStatus.FAILED).exception(e).send();
                         }
                     } else if (driverRequest.equalsIgnoreCase("SERVICE_SET_HOST")) {
+
                         driverRequest.createResponse().data(service.setHost(document.getString("host")).pullValue()).send();
 
                     } else if (driverRequest.equalsIgnoreCase("SERVICE_VERIFYY")) {
@@ -65,14 +66,14 @@ public class CloudHandlerUpdate implements PacketHandler {
                         boolean verify = document.getBoolean("verified");
                         ServiceState state = ServiceState.valueOf(document.getString("state"));
 
-                        ServiceObject serviceObject = (ServiceObject) service;
-                        serviceObject.setCachedAuthenticated(verify);
-                        serviceObject.setCachedHost(host);
-                        serviceObject.setCachedProperties(properties);
-                        serviceObject.setCachedState(state);
-                        serviceObject.update();
-                        System.out.println("Updated " + serviceObject.getName() + " to " + serviceObject.getState());
-                        driverRequest.createResponse().data(ResponseStatus.SUCCESS).send();
+                        service.setCachedAuthenticated(verify);
+                        service.setCachedHost(host);
+                        service.setCachedProperties(properties);
+                        service.setCachedState(state);
+
+                        CloudDriver.getInstance().getServiceManager().updateService(service);
+                        CloudDriver.getInstance().reload();
+                        driverRequest.createResponse().data(service).send();
                     }
                 }
             }

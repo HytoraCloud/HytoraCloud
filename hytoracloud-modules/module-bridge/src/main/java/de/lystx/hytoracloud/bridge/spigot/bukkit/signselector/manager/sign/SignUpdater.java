@@ -6,10 +6,9 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.*;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.ServicePing;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -22,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Getter
-public class SignUpdater {
+public class SignUpdater implements Runnable {
 
     /**
      * The signManager instance
@@ -32,7 +31,7 @@ public class SignUpdater {
     /**
      * The server pinger
      */
-    private final ServerPinger serverPinger;
+    private final ServicePing ping;
 
     /**
      * All free signs
@@ -54,15 +53,45 @@ public class SignUpdater {
         this.plugin = plugin;
         this.freeSigns = new HashMap<>();
         this.serviceMap = new HashMap<>();
-        this.serverPinger = plugin.getServerPinger();
+        this.ping = plugin.getServicePing();
 
-        CloudDriver.getInstance().registerPacketHandler(packet -> {
-            if (packet instanceof PacketOutGlobalInfo) {
-                update();
+    }
+
+    /**
+     * Loads the repeat tick
+     * for the SignUpdater
+     * and executes the update-Method
+     */
+    @Override
+    public void run() {
+        long repeat = plugin.getConfiguration().getLoadingLayout().getRepeatingTick();
+        if (animationScheduler != 0) {
+            Bukkit.getScheduler().cancelTask(this.animationScheduler);
+        }
+        this.animationScheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitBridge.getInstance(), () -> {
+
+            try {
+                SignConfiguration configuration = ServerSelector.getInstance().getSignManager().getConfiguration();
+
+                freeSigns.clear();
+                serviceMap.clear();
+
+                for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceType.SPIGOT)) {
+                    if (!service.getState().equals(ServiceState.INGAME) && !service.getState().equals(ServiceState.OFFLINE)) {
+                        update(service);
+                    }
+                }
+
+                if (animationsTick >= configuration.getLoadingLayout().size()) {
+                    animationsTick = 0;
+                    return;
+                }
+
+                animationsTick++;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitBridge.getInstance(), () -> {
             SignConfiguration configuration = ServerSelector.getInstance().getSignManager().getConfiguration();
             KnockbackConfig knockBackConfig = configuration.getKnockBackConfig();
             if (!knockBackConfig.isEnabled()) {
@@ -84,56 +113,8 @@ public class SignUpdater {
                     }
                 }
             });
-        }, 0L, 5L);
+        }, 0L, repeat);
     }
-
-    /**
-     * Loads the repeat tick
-     * for the SignUpdater
-     * and executes the {@link SignUpdater#update()} Method
-     */
-    public void run() {
-        long repeat = plugin.getConfiguration().getLoadingLayout().getRepeatingTick();
-        if (animationScheduler != 0) {
-            Bukkit.getScheduler().cancelTask(this.animationScheduler);
-        }
-        this.animationScheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitBridge.getInstance(), this::update, 0L, repeat);
-
-    }
-
-    /**
-     * Iterates through all
-     * online services
-     * and executes the {@link SignUpdater#update(IService)} Method
-     * Also increases the animationsTick by 1 until its max
-     * then resets it to 0
-     */
-    public void update() {
-
-        try {
-            SignConfiguration configuration = ServerSelector.getInstance().getSignManager().getConfiguration();
-
-            this.freeSigns.clear();
-            this.serviceMap.clear();
-
-            for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceType.SPIGOT)) {
-                if (!service.getState().equals(ServiceState.INGAME) && !service.getState().equals(ServiceState.OFFLINE)) {
-                    this.update(service);
-                }
-            }
-
-            if (this.animationsTick >= configuration.getLoadingLayout().size()) {
-                this.animationsTick = 0;
-                return;
-            }
-
-            this.animationsTick++;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 
     /**
      * Updates Sign for a single {@link IService}
@@ -145,108 +126,103 @@ public class SignUpdater {
             return;
         }
 
-        SignGroup signGroup = new SignGroup(current.getGroup().getName(), ServerSelector.getInstance().getSignManager().getCloudSigns());
-        Map<Integer, CloudSign> signs = signGroup.getCloudSigns();
-        CloudSign cloudSign = signs.get(current.getId());
+        CloudDriver.getInstance().getExecutorService().execute(() -> {
+            SignGroup signGroup = new SignGroup(current.getGroup().getName(), ServerSelector.getInstance().getSignManager().getCloudSigns());
+            Map<Integer, CloudSign> signs = signGroup.getCloudSigns();
+            CloudSign cloudSign = signs.get(current.getId());
 
-        this.serviceMap.put(cloudSign, current.getName());
+            this.serviceMap.put(cloudSign, current.getName());
 
-        if (this.freeSigns.containsKey(current.getGroup().getName())) {
-            Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(current.getGroup().getName());
-            onlineSigns.put(current.getId(), cloudSign);
-            this.freeSigns.replace(current.getGroup().getName(), onlineSigns);
-        } else {
-            Map<Integer, CloudSign> onlineSins = new HashMap<>();
-            onlineSins.put(current.getId(), cloudSign);
-            this.freeSigns.put(current.getGroup().getName(), onlineSins);
-        }
+            if (this.freeSigns.containsKey(current.getGroup().getName())) {
+                Map<Integer, CloudSign> onlineSigns = this.freeSigns.get(current.getGroup().getName());
+                onlineSigns.put(current.getId(), cloudSign);
+                this.freeSigns.replace(current.getGroup().getName(), onlineSigns);
+            } else {
+                Map<Integer, CloudSign> onlineSins = new HashMap<>();
+                onlineSins.put(current.getId(), cloudSign);
+                this.freeSigns.put(current.getGroup().getName(), onlineSins);
+            }
 
-        Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> this.setOfflineSigns(current.getGroup().getName(), current, this.freeSigns)); //Sets offline signs for current group
+            //Sets offline signs for current group
+            Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> {
 
-        if (cloudSign != null) {
-            try {
-                Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()), cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
+                String group = current.getGroup().getName();
+                List<CloudSign> offlineSigns = this.getOfflineSigns(group);
 
-                if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
-                    return;
-                }
+                for (CloudSign sign : offlineSigns) {
+                    try {
 
-                try {
-                    serverPinger.pingServer(CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), current.getPort(), 20);
-                } catch (IOException exception) {
-                    //IGNORING IT WORKS FINE
-                }
-                Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () -> {
-                    Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
-                    if (!blockAt.getType().equals(Material.WALL_SIGN)) {
-                        return;
+                        Location bukkitLocation = new Location(Bukkit.getWorld(sign.getWorld()),sign.getX(),sign.getY(),sign.getZ());
+                        if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(sign.getWorld())) {
+                            return;
+                        }
+                        Block blockAt = Bukkit.getServer().getWorld(sign.getWorld()).getBlockAt(bukkitLocation);
+
+                        if (!blockAt.getType().equals(Material.WALL_SIGN) || blockAt.getType().equals(Material.AIR)) {
+                            return;
+                        }
+
+                        Sign bukkitSign = (Sign) blockAt.getState();
+                        if (CloudDriver.getInstance().getServiceManager().getServiceGroup(group) != null && CloudDriver.getInstance().getServiceManager().getServiceGroup(group).isMaintenance()) {
+                            this.updateBukkitSign(bukkitSign, current);
+                            return;
+                        }
+
+                        SignAnimation loadingLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout();
+                        SignLayout signLayout;
+                        if (animationsTick >= ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout().size()) {
+                            animationsTick = 0;
+                            signLayout = loadingLayout.get(0);
+                        } else {
+                            signLayout = loadingLayout.get(animationsTick);
+                        }
+                        for (int i = 0; i != 4; i++) {
+                            bukkitSign.setLine(i, PlaceHolder.apply(signLayout.getLines()[i], current, current.getGroup()));
+                        }
+                        bukkitSign.update(true);
+                        Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () ->  this.setBlock(signLayout, bukkitSign.getLocation(), ServiceState.OFFLINE));
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
-                    Sign sign = (Sign) blockAt.getState();
-                    this.signUpdate(sign, current, serverPinger);
-                    sign.update();
-                });
-            } catch (NullPointerException e) {
-                //IGNORING ON BOOTUP
-            }
-        }
-    }
-
-    /**
-     * Sets the offline signs
-     * and updates them
-     * @param group the group
-     * @param service the service
-     * @param freeSigns the currently free signs
-     */
-    public void setOfflineSigns(String group, IService service, Map<String, Map<Integer, CloudSign>> freeSigns) {
-        this.getOfflineSigns(group, freeSigns).forEach(cloudSign -> {
-            try {
-
-                Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()),cloudSign.getX(),cloudSign.getY(),cloudSign.getZ());
-                if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
-                    return;
-                }
-                Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
-
-                if (!blockAt.getType().equals(Material.WALL_SIGN) || blockAt.getType().equals(Material.AIR)) {
-                    return;
                 }
 
-                Sign sign = (Sign) blockAt.getState();
-                if (CloudDriver.getInstance().getServiceManager().getServiceGroup(group) != null && CloudDriver.getInstance().getServiceManager().getServiceGroup(group).isMaintenance()) {
-                    this.signUpdate(sign, service, null);
-                    return;
-                }
+                if (cloudSign != null) {
+                    try {
+                        Location bukkitLocation = new Location(Bukkit.getWorld(cloudSign.getWorld()), cloudSign.getX(), cloudSign.getY(), cloudSign.getZ());
 
+                        if (!bukkitLocation.getWorld().getName().equalsIgnoreCase(cloudSign.getWorld())) {
+                            return;
+                        }
 
-                SignAnimation loadingLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout();
-                SignLayout signLayout;
-                if (animationsTick >= ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout().size()) {
-                    animationsTick = 0;
-                    signLayout = loadingLayout.get(0);
-                } else {
-                    signLayout = loadingLayout.get(animationsTick);
+                        try {
+                            ping.pingServer(current.getHost(), current.getPort(), 20);
+                        } catch (IOException e) {
+                            //IGNORING IT WORKS FINE
+                        }
+
+                        Block blockAt = Bukkit.getServer().getWorld(cloudSign.getWorld()).getBlockAt(bukkitLocation);
+                        if (!blockAt.getType().equals(Material.WALL_SIGN)) {
+                            return;
+                        }
+                        Sign sign = (Sign) blockAt.getState();
+                        this.updateBukkitSign(sign, current);
+                        sign.update();
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
                 }
-                for (int i = 0; i != 4; i++) {
-                    sign.setLine(i, PlaceHolder.apply(signLayout.getLines()[i], service, service.getGroup()));
-                }
-                sign.update(true);
-                Bukkit.getScheduler().runTask(BukkitBridge.getInstance(), () ->  this.setBlock(signLayout, sign.getLocation(), ServiceState.OFFLINE));
-            } catch (NullPointerException e) {
-                //IGNORING ON BOOTUP
-            }
+            });
+
         });
-
     }
 
     /**
      * Loads all offline signs
      *
      * @param name the name of the group
-     * @param freeSigns the free signs
      * @return list
      */
-    public List<CloudSign> getOfflineSigns(String name, Map<String, Map<Integer, CloudSign>> freeSigns) {
+    public List<CloudSign> getOfflineSigns(String name) {
 
         Set<Integer> allSigns = new SignGroup(name, ServerSelector.getInstance().getSignManager().getCloudSigns()).getCloudSigns().keySet();
         Set<Integer> onlineSigns = freeSigns.get(name).keySet();
@@ -272,13 +248,13 @@ public class SignUpdater {
     }
 
     /**
-     * Updates a Sign
+     * Updates a Bukkit sign and the block behind it to
+     * a given {@link SignLayout} depending on the {@link ServiceState} of the {@link IService}
      *
      * @param sign the sign
      * @param service the service
-     * @param serverPinger the pinger
      */
-    public void signUpdate(Sign sign, IService service, ServerPinger serverPinger) {
+    public void updateBukkitSign(Sign sign, IService service) {
 
         SignLayout signLayout;
         ServiceState state;
@@ -288,13 +264,15 @@ public class SignUpdater {
         } else if (service.getState().equals(ServiceState.BOOTING)) {
             signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getStartingLayOut();
             state = ServiceState.BOOTING;
-        } else if (service.getState().equals(ServiceState.FULL) || serverPinger.getPlayers() >= serverPinger.getMaxplayers()) {
+        } else if (service.getState().equals(ServiceState.FULL) || service.getPlayers().size() >= ping.getMaxplayers()) {
             signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getFullLayout();
             state = ServiceState.FULL;
         } else {
             signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getOnlineLayout();
             state = ServiceState.AVAILABLE;
         }
+
+        //Updating sign line
         for (int i = 0; i != 4; i++) {
             sign.setLine(i, PlaceHolder.apply(signLayout.getLines()[i], service, service.getGroup()));
         }
@@ -339,6 +317,7 @@ public class SignUpdater {
 
     /**
      * Filters for a {@link CloudSign} by bukkit-location
+     *
      * @param location the location
      * @return sign or null
      */

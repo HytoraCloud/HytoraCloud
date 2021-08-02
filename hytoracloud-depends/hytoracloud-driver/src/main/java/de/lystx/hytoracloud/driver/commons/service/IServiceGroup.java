@@ -4,6 +4,7 @@ import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.commons.interfaces.Syncable;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
@@ -13,7 +14,7 @@ import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
 import java.io.Serializable;
 import java.util.List;
 
-public interface IServiceGroup extends Serializable, Identifiable {
+public interface IServiceGroup extends Syncable<IServiceGroup>, Serializable, Identifiable {
 
     /**
      * The template of this group

@@ -44,9 +44,6 @@ public class RequestManager {
                 if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
                     if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("CLOUD")) {
                         for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
-                            if (request == null) {
-                                continue;
-                            }
                             requestHandler.accept(request);
                         }
                     } else {
@@ -58,9 +55,6 @@ public class RequestManager {
                 if (CloudDriver.getInstance().getDriverType() == CloudType.RECEIVER) {
                     if (request.getTarget() == null || request.getTarget().equalsIgnoreCase("RECEIVER")) {
                         for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
-                            if (request == null) {
-                                continue;
-                            }
                             requestHandler.accept(request);
                         }
                     }
@@ -69,9 +63,6 @@ public class RequestManager {
                 if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
                     if (request.getTarget() == null || request.getTarget().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getThisService().getName()) || request.getTarget().equalsIgnoreCase("PROXY") && CloudDriver.getInstance().getServiceManager().getThisService().getGroup().getType() == ServiceType.PROXY || request.getTarget().equalsIgnoreCase("BUKKIT") && CloudDriver.getInstance().getServiceManager().getThisService().getGroup().getType() == ServiceType.SPIGOT) {
                         for (Consumer<DriverRequest<?>> requestHandler : requestHandlers) {
-                            if (request == null) {
-                                continue;
-                            }
                             requestHandler.accept(request);
                         }
                     }

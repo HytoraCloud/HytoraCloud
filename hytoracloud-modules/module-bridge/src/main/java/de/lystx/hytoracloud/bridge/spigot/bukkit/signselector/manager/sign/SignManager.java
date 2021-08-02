@@ -4,7 +4,7 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.sign;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignConfiguration;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.ServerPinger;
+import de.lystx.hytoracloud.driver.commons.minecraft.other.ServicePing;
 import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +28,7 @@ public class SignManager {
     /**
      * The server pinger
      */
-    private ServerPinger serverPinger;
+    private ServicePing servicePing;
 
     /**
      * The sign updater
@@ -38,7 +38,7 @@ public class SignManager {
     public SignManager() {
         this.cloudSigns = new LinkedList<>();
         this.configuration = SignConfiguration.createDefault();
-        this.serverPinger = new ServerPinger();
+        this.servicePing = new ServicePing();
         this.signUpdater = new SignUpdater(this);
         this.run();
     }
@@ -51,7 +51,7 @@ public class SignManager {
             if (!CloudDriver.getInstance().getServiceManager().getThisService().getGroup().isLobby()) {
                 return;
             }
-            new Thread(() -> this.signUpdater.run(), "signThread").start();
+            new Thread(this.signUpdater, "signThread").start();
         } catch (NullPointerException e) {
             Scheduler.getInstance().scheduleDelayedTask(this::run, 5L);
         }

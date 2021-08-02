@@ -3,6 +3,7 @@ package de.lystx.hytoracloud.driver.commons.service;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
 import de.lystx.hytoracloud.driver.commons.interfaces.Identifiable;
+import de.lystx.hytoracloud.driver.commons.interfaces.Syncable;
 import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface IService extends Serializable, Identifiable {
+public interface IService extends Serializable, Syncable<IService>, Identifiable {
 
     /**
      * Sends a {@link Packet} to only this {@link IService}
@@ -52,9 +53,9 @@ public interface IService extends Serializable, Identifiable {
      * @param verified if its authenticated
      * @param state the state
      * @param properties the properties
-     * @return query
+     * @return query with updated service
      */
-    DriverQuery<ResponseStatus> verify(String host, boolean verified, ServiceState state, JsonObject<?> properties);
+    DriverQuery<IService> verify(String host, boolean verified, ServiceState state, JsonObject<?> properties);
 
     /**
      * Sets the state of this service

@@ -41,7 +41,6 @@ public class PlayerChatListener implements Listener {
 
         String command = event.getCommand().split(" ")[0];
 
-        System.out.println(command);
         if (CloudDriver.getInstance().getInstance(CommandService.class).getCommand(command) != null) {
             event.setCancelled(true);
             CloudDriver.getInstance().getInstance(CommandService.class).execute(consoleCommandSender, true, event.getCommand());

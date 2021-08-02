@@ -192,9 +192,10 @@ public class CloudBridge {
                             host = InetAddress.getLocalHost().getHostAddress();
                         }
 
-                        DriverQuery<ResponseStatus> authentication = service.verify(host, true, ServiceState.AVAILABLE, service.getProperties()).setTimeOut(30, ResponseStatus.FAILED);
+                        service = service.verify(host, true, ServiceState.AVAILABLE, service.getProperties()).setTimeOut(30, service).pullValue();
+                        service.update();
 
-                        System.out.println("[CloudBridge] Authentication for '" + service.getName() + "' executed: " + authentication.pullValue().name());
+                        System.out.println("[CloudBridge] Authentication for '" + service.getName() + "' executed: " + (service.getState() == ServiceState.BOOTING ? "FAILED" : "SUCCESS"));
                         System.out.println("[CloudBridge] Summary: " + service.getName() + ":");
                         System.out.println("[CloudBridge]   > State: " + service.getState().name());
                         System.out.println("[CloudBridge]   > Authenticated: " + service.isAuthenticated());
@@ -212,12 +213,10 @@ public class CloudBridge {
 
             @Override
             public void onDisconnect() {
-
             }
 
             @Override
             public void onReceive(ComponentSender sender, Object object) {
-
             }
 
             @Override
@@ -226,7 +225,6 @@ public class CloudBridge {
 
             @Override
             public void packetOut(Packet packet) {
-
             }
         }).login(new NetworkLogin(jsonDocument.getString("server"))).createConnection();
 

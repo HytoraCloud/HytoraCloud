@@ -62,38 +62,6 @@ public class ChannelMessageObject extends WrappedObject<IChannelMessage, Channel
         return new JsonDocument(this.document);
     }
 
-    @Override
-    public IChannelMessage sendQuery() {
-        AtomicReference<IChannelMessage> reference = new AtomicReference<>();
-        int timeOut = 3000;
-
-        CloudDriver.getInstance().getMessageManager().sendChannelMessage(this);
-        CloudDriver.getInstance().getConnection().registerChannelHandler(this.channel, new Consumer<RepliableComponent>() {
-            @Override
-            public void accept(RepliableComponent repliableComponent) {
-
-                Component component = repliableComponent.getComponent();
-                if (component.getRequestID() == getId() && component.has("iMessage")) {
-                    reference.set(component.get("iMessage"));
-                }
-                CloudDriver.getInstance().getConnection().unregisterChannelHandler(channel, this);
-            }
-        });
-
-        int count = 0;
-        while (reference.get() == null && count++ < timeOut) {
-            try {
-                Thread.sleep(0, 500000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        if (count >= timeOut) {
-            reference.set(IChannelMessage.builder().build());
-        }
-        return reference.get();
-    }
-
     @Override @SneakyThrows
     public void respond(IChannelMessage message) {
         message.setId(this.id);

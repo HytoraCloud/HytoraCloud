@@ -16,31 +16,70 @@ import java.nio.charset.StandardCharsets;
  * of them like OnlinePlayers, MaxPlayers and the Motd
  */
 @Getter
-public class ServerPinger {
+public class ServicePing {
 
+    /**
+     * The motd of this ping
+     */
     private String motd;
+
+    /**
+     * The amount of players
+     */
     private int players;
+
+    /**
+     * The max players
+     */
     private int maxplayers;
+
+    /**
+     * If online
+     */
     private boolean online;
 
-    private Socket socket = null;
-    private OutputStream outputStream = null;
-    private DataOutputStream dataOutputStream = null;
-    private InputStream inputStream = null;
+    /**
+     * The socket for data
+     */
+    private Socket socket;
+
+    /**
+     * The output of the socket
+     */
+    private OutputStream outputStream;
+
+    /**
+     * The data reader of the socket
+     */
+    private DataOutputStream dataOutputStream;
+
+    /**
+     * The input of the socket
+     */
+    private InputStream inputStream;
+
+    /**
+     * The data reader of the socket
+     */
     private InputStreamReader inputStreamReader = null;
-    int tries = 0;
+
+    /**
+     * The connected tries
+     */
+    private int tries = 0;
 
     /**
      * Pings Server and sets fields to returned values
-     * @param adress
-     * @param port
-     * @param timeout
-     * @throws IOException
+     *
+     * @param address the address
+     * @param port the port
+     * @param timeout the timeout
+     * @throws IOException if something goes wrong
      */
-    public void pingServer(final String adress, final int port, final int timeout) throws IOException {
+    public void pingServer(String address, int port, int timeout) throws IOException {
         this.socket = new Socket();
         this.socket.setSoTimeout(timeout);
-        this.socket.connect(new InetSocketAddress(adress, port), timeout);
+        this.socket.connect(new InetSocketAddress(address, port), timeout);
 
         this.outputStream = socket.getOutputStream();
         this.dataOutputStream = new DataOutputStream(outputStream);
@@ -49,9 +88,9 @@ public class ServerPinger {
 
         try {
 
-            dataOutputStream.write(new byte[] { -2, 1 });
+            this.dataOutputStream.write(new byte[] { -2, 1 });
             int packetId = inputStream.read();
-            if(packetId != 255) {
+            if (packetId != 255) {
                this.close();
             }
 
@@ -60,15 +99,15 @@ public class ServerPinger {
                 this.close();
             }
 
-            final char[] chars = new char[length];
+            char[] chars = new char[length];
 
             if (inputStreamReader.read(chars, 0, length) != length) {
                 this.close();
             }
 
-            final String string = new String(chars);
+            String string = new String(chars);
+            String[] data;
 
-            final String[] data;
             try {
                 if (string.startsWith("§")) {
                     data = string.split("\u0000");
@@ -89,7 +128,7 @@ public class ServerPinger {
         } catch (SocketTimeoutException e) {
             if (this.tries < 5) {
                 this.tries++;
-                this.pingServer(adress, port, timeout);
+                this.pingServer(address, port, timeout);
                 return;
             }
             this.tries = 0;
@@ -97,15 +136,17 @@ public class ServerPinger {
     }
 
     /**
-     * Stops pinging server
-     * @throws IOException
+     * Closes the socket connection
+     * and stops the ping-request
+     *
+     * @throws IOException if something goes wrong
      */
     private void close() throws IOException {
-        dataOutputStream.close();
-        outputStream.close();
-        inputStreamReader.close();
-        inputStream.close();
-        socket.close();
+        this.dataOutputStream.close();
+        this.outputStream.close();
+        this.inputStreamReader.close();
+        this.inputStream.close();
+        this.socket.close();
     }
 
 }

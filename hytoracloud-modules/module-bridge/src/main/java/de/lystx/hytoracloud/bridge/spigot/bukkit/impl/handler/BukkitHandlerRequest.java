@@ -9,9 +9,9 @@ import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 
 import java.util.function.Consumer;
 
-public class BukkitHandlerTPS implements PacketHandler {
+public class BukkitHandlerRequest implements PacketHandler {
 
-    public BukkitHandlerTPS() {
+    public BukkitHandlerRequest() {
         CloudDriver.getInstance().getRequestManager().registerRequestHandler(new Consumer<DriverRequest<?>>() {
             @Override
             public void accept(DriverRequest<?> driverRequest) {
@@ -24,7 +24,6 @@ public class BukkitHandlerTPS implements PacketHandler {
                     driverRequest.createResponse().data(CloudDriver.getInstance().getServiceManager().getThisService().setMaxPlayers(document.getInteger("maxPlayers")));
                 } else if (driverRequest.equalsIgnoreCase("SERVICE_UPDATE_INFO")) {
                     driverRequest.createResponse().data(CloudDriver.getInstance().getServiceManager().getThisService().setInfo(document.get("serviceInfo", ServiceInfoObject.class)));
-                } else if (driverRequest.equalsIgnoreCase("SERVICE_SET_MAX_PLAYERS")) {
                 }
             }
         });
@@ -33,6 +32,5 @@ public class BukkitHandlerTPS implements PacketHandler {
     @Override
     public void handle(Packet packet) {
     }
-
 
 }
