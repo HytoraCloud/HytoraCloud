@@ -1,7 +1,0 @@
-author: Lystx
-name: BungeeCord-CloudBridge
-main: de.lystx.hytoracloud.bridge.proxy.bungeecord.BungeeBridge
-version: STABLE-1.8
-load: STARTUP
-description: CloudBridge for HytoraCloud
-

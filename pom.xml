@@ -9,14 +9,22 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>hytoracloud-bridge</module>
-        <module>hytoracloud-driver</module>
-        <module>hytoracloud-launcher</module>
-        <module>hytoracloud-discordbot</module>
-        <module>hytoracloud-networking</module>
+
+        <!-- Modules -->
+        <module>hytoracloud-modules/module-bridge</module>
         <module>hytoracloud-modules/module-cloudflare</module>
         <module>hytoracloud-modules/module-smart-proxy</module>
         <module>hytoracloud-modules/module-labymod</module>
+
+        <!-- Depends -->
+        <module>hytoracloud-depends</module>
+        <module>hytoracloud-depends/hytoracloud-networking</module>
+        <module>hytoracloud-depends/hytoracloud-driver</module>
+
+        <!-- Other -->
+        <module>hytoracloud-other</module>
+        <module>hytoracloud-other/hytoracloud-discordbot</module>
+        <module>hytoracloud-other/hytoracloud-cloud</module>
     </modules>
 
     <properties>

@@ -11,7 +11,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 
 import java.net.InetSocketAddress;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
