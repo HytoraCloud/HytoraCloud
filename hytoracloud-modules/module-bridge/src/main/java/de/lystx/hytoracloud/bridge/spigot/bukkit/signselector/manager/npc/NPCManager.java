@@ -4,6 +4,7 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.N
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCConfig;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -33,7 +34,7 @@ public class NPCManager {
     private NPCConfig npcConfig;
 
     public NPCManager() {
-        this.npcs = new HashMap<>();
+        this.npcs = new CloudMap<>();
     }
 
     /**

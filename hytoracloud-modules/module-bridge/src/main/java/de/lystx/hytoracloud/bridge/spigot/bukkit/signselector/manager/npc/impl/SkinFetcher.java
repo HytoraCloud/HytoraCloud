@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -69,22 +69,26 @@ public class SkinFetcher {
                 uc.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
                 uc.addRequestProperty("Pragma", "no-cache");
                 String json = new Scanner(uc.getInputStream(), "UTF-8").useDelimiter("\\A").next();
-                JSONParser parser = new JSONParser();
+                JsonParser parser = new JsonParser();
                 Object obj = parser.parse(json);
-                JSONArray properties = (JSONArray) ((JSONObject) obj).get("properties");
-                for (int i = 0; i < properties.size(); i++) {
+                JsonArray properties = (JsonArray) ((JsonObject) obj).get("properties");
+                for (Object o : properties) {
                     try {
-                        JSONObject property = (JSONObject) properties.get(i);
-                        String name = (String) property.get("name");
-                        String value = (String) property.get("value");
-                        String signature = property.containsKey("signature") ? (String) property.get("signature") : null;
+                        JsonObject property = (JsonObject) o;
+                        String name = property.get("name").getAsString();
+                        String value = property.get("value").getAsString();
+                        String signature = property.has("signature") ? property.get("signature").getAsString() : null;
                         values.put(uuid, value);
                         signatures.put(uuid, signature);
                         data[0] = value;
                         data[1] = signature;
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             data[0] = values.get(uuid);
             data[1] = signatures.get(uuid);

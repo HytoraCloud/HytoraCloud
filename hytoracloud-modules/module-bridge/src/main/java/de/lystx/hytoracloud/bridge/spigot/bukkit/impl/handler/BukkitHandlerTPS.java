@@ -23,7 +23,8 @@ public class BukkitHandlerTPS implements PacketHandler {
                 } else if (driverRequest.equalsIgnoreCase("SERVICE_SET_MAX_PLAYERS")) {
                     driverRequest.createResponse().data(CloudDriver.getInstance().getServiceManager().getThisService().setMaxPlayers(document.getInteger("maxPlayers")));
                 } else if (driverRequest.equalsIgnoreCase("SERVICE_UPDATE_INFO")) {
-                    driverRequest.createResponse().data(CloudDriver.getInstance().getServiceManager().getThisService().updateServiceInfo(document.get("serviceInfo", ServiceInfoObject.class)));
+                    driverRequest.createResponse().data(CloudDriver.getInstance().getServiceManager().getThisService().setInfo(document.get("serviceInfo", ServiceInfoObject.class)));
+                } else if (driverRequest.equalsIgnoreCase("SERVICE_SET_MAX_PLAYERS")) {
                 }
             }
         });

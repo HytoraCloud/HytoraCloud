@@ -285,12 +285,15 @@ public class SignUpdater {
         if (service.getState().equals(ServiceState.MAINTENANCE) || service.getSyncedGroup().orElse(service.getGroup()).isMaintenance()) {
             signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getMaintenanceLayout();
             state = ServiceState.MAINTENANCE;
+        } else if (service.getState().equals(ServiceState.BOOTING)) {
+            signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getStartingLayOut();
+            state = ServiceState.BOOTING;
         } else if (service.getState().equals(ServiceState.FULL) || serverPinger.getPlayers() >= serverPinger.getMaxplayers()) {
             signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getFullLayout();
             state = ServiceState.FULL;
         } else {
             signLayout = ServerSelector.getInstance().getSignManager().getConfiguration().getOnlineLayout();
-            state = ServiceState.LOBBY;
+            state = ServiceState.AVAILABLE;
         }
         for (int i = 0; i != 4; i++) {
             sign.setLine(i, PlaceHolder.apply(signLayout.getLines()[i], service, service.getGroup()));

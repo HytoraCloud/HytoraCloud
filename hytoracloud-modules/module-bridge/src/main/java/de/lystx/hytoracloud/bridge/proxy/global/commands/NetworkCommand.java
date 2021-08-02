@@ -27,7 +27,7 @@ public class NetworkCommand {
             player.sendMessage("  §8➜ §bAll §8┃ §7" + CloudDriver.getInstance().getServiceManager().getCachedObjects().size());
             player.sendMessage("  §8➜ §bMaintenance §8┃ §7" + CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceState.MAINTENANCE).size());
             player.sendMessage("  §8➜ §bFull §8┃ §7" + CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceState.FULL).size());
-            player.sendMessage("  §8➜ §bLobby §8┃ §7" + CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceState.LOBBY).size());
+            player.sendMessage("  §8➜ §bLobby §8┃ §7" + CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceState.AVAILABLE).size());
 
             player.sendMessage("§8» §bGlobal§8:");
             player.sendMessage("  §8➜ §bCloud TPS §8┃ §7" + DriverRequest.create("CLOUD_GET_TPS", "CLOUD", String.class).execute().pullValue());

@@ -16,16 +16,9 @@ public class BukkitHandlerSign implements PacketHandler {
         if (packet instanceof PacketOutServerSelector) {
             PacketOutServerSelector info = (PacketOutServerSelector) packet;
 
-            boolean b = false;
-            int repeatTick = ServerSelector.getInstance().getSignManager().getConfiguration().getLoadingLayout().getRepeatingTick();
-            if (repeatTick != info.getConfiguration().getLoadingLayout().getRepeatingTick()) {
-                b = true;
-            }
-
             ServerSelector.getInstance().getSignManager().setConfiguration(info.getConfiguration());
             ServerSelector.getInstance().getSignManager().setCloudSigns(info.getCloudSigns());
 
-            if (!b) ServerSelector.getInstance().getSignManager().run();
             if (CloudDriver.getInstance().getBukkit().isNewVersion()) {
                 return;
             }

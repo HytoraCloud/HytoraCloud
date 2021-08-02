@@ -16,7 +16,7 @@ import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
 import de.lystx.hytoracloud.cloud.impl.manager.server.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
 
-import de.lystx.hytoracloud.global.InternalReceiver;
+import de.lystx.hytoracloud.driver.commons.wrapped.InternalReceiver;
 import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerActions;
 import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerRegister;
 import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerScreen;

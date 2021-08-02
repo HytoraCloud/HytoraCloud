@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
+import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
 import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
 import de.lystx.hytoracloud.networking.elements.packet.Packet;
@@ -35,6 +36,17 @@ public interface IService extends Serializable, Identifiable {
      * @param host the host
      */
     DriverQuery<ResponseStatus> setHost(String host);
+
+    /**
+     * Verifies this whole service and updates all values
+     *
+     * @param host the host
+     * @param verified if its authenticated
+     * @param state the state
+     * @param properties the properties
+     * @return query
+     */
+    DriverQuery<ResponseStatus> verify(String host, boolean verified, ServiceState state, JsonObject<?> properties);
 
     /**
      * Sets the state of this service
@@ -121,7 +133,7 @@ public interface IService extends Serializable, Identifiable {
      * @param serviceInfo the info
      * @return response
      */
-    DriverQuery<ResponseStatus> updateServiceInfo(ServiceInfo serviceInfo);
+    DriverQuery<ResponseStatus> setInfo(ServiceInfo serviceInfo);
 
     /**
      * Gets the formatted tps of this

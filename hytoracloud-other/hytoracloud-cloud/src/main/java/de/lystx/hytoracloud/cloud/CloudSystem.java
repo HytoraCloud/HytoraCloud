@@ -19,7 +19,7 @@ import de.lystx.hytoracloud.cloud.impl.manager.NetworkService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
-import de.lystx.hytoracloud.global.InternalReceiver;
+import de.lystx.hytoracloud.driver.commons.wrapped.InternalReceiver;
 import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
 import de.lystx.hytoracloud.driver.cloudservices.managing.database.DatabaseType;
 import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
@@ -59,6 +59,7 @@ import de.lystx.hytoracloud.global.commands.DeleteCommand;
 import de.lystx.hytoracloud.global.commands.DownloadCommand;
 import de.lystx.hytoracloud.global.commands.StopCommand;
 import de.lystx.hytoracloud.global.setups.DatabaseSetupExecutor;
+import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerActions;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -180,23 +181,27 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().getNetworkConfig().update();
             CloudDriver.getInstance().getPermissionPool().update();
 
-            CloudDriver.getInstance().getServiceManager().sync(getInstance(GroupService.class).getGroups());
+            if (getInstance(GroupService.class) != null && CloudDriver.getInstance().getServiceManager() != null) {
+                CloudDriver.getInstance().getServiceManager().sync(getInstance(GroupService.class).getGroups());
+                //Sending network config and services and groups
+                CloudDriver.getInstance().sendPacket((new PacketOutGlobalInfo(
+                        CloudDriver.getInstance().getNetworkConfig(),
+                        CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
+                        CloudDriver.getInstance().getServiceManager().getCachedObjects(),
+                        CloudDriver.getInstance().getPlayerManager().getCachedObjects()
+                )));
 
-            //Sending network config and services and groups
-            CloudDriver.getInstance().sendPacket((new PacketOutGlobalInfo(
-                    CloudDriver.getInstance().getNetworkConfig(),
-                    CloudDriver.getInstance().getInstance(GroupService.class).getGroups(),
-                    CloudDriver.getInstance().getServiceManager().getCachedObjects(),
-                    CloudDriver.getInstance().getPlayerManager().getCachedObjects()
-            )));
+            }
 
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
 
-        //Updating webserver
-        webServer.update("players", new JsonDocument().append("players", CloudDriver.getInstance().getPlayerManager().getCachedObjects()));
-        webServer.update("services", new JsonDocument().append("services", CloudDriver.getInstance().getServiceManager().getCachedObjects()));
+        if (webServer != null && CloudDriver.getInstance().getPlayerManager() != null && CloudDriver.getInstance().getServiceManager() != null) {
+            //Updating webserver
+            webServer.update("players", new JsonDocument().append("players", CloudDriver.getInstance().getPlayerManager().getCachedObjects()));
+            webServer.update("services", new JsonDocument().append("services", CloudDriver.getInstance().getServiceManager().getCachedObjects()));
+        }
 
     }
 
@@ -235,8 +240,10 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new RunCommand(this));
             CloudDriver.getInstance().getInstance(CommandService.class).registerCommand(new LogCommand(this));
 
-            CloudDriver.getInstance().getImplementedData().put("receiver", new InternalReceiver());
-            CloudDriver.getInstance().getReceiverManager().registerReceiver(new InternalReceiver());
+            InternalReceiver receiver = new InternalReceiver();
+            CloudDriver.getInstance().getImplementedData().put("receiver", receiver);
+            CloudDriver.getInstance().getReceiverManager().registerReceiver(receiver);
+            CloudDriver.getInstance().getConnection().registerPacketHandler(new ReceiverHandlerActions());
 
             CloudDriver.getInstance().setInstance("connection", CloudDriver.getInstance().getInstance(NetworkService.class).getHytoraServer());
             CloudDriver.getInstance().setInstance("serviceManager", new CloudSideServiceManager(CloudDriver.getInstance().getInstance(GroupService.class).getGroups()));

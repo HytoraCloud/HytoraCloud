@@ -1,15 +1,18 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.listener;
 
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
-import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.event.CloudServerNPCInteractEvent;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.NPC;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.BukkitItem;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.cloudservices.managing.event.handling.IEventHandler;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
 import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Item;
 import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCConfig;
+import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerNPC;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,7 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 @Getter
-public class PlayerNPCListener implements Listener {
+public class PlayerNPCListener implements IEventHandler<DriverEventPlayerNPC> {
 
     private final Map<UUID, Map<Integer, IService>> services;
 
@@ -32,18 +35,6 @@ public class PlayerNPCListener implements Listener {
         this.services = new HashMap<>();
     }
 
-
-    @EventHandler
-    public void onInteract(CloudServerNPCInteractEvent event) {
-        NPC npc = event.getNpc();
-        Player player = event.getPlayer();
-        String group = ServerSelector.getInstance().getNpcManager().getNpcs().get(npc).getGroup();
-        if (group == null) {
-            player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cCan't handle NPC because group was not found!");
-            return;
-        }
-        CloudDriver.getInstance().getExecutorService().execute(() -> player.openInventory(this.getInventory(player, group)));
-    }
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
@@ -211,5 +202,27 @@ public class PlayerNPCListener implements Listener {
             e.printStackTrace();
         }
         return input;
+    }
+
+    @Override
+    public void handle(DriverEventPlayerNPC event) {
+        NPCMeta npcMeta = event.getNpcMeta();
+        ICloudPlayer player = event.getPlayer();
+        Map<NPC, NPCMeta> npcs = ServerSelector.getInstance().getNpcManager().getNpcs();
+
+        if (npcs instanceof CloudMap) {
+            CloudMap<NPC, NPCMeta> cloudMap = (CloudMap<NPC, NPCMeta>) npcs;
+            NPCMeta safeGet = cloudMap.values().stream().filter(meta -> meta.getGroup().equalsIgnoreCase(npcMeta.getGroup()) && meta.getName().equalsIgnoreCase(npcMeta.getName())).findFirst().orElse(null);
+            if (safeGet != null) {
+                NPC npc = cloudMap.getKey(safeGet);
+                String group = ServerSelector.getInstance().getNpcManager().getNpcs().get(npc).getGroup();
+                if (group == null) {
+                    player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cCan't handle NPC because group was not found!");
+                    return;
+                }
+                CloudDriver.getInstance().getExecutorService().execute(() -> Bukkit.getPlayer(player.getName()).openInventory(this.getInventory(Bukkit.getPlayer(player.getName()), group)));
+            }
+        }
+
     }
 }

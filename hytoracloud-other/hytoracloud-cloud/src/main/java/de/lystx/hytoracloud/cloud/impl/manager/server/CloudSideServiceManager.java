@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.cloud.impl.manager.server;
 
-import de.lystx.hytoracloud.global.InternalReceiver;
+import de.lystx.hytoracloud.driver.commons.wrapped.InternalReceiver;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
 import de.lystx.hytoracloud.driver.commons.events.other.*;
@@ -50,6 +50,16 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     private final List<IService> otherReceiverCache;
 
     /**
+     * ALl services that are not starting on this instance
+     */
+    private final List<String> authenticatedCache;
+
+    /**
+     * All updates that couldn't be done because the service was not registered before
+     */
+    private final List<IService> pendingUpdates;
+
+    /**
      * If the manager is still running
      * or should not be allowed to start new services
      */
@@ -57,6 +67,8 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     public CloudSideServiceManager(List<IServiceGroup> serviceGroups) {
         this.cachedObjects = new LinkedList<>();
+        this.authenticatedCache = new LinkedList<>();
+        this.pendingUpdates = new LinkedList<>();
         this.otherReceiverCache = new LinkedList<>();
         CloudDriver.getInstance().registerNetworkHandler(this);
 
@@ -145,21 +157,44 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
     @Override
     public void updateService(IService service) {
 
-        if (this.getCachedObject(service.getName()) == null) {
+        IService cachedObject = this.getCachedObject(service.getName());
+        IService receiverCache = this.otherReceiverCache.stream().filter(s -> s.getName().equalsIgnoreCase(service.getName())).findFirst().orElse(null);
+        if (cachedObject == null) {
+            IService pendingService = this.pendingUpdates.stream().filter(s -> s.getName().equalsIgnoreCase(service.getName())).findFirst().orElse(null);
+            if (pendingService == null) {
+                this.pendingUpdates.add(service);
+            } else {
+                int index = this.pendingUpdates.indexOf(pendingService);
+                this.pendingUpdates.set(index, service);
+            }
             return;
         }
-        this.cachedObjects = new LinkedList<>(this.cachedObjects);
 
-        try {
-            this.cachedObjects.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
-            this.otherReceiverCache.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
-            this.otherReceiverCache.add(service);
-            this.cachedObjects.add(service);
-        } catch (Exception e) {
-            //Ignoring ex
+        if (authenticatedCache.contains(service.getName())) {
+            ((ServiceObject)service).setBAuthenticated(true);
+        } else {
+            if (service.isAuthenticated()) {
+                authenticatedCache.add(service.getName());
+            }
         }
 
+        try {
+            int index = this.cachedObjects.indexOf(cachedObject);
 
+            if (index == -1) {
+                this.cachedObjects.removeIf(s -> s.getName().equalsIgnoreCase(service.getName()));
+                this.cachedObjects.add(service);
+            } else {
+                this.cachedObjects.set(index, service);
+            }
+            if (receiverCache != null) {
+                int index2 = this.otherReceiverCache.indexOf(receiverCache);
+                this.otherReceiverCache.set(index2, service);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         CloudDriver.getInstance().callEvent(new DriverEventServiceUpdate(service));
     }
 
@@ -176,11 +211,18 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     @Override
     public void registerService(IService service) {
+        if (service == null || !this.running) {
+            return;
+        }
+
         if (this.getCachedObject(service.getName()) == null) {
             this.cachedObjects.add(service);
         }
-        if (service == null || !this.running) {
-            return;
+
+        for (IService pendingUpdate : this.pendingUpdates) {
+            if (pendingUpdate.getName().equalsIgnoreCase(service.getName())) {
+                this.updateService(pendingUpdate);
+            }
         }
 
         IReceiver receiver = service.getReceiver();
@@ -194,6 +236,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
 
     @Override
     public void unregisterService(IService service) {
+        this.authenticatedCache.remove(service.getName());
         try {
             this.cachedObjects.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
             this.otherReceiverCache.removeIf(service1 -> service1.getName().equalsIgnoreCase(service.getName()));
@@ -292,6 +335,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         if (receiver == null) {
             CloudDriver.getInstance().getParent().getConsole().getLogger().sendMessage("ERROR", "§cNo Receiver was found to stop §e" + service.getName() + " §c! Using §eInternalReceiver§c!");
             receiver = new InternalReceiver();
+            ((InternalReceiver)receiver).setPacketVar(false);
         }
 
         CloudDriver.getInstance().getIdService().removeID(service.getGroup().getName(), service.getId());

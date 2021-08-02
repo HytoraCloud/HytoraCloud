@@ -64,7 +64,7 @@ public class InfoCommand implements TabCompletable {
                         sender.sendMessage("INFO", "  §h> §bHost: " + service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
                         sender.sendMessage("INFO", "  §h> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage().setTimeOut(30, -1L).pullValue() : "-1") + "/" + service.getGroup().getMemory() + " §7| §eTPS: " + (service.isAuthenticated() ? service.getTPS().setTimeOut(30, "§c???").pullValue() : "§c???"));
                         sender.sendMessage("INFO", "  §h> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
-                        if (service.getProperties().keySet().isEmpty()) {
+                        if (service.getProperties() != null && service.getProperties().keySet().isEmpty()) {
                             sender.sendMessage("INFO", "  §h> §bProperties: §cNone");
                         } else {
                             sender.sendMessage("INFO", "  §h> §bProperties: §a" + service.getProperties().keySet().size());
@@ -120,13 +120,14 @@ public class InfoCommand implements TabCompletable {
             }
             sender.sendMessage("INFO", "§7----------------------------------");
             sender.sendMessage("INFO", "§h> §a" + cachedObject.getName() + " §h[§d" + cachedObject.getUniqueId() + " §7| §6Authenticated: " + (cachedObject.isAuthenticated() ? "§aYes" : "§cNo") + "§h] §h:");
-            sender.sendMessage("INFO", "  §h> §bID: #" + cachedObject.getId() + " §7| §eState: " + cachedObject.getState().getColor() + cachedObject.getState().name());
+            sender.sendMessage("INFO", "  §h> §bID: #" + cachedObject.getId() + " §7| §eState: §f" + cachedObject.getState().getColor() + cachedObject.getState().name());
             sender.sendMessage("INFO", "  §h> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + cachedObject.getPort() + " §7| §eReceiver: " + cachedObject.getGroup().getReceiver());
             sender.sendMessage("INFO", "  §h> §bType: " + cachedObject.getGroup().getType() + " §7| §eTemplate: " + cachedObject.getGroup().getCurrentTemplate().getName());
             sender.sendMessage("INFO", "  §h> §bHost: " + cachedObject.getHost() + " §7| §ePlayers: " + cachedObject.getPlayers().size() + "/" + cachedObject.getGroup().getMaxPlayers());
-            sender.sendMessage("INFO", "  §h> §bMemory: " + (cachedObject.isAuthenticated() ? cachedObject.getMemoryUsage() : "-1") + "/" + cachedObject.getGroup().getMemory() + " §7| §eTPS: " + (cachedObject.isAuthenticated() ? cachedObject.getTPS() : "§c???"));
+            sender.sendMessage("INFO", "  §h> §bMemory: " + (cachedObject.isAuthenticated() ? cachedObject.getMemoryUsage().pullValue() : "-1") + "/" + cachedObject.getGroup().getMemory() + " §7| §eTPS: " + (cachedObject.isAuthenticated() ? cachedObject.getTPS().pullValue() : "§c???"));
             sender.sendMessage("INFO", "  §h> §bLoaded Plugins: " + (cachedObject.isAuthenticated() ? cachedObject.getPlugins().length : -1));
-            if (cachedObject.getProperties().keySet().isEmpty()) {
+
+            if (cachedObject.getProperties() == null || cachedObject.getProperties().keySet().isEmpty()) {
                 sender.sendMessage("INFO", "  §h> §bProperties: §cNone");
             } else {
                 sender.sendMessage("INFO", "  §h> §bProperties: §a" + cachedObject.getProperties().keySet().size());

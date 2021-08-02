@@ -8,6 +8,7 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.NPCMan
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.PacketReader;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.sign.SignManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerNPC;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
@@ -44,7 +45,7 @@ public class ServerSelector {
 
         if (!CloudDriver.getInstance().getBukkit().isNewVersion()) {
             this.npcManager = new NPCManager();
-            bridge.getServer().getPluginManager().registerEvents(new PlayerNPCListener(), bridge);
+            CloudDriver.getInstance().getEventManager().registerHandler(DriverEventPlayerNPC.class, new PlayerNPCListener());
         }
 
         CloudDriver.getInstance().registerPacketHandler(

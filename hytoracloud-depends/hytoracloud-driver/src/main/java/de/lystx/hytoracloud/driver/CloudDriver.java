@@ -84,7 +84,8 @@ import java.util.function.Consumer;
         highestSupportVersion = "1.16.5",
         allowedJavaVersions = {"1.8"},
         todo = {
-                "Java 11, Java 16 -> Velocity Support"
+                "Java 11, Java 16 -> Velocity Support",
+                "Check NPCs"
         }
 )
 public class CloudDriver {

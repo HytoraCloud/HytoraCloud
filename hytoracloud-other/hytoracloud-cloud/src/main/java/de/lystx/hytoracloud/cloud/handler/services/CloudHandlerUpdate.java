@@ -6,6 +6,8 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.commons.service.IService;
 import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
 import de.lystx.hytoracloud.networking.elements.packet.Packet;
 import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
 import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
@@ -35,7 +37,9 @@ public class CloudHandlerUpdate implements PacketHandler {
                     }
                     String name = document.getString("name");
                     IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(name);
-
+                    if (service == null) {
+                        return;
+                    }
                     if (driverRequest.equalsIgnoreCase("SERVICE_SET_PROPERTIES")) {
                         driverRequest.createResponse().data(service.setProperties(JsonObject.serializable(document.getString("properties"))).pullValue()).send();
 
@@ -50,11 +54,24 @@ public class CloudHandlerUpdate implements PacketHandler {
                             ServiceState state = ServiceState.valueOf(document.getString("state"));
                             driverRequest.createResponse().data(service.setState(state).pullValue()).send();
                         } catch (Exception e) {
-                            driverRequest.createResponse().exception(e).data(ResponseStatus.FAILED).send();
+                            driverRequest.createResponse().data(ResponseStatus.FAILED).exception(e).send();
                         }
                     } else if (driverRequest.equalsIgnoreCase("SERVICE_SET_HOST")) {
                         driverRequest.createResponse().data(service.setHost(document.getString("host")).pullValue()).send();
 
+                    } else if (driverRequest.equalsIgnoreCase("SERVICE_VERIFYY")) {
+                        JsonObject<PropertyObject> properties = JsonObject.serializable(document.getString("properties"));
+                        String host = document.getString("host");
+                        boolean verify = document.getBoolean("verified");
+                        ServiceState state = ServiceState.valueOf(document.getString("state"));
+
+                        ServiceObject serviceObject = (ServiceObject) service;
+                        serviceObject.setBAuthenticated(verify);
+                        serviceObject.setSHost(host);
+                        serviceObject.setPropertyObject((PropertyObject) properties);
+                        serviceObject.setEState(state);
+                        serviceObject.update();
+                        driverRequest.createResponse().data(ResponseStatus.SUCCESS).send();
                     }
                 }
             }

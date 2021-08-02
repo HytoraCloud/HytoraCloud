@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -125,6 +127,22 @@ public class JsonDocument implements de.lystx.hytoracloud.driver.commons.storage
             } catch (Exception e) {
                 jsonObject = new JsonObject();
             }
+        }
+    }
+
+    public JsonDocument(URL url) {
+        this();
+        try {
+            URLConnection uc = url.openConnection();
+            uc.setUseCaches(false);
+            uc.setDefaultUseCaches(false);
+            uc.addRequestProperty("User-Agent", "Mozilla/5.0");
+            uc.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+            uc.addRequestProperty("Pragma", "no-cache");
+            String json = new Scanner(uc.getInputStream(), "UTF-8").useDelimiter("\\A").next();
+            this.jsonObject = new JsonParser().parse(json).getAsJsonObject();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
