@@ -66,11 +66,12 @@ public class CloudHandlerUpdate implements PacketHandler {
                         ServiceState state = ServiceState.valueOf(document.getString("state"));
 
                         ServiceObject serviceObject = (ServiceObject) service;
-                        serviceObject.setBAuthenticated(verify);
-                        serviceObject.setSHost(host);
-                        serviceObject.setPropertyObject((PropertyObject) properties);
-                        serviceObject.setEState(state);
+                        serviceObject.setCachedAuthenticated(verify);
+                        serviceObject.setCachedHost(host);
+                        serviceObject.setCachedProperties(properties);
+                        serviceObject.setCachedState(state);
                         serviceObject.update();
+                        System.out.println("Updated " + serviceObject.getName() + " to " + serviceObject.getState());
                         driverRequest.createResponse().data(ResponseStatus.SUCCESS).send();
                     }
                 }

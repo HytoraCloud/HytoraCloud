@@ -61,17 +61,17 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     /**
      * The host of the cloud to connect to
      */
-    private String sHost;
+    private String host;
 
     /**
      * The state of this service
      */
-    private ServiceState eState;
+    private ServiceState state;
 
     /**
      * The properties of this service to store values
      */
-    private PropertyObject propertyObject;
+    private PropertyObject properties;
 
     /**
      * The group of this service
@@ -81,20 +81,31 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     /**
      * If the service is connected to the cloud
      */
-    private boolean bAuthenticated;
+    private boolean authenticated;
 
     public ServiceObject(IServiceGroup group, int id, int port) {
         this(UUID.randomUUID(), id, port, CloudDriver.getInstance() == null ? "127.0.0.1" : CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress(), ServiceState.BOOTING, (PropertyObject) JsonObject.serializable(), (ServiceGroupObject) group, false);
     }
 
+    //============================================
+    // PROPERTY MANAGEMENT
     @Override
     public JsonObject<?> getProperties() {
-        return propertyObject;
+        try {
+            return properties;
+        } catch (NullPointerException e) {
+            return JsonObject.serializable();
+        }
+    }
+
+    @Override
+    public void setCachedProperties(JsonObject<?> properties) {
+        this.properties = (PropertyObject) properties;
     }
 
     @Override
     public DriverQuery<ResponseStatus> setProperties(JsonObject<?> properties) {
-        this.propertyObject = (PropertyObject) properties;
+        this.properties = (PropertyObject) properties;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
             return DriverQuery.dummy("SERVICE_SET_PROPERTIES", ResponseStatus.SUCCESS);
@@ -106,12 +117,8 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public Optional<IServiceGroup> getSyncedGroup() {
-       return CloudDriver.getInstance().getServiceManager().getCachedGroups().stream().filter(iServiceGroup -> iServiceGroup.getName().equalsIgnoreCase(this.group.getName())).findFirst();
-    }
-
     public DriverQuery<ResponseStatus> addProperty(String key, JsonObject<?> data) {
-        this.propertyObject.append(key, data);
+        this.properties.append(key, data);
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
             return DriverQuery.dummy("SERVICE_ADD_PROPERTY", ResponseStatus.SUCCESS);
@@ -123,14 +130,18 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return request.execute();
     }
 
+
+    //============================================
+    // AUTHENTICATION MANAGEMENT
+
     @Override
-    public boolean isAuthenticated() {
-        return bAuthenticated;
+    public void setCachedAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
     }
 
     @Override
     public DriverQuery<ResponseStatus> setAuthenticated(boolean authenticated) {
-        this.bAuthenticated = authenticated;
+        this.authenticated = authenticated;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
             return DriverQuery.dummy("SERVICE_SET_AUTHENTICATED", ResponseStatus.SUCCESS);
@@ -141,14 +152,18 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return request.execute();
     }
 
+
+    //============================================
+    // STATE MANAGEMENT
+
     @Override
-    public ServiceState getState() {
-        return eState;
+    public void setCachedState(ServiceState state) {
+        this.state = state;
     }
 
     @Override
     public DriverQuery<ResponseStatus> setState(ServiceState state) {
-        this.eState = state;
+        this.state = state;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
             return DriverQuery.dummy("SERVICE_SET_STATE", ResponseStatus.SUCCESS);
@@ -159,13 +174,17 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return request.execute();
     }
 
-    public String getHost() {
-        return sHost;
+    //============================================
+    // HOST MANAGEMENT
+
+    @Override
+    public void setCachedHost(String host) {
+        this.host = host;
     }
 
     @Override
     public DriverQuery<ResponseStatus> setHost(String host) {
-        this.sHost = host;
+        this.host = host;
         if (CloudDriver.getInstance().getDriverType() == CloudType.CLOUDSYSTEM) {
             this.update();
             return DriverQuery.dummy("SERVICE_SET_HOST", ResponseStatus.SUCCESS);
@@ -175,6 +194,9 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         request.append("host", host);
         return request.execute();
     }
+
+    //============================================
+    // MOTD MANAGEMENT
 
     @Override
     public DriverQuery<ResponseStatus> setMotd(Motd motd) {
@@ -193,6 +215,9 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         return request.execute();
     }
 
+    //============================================
+    // PLAYER MANAGEMENT
+
     @Override
     public DriverQuery<ResponseStatus> setMaxPlayers(int maxPlayers) {
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getThisService().getName())) {
@@ -204,6 +229,9 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         request.append("maxPlayers", maxPlayers);
         return request.execute();
     }
+
+    //============================================
+    // GLOBAL INFO MANAGEMENT
 
     @Override
     public DriverQuery<ResponseStatus> verify(String host, boolean verified, ServiceState state, JsonObject<?> properties) {
@@ -227,13 +255,16 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         request.append("name", this.getName());
         request.append("info", serviceInfo);
 
-        if (serviceInfo.getState() != this.getEState()) {
+        if (serviceInfo.getState() != this.getState()) {
             //The state has to be updated
-            this.setEState(serviceInfo.getState());
+            this.setState(serviceInfo.getState());
         }
 
         return request.execute();
     }
+
+    //============================================
+    // OTHER MANAGEMENT
 
     @Override
     public boolean isInstanceOf(ServiceType serviceType) {
@@ -443,6 +474,12 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
         }
         return receiver;
     }
+
+    @Override
+    public Optional<IServiceGroup> getSyncedGroup() {
+        return CloudDriver.getInstance().getServiceManager().getCachedGroups().stream().filter(iServiceGroup -> iServiceGroup.getName().equalsIgnoreCase(this.group.getName())).findFirst();
+    }
+
 
     @Override
     public InetSocketAddress getAddress() {

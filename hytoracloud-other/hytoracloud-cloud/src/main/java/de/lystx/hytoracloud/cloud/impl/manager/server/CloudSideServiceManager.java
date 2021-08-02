@@ -171,7 +171,7 @@ public class CloudSideServiceManager implements ICloudService, IServiceManager, 
         }
 
         if (authenticatedCache.contains(service.getName())) {
-            ((ServiceObject)service).setBAuthenticated(true);
+            service.setCachedAuthenticated(true);
         } else {
             if (service.isAuthenticated()) {
                 authenticatedCache.add(service.getName());

@@ -38,6 +38,14 @@ public interface IService extends Serializable, Identifiable {
     DriverQuery<ResponseStatus> setHost(String host);
 
     /**
+     * Sets the host of this service
+     * but does not update it directly
+     *
+     * @param host the host
+     */
+    void setCachedHost(String host);
+
+    /**
      * Verifies this whole service and updates all values
      *
      * @param host the host
@@ -56,11 +64,27 @@ public interface IService extends Serializable, Identifiable {
     DriverQuery<ResponseStatus> setState(ServiceState state);
 
     /**
+     * Sets the state of this service
+     * but does not update it directly
+     *
+     * @param state the state
+     */
+    void setCachedState(ServiceState state);
+
+    /**
      * Sets the properties of this service
      *
      * @param properties the properties
      */
     DriverQuery<ResponseStatus> setProperties(JsonObject<?> properties);
+
+    /**
+     * Sets the properties of this service
+     * but does not update it directly
+     *
+     * @param properties the properties
+     */
+    void setCachedProperties(JsonObject<?> properties);
 
     /**
      * The group of this service
@@ -88,6 +112,14 @@ public interface IService extends Serializable, Identifiable {
      * @param authenticated boolean
      */
     DriverQuery<ResponseStatus> setAuthenticated(boolean authenticated);
+
+    /**
+     * Sets the authentication-state of this service
+     * but does not update it directly
+     *
+     * @param authenticated if authenticated
+     */
+    void setCachedAuthenticated(boolean authenticated);
 
     /**
      * Adds a property to this service

@@ -113,7 +113,7 @@ public class ServiceBuilder {
                         .append("template", this.template == null ? this.group.getCurrentTemplate().getName() : this.template)
                         .append("timeOut", this.timeOutIfNoPlayers)
         );
-        service.setPropertyObject((PropertyObject) this.properties);
+        service.setCachedProperties(this.properties);
 
         return service;
     }
