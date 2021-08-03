@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.modules.cloudflare.elements;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.config.CloudFlareConfig;
+import de.lystx.hytoracloud.driver.connection.cloudflare.elements.config.CloudFlareConfig;
 import lombok.Getter;
 
 import java.util.Map;

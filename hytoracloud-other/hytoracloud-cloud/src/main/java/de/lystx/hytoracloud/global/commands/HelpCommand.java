@@ -1,24 +1,24 @@
 package de.lystx.hytoracloud.global.commands;
 
-import de.lystx.hytoracloud.global.CloudProcess;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.CommandInfo;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.command.execution.ICommand;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
+import de.lystx.hytoracloud.driver.utils.other.Array;
 import lombok.AllArgsConstructor;
 
-import java.util.Arrays;
-
 @AllArgsConstructor
-public class HelpCommand {
+@CommandInfo(name = "help", description = "Shows you this message", aliases = {"?", "whattodo"})
+public class HelpCommand implements CommandListener {
 
-
-    private final CloudProcess cloudInstance;
-    
-    @Command(name = "help", description = "Shows you this message", aliases = {"?", "whattodo"})
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
-        for (CommandInfo commandInfo1 : cloudInstance.getInstance(CommandService.class).getCommandInfos()) {
-            sender.sendMessage("COMMAND", "§b" + commandInfo1.getName() + " §7| §a" + commandInfo1.getDescription() + " §7| §2" + Arrays.toString(commandInfo1.getAliases()));
+        sender.sendMessage("INFO", "§7All registered §bCommands §h[§3" + CloudDriver.getInstance().getCommandManager().getCommands().size() + "§h]:");
+        for (ICommand command : CloudDriver.getInstance().getCommandManager().getCommands()) {
+            Array<String> array = new Array<>(command.getAliases());
+            sender.sendMessage("INFO", "§h» §b" + command.getName() + " §h| §7" + command.getDescription() + " §h| §7" + (array.size() == 1 ? "Alias" : "Aliases") + " " + (array.size() == 0 ? "§cNone" : "§3" + array.toStringWithChars()));
         }
+        sender.sendMessage("§8");
     }
 }

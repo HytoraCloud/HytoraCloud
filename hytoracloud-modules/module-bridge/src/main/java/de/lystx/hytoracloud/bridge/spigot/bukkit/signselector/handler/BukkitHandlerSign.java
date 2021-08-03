@@ -2,13 +2,12 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.handler;
 
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.handling.IEventHandler;
-import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStop;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutServerSelector;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutStopServer;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.event.handle.IEventHandler;
+import de.lystx.hytoracloud.driver.event.events.other.DriverEventServiceStop;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutServerSelector;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 
 public class BukkitHandlerSign implements PacketHandler, IEventHandler<DriverEventServiceStop> {

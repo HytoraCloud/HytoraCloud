@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.bridge.proxy.global.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutRegisterServer;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 
 public class ProxyHandlerRegister implements PacketHandler {

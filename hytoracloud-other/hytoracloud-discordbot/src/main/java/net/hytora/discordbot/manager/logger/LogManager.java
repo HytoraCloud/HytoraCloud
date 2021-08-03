@@ -1,6 +1,6 @@
 package net.hytora.discordbot.manager.logger;
 
-import de.lystx.hytoracloud.driver.utils.StringCreator;
+import de.lystx.hytoracloud.driver.utils.other.StringCreator;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;

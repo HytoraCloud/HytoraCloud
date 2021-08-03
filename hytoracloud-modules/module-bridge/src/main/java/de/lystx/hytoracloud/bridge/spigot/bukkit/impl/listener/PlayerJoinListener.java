@@ -3,10 +3,10 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.CloudPermissibleBase;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.utils.Reflections;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.utils.other.Reflections;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +25,7 @@ public class PlayerJoinListener implements Listener {
         ICloudPlayer cloudPlayer = CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName());
 
         if (cloudPlayer == null) {
-            event.setKickMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getOnlyProxyJoin().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+            event.setKickMessage(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getOnlyProxyJoin().replace("%prefix%", CloudDriver.getInstance().getPrefix()));
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             return;
         }

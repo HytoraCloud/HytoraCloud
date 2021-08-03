@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.cloud.handler.other;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.Getter;
 

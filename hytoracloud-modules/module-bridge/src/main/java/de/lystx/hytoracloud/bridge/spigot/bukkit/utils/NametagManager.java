@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 import java.lang.reflect.*;
 import java.util.*;
 
-import de.lystx.hytoracloud.driver.utils.Reflections;
+import de.lystx.hytoracloud.driver.utils.other.Reflections;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

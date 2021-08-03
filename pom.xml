@@ -18,7 +18,6 @@
 
         <!-- Depends -->
         <module>hytoracloud-depends</module>
-        <module>hytoracloud-depends/hytoracloud-networking</module>
         <module>hytoracloud-depends/hytoracloud-driver</module>
 
         <!-- Other -->

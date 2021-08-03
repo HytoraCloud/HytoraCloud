@@ -2,12 +2,12 @@ package de.lystx.hytoracloud.bridge.proxy.global.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.*;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.*;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 
 import java.util.UUID;

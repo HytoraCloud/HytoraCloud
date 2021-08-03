@@ -1,17 +1,17 @@
 package de.lystx.modules.smart;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleInfo;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleState;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleTask;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.enums.other.ModuleCopyType;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.module.base.info.ModuleInfo;
+import de.lystx.hytoracloud.driver.module.base.ModuleState;
+import de.lystx.hytoracloud.driver.module.base.info.ModuleTask;
+import de.lystx.hytoracloud.driver.module.cloud.DriverModule;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.utils.enums.other.ModuleCopyType;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
 import de.lystx.modules.smart.commands.SmartProxyCommand;
 import de.lystx.modules.smart.packet.MinecraftPacket;
 import de.lystx.modules.smart.packet.PingPacket;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
         website = "https://hytora.cloud",
         main = SmartProxy.class,
         copyType = ModuleCopyType.NOT,
-        allowedTypes = ServiceType.CLOUDSYSTEM
+        allowedTypes = ServerEnvironment.CLOUD
 )
 
 @Getter @Setter
@@ -107,7 +107,7 @@ public class SmartProxy extends DriverModule {
         this.proxySearchMode = this.config.def("RANDOM").getString("proxySearchMode");
         this.config.save();
 
-        NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
+        NetworkConfig networkConfig = CloudDriver.getInstance().getConfigManager().getNetworkConfig();
         if (enabled) {
             if (networkConfig.getProxyStartPort() == 25565) {
                 CloudDriver.getInstance().log("SmartProxy", "§7Default-Proxy-Port was §b25565 §7had to change to §325566 §7in order to make §bSmartProxy §7work§h!");
@@ -130,7 +130,7 @@ public class SmartProxy extends DriverModule {
         if (this.enabled) {
             this.workerGroup = new NioEventLoopGroup();
             this.proxyNettyServer = new ProxyNettyServer("127.0.0.1", 25565);
-            CloudDriver.getInstance().registerCommand(new SmartProxyCommand());
+            CloudDriver.getInstance().getCommandManager().registerCommand(new SmartProxyCommand());
             try {
                 proxyNettyServer.bind();
             } catch (Exception e) {

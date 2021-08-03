@@ -2,23 +2,23 @@ package de.lystx.hytoracloud.global.commands;
 
 import de.lystx.hytoracloud.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
+import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideGroupManager;
 import lombok.AllArgsConstructor;
 
 import java.util.LinkedList;
 import java.util.List;
 
 @AllArgsConstructor
-public class StopCommand implements TabCompletable {
+@CommandInfo(name = "stop", description = "Stops a service or group")
+public class StopCommand implements CommandListenerTabComplete {
 
     private final CloudProcess cloudInstance;
 
-    @Command(name = "stop", description = "Stops a service or group")
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             String s = args[0];
@@ -31,7 +31,7 @@ public class StopCommand implements TabCompletable {
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("group")) {
                 String groupName = args[1];
-                IServiceGroup group = cloudInstance.getInstance(GroupService.class).getGroup(groupName);
+                IServiceGroup group = CloudDriver.getInstance().getServiceRegistry().getInstance(CloudSideGroupManager.class).getCachedObject(groupName);
                 if (group == null) {
                     sender.sendMessage("ERROR", "§cThe group §e" + groupName + " §cseems not to exist!");
                     return;
@@ -58,7 +58,7 @@ public class StopCommand implements TabCompletable {
                 list.add(globalIService.getName());
             }
         } else if (args.length == 3 && args[1].equalsIgnoreCase("group")) {
-            for (IServiceGroup globalService : cloudDriver.getInstance(GroupService.class).getGroups()) {
+            for (IServiceGroup globalService : CloudDriver.getInstance().getServiceRegistry().getInstance(CloudSideGroupManager.class).getCachedObjects()) {
                 if (CloudDriver.getInstance().getServiceManager().getCachedObject(globalService.getName()) == null) {
                     continue;
                 }

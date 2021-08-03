@@ -2,18 +2,18 @@ package de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.BungeeBridge;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.IPlayerConnection;
-import de.lystx.hytoracloud.driver.commons.enums.versions.MinecraftProtocol;
-import de.lystx.hytoracloud.driver.commons.events.EventResult;
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
+import de.lystx.hytoracloud.driver.player.required.IPlayerConnection;
+import de.lystx.hytoracloud.driver.utils.enums.versions.MinecraftProtocol;
+import de.lystx.hytoracloud.driver.event.events.EventResult;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerConnectionObject;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerObject;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerJoin;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.wrapped.PlayerConnectionObject;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.wrapped.PlayerObject;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -131,9 +131,9 @@ public class PlayerListener implements Listener {
         if (serviceGroup.isMaintenance() && (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
 
             if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
-                player.disconnect(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                player.disconnect(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix()));
             } else {
-                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
+                String message = CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", serviceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
                 player.sendMessage(new TextComponent(message));
             }
             event.setCancelled(true);
@@ -144,7 +144,7 @@ public class PlayerListener implements Listener {
     public void onJoin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
         ProxyServer.getInstance().getScheduler().schedule(BungeeBridge.getInstance(), () -> {
-            CloudDriver.getInstance().callEvent(new DriverEventPlayerJoin(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName())));
+            CloudDriver.getInstance().getEventManager().callEvent(new DriverEventPlayerJoin(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName())));
         }, 3L, TimeUnit.SECONDS);
     }
 

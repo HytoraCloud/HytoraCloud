@@ -1,21 +1,23 @@
 package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.OfflinePlayer;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
 
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PermsCommand {
+@CommandInfo(name = "perms", description = "Manages permissions", aliases = {"cloudperms", "hperms"})
+public class PermsCommand implements CommandListener {
 
-	@Command(name = "perms", description = "Manages permissions", aliases = {"cloudperms", "hperms"})
+	@Override
 	public void execute(CommandExecutor sender, String[] args) {
 		ICloudPlayer player = (ICloudPlayer)sender;
 		if (player.hasPermission("cloudsystem.perms.command")) {

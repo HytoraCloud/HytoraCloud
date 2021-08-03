@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.cloud.handler.player;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.OfflinePlayer;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
 import lombok.AllArgsConstructor;
 
 import java.util.UUID;

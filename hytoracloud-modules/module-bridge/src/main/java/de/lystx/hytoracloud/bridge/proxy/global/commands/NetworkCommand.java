@@ -1,18 +1,19 @@
 package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import lombok.SneakyThrows;
 
-public class NetworkCommand {
+@CommandInfo(name = "networkInfo", aliases = {"info", "cloudInfo"})
+public class NetworkCommand implements CommandListener {
 
 
-    @SneakyThrows
-    @Command(name = "networkInfo", aliases = {"info", "cloudInfo"})
+    @SneakyThrows @Override
     public void execute(CommandExecutor sender, String[] args) {
         ICloudPlayer player = (ICloudPlayer)sender;
         if (player.hasPermission("cloudsystem.command")) {
@@ -21,7 +22,7 @@ public class NetworkCommand {
             player.sendMessage("§8§m--------------------------------------");
             player.sendMessage("§8» §bPlayers§8:");
             player.sendMessage("  §8➜ §bOnline §8┃ §7" + CloudDriver.getInstance().getPlayerManager().getCachedObjects().size());
-            player.sendMessage("  §8➜ §bMax §8┃ §7" + CloudDriver.getInstance().getNetworkConfig().getMaxPlayers());
+            player.sendMessage("  §8➜ §bMax §8┃ §7" + CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMaxPlayers());
 
             player.sendMessage("§8» §bServices§8:");
             player.sendMessage("  §8➜ §bAll §8┃ §7" + CloudDriver.getInstance().getServiceManager().getCachedObjects().size());

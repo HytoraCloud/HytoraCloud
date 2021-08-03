@@ -1,7 +1,10 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleExecutor;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
+import de.lystx.hytoracloud.driver.command.executor.ConsoleExecutor;
+import de.lystx.hytoracloud.driver.service.minecraft.chat.ChatComponent;
+import de.lystx.hytoracloud.driver.setup.SetupExecutor;
+import jline.console.ConsoleReader;
+import jline.console.completer.Completer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.command.CommandSender;
@@ -45,4 +48,27 @@ public class ConsoleCommandSenderExecutor implements ConsoleExecutor {
     }
 
 
+    @Override
+    public void clearScreen() {
+
+    }
+
+    @Override
+    public void setCurrentSetup(SetupExecutor<?> setup) {
+    }
+
+    @Override
+    public String getPrefix() {
+        return "";
+    }
+
+    @Override
+    public ConsoleReader getConsoleReader() {
+        return null;
+    }
+
+    @Override
+    public Completer getCompleter() {
+        return null;
+    }
 }

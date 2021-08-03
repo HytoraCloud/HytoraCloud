@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.bridge.global.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUpdatePlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.PacketUnregisterPlayer;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.PacketUpdatePlayer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 
 public class BridgeHandlerPlayer implements PacketHandler {
 

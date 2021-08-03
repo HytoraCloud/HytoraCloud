@@ -6,7 +6,7 @@ import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 
 public class CommandListener {
 

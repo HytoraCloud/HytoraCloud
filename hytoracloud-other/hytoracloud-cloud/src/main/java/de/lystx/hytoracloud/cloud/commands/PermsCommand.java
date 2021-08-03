@@ -1,23 +1,24 @@
 package de.lystx.hytoracloud.cloud.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionValidity;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.OfflinePlayer;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionValidity;
+import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class PermsCommand implements TabCompletable {
+@CommandInfo(name = "perms", description = "Manages permissions", aliases = {"cperms", "permissions"})
+public class PermsCommand implements CommandListenerTabComplete {
 
 
-    @Command(name = "perms", description = "Manages permissions", aliases = {"cperms", "permissions"})
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {

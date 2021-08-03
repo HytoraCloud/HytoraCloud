@@ -2,16 +2,16 @@ package de.lystx.hytoracloud.cloud.handler.services;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroup;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartGroupWithProperties;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStartService;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStartGroup;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStartGroupWithProperties;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStartService;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideGroupManager;
 import lombok.AllArgsConstructor;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 @AllArgsConstructor
 public class CloudHandlerStart implements PacketHandler {
@@ -31,9 +31,9 @@ public class CloudHandlerStart implements PacketHandler {
         } else if (packet instanceof PacketInStartGroupWithProperties) {
             PacketInStartGroupWithProperties packetPlayInStartGroup = (PacketInStartGroupWithProperties) packet;
             IServiceGroup group = packetPlayInStartGroup.getGroup();
-            IServiceGroup get = this.cloudSystem.getInstance(GroupService.class).getGroup(group.getName());
+            IServiceGroup get = CloudDriver.getInstance().getServiceRegistry().getInstance(CloudSideGroupManager.class).getCachedObject(group.getName());
             if (get == null) {
-                cloudSystem.getParent().getConsole().getLogger().sendMessage("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
+                cloudSystem.getParent().getConsole().sendMessage("ERROR", "§cCouldn't find group for §e" + group.getName() + "§c!");
                 return;
             }
             CloudDriver.getInstance().getServiceManager().startService(get, packetPlayInStartGroup.getProperties());

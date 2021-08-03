@@ -1,30 +1,30 @@
 package de.lystx.hytoracloud.bridge.proxy.bungeecord;
 
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerInjectListener;
-import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
+import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
-import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
+import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.CommandListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player.PlayerListener;
 import de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.server.ServerKickListener;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessage;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.IPlayerSettings;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
+import de.lystx.hytoracloud.driver.player.featured.IPlayerSettings;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.service.minecraft.chat.ChatComponent;
+import de.lystx.hytoracloud.driver.service.minecraft.chat.CloudComponentAction;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.utils.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 
 
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerSettingsObject;
-import de.lystx.hytoracloud.driver.utils.Action;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.wrapped.PlayerSettingsObject;
+import de.lystx.hytoracloud.driver.utils.other.Action;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
-import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
@@ -289,7 +289,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
             }
         });
 
-        if (CloudDriver.getInstance().getProxyConfig() == null) {
+        if (CloudDriver.getInstance().getConfigManager().getProxyConfig() == null) {
             CloudDriver.getInstance().messageCloud(CloudDriver.getInstance().getServiceManager().getThisService().getName(), "§cCouldn't find §eProxyConfig §cfor this service!");
             System.out.println("[CloudBridge] Couldn't find ProxyConfig!");
         }
@@ -303,7 +303,11 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
     @Override
     public int getPing(UUID playerUniqueId) {
-        return CloudDriver.getInstance().getProxyBridge().getPing(playerUniqueId);
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUniqueId);
+        if (player == null) {
+            return -1;
+        }
+        return player.getPing();
     }
 
     @Override
@@ -325,7 +329,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
                 new PropertyObject()
                         .append("max-players", service.getGroup().getMaxPlayers())
                         .append("players", ProxyServer.getInstance().getOnlineCount())
-                        .append("online-mode", CloudDriver.getInstance().getProxyConfig().isOnlineMode())
+                        .append("online-mode", CloudDriver.getInstance().getConfigManager().getProxyConfig().isOnlineMode())
         );
 
         List<JsonObject<?>> plugins = new LinkedList<>();
@@ -365,6 +369,16 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
         );
     }
 
+    @Override
+    public void sendMessage(UUID uniqueId, ChatComponent message) {
+
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uniqueId);
+        if (player == null) {
+            return;
+        }
+        player.sendMessage(fromCloud(message));
+    }
+
     public void shutdown() {
         try {
             CloudDriver.getInstance().getConnection().close();
@@ -374,8 +388,8 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
     }
 
     @Override
-    public ServiceType type() {
-        return ServiceType.PROXY;
+    public ServerEnvironment type() {
+        return ServerEnvironment.PROXY;
     }
 
 }

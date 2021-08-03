@@ -2,9 +2,9 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.listener;
 
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
-import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.serverselector.sign.CloudSign;
+import de.lystx.hytoracloud.driver.service.IService;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -40,7 +40,7 @@ public class PlayerSignListener implements Listener {
             }
 
             if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getThisService().getName()) && !service.getGroup().isMaintenance()) {
-                player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                player.sendMessage(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                 return;
             }
             cloudPlayer.connect(service);

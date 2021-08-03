@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.receiver.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
-import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverScreenRequest;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.service.screen.IScreen;
+import de.lystx.hytoracloud.driver.service.screen.IScreenManager;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverScreenRequest;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 import java.util.LinkedList;
 
@@ -17,8 +17,8 @@ public class ReceiverHandlerScreen implements PacketHandler {
             PacketReceiverScreenRequest packetReceiverScreenRequest = (PacketReceiverScreenRequest)packet;
 
             String screen = packetReceiverScreenRequest.getScreen();
-            ServiceOutputService instance = CloudDriver.getInstance().getInstance(ServiceOutputService.class);
-            ServiceOutput serviceOutput = instance.getMap().get(screen);
+            IScreenManager instance = CloudDriver.getInstance().getScreenManager();
+            IScreen serviceOutput = instance.getOrRequest(screen);
 
             if (serviceOutput == null) {
                 return;

@@ -14,12 +14,12 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.proxy.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.versions.MinecraftProtocol;
-import de.lystx.hytoracloud.driver.commons.events.EventResult;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerConnectionObject;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
+import de.lystx.hytoracloud.driver.utils.enums.versions.MinecraftProtocol;
+import de.lystx.hytoracloud.driver.event.events.EventResult;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.wrapped.PlayerConnectionObject;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerJoin;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 
@@ -75,7 +75,7 @@ public class PlayerLoginListener {
     @Subscribe
     public void handleJoin(PostLoginEvent event) {
         Player player = event.getPlayer();
-        VelocityBridge.getInstance().getServer().getScheduler().buildTask(VelocityBridge.getInstance(), () -> CloudDriver.getInstance().callEvent(new DriverEventPlayerJoin(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUsername())))).delay(3, TimeUnit.SECONDS);
+        VelocityBridge.getInstance().getServer().getScheduler().buildTask(VelocityBridge.getInstance(), () -> CloudDriver.getInstance().getEventManager().callEvent(new DriverEventPlayerJoin(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getUsername())))).delay(3, TimeUnit.SECONDS);
     }
 
     @Subscribe

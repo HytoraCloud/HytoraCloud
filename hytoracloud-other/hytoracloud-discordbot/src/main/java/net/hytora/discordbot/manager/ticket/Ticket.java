@@ -1,6 +1,6 @@
 package net.hytora.discordbot.manager.ticket;
 
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

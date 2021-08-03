@@ -3,12 +3,12 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.sign;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.*;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.ServicePing;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.utils.interfaces.PlaceHolder;
+import de.lystx.hytoracloud.driver.serverselector.sign.*;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.service.minecraft.other.ServicePing;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -76,7 +76,7 @@ public class SignUpdater implements Runnable {
                 freeSigns.clear();
                 serviceMap.clear();
 
-                for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceType.SPIGOT)) {
+                for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects(ServerEnvironment.SPIGOT)) {
                     if (!service.getState().equals(ServiceState.INGAME) && !service.getState().equals(ServiceState.OFFLINE)) {
                         update(service);
                     }
@@ -122,7 +122,7 @@ public class SignUpdater implements Runnable {
      * @param current > Service to update
      */
     public void update(IService current) {
-        if (current.getGroup().getType().equals(ServiceType.PROXY)) {
+        if (current.getGroup().getEnvironment().equals(ServerEnvironment.PROXY)) {
             return;
         }
 

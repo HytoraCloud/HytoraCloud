@@ -9,26 +9,26 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
+import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.player.*;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.other.ProxyPingListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerConnectListener;
 import de.lystx.hytoracloud.bridge.proxy.velocity.listener.server.ServerKickListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.featured.IPlayerSettings;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.CloudComponentAction;
-import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
+import de.lystx.hytoracloud.driver.player.featured.IPlayerSettings;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.service.minecraft.chat.ChatComponent;
+import de.lystx.hytoracloud.driver.service.minecraft.chat.CloudComponentAction;
+import de.lystx.hytoracloud.driver.utils.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 
 
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerSettingsObject;
+import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.wrapped.PlayerSettingsObject;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -202,7 +202,7 @@ public class VelocityBridge implements BridgeInstance {
                 public void registerService(IService service) {
 
                     //Proxy's do not need to be registered
-                    if (service.getGroup().getType().isProxy()) {
+                    if (service.getGroup().getEnvironment() == ServerEnvironment.PROXY) {
                         return;
                     }
 
@@ -291,7 +291,22 @@ public class VelocityBridge implements BridgeInstance {
 
     @Override
     public int getPing(UUID playerUniqueId) {
-        return CloudDriver.getInstance().getProxyBridge().getPing(playerUniqueId);
+        Player player = server.getPlayer(playerUniqueId).orElse(null);
+        if (player == null) {
+            return -1;
+        }
+
+        return (int) player.getPing();
+    }
+
+    @Override
+    public void sendMessage(UUID uniqueId, ChatComponent message) {
+        Player player = server.getPlayer(uniqueId).orElse(null);
+        if (player == null) {
+            return;
+        }
+
+        player.sendMessage(fromCloud(message));
     }
 
     @Override
@@ -315,7 +330,7 @@ public class VelocityBridge implements BridgeInstance {
                 new PropertyObject()
                         .append("max-players", service.getGroup().getMaxPlayers())
                         .append("players", server.getAllPlayers().size())
-                        .append("online-mode", CloudDriver.getInstance().getProxyConfig().isOnlineMode())
+                        .append("online-mode", CloudDriver.getInstance().getConfigManager().getProxyConfig().isOnlineMode())
         );
 
         List<JsonObject<?>> plugins = new LinkedList<>();
@@ -350,8 +365,8 @@ public class VelocityBridge implements BridgeInstance {
     }
 
     @Override
-    public ServiceType type() {
-        return ServiceType.PROXY;
+    public ServerEnvironment type() {
+        return ServerEnvironment.PROXY;
     }
 
 

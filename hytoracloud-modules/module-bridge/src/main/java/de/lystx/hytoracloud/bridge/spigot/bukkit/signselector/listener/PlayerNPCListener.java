@@ -4,21 +4,20 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.NPC;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.BukkitItem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.handling.IEventHandler;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Item;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerNPC;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
+import de.lystx.hytoracloud.driver.event.handle.IEventHandler;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.inventory.Item;
+import de.lystx.hytoracloud.driver.serverselector.npc.NPCConfig;
+import de.lystx.hytoracloud.driver.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerNPC;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.utils.other.CloudMap;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -58,7 +57,7 @@ public class PlayerNPCListener implements IEventHandler<DriverEventPlayerNPC> {
                 }
                 IService service = serviceMap.get(event.getSlot());
                 if (service.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getThisService().getName())) {
-                    player.sendMessage(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
+                    player.sendMessage(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getAlreadyConnected().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix()));
                     return;
                 }
                 if (!ServerSelector.getInstance().getNpcManager().getNpcConfig().getConnectingMessage().trim().isEmpty()) {
@@ -191,7 +190,7 @@ public class PlayerNPCListener implements IEventHandler<DriverEventPlayerNPC> {
                 IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName());
                 input = input.replace("%group%", group.getName());
                 input = input.replace("%template%", IServiceGroup.getCurrentTemplate().getName());
-                input = input.replace("%type%", IServiceGroup.getType().name());
+                input = input.replace("%type%", IServiceGroup.getEnvironment().name());
                 input = input.replace("%newServer%", "" + IServiceGroup.getNewServerPercent());
                 input = input.replace("%online_services%", group.getServices().size() + "");
                 input = input.replace("%online_players%", group.getPlayers().size() + "");

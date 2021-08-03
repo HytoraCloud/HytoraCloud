@@ -1,8 +1,8 @@
 package de.lystx.modules.smart.server;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.modules.smart.SmartProxy;
 import de.lystx.modules.smart.packet.PacketBuffer;
 import de.lystx.modules.smart.packet.MinecraftPacket;
@@ -50,7 +50,7 @@ public class PacketDecoder extends SimpleChannelInboundHandler<ByteBuf> {
                 hostName = hostName.replace("localhost", "127.0.0.1");
                 hostName = hostName.replace("192.168.178.82", "127.0.0.1");
 
-                List<IService> proxies = CloudDriver.getInstance().getServiceManager().getCachedObjects(ServiceType.PROXY);
+                List<IService> proxies = CloudDriver.getInstance().getServiceManager().getCachedObjects(ServerEnvironment.PROXY);
                 IService service = proxies.get(new Random().nextInt(proxies.size()));
 
                 if (service != null) {

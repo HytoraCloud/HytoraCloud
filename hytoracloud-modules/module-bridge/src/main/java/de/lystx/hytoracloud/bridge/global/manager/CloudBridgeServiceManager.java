@@ -1,17 +1,17 @@
 package de.lystx.hytoracloud.bridge.global.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.interfaces.Requestable;
-import de.lystx.hytoracloud.driver.commons.packets.in.*;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
+import de.lystx.hytoracloud.driver.utils.interfaces.Requestable;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.*;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
+import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.service.IServiceManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +42,15 @@ public class CloudBridgeServiceManager implements IServiceManager {
     public IService getThisService() {
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
         return this.getCachedObject(jsonDocument.getString("server"));
+    }
+
+    @Override
+    public ServerEnvironment getCurrentEnvironment() {
+        if (this.getThisService() == null) {
+            return ServerEnvironment.NONE;
+        } else {
+            return this.getThisService().getGroup().getEnvironment();
+        }
     }
 
     @Override
@@ -119,17 +128,17 @@ public class CloudBridgeServiceManager implements IServiceManager {
 
     @Override
     public List<IService> getCachedObjects(ServiceState serviceState) {
-        return getCachedObjects(service -> service.getGroup().getType().equals(ServiceType.SPIGOT) && service.getState().equals(serviceState));
+        return getCachedObjects(service -> service.getGroup().getEnvironment().equals(ServerEnvironment.SPIGOT) && service.getState().equals(serviceState));
     }
 
     @Override
     public List<IService> getLobbies() {
-        return getCachedObjects(service -> service.getGroup().isLobby() && service.getGroup().getType().equals(ServiceType.SPIGOT));
+        return getCachedObjects(service -> service.getGroup().isLobby() && service.getGroup().getEnvironment().equals(ServerEnvironment.SPIGOT));
     }
 
     @Override
-    public List<IService> getCachedObjects(ServiceType serviceType) {
-        return getCachedObjects(service -> service.getGroup().getType().equals(serviceType));
+    public List<IService> getCachedObjects(ServerEnvironment serviceType) {
+        return getCachedObjects(service -> service.getGroup().getEnvironment().equals(serviceType));
     }
 
     @Override

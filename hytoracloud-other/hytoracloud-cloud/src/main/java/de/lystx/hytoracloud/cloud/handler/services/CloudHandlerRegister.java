@@ -1,14 +1,20 @@
 package de.lystx.hytoracloud.cloud.handler.services;
 
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutRegisterServer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketRegisterService;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketRegisterService;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.wrapped.ServiceObject;
+
+import java.util.function.Consumer;
 
 public class CloudHandlerRegister implements PacketHandler {
-
 
     @Override
     public void handle(Packet packet) {

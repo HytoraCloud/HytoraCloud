@@ -1,11 +1,12 @@
 package de.lystx.hytoracloud.modules.cloudflare;
 
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleState;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.ModuleTask;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.CloudFlareAPI;
-import de.lystx.hytoracloud.driver.cloudservices.global.cloudflare.elements.config.CloudFlareAuth;
-import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.cloudflare.ICloudFlareManager;
+import de.lystx.hytoracloud.driver.connection.cloudflare.elements.config.CloudFlareAuth;
+import de.lystx.hytoracloud.driver.module.base.ModuleState;
+import de.lystx.hytoracloud.driver.module.base.info.ModuleTask;
+import de.lystx.hytoracloud.driver.module.cloud.DriverModule;
+import de.lystx.hytoracloud.driver.utils.other.CloudMap;
 import de.lystx.hytoracloud.modules.cloudflare.elements.ModuleConfig;
 import lombok.Getter;
 
@@ -31,8 +32,9 @@ public class CloudFlareModule extends DriverModule {
 
     @ModuleTask(id = 2, state = ModuleState.STARTING)
     public void startModule() {
-
-        new CloudFlareAPI(new CloudFlareAuth(this.moduleConfig.getXAuthKey(), this.moduleConfig.getXAuthEmail()), this.moduleConfig.getZoneId());
+        ICloudFlareManager cloudFlareManager = CloudDriver.getInstance().getCloudFlareManager();
+        cloudFlareManager.setAuth(new CloudFlareAuth(this.moduleConfig.getXAuthKey(), this.moduleConfig.getXAuthEmail()));
+        cloudFlareManager.setZoneId(this.moduleConfig.getZoneId());
     }
 
     @ModuleTask(id = 3, state = ModuleState.RELOADING)

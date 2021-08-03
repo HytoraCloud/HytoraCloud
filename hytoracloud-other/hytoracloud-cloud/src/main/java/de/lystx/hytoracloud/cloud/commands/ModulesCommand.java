@@ -1,31 +1,33 @@
 package de.lystx.hytoracloud.cloud.commands;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.DriverModule;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.cloud.ModuleService;
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.module.cloud.DriverModule;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.module.cloud.ModuleService;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
 
 import java.util.Arrays;
 
-public class ModulesCommand {
+@CommandInfo(name = "modules", description = "Manages modules", aliases = {"pl", "plugins"})
+public class ModulesCommand implements CommandListener {
 
-
-    @Command(name = "modules", description = "Manages modules", aliases = {"pl", "plugins"})
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("list")) {
-                if (CloudSystem.getInstance().getInstance(ModuleService.class).getDriverModules().isEmpty()) {
+                if (CloudDriver.getInstance().getServiceRegistry().getInstance(ModuleService.class).getDriverModules().isEmpty()) {
                     sender.sendMessage("ERROR", "§cThere are no modules at the moment!");
                     return;
                 }
                 sender.sendMessage("INFO", "§bModules§7:");
-                for (DriverModule driverModule : CloudSystem.getInstance().getInstance(ModuleService.class).getDriverModules()) {
+                for (DriverModule driverModule : CloudDriver.getInstance().getServiceRegistry().getInstance(ModuleService.class).getDriverModules()) {
                     sender.sendMessage("INFO", "§9" + driverModule.getBase().getName() + " §7| §bVersion " + driverModule.getBase().getVersion() + " §7| §bAuthor " + Arrays.toString(driverModule.getBase().getAuthor()));
                 }
             } else if (args[0].equalsIgnoreCase("rl")) {
-                CloudSystem.getInstance().getInstance(ModuleService.class).shutdown(() -> {
-                    CloudSystem.getInstance().getInstance(ModuleService.class).load();
+                CloudDriver.getInstance().getServiceRegistry().getInstance(ModuleService.class).shutdown(() -> {
+                    CloudDriver.getInstance().getServiceRegistry().getInstance(ModuleService.class).load();
                     sender.sendMessage("INFO", "§aThe modules were §2reloaded§a!");
                 });
             } else {
@@ -34,7 +36,7 @@ public class ModulesCommand {
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("rl")) {
                 String module = args[1];
-                DriverModule finalDriverModule = CloudSystem.getInstance().getInstance(ModuleService.class).getModule(module);
+                DriverModule finalDriverModule = CloudDriver.getInstance().getServiceRegistry().getInstance(ModuleService.class).getModule(module);
                 if (finalDriverModule == null) {
                     sender.sendMessage("ERROR", "§cThe module §e" + module + " §cseems not to exist!");
                     return;

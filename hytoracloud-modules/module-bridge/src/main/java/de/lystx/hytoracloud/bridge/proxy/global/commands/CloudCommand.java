@@ -2,29 +2,40 @@ package de.lystx.hytoracloud.bridge.proxy.global.commands;
 
 import com.google.common.collect.ImmutableList;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Inventory;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Item;
-import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplate;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketShutdown;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.OfflinePlayer;
-import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.driver.service.screen.IScreen;
+import de.lystx.hytoracloud.driver.player.inventory.Inventory;
+import de.lystx.hytoracloud.driver.player.inventory.Item;
+import de.lystx.hytoracloud.driver.service.template.ITemplate;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketShutdown;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.response.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CloudCommand implements TabCompletable {
+@CommandInfo(
+        name = "cloud",
+        description = "Cloud Proxyy Command",
+        aliases = {
+                "hytoracloud",
+                "hcloud",
+                "cloudsystem",
+                "klaud"
+        }
+)
+public class CloudCommand implements CommandListenerTabComplete {
 
-    @Command(name = "cloud", description = "Cloud Proxyy Command", aliases = {"hytoracloud", "hcloud", "cloudsystem", "klaud"})
+    @Override
     public void execute(CommandExecutor commandSender, String[] args) {
         if (commandSender instanceof ICloudPlayer) {
             ICloudPlayer player = (ICloudPlayer)commandSender;
@@ -36,6 +47,10 @@ public class CloudCommand implements TabCompletable {
 
                     } else if (args[0].equalsIgnoreCase("debug") && player.getName().equalsIgnoreCase("Lystx")) {
 
+
+                        for (IScreen screen : CloudDriver.getInstance().getScreenManager().getScreens()) {
+                            player.sendMessage(screen.getCachedLines().size() + " -> " + screen.getService().getName());
+                        }
 
                         Inventory inventory = Inventory.builder()
                                 .info("§bHytoraCloud", 3)
@@ -64,14 +79,14 @@ public class CloudCommand implements TabCompletable {
 
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
 
-                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7CloudSystem Version §a" + CloudDriver.getInstance().getVersion());
+                        player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7CloudSystem Version §a" + CloudDriver.getInstance().getInfo().version());
 
                     } else if (args[0].equalsIgnoreCase("shutdown")) {
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Cloud will be shut down in §e3 Seconds§8...");
 
                         Utils.doUntilEmpty(
                                 CloudDriver.getInstance().getPlayerManager().getCachedObjects(),
-                                cloudPlayer -> cloudPlayer.kick(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getCloudShutdown().replace("%prefix%", CloudDriver.getInstance().getPrefix())),
+                                cloudPlayer -> cloudPlayer.kick(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getCloudShutdown().replace("%prefix%", CloudDriver.getInstance().getPrefix())),
                                 cloudPlayers -> CloudDriver.getInstance().sendPacket(new PacketShutdown())
                         );
                     } else {
@@ -95,16 +110,16 @@ public class CloudCommand implements TabCompletable {
                         boolean add = args[0].equalsIgnoreCase("add");
                         String playername = args[1];
 
-                        if (add && CloudDriver.getInstance().getNetworkConfig().getWhitelistedPlayers().contains(playername)) {
+                        if (add && CloudDriver.getInstance().getConfigManager().getNetworkConfig().getWhitelistedPlayers().contains(playername)) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + playername + " §cis already added to maintenance§8!");
                             return;
                         }
-                        if (!add && !CloudDriver.getInstance().getNetworkConfig().getWhitelistedPlayers().contains(playername)) {
+                        if (!add && !CloudDriver.getInstance().getConfigManager().getNetworkConfig().getWhitelistedPlayers().contains(playername)) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe player §e" + playername + " §cis not added to maintenance§8!");
                             return;
                         }
 
-                        NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
+                        NetworkConfig networkConfig = CloudDriver.getInstance().getConfigManager().getNetworkConfig();
 
                         if (add) {
                             networkConfig.getWhitelistedPlayers().add(playername);
@@ -119,12 +134,14 @@ public class CloudCommand implements TabCompletable {
                         if (!add && cachedPlayer != null) {
                             if (!CloudDriver
                                     .getInstance()
+                                    .getConfigManager()
                                     .getNetworkConfig()
                                     .getWhitelistedPlayers()
                                     .contains(player.getName())
                                     && !player.hasPermission("cloudsystem.network.maintenance")) {
                                 cachedPlayer.kick(
                                         CloudDriver.getInstance()
+                                                .getConfigManager()
                                                 .getNetworkConfig()
                                                 .getMessageConfig()
                                                 .getMaintenanceNetwork()
@@ -135,8 +152,8 @@ public class CloudCommand implements TabCompletable {
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7The player §b" + playername + " §7was " + (add ? "§aadded to §7" : "§cremoved from §7") + "maintenance§8!");
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         if (args[1].equalsIgnoreCase("maintenance")) {
-                            boolean maintenance = !CloudDriver.getInstance().getNetworkConfig().isMaintenance();
-                            NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
+                            boolean maintenance = !CloudDriver.getInstance().getConfigManager().getNetworkConfig().isMaintenance();
+                            NetworkConfig networkConfig = CloudDriver.getInstance().getConfigManager().getNetworkConfig();
                             networkConfig.setMaintenance(maintenance);
                             networkConfig.update();
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + (maintenance ? "§7The Network is now in §amaintenance§8!" : "§7The Network is §cno longer §7in maintenance§8!"));
@@ -207,12 +224,12 @@ public class CloudCommand implements TabCompletable {
                         player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Trying to stop services from group §c" + group.getName() + "§8...");
                     } else if (args[0].equalsIgnoreCase("list")) {
                         if (args[1].equalsIgnoreCase("maintenance")) {
-                            if (CloudDriver.getInstance().getNetworkConfig().getWhitelistedPlayers().isEmpty()) {
+                            if (CloudDriver.getInstance().getConfigManager().getNetworkConfig().getWhitelistedPlayers().isEmpty()) {
                                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere are no whitelisted players yet!");
                                 return;
                             }
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§7Players:");
-                            for (String whitelistedPlayer : CloudDriver.getInstance().getNetworkConfig().getWhitelistedPlayers()) {
+                            for (String whitelistedPlayer : CloudDriver.getInstance().getConfigManager().getNetworkConfig().getWhitelistedPlayers()) {
                                 player.sendMessage("§8» §7" + whitelistedPlayer);
                             }
                             player.sendMessage("§8§m---------");

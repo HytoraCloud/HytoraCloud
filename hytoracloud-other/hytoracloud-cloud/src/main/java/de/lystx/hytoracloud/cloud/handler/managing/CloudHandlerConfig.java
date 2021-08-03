@@ -2,11 +2,11 @@ package de.lystx.hytoracloud.cloud.handler.managing;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.config.IConfigManager;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketUpdateNetworkConfig;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 public class CloudHandlerConfig implements PacketHandler {
 
@@ -15,13 +15,13 @@ public class CloudHandlerConfig implements PacketHandler {
     public void handle(Packet packet) {
         if (packet instanceof PacketUpdateNetworkConfig) {
 
-            ConfigService configService = CloudDriver.getInstance().getInstance(ConfigService.class);
+            IConfigManager configManager = CloudDriver.getInstance().getConfigManager();
             PacketUpdateNetworkConfig packetUpdateNetworkConfig = (PacketUpdateNetworkConfig)packet;
             NetworkConfig config = packetUpdateNetworkConfig.getNetworkConfig();
 
-            configService.setNetworkConfig(config);
-            configService.save();
-            configService.reload();
+            configManager.setNetworkConfig(config);
+            configManager.shutdown();
+            configManager.reload();
             CloudDriver.getInstance().sendPacket(packet);
         }
     }

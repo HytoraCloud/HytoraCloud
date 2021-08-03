@@ -1,19 +1,19 @@
 package de.lystx.hytoracloud.cloud.commands;
 
 
+import de.lystx.hytoracloud.driver.service.group.IGroupManager;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
 import de.lystx.hytoracloud.global.CloudProcess;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
+import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.service.receiver.IReceiverManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
+import de.lystx.hytoracloud.driver.registry.ICloudService;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
+import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideConfigManager;
+import de.lystx.hytoracloud.driver.service.minecraft.other.NetworkInfo;
 import lombok.AllArgsConstructor;
 
 import java.text.DecimalFormat;
@@ -22,11 +22,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 @AllArgsConstructor
-public class InfoCommand implements TabCompletable {
+@CommandInfo(
+        name = "info",
+        description = "Shows information",
+        aliases = "information"
+)
+public class InfoCommand implements CommandListenerTabComplete {
 
     private final CloudProcess cloudInstance;
 
-    @Command(name = "info", description = "Shows information", aliases = "information")
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             switch (args[0]) {
@@ -36,21 +41,21 @@ public class InfoCommand implements TabCompletable {
                     networkInfo.calculate();
                     sender.sendMessage("INFO", "§cCalculating §eNetworkStats§c....");
                     sender.sendMessage("INFO", "§7----------------------------------");
-                    sender.sendMessage("INFO", "§bVersion §a: §f" + CloudDriver.getInstance().getVersion());
+                    sender.sendMessage("INFO", "§bVersion §a: §f" + CloudDriver.getInstance().getInfo().version());
                     sender.sendMessage("INFO", "§bCPU-Usage §a: §f" + format.format(networkInfo.getCPUUsage()) + "%");
                     sender.sendMessage("INFO", "§bInternal CPU-Usage §a: §f" + format.format(networkInfo.getInternalCPUUsage()) + "%");
                     sender.sendMessage("INFO", "§bServer CPU §f: §a" + format.format(networkInfo.getUsedCPU()) + "%§h/§c" + format.format(networkInfo.getFreeCPU()));
                     sender.sendMessage("INFO", "§bServer Memory §f: §a" + format.format(networkInfo.getUsedMemory()) + "§h/§c" + format.format(networkInfo.getFreeMemory()) + " §h(§eTotal§8h: §7" + format.format(networkInfo.getTotalMemory()) + "§h)");
 
                     sender.sendMessage("INFO", "§bTPS §a: §f" + networkInfo.formatTps(cloudInstance.getTicksPerSecond().getTPS()));
-                    sender.sendMessage("INFO", "§bConnection §a: §f" + cloudInstance.getInstance(ConfigService.class).getNetworkConfig().getHost() + ":" + cloudInstance.getInstance(ConfigService.class).getNetworkConfig().getPort());
+                    sender.sendMessage("INFO", "§bConnection §a: §f" + CloudDriver.getInstance().getConfigManager().getNetworkConfig().getHost() + ":" + CloudDriver.getInstance().getConfigManager().getNetworkConfig().getPort());
                     sender.sendMessage("INFO", "§7----------------------------------");
                     return;
                 case "services":
                     sender.sendMessage("INFO", "§7----------------------------------");
                     for (ICloudService registeredService : CloudDriver.getInstance().getServiceRegistry().getRegisteredServices()) {
                         String s = CloudDriver.getInstance().getServiceRegistry().getDeniedToAccessServices().contains(registeredService.getClass()) ? "§cDenied" : "§aAllowed";
-                        sender.sendMessage("INFO", "§9" + registeredService.getName() + " §7| §bType " + registeredService.getType() + " §7| §eVersion " + registeredService.getVersion() + " §7| §h[" + s + "§h]");
+                        sender.sendMessage("INFO", "§9" + registeredService.getName() + " §7| §eVersion " + registeredService.getVersion() + " §7| §h[" + s + "§h]");
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
                     return;
@@ -59,8 +64,8 @@ public class InfoCommand implements TabCompletable {
                     for (IService service : CloudDriver.getInstance().getServiceManager().getCachedObjects()) {
                         sender.sendMessage("INFO", "§h> §a" + service.getName() + " §h[§d" + service.getUniqueId() + " §7| §6Authenticated: " + (service.isAuthenticated() ? "§aYes" : "§cNo") + "§h] §h:");
                         sender.sendMessage("INFO", "  §h> §bID: #" + service.getId() + " §7| §eState: " + service.getState().getColor() + service.getState().name());
-                        sender.sendMessage("INFO", "  §h> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
-                        sender.sendMessage("INFO", "  §h> §bType: " + service.getGroup().getType() + " §7| §eTemplate: " + service.getGroup().getCurrentTemplate().getName());
+                        sender.sendMessage("INFO", "  §h> §bConnection: " + CloudDriver.getInstance().getAddress().getAddress().getHostAddress() + ":" + service.getPort() + " §7| §eReceiver: " + service.getGroup().getReceiver());
+                        sender.sendMessage("INFO", "  §h> §bType: " + service.getGroup().getEnvironment() + " §7| §eTemplate: " + service.getGroup().getCurrentTemplate().getName());
                         sender.sendMessage("INFO", "  §h> §bHost: " + service.getHost() + " §7| §ePlayers: " + service.getPlayers().size() + "/" + service.getGroup().getMaxPlayers());
                         sender.sendMessage("INFO", "  §h> §bMemory: " + (service.isAuthenticated() ? service.getMemoryUsage().setTimeOut(30, -1L).pullValue() : "-1") + "/" + service.getGroup().getMemory() + " §7| §eTPS: " + (service.isAuthenticated() ? service.getTPS().setTimeOut(30, "§c???").pullValue() : "§c???"));
                         sender.sendMessage("INFO", "  §h> §bLoaded Plugins: " + (service.isAuthenticated() ? service.getPlugins().length : -1));
@@ -76,18 +81,18 @@ public class InfoCommand implements TabCompletable {
                     sender.sendMessage("INFO", "§7----------------------------------");
                     return;
                 case "groups":
-                    GroupService instance = CloudDriver.getInstance().getInstance(GroupService.class);
-                    if (instance.getGroups().isEmpty()) {
+                    IGroupManager groupManager = CloudDriver.getInstance().getGroupManager();
+                    if (groupManager.getCachedObjects().isEmpty()) {
                         sender.sendMessage("ERROR", "§cSadly, there are no groups yet :(");
                         return;
                     }
                     sender.sendMessage("INFO", "§7----------------------------------");
-                    for (IServiceGroup serviceGroup : new LinkedList<>(instance.getGroups())) {
+                    for (IServiceGroup serviceGroup : new LinkedList<>(groupManager.getCachedObjects())) {
 
                         int max = serviceGroup.getServices().size() * serviceGroup.getMaxPlayers();
 
                         sender.sendMessage("INFO", "§h> §b" + serviceGroup.getName() + " §h[§f" + serviceGroup.getUniqueId() + "§h] §h:");
-                        sender.sendMessage("INFO", "  §h> §bType: " + serviceGroup.getType() + " §7| §eReceiver: " + serviceGroup.getReceiver());
+                        sender.sendMessage("INFO", "  §h> §bType: " + serviceGroup.getEnvironment() + " §7| §eReceiver: " + serviceGroup.getReceiver());
                         sender.sendMessage("INFO", "  §h> §bPlayers: " + serviceGroup.getPlayers().size() + "/" + max + " §7| §eTemplate: " + serviceGroup.getCurrentTemplate().getName());
                         sender.sendMessage("INFO", "  §h> §bMemory: " + serviceGroup.getMemory());
                         sender.sendMessage("INFO", "  §h> §bMinServer: " + serviceGroup.getMinServer() + " §7| §eMaxServer: " + serviceGroup.getMaxServer());
@@ -121,8 +126,8 @@ public class InfoCommand implements TabCompletable {
             sender.sendMessage("INFO", "§7----------------------------------");
             sender.sendMessage("INFO", "§h> §a" + cachedObject.getName() + " §h[§d" + cachedObject.getUniqueId() + " §7| §6Authenticated: " + (cachedObject.isAuthenticated() ? "§aYes" : "§cNo") + "§h] §h:");
             sender.sendMessage("INFO", "  §h> §bID: #" + cachedObject.getId() + " §7| §eState: §f" + cachedObject.getState().getColor() + cachedObject.getState().name());
-            sender.sendMessage("INFO", "  §h> §bConnection: " + CloudDriver.getInstance().getCloudAddress().getAddress().getHostAddress() + ":" + cachedObject.getPort() + " §7| §eReceiver: " + cachedObject.getGroup().getReceiver());
-            sender.sendMessage("INFO", "  §h> §bType: " + cachedObject.getGroup().getType() + " §7| §eTemplate: " + cachedObject.getGroup().getCurrentTemplate().getName());
+            sender.sendMessage("INFO", "  §h> §bConnection: " + CloudDriver.getInstance().getAddress().getAddress().getHostAddress() + ":" + cachedObject.getPort() + " §7| §eReceiver: " + cachedObject.getGroup().getReceiver());
+            sender.sendMessage("INFO", "  §h> §bType: " + cachedObject.getGroup().getEnvironment() + " §7| §eTemplate: " + cachedObject.getGroup().getCurrentTemplate().getName());
             sender.sendMessage("INFO", "  §h> §bHost: " + cachedObject.getHost() + " §7| §ePlayers: " + cachedObject.getPlayers().size() + "/" + cachedObject.getGroup().getMaxPlayers());
             sender.sendMessage("INFO", "  §h> §bMemory: " + (cachedObject.isAuthenticated() ? cachedObject.getMemoryUsage().pullValue() : "-1") + "/" + cachedObject.getGroup().getMemory() + " §7| §eTPS: " + (cachedObject.isAuthenticated() ? cachedObject.getTPS().pullValue() : "§c???"));
             sender.sendMessage("INFO", "  §h> §bLoaded Plugins: " + (cachedObject.isAuthenticated() ? cachedObject.getPlugins().length : -1));

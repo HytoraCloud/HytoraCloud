@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.global.setups;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.setup.SetupExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.global.setup.QuestionSkip;
-import de.lystx.hytoracloud.driver.cloudservices.global.setup.Setup;
-import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
+import de.lystx.hytoracloud.driver.setup.SetupExecutor;
+import de.lystx.hytoracloud.driver.setup.QuestionSkip;
+import de.lystx.hytoracloud.driver.setup.Setup;
+import de.lystx.hytoracloud.driver.utils.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.utils.enums.versions.SpigotVersion;
 import lombok.Getter;
 
 @Getter

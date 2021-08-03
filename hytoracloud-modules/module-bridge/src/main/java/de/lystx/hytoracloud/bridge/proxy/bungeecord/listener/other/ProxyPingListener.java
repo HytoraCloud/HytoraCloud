@@ -5,13 +5,13 @@ import java.util.UUID;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.commons.enums.versions.MinecraftProtocol;
-import de.lystx.hytoracloud.driver.commons.events.network.DriverEventNetworkPing;
-import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.Motd;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.commons.wrapped.PlayerConnectionObject;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.utils.enums.versions.MinecraftProtocol;
+import de.lystx.hytoracloud.driver.event.events.network.DriverEventNetworkPing;
+import de.lystx.hytoracloud.driver.utils.interfaces.PlaceHolder;
+import de.lystx.hytoracloud.driver.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.wrapped.PlayerConnectionObject;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
@@ -37,9 +37,9 @@ public class ProxyPingListener implements Listener {
             int port = CloudDriver.getInstance().getServiceManager().getThisService().getPort();
 
 
-            NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
+            NetworkConfig networkConfig = CloudDriver.getInstance().getConfigManager().getNetworkConfig();
 
-            ProxyConfig proxyConfig = CloudDriver.getInstance().getProxyConfig();
+            ProxyConfig proxyConfig = CloudDriver.getInstance().getConfigManager().getProxyConfig();
 
             if (!proxyConfig.isEnabled()) {
                 return;
@@ -60,7 +60,7 @@ public class ProxyPingListener implements Listener {
                         event.getConnection().isLegacy()
                 );
 
-                CloudDriver.getInstance().callEvent(new DriverEventNetworkPing(connectionObject));
+                CloudDriver.getInstance().getEventManager().callEvent(new DriverEventNetworkPing(connectionObject));
 
             }
             if (motd.getVersionString() != null && !motd.getVersionString().trim().isEmpty()) {

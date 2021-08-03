@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit;
 
-import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
+import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command.ServiceCommand;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command.StopCommand;
@@ -11,28 +11,28 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler.*;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerChatListener;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerJoinListener;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener.PlayerQuitListener;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.minecraft.MinecraftInfo;
-import de.lystx.hytoracloud.driver.commons.minecraft.chat.ChatComponent;
-import de.lystx.hytoracloud.driver.commons.minecraft.entity.MinecraftEntity;
-import de.lystx.hytoracloud.driver.commons.minecraft.entity.MinecraftPlayer;
-import de.lystx.hytoracloud.driver.commons.minecraft.plugin.PluginInfo;
-import de.lystx.hytoracloud.driver.commons.minecraft.world.*;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInStopServer;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.NetworkInfo;
-import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.utils.Reflections;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.service.minecraft.MinecraftInfo;
+import de.lystx.hytoracloud.driver.service.minecraft.chat.ChatComponent;
+import de.lystx.hytoracloud.driver.service.minecraft.entity.MinecraftEntity;
+import de.lystx.hytoracloud.driver.service.minecraft.entity.MinecraftPlayer;
+import de.lystx.hytoracloud.driver.service.minecraft.plugin.PluginInfo;
+import de.lystx.hytoracloud.driver.service.minecraft.world.*;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStopServer;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.service.minecraft.other.NetworkInfo;
+import de.lystx.hytoracloud.driver.utils.other.CloudMap;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.utils.other.Reflections;
 import lombok.SneakyThrows;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
+import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.*;
@@ -91,6 +91,13 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
 
         this.bootstrap();
 
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
+
+            System.out.println("----------");
+            for (IService service : CloudDriver.getInstance().getServiceManager()) {
+                System.out.println(service.getName());
+            }
+        }, 20L, 20L);
     }
 
 
@@ -133,7 +140,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
      * The next step it starts the stopping timer
      * And last it manages the Bukkit stuff like
      * registering {@link Listener}s, {@link org.bukkit.command.Command}s and
-     * CloudCommands with the {@link Command} Annotation
+     * CloudCommands with the {@link CommandInfo} Annotation
      * (+ it registers the listeners to fire the  )
      */
     @Override
@@ -150,8 +157,8 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
         // Registering commands
-        CloudDriver.getInstance().registerCommand(new ServiceCommand());
-        CloudDriver.getInstance().registerCommand(new StopCommand());
+        CloudDriver.getInstance().getCommandManager().registerCommand(new ServiceCommand());
+        CloudDriver.getInstance().getCommandManager().registerCommand(new StopCommand());
 
         //Start checking for players or stop server
         CloudDriver.getInstance().executeIf(this::startStopTimer, () -> CloudDriver.getInstance().getServiceManager().getThisService() != null);
@@ -350,6 +357,17 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     }
 
     @Override
+    public void sendMessage(UUID uniqueId, ChatComponent message) {
+
+        Player player = Bukkit.getPlayer(uniqueId);
+
+        if (player == null) {
+            return;
+        }
+        player.sendMessage(message.toString());
+    }
+
+    @Override
     public Map<String, Object> loadExtras() {
         return new CloudMap<String, Object>().append("info", requestMinecraft());
     }
@@ -401,8 +419,8 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     }
 
     @Override
-    public ServiceType type() {
-        return ServiceType.SPIGOT;
+    public ServerEnvironment type() {
+        return ServerEnvironment.SPIGOT;
     }
 
     @Override
@@ -412,7 +430,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
             CloudDriver.getInstance().getScheduler().cancelTask(this.taskId);
         }
 
-        String msg = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getBukkitShutdown().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix());
+        String msg = CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getBukkitShutdown().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix());
 
         //Already no one online anymore
         if (Bukkit.getOnlinePlayers().size() <= 0) {

@@ -1,17 +1,17 @@
 package de.lystx.hytoracloud.cloud.handler.managing;
 
-import de.lystx.hytoracloud.cloud.impl.manager.NPCService;
+import de.lystx.hytoracloud.cloud.manager.other.NPCService;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
+import de.lystx.hytoracloud.driver.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInNPCCreate;
 
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCDelete;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInNPCDelete;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 @AllArgsConstructor @Getter
 public class CloudHandlerNPC implements PacketHandler {
@@ -20,7 +20,7 @@ public class CloudHandlerNPC implements PacketHandler {
 
     @SneakyThrows
     public void handle(Packet packet) {
-        NPCService npcService = this.cloudDriver.getInstance(NPCService.class);
+        NPCService npcService = CloudDriver.getInstance().getServiceRegistry().getInstance(NPCService.class);
         if (packet instanceof PacketInNPCCreate) {
 
             PacketInNPCCreate packetInNPCCreate = (PacketInNPCCreate)packet;

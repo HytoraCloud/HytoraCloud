@@ -1,13 +1,15 @@
 package de.lystx.hytoracloud.receiver.impl.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.main.CloudServiceType;
-import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudServiceInfo;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.commons.wrapped.ReceiverObject;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.config.IConfigManager;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.config.impl.proxy.ProxyConfig;
+import de.lystx.hytoracloud.driver.registry.ICloudService;
+import de.lystx.hytoracloud.driver.registry.CloudServiceInfo;
+import de.lystx.hytoracloud.driver.config.FileService;
+import de.lystx.hytoracloud.driver.wrapped.ReceiverObject;
+import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -16,25 +18,38 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.UUID;
 
-@ICloudServiceInfo(
+@CloudServiceInfo(
         name = "Receiver-ConfigService",
-        type = CloudServiceType.CONFIG,
         description = "Used to store the receiver data",
         version = 1.0
 )
 @Getter @Setter
-public class ConfigService implements ICloudService {
+public class ConfigService implements ICloudService, IConfigManager {
 
     private final File configFile;
+
+    private NetworkConfig networkConfig;
 
     private IReceiver receiver;
 
     public ConfigService() {
-        this.configFile = CloudDriver.getInstance().getInstance(FileService.class).getConfigFile();
+        CloudDriver.getInstance().getServiceRegistry().registerService(this);
+
+        this.configFile = CloudDriver.getInstance().getServiceRegistry().getInstance(FileService.class).getConfigFile();
         this.receiver = null;
         this.reload();
     }
 
+
+    @Override
+    public ProxyConfig getProxyConfig() {
+        return null;
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
 
     @SneakyThrows
     @Override
@@ -51,6 +66,11 @@ public class ConfigService implements ICloudService {
         }
 
         this.receiver = new ReceiverObject(json.getString("host"), json.getInteger("port"), json.getString("name"), UUID.fromString(json.getString("uniqueId")), json.getLong("memory"), false, InetAddress.getLocalHost());
+    }
+
+    @Override
+    public JsonDocument getJson() {
+        return new JsonDocument(this.configFile);
     }
 
     @Override

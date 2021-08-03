@@ -1,19 +1,21 @@
 package de.lystx.hytoracloud.global.commands;
 
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
 import de.lystx.hytoracloud.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
 import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
-public class ReloadCommand {
+@CommandInfo(name = "reload", description = "Reloads the network", aliases = {"rl"})
+public class ReloadCommand implements CommandListener {
     
     private final CloudProcess cloudInstance;
 
-    @Command(name = "reload", description = "Reloads the network", aliases = {"rl"})
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
 

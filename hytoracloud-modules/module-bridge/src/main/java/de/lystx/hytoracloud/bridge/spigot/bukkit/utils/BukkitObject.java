@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.bridge.IBukkit;
-import de.lystx.hytoracloud.driver.commons.service.ServiceInfo;
+import de.lystx.hytoracloud.driver.service.util.IBukkit;
+import de.lystx.hytoracloud.driver.service.ServiceInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;

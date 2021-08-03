@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.utils.Reflections;
+import de.lystx.hytoracloud.driver.utils.other.Reflections;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.server.v1_8_R3.*;

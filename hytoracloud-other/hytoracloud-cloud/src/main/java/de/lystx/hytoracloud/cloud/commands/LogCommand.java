@@ -1,14 +1,13 @@
 package de.lystx.hytoracloud.cloud.commands;
 
 
+import de.lystx.hytoracloud.driver.service.screen.IScreen;
 import de.lystx.hytoracloud.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutput;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputService;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
 import lombok.AllArgsConstructor;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -22,11 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
-public class LogCommand implements TabCompletable {
+@CommandInfo(name = "log", description = "Logs a server or all")
+public class LogCommand implements CommandListenerTabComplete {
 
     private final CloudProcess cloudInstance;
 
-    @Command(name = "log", description = "Logs a server or all")
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 2) {
             String cloudType = args[1];
@@ -53,24 +53,28 @@ public class LogCommand implements TabCompletable {
             }
             try {
                 String realLink = this.post(finalText, cloudType,false, file);
-                if (cloudType.equalsIgnoreCase("file")) {
-                    Desktop.getDesktop().open(file);
+                if (System.getProperty("os.name").contains("Windows")) {
+                    if (cloudType.equalsIgnoreCase("file")) {
+                        Desktop.getDesktop().open(file);
+                    } else {
+                        Desktop.getDesktop().browse(new URI(realLink));
+                    }
+                    sender.sendMessage("INFO", "§2Opening §aLog....");
                 } else {
-                    Desktop.getDesktop().browse(new URI(realLink));
+
+                    sender.sendMessage("INFO", "§7Log was uploaded to §b" + realLink);
                 }
-                sender.sendMessage("INFO", "§2Opening §aLog....");
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         } else {
             sender.sendMessage("ERROR", "§clog <all/serverName> <file/web>");
-            sender.sendMessage("INFO", "§cWebsite logging only works on Windows as you can not copy anything from command on linux!");
         }
     }
 
     public String getLog(IService IService, CloudDriver cloudDriver) {
 
-        ServiceOutput screen = cloudDriver.getInstance(ServiceOutputService.class).getMap().get(IService.getName());
+        IScreen screen = CloudDriver.getInstance().getScreenManager().getOrRequest(IService.getName());
         if (screen == null) {
             return null;
         }

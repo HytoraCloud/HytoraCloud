@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.cloud.handler.other;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketReloadService;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReloadService;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReload;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 @AllArgsConstructor @Getter
 public class CloudHandlerReload implements PacketHandler {

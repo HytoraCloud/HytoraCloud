@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.global.setups;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.setup.SetupExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.global.setup.Setup;
+import de.lystx.hytoracloud.driver.setup.SetupExecutor;
+import de.lystx.hytoracloud.driver.setup.Setup;
 import lombok.Getter;
 
 @Getter
@@ -27,13 +27,11 @@ public class InstanceChooser extends SetupExecutor<InstanceChooser> {
             question = "Do you want to start the Cloud or the Receiver?",
             message = {
                     "Setup%%§f[§b1§f] §eCloudSystem",
-                    "Setup%%§f[§b2§f] §6Receiver",
-                    "Setup%%§f[§b3§f] §aManager"
+                    "Setup%%§f[§b2§f] §6Receiver"
             },
             onlyAnswers = {
                     "1",
-                    "2",
-                    "3"
+                    "2"
             }
             )
     private String instance;

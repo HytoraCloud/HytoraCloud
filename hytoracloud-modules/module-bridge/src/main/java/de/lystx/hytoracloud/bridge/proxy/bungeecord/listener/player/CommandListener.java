@@ -2,10 +2,9 @@ package de.lystx.hytoracloud.bridge.proxy.bungeecord.listener.player;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.CommandInfo;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.command.execution.ICommand;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.TabCompleteEvent;
@@ -35,9 +34,6 @@ public class CommandListener implements Listener {
     public void handleTab(TabCompleteEvent event) {
 
 
-        CommandService commandService = CloudDriver.getInstance().getInstance(CommandService.class);
-
-
         try {
             String cmd = event.getCursor().split(" ")[0].substring(1);
             String[] split = event.getCursor().split(cmd + " ");
@@ -52,14 +48,15 @@ public class CommandListener implements Listener {
                 args = new String[0];
             }
 
-            CommandInfo commandInfo = CloudDriver.getInstance().getInstance(CommandService.class).getCommand(cmd);
-            if (commandInfo == null) {
+            ICommand command = CloudDriver.getInstance().getCommandManager().getCommand(cmd);
+            if (command == null) {
                 return;
             }
 
-            Object object = CloudDriver.getInstance().getInstance(CommandService.class).getInvokers().get(cmd);
-            if (object instanceof TabCompletable) {
-                List<String> list = new ArrayList<>(((TabCompletable) object).onTabComplete(CloudDriver.getInstance(), args));
+            de.lystx.hytoracloud.driver.command.execution.CommandListener listener = CloudDriver.getInstance().getCommandManager().getListener(cmd);
+            if (listener instanceof CommandListenerTabComplete) {
+                CommandListenerTabComplete tabComplete = (CommandListenerTabComplete)listener;
+                List<String> list = new ArrayList<>(tabComplete.onTabComplete(CloudDriver.getInstance(), args));
                 event.getSuggestions().addAll(list);
             }
 

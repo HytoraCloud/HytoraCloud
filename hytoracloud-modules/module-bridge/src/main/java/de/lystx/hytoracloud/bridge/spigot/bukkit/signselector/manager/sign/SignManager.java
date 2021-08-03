@@ -2,10 +2,9 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.sign;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.SignConfiguration;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.ServicePing;
-import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.serverselector.sign.CloudSign;
+import de.lystx.hytoracloud.driver.serverselector.sign.SignConfiguration;
+import de.lystx.hytoracloud.driver.service.minecraft.other.ServicePing;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,7 +52,7 @@ public class SignManager {
             }
             new Thread(this.signUpdater, "signThread").start();
         } catch (NullPointerException e) {
-            Scheduler.getInstance().scheduleDelayedTask(this::run, 5L);
+            CloudDriver.getInstance().getScheduler().scheduleDelayedTask(this::run, 5L);
         }
     }
 }

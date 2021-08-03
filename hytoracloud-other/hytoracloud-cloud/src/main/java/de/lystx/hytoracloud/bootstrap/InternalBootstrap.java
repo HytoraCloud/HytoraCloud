@@ -3,9 +3,8 @@ package de.lystx.hytoracloud.bootstrap;
 import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.global.CloudProcess;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.global.manager.Manager;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
 import de.lystx.hytoracloud.receiver.Receiver;
 
 import java.io.File;
@@ -32,10 +31,7 @@ public class InternalBootstrap {
             e.printStackTrace();
         }
         for (String arg : args) {
-            if (arg.equalsIgnoreCase("--process=MANAGER")) {
-                Manager manager = new Manager();
-                return;
-            } else if (arg.equalsIgnoreCase("--process=CLOUD")) {
+            if (arg.equalsIgnoreCase("--process=CLOUD")) {
                 CloudSystem cloudSystem = new CloudSystem();
                 return;
             } else if (arg.equalsIgnoreCase("--process=RECEIVER")) {

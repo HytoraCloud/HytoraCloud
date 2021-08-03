@@ -2,13 +2,13 @@ package de.lystx.hytoracloud.cloud.handler.group;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCreateTemplate;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInCreateTemplate;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
+import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideGroupManager;
 import lombok.AllArgsConstructor;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 @AllArgsConstructor
 public class CloudHandlerTemplateCopy implements PacketHandler {
@@ -20,7 +20,7 @@ public class CloudHandlerTemplateCopy implements PacketHandler {
         if (packet instanceof PacketInCreateTemplate) {
             PacketInCreateTemplate packetInCreateTemplate = (PacketInCreateTemplate)packet;
             IServiceGroup group = packetInCreateTemplate.getIServiceGroup();
-            IServiceGroup get = this.cloudSystem.getInstance(GroupService.class).getGroup(group.getName());
+            IServiceGroup get = CloudDriver.getInstance().getServiceRegistry().getInstance(CloudSideGroupManager.class).getCachedObject(group.getName());
             if (get == null) {
                 return;
             }

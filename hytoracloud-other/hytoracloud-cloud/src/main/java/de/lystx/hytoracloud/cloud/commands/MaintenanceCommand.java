@@ -1,23 +1,23 @@
 package de.lystx.hytoracloud.cloud.commands;
 
 
-import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
+import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideConfigManager;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
 
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class MaintenanceCommand implements TabCompletable {
+@CommandInfo(name = "maintenance", description = "Manages maintenance of network", aliases = "mc")
+public class MaintenanceCommand implements CommandListenerTabComplete {
 
-    @Command(name = "maintenance", description = "Manages maintenance of network", aliases = "mc")
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
-        NetworkConfig config = CloudSystem.getInstance().getInstance(ConfigService.class).getNetworkConfig();
+        NetworkConfig config = CloudDriver.getInstance().getConfigManager().getNetworkConfig();
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("switch")) {
                 if (!config.isMaintenance()) {
@@ -27,7 +27,7 @@ public class MaintenanceCommand implements TabCompletable {
                     config.setMaintenance(false);
                     sender.sendMessage("INFO", "§9The network is no longer in §cmaintenance§9!");
                 }
-                CloudDriver.getInstance().getNetworkConfig().update();
+                CloudDriver.getInstance().getConfigManager().getNetworkConfig().update();
                 CloudDriver.getInstance().reload();
             } else if (args[0].equalsIgnoreCase("list")) {
                 sender.sendMessage("INFO", "§bWhitelisted Players§7:");
@@ -50,7 +50,7 @@ public class MaintenanceCommand implements TabCompletable {
                 }
                 whitelist.add(user);
                 config.setWhitelistedPlayers(whitelist);
-                CloudDriver.getInstance().getNetworkConfig().update();
+                CloudDriver.getInstance().getConfigManager().getNetworkConfig().update();
                 CloudDriver.getInstance().reload();
                 sender.sendMessage("COMMAND", "§7The player §a" + user + " §7was added to maintenance§8!");
             } else if (identifier.equalsIgnoreCase("remove")) {
@@ -60,7 +60,7 @@ public class MaintenanceCommand implements TabCompletable {
                 }
                 whitelist.remove(user);
                 config.setWhitelistedPlayers(whitelist);
-                CloudDriver.getInstance().getNetworkConfig().update();
+                CloudDriver.getInstance().getConfigManager().getNetworkConfig().update();
                 CloudDriver.getInstance().reload();
                 sender.sendMessage("COMMAND", "§7The player §a" + user + " §7was removed to maintenance§8!");
             } else {
@@ -87,7 +87,7 @@ public class MaintenanceCommand implements TabCompletable {
             list.add("remove");
             list.add("switch");
         } else if (args.length == 3 && args[1].equalsIgnoreCase("remove")) {
-            list.addAll(cloudDriver.getInstance(ConfigService.class).getNetworkConfig().getWhitelistedPlayers());
+            list.addAll(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getWhitelistedPlayers());
         }
         return list;
     }

@@ -5,7 +5,7 @@ import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.lystx.hytoracloud.bridge.proxy.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 import net.kyori.adventure.text.Component;
 
 public class ServerConnectListener {
@@ -19,7 +19,7 @@ public class ServerConnectListener {
             if (player.hasPermission("cloudsystem.group.maintenance")) {
                 event.setResult(ServerPreConnectEvent.ServerResult.allowed(VelocityBridge.getInstance().getServer().getServer(servername).get()));
             } else {
-                String message = CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", IServiceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
+                String message = CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%group%", IServiceGroup.getName()).replace("%prefix%", CloudDriver.getInstance().getPrefix());
                 player.sendMessage(Component.text(message));
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
             }

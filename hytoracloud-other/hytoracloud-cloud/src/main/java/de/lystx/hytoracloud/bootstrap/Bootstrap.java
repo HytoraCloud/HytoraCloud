@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.bootstrap;
 
-import de.lystx.hytoracloud.driver.commons.interfaces.DriverInfo;
+import de.lystx.hytoracloud.driver.DriverInfo;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
 import java.util.Arrays;

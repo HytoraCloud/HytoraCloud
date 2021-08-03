@@ -2,16 +2,15 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc;
 
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.NPC;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
-import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
+import de.lystx.hytoracloud.driver.serverselector.npc.NPCConfig;
+import de.lystx.hytoracloud.driver.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.utils.other.CloudMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

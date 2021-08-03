@@ -17,7 +17,7 @@ HytoraCloud is a server-management system used, to manage all your servers for y
 - [X] Auto-Starting servers
 - [X] Multi-Proxy available
 - [X] Toggle Server- start and stop messages (for yourself)
-- [X] Spigot installation command with a backup of old versions
+- [X] Spigot installation commandInfo with a backup of old versions
 - [X] Small Module System (not that many features at the moment)
 - [X] Screen System (Output of services)
 - [X] Big CloudAPI and easy to understand (Documentation on Discord)

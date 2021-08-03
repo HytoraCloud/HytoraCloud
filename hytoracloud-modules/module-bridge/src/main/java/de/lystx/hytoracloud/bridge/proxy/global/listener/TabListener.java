@@ -2,14 +2,14 @@ package de.lystx.hytoracloud.bridge.proxy.global.listener;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.TabList;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.handling.IListener;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.handling.EventHandler;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.commons.events.network.DriverEventReload;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerJoin;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerQuit;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerServerChange;
+import de.lystx.hytoracloud.driver.config.impl.proxy.TabList;
+import de.lystx.hytoracloud.driver.event.handle.IListener;
+import de.lystx.hytoracloud.driver.event.handle.EventHandler;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.event.events.network.DriverEventReload;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerJoin;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerQuit;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerServerChange;
 
 public class TabListener implements IListener {
 
@@ -74,7 +74,7 @@ public class TabListener implements IListener {
 
         return input
                 .replace("&", "§")
-                .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getNetworkConfig().getMaxPlayers()))
+                .replace("%max_players%", String.valueOf(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMaxPlayers()))
                 .replace("%online_players%", String.valueOf(CloudDriver.getInstance().getPlayerManager().getCachedObjects().size()))
                 .replace("%id%", id)
                 .replace("%group%", group)

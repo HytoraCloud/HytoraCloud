@@ -1,12 +1,12 @@
 package de.lystx.hytoracloud.bridge.global.manager;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.OfflinePlayer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverQuery;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;

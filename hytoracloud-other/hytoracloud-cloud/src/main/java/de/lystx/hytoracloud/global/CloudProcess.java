@@ -4,23 +4,19 @@ import de.lystx.hytoracloud.global.commands.ClearCommand;
 import de.lystx.hytoracloud.global.commands.HelpCommand;
 import de.lystx.hytoracloud.global.commands.ReloadCommand;
 import de.lystx.hytoracloud.global.commands.ShutdownCommand;
-import de.lystx.hytoracloud.global.manager.Manager;
+
 import lombok.Setter;
 import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.interfaces.DriverParent;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.driver.cloudservices.global.AuthManager;
+import de.lystx.hytoracloud.driver.utils.interfaces.DriverParent;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
+import de.lystx.hytoracloud.driver.utils.other.KeyAuth;
 import de.lystx.hytoracloud.global.setups.InstanceChooser;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.logger.LoggerService;
-import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.output.ServiceOutputPrinter;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.log.LogService;
+import de.lystx.hytoracloud.cloud.console.CloudConsole;
+import de.lystx.hytoracloud.driver.console.logger.LoggerService;
+import de.lystx.hytoracloud.driver.console.logger.LogService;
 import de.lystx.hytoracloud.global.webserver.WebServer;
-import de.lystx.hytoracloud.launcher.global.commands.*;
 import de.lystx.hytoracloud.receiver.Receiver;
 import lombok.Getter;
 
@@ -38,12 +34,12 @@ public class CloudProcess extends CloudDriver implements DriverParent {
     /**
      * The console
      */
-    protected Console console;
+    protected CloudConsole console;
 
     /**
      * The authmanager for keys
      */
-    protected AuthManager authManager;
+    protected KeyAuth keyAuth;
 
 
     public CloudProcess(CloudType cloudType) {
@@ -57,8 +53,8 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         CloudDriver.getInstance().getServiceRegistry().registerService(new LogService());
 
         //The console
-        this.console = new Console(this.getInstance(LoggerService.class), this.getInstance(CommandService.class), System.getProperty("user.name"));
-        this.authManager = new AuthManager(new File("auth.json"));
+        this.console = new CloudConsole(this.getServiceRegistry().getInstance(LoggerService.class), this.getCommandManager(), System.getProperty("user.name"));
+        this.keyAuth = new KeyAuth(new File("auth.json"));
 
         //CHoosing instance
         if (cloudType == CloudType.NONE) {
@@ -72,21 +68,18 @@ public class CloudProcess extends CloudDriver implements DriverParent {
                 if (instanceChooser.getInstance().equalsIgnoreCase("3")) {
                     console.getLogger().sendMessage("INFO", "§7Starting §aManager§7....");
                 } else {
-                    console.getLogger().sendMessage("INFO", "§7Starting §b" + (instanceChooser.getInstance().equalsIgnoreCase("2") ? "Receiver" : "CloudSystem") + " §7version §a" + CloudDriver.getInstance().getVersion() + " §7by §bLystx§h...");
+                    console.getLogger().sendMessage("INFO", "§7Starting §b" + (instanceChooser.getInstance().equalsIgnoreCase("2") ? "Receiver" : "CloudSystem") + " §7version §a" + CloudDriver.getInstance().getInfo().version() + " §7by §bLystx§h...");
                 }
-                Scheduler.getInstance().scheduleDelayedTask(Utils::clearConsole, 10L);
+                CloudDriver.getInstance().getScheduler().scheduleDelayedTask(Utils::clearConsole, 10L);
 
                 console.stop();
                 console.interrupt();
 
-                Scheduler.getInstance().scheduleDelayedTask(() -> {
+                CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
                     this.console.getCommandManager().setActive(true);
                     if (instanceChooser.getInstance().equalsIgnoreCase("2")) {
                         Receiver receiver = new Receiver();
                         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "parent", receiver);
-                    } else if (instanceChooser.getInstance().equalsIgnoreCase("3")) {
-                        Manager manager = new Manager();
-                        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "parent", manager);
                     } else {
                         CloudSystem cloudSystem = new CloudSystem();
                         Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "parent", cloudSystem);
@@ -96,20 +89,15 @@ public class CloudProcess extends CloudDriver implements DriverParent {
         }
 
         //Registering commands for every instance
-        this.getInstance(CommandService.class).registerCommand(new ShutdownCommand(this));
-        this.getInstance(CommandService.class).registerCommand(new HelpCommand(this));
-        this.getInstance(CommandService.class).registerCommand(new ReloadCommand(this));
-        this.getInstance(CommandService.class).registerCommand(new ClearCommand(this));
+        this.getCommandManager().registerCommand(new ShutdownCommand(this));
+        this.getCommandManager().registerCommand(new HelpCommand());
+        this.getCommandManager().registerCommand(new ReloadCommand(this));
+        this.getCommandManager().registerCommand(new ClearCommand(this));
 
     }
 
     public void bootstrap() {
 
-    }
-
-    @Override
-    public ServiceOutputPrinter getScreenPrinter() {
-        return new ServiceOutputPrinter();
     }
 
     /**

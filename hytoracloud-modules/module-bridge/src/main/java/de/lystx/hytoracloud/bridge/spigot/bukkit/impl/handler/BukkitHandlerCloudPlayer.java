@@ -3,12 +3,12 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.BukkitItem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Item;
-import de.lystx.hytoracloud.driver.commons.minecraft.world.MinecraftLocation;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.player.inventory.Item;
+import de.lystx.hytoracloud.driver.service.minecraft.world.MinecraftLocation;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatMessageType;

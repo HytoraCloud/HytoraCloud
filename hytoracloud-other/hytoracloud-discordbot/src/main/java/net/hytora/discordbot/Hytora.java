@@ -1,9 +1,9 @@
 package net.hytora.discordbot;
 
 
-import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -102,7 +102,7 @@ public class Hytora {
         this.discordButtons = new ArrayList<>();
 
         if (this.loadConfig() && this.loadJDA(new CommandListener(), new JoinListener(), new DiscordButtonListener(), new ConversationListener())) {
-            Scheduler.getInstance().scheduleDelayedTask(() -> {
+            CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
                 Utils.clearConsole();
                 this.logManager.log("\n  _    _       _                  \n" +
                         " | |  | |     | |                 \n" +
@@ -142,7 +142,7 @@ public class Hytora {
                                             EmbedBuilder embedBuilder = Hytora.getHytora().getLogManager().embedBuilder(Color.DARK_GRAY,"Shutdown", discordButtonAction.getUser(), "The HytoraCloud Bot", "Is shutting down in 1 Second...");
                                             message.editMessage(embedBuilder.build()
                                             ).queue(message1 -> {
-                                                Scheduler.getInstance().scheduleDelayedTask(() -> {
+                                                CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
                                                     message1.delete().queue(unused -> Hytora.getHytora().shutdown());
                                                 }, 20L);
                                             });
@@ -196,22 +196,26 @@ public class Hytora {
         //HEllo triggers
         this.conversationManager.registerAnswer(
                 "Hello",
-                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                0.70,
+                (s, user, message) -> s.replace("%user%", user.getAsMention()),
                 "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
         );
         this.conversationManager.registerAnswer(
                 "Hey",
-                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                0.70,
+                (s, user, message) -> s.replace("%user%", user.getAsMention()),
                 "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
         );
         this.conversationManager.registerAnswer(
                 "Hallo",
-                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                0.70,
+                (s, user, message) -> s.replace("%user%", user.getAsMention()),
                 "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
         );
         this.conversationManager.registerAnswer(
                 "Hi",
-                0.70, (s, user, message) -> s.replace("%user%", user.getAsMention()),
+                0.70,
+                (s, user, message) -> s.replace("%user%", user.getAsMention()),
                 "Hello %user%!", "Hey %user%! How was your day?", "Bonjour %user% you had a nice day?"
         );
 

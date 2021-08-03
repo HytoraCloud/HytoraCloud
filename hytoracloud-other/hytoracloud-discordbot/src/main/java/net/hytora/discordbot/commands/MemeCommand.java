@@ -1,7 +1,7 @@
 package net.hytora.discordbot.commands;
 
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.utils.StringCreator;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
+import de.lystx.hytoracloud.driver.utils.other.StringCreator;
 import jdk.nashorn.api.scripting.URLReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;

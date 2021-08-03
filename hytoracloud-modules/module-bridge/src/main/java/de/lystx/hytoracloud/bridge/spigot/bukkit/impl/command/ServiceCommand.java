@@ -3,23 +3,21 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command;
 import com.sun.management.OperatingSystemMXBean;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.NPC;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.ConsoleExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.sign.CloudSign;
-import de.lystx.hytoracloud.driver.commons.interfaces.RunTaskSynchronous;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignCreate;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInCloudSignDelete;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCCreate;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.service.ServiceInfo;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
+import de.lystx.hytoracloud.driver.command.executor.ConsoleExecutor;
+import de.lystx.hytoracloud.driver.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.serverselector.sign.CloudSign;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInCloudSignCreate;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInCloudSignDelete;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInNPCCreate;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -29,20 +27,20 @@ import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.util.*;
 
-@RunTaskSynchronous(false)
-public class ServiceCommand {
+@CommandInfo(
+        name = "service",
+        description = "Bukkit server command",
+        aliases = {
+                "hs",
+                "cloudServer",
+                "hytoraServer"
+        }
+)
+public class ServiceCommand implements CommandListener {
 
     private boolean executed = false;
 
-    @Command(
-            name = "service",
-            description = "Bukkit server command",
-            aliases = {
-                    "hs",
-                    "cloudServer",
-                    "hytoraServer"
-            }
-    )
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         if (sender instanceof ConsoleExecutor) {
             return;
@@ -70,7 +68,7 @@ public class ServiceCommand {
                         player.sendMessage("  §8» §bUUID §8┃ §7" + CloudDriver.getInstance().getServiceManager().getThisService().getUniqueId());
                         player.sendMessage("  §8» §bPort §8┃ §7" + CloudDriver.getInstance().getServiceManager().getThisService().getPort());
                         player.sendMessage("  §8» §bReceiver §8┃ §7" + CloudDriver.getInstance().getConnection().remoteAddress().toString());
-                        player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudDriver.getInstance().getCloudAddress());
+                        player.sendMessage("  §8» §bConnected to §8┃ §7" + CloudDriver.getInstance().getAddress());
                         player.sendMessage("  §8» §bTemplate §8┃ §7" + CloudDriver.getInstance().getServiceManager().getThisService().getGroup().getCurrentTemplate().getName());
                         player.sendMessage("  §8» §bMemory §8┃ §7" + used + "§7/§7" + max + "MB");
                         player.sendMessage("  §8» §bInternal CPU Usage §8┃ §7" + format);
@@ -146,7 +144,7 @@ public class ServiceCommand {
 
 
                         if (group != null) {
-                            if (group.getType() == ServiceType.PROXY) {
+                            if (group.getEnvironment() == ServerEnvironment.PROXY) {
                                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cYou can not create §eCloudSigns §cfor §eProxyGroups§c!");
                                 return;
                             }

@@ -1,29 +1,29 @@
 package de.lystx.hytoracloud.global.commands;
 
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.enums.versions.ProxyVersion;
-import de.lystx.hytoracloud.driver.commons.enums.versions.SpigotVersion;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.Console;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.driver.utils.enums.versions.ProxyVersion;
+import de.lystx.hytoracloud.driver.utils.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.config.FileService;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
 import de.lystx.hytoracloud.global.setups.VersionDownload;
 import java.io.File;
 
-public class DownloadCommand {
+@CommandInfo(
+        name = "download",
+        description = "Manages spigot versions",
+        aliases = {
+                "spigot",
+                "bukkit",
+                "install"
+        }
+)
+public class DownloadCommand implements CommandListener {
 
-
-    @Command(
-            name = "download",
-            description = "Manages spigot versions",
-            aliases = {
-                    "spigot",
-                    "bukkit",
-                    "install"
-            }
-    )
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         new VersionDownload().start(download -> {
 
@@ -31,10 +31,10 @@ public class DownloadCommand {
                 return;
             }
 
-            ServiceType type;
+            ServerEnvironment type;
 
             try {
-                type = ServiceType.valueOf(download.getType());
+                type = ServerEnvironment.valueOf(download.getType());
             } catch (IllegalArgumentException e) {
                 type = null;
             }
@@ -44,19 +44,18 @@ public class DownloadCommand {
                 return;
             }
 
-            Console cloudConsole = (Console)sender;
             File versionsFile;
 
-            if (type.isProxy()) {
+            if (type == ServerEnvironment.PROXY) {
                 ProxyVersion proxyVersion = ProxyVersion.valueOf(download.getProxyVersion());
 
-                versionsFile = new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), proxyVersion.getJarName());
+                versionsFile = new File(CloudDriver.getInstance().getServiceRegistry().getInstance(FileService.class).getVersionsDirectory(), proxyVersion.getJarName());
 
                 Utils.download(proxyVersion.getUrl(), versionsFile, "Downloading " + proxyVersion.name());
             } else {
                 SpigotVersion spigotVersion = SpigotVersion.valueOf(download.getSpigotVersion());
 
-                versionsFile = new File(CloudDriver.getInstance().getInstance(FileService.class).getVersionsDirectory(), spigotVersion.getJarName());
+                versionsFile = new File(CloudDriver.getInstance().getServiceRegistry().getInstance(FileService.class).getVersionsDirectory(), spigotVersion.getJarName());
 
                 Utils.download(spigotVersion.getUrl(), versionsFile, "Downloading " + spigotVersion.name());
             }

@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.bridge.global.handler;
 
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketUpdateNetworkConfig;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.commons.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketUpdateNetworkConfig;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutRegisterServer;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
@@ -13,14 +13,16 @@ import lombok.SneakyThrows;
 public class BridgeHandlerConfig implements PacketHandler {
 
 
-    
     @SneakyThrows
     public void handle(Packet packet) {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo packetOutGlobalInfo = ((PacketOutGlobalInfo) packet);
 
             //Config
-            CloudDriver.getInstance().setNetworkConfig(packetOutGlobalInfo.getNetworkConfig());
+            CloudDriver.getInstance().getConfigManager().setNetworkConfig(packetOutGlobalInfo.getNetworkConfig());
+
+            //Groups
+            CloudDriver.getInstance().getGroupManager().setCachedObjects(packetOutGlobalInfo.getGroups());
 
             //Service
             CloudDriver.getInstance().getServiceManager().setCachedObjects(packetOutGlobalInfo.getServices());
@@ -40,7 +42,7 @@ public class BridgeHandlerConfig implements PacketHandler {
         } else if (packet instanceof PacketUpdateNetworkConfig) {
 
             PacketUpdateNetworkConfig packetUpdateNetworkConfig = (PacketUpdateNetworkConfig)packet;
-            CloudDriver.getInstance().setNetworkConfig(packetUpdateNetworkConfig.getNetworkConfig());
+            CloudDriver.getInstance().getConfigManager().setNetworkConfig(packetUpdateNetworkConfig.getNetworkConfig());
         }
     }
 

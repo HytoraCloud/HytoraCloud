@@ -1,17 +1,19 @@
 package de.lystx.modules.smart.commands;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
 import de.lystx.modules.smart.SmartProxy;
 
-public class SmartProxyCommand {
+@CommandInfo(
+        name = "smartproxy",
+        description = "Manages this module",
+        aliases = {"proxy", "sp"}
+)
+public class SmartProxyCommand implements CommandListener {
 
-    @Command(
-            name = "smartproxy",
-            description = "Manages this module",
-            aliases = {"proxy", "sp"}
-    )
+    @Override
     public void execute(CommandExecutor executor, String[] args) {
         JsonDocument config = SmartProxy.getInstance().getConfig();
         if (args.length == 1) {

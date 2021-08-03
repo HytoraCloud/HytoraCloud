@@ -8,8 +8,8 @@ import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.NPCMan
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl.PacketReader;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.sign.SignManager;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.events.other.DriverEventServiceStop;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerNPC;
+import de.lystx.hytoracloud.driver.event.events.other.DriverEventServiceStop;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerNPC;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 

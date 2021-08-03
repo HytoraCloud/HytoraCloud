@@ -1,14 +1,14 @@
 package de.lystx.hytoracloud.cloud.handler.player;
 
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUnregisterPlayer;
-import de.lystx.hytoracloud.driver.commons.packets.both.player.PacketUpdatePlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.PacketUnregisterPlayer;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.PacketUpdatePlayer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;

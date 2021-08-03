@@ -2,9 +2,9 @@ package de.lystx.hytoracloud.global.webserver;
 
 import com.sun.net.httpserver.HttpServer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
+import de.lystx.hytoracloud.driver.config.FileService;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import lombok.Getter;
 
 import java.io.File;
@@ -52,7 +52,7 @@ public class WebServer {
 
         this.routes = new LinkedList<>();
 
-        this.config = new JsonDocument(new File(cloudDriver.getInstance(FileService.class).getDatabaseDirectory(), "web.json"));
+        this.config = new JsonDocument(new File(CloudDriver.getInstance().getServiceRegistry().getInstance(FileService.class).getDatabaseDirectory(), "web.json"));
 
         this.port = this.config.has("port") ? this.config.getInteger("port") : this.config.append("port", 2217).getInteger("port");
         this.enabled = this.config.def(true).getBoolean("enabled");
@@ -76,7 +76,7 @@ public class WebServer {
      */
     public void start() {
         CloudDriver.getInstance().getScheduler().scheduleRepeatingTask(() -> {
-            this.update("", JsonObject.gson().append("info", "There's nothing to see here").append("routes", this.getRoutes()).append("version", CloudDriver.getInstance().getVersion()));
+            this.update("", JsonObject.gson().append("info", "There's nothing to see here").append("routes", this.getRoutes()).append("version", CloudDriver.getInstance().getInfo().version()));
         }, 0L, 60L);
 
         if (this.enabled) {

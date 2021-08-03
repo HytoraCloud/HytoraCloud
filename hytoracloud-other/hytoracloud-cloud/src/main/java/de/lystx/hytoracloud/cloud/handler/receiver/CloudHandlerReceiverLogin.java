@@ -2,11 +2,11 @@ package de.lystx.hytoracloud.cloud.handler.receiver;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.receiver.PacketReceiverLogin;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverLogin;
+import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.service.receiver.IReceiverManager;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 public class CloudHandlerReceiverLogin implements PacketHandler {
     @Override
@@ -24,7 +24,7 @@ public class CloudHandlerReceiverLogin implements PacketHandler {
                     component.put("message", "§cThere is already a Receiver with name §e" + receiver.getName() + " §cregistered!");
                 });
             } else {
-                if (packetReceiverLogin.getKey().equalsIgnoreCase(CloudSystem.getInstance().getAuthManager().getKey())) {
+                if (packetReceiverLogin.getKey().equalsIgnoreCase(CloudSystem.getInstance().getKeyAuth().getKey())) {
                     packet.reply(component -> {
                         component.put("allowed", true);
                         component.put("message", "§7Logged in on §3Main-CloudInstance as §h'§b" + receiver.getName() + "§h'!");

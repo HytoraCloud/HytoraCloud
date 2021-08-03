@@ -2,9 +2,8 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.listener;
 
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.ConsoleCommandSenderExecutor;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import de.lystx.hytoracloud.driver.commons.interfaces.PlaceHolder;
+import de.lystx.hytoracloud.driver.utils.interfaces.PlaceHolder;
 import org.bukkit.event.server.RemoteServerCommandEvent;
 
 public class PlayerChatListener implements Listener {
@@ -26,9 +25,9 @@ public class PlayerChatListener implements Listener {
 
         String command = event.getMessage().substring(1).split(" ")[0];
 
-        if (CloudDriver.getInstance().getInstance(CommandService.class).getCommand(command) != null) {
+        if (CloudDriver.getInstance().getCommandManager().getCommand(command) != null) {
             event.setCancelled(true);
-            CloudDriver.getInstance().getInstance(CommandService.class).execute(cloudPlayer, true, event.getMessage());
+            CloudDriver.getInstance().getCommandManager().executeCommand(cloudPlayer, true, event.getMessage());
         }
 
     }
@@ -41,9 +40,9 @@ public class PlayerChatListener implements Listener {
 
         String command = event.getCommand().split(" ")[0];
 
-        if (CloudDriver.getInstance().getInstance(CommandService.class).getCommand(command) != null) {
+        if (CloudDriver.getInstance().getCommandManager().getCommand(command) != null) {
             event.setCancelled(true);
-            CloudDriver.getInstance().getInstance(CommandService.class).execute(consoleCommandSender, true, event.getCommand());
+            CloudDriver.getInstance().getCommandManager().executeCommand(consoleCommandSender, true, event.getCommand());
         }
     }
 

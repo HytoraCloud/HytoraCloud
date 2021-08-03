@@ -2,13 +2,15 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.command;
 
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
 
-public class StopCommand {
+@CommandInfo(name = "stop", description = "Stops the server", aliases = {"bukkit:stop", "shutdown", "bukkit:shutdown"})
+public class StopCommand implements CommandListener {
 
-    @Command(name = "stop", description = "Stops the server", aliases = {"bukkit:stop", "shutdown", "bukkit:shutdown"})
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         ICloudPlayer player = (ICloudPlayer) sender;
         if (!player.hasPermission("bukkit.command.stop")) {

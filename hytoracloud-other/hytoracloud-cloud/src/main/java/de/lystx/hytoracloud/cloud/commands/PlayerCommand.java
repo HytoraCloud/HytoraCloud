@@ -2,23 +2,25 @@ package de.lystx.hytoracloud.cloud.commands;
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionEntry;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.required.OfflinePlayer;
-import de.lystx.hytoracloud.driver.commons.service.IService;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionEntry;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
+import de.lystx.hytoracloud.driver.command.execution.CommandListener;
+import de.lystx.hytoracloud.driver.service.IService;
 
 import java.util.Date;
 import java.util.UUID;
 
-public class PlayerCommand {
+@CommandInfo(name = "player", description = "Manages players on the network", aliases = "players")
+public class PlayerCommand implements CommandListener {
 
 
-    @Command(name = "player", description = "Manages players on the network", aliases = "players")
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         ICloudPlayerManager ps = CloudDriver.getInstance().getPlayerManager();
         if (args.length == 1) {

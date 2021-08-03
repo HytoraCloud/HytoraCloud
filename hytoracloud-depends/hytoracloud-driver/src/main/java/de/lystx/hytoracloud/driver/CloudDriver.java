@@ -1,74 +1,74 @@
 package de.lystx.hytoracloud.driver;
 
 import ch.qos.logback.classic.LoggerContext;
-import de.lystx.hytoracloud.driver.bridge.BridgeInstance;
-import de.lystx.hytoracloud.driver.bridge.ProxyBridge;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.console.color.ConsoleColor;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.DefaultModuleManager;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.module.base.IModuleManager;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.DefaultChannelMessenger;
-import de.lystx.hytoracloud.driver.cloudservices.global.messenger.IChannelMessenger;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.DefaultFallbackManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.IFallbackManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.template.DefaultTemplateManager;
-import de.lystx.hytoracloud.driver.cloudservices.managing.template.ITemplateManager;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.commons.interfaces.*;
-import de.lystx.hytoracloud.driver.commons.minecraft.DefaultMinecraftManager;
-import de.lystx.hytoracloud.driver.commons.minecraft.IMinecraftManager;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketReload;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketReloadService;
-import de.lystx.hytoracloud.driver.commons.receiver.DefaultReceiverManager;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiver;
-import de.lystx.hytoracloud.driver.commons.receiver.IReceiverManager;
-import de.lystx.hytoracloud.driver.commons.requests.RequestManager;
-import de.lystx.hytoracloud.driver.commons.service.IDService;
-import de.lystx.hytoracloud.driver.commons.service.PortService;
-import de.lystx.hytoracloud.driver.commons.storage.JsonDocument;
-import de.lystx.hytoracloud.driver.commons.packets.both.other.PacketCallEvent;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketLogMessage;
-import de.lystx.hytoracloud.driver.commons.packets.both.PacketCommand;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.IEventManager;
-import de.lystx.hytoracloud.driver.cloudservices.global.main.DefaultServiceRegistry;
-import de.lystx.hytoracloud.driver.cloudservices.global.main.IServiceRegistry;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.proxy.ProxyConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.database.IDatabaseManager;
-import de.lystx.hytoracloud.driver.bridge.IBukkit;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionPool;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayerManager;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.IServiceManager;
-import de.lystx.hytoracloud.driver.utils.Utils;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.log.Loggers;
-import de.lystx.hytoracloud.driver.commons.minecraft.other.TicksPerSecond;
-import de.lystx.hytoracloud.driver.utils.CloudRunnable;
-import de.lystx.hytoracloud.driver.commons.storage.CloudMap;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.MessageConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.service.DefaultEventManager;
-import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
-import de.lystx.hytoracloud.driver.cloudservices.global.main.ICloudService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.event.base.IEvent;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.FileService;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.lib.LibraryService;
-import de.lystx.hytoracloud.driver.utils.UUIDPool;
+import de.lystx.hytoracloud.driver.connection.cloudflare.ICloudFlareManager;
+import de.lystx.hytoracloud.driver.connection.cloudflare.def.DefaultCloudFlareManager;
+import de.lystx.hytoracloud.driver.config.IConfigManager;
+import de.lystx.hytoracloud.driver.event.events.network.DriverEventReload;
+import de.lystx.hytoracloud.driver.service.screen.IScreenManager;
+import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
+import de.lystx.hytoracloud.driver.utils.interfaces.BooleanRequest;
+import de.lystx.hytoracloud.driver.utils.interfaces.DriverParent;
+import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
+import de.lystx.hytoracloud.driver.utils.interfaces.NetworkHandler;
+import de.lystx.hytoracloud.driver.service.minecraft.DefaultMinecraftManager;
+import de.lystx.hytoracloud.driver.service.minecraft.IMinecraftManager;
+import de.lystx.hytoracloud.driver.service.receiver.DefaultReceiverManager;
+import de.lystx.hytoracloud.driver.service.receiver.IReceiverManager;
+import de.lystx.hytoracloud.driver.wrapped.SchedulerObject;
+import de.lystx.hytoracloud.driver.utils.interfaces.RunTaskSynchronous;
+import de.lystx.hytoracloud.driver.service.util.IDService;
+import de.lystx.hytoracloud.driver.service.util.PortService;
+import de.lystx.hytoracloud.driver.console.color.ConsoleColor;
+import de.lystx.hytoracloud.driver.module.def.DefaultModuleManager;
+import de.lystx.hytoracloud.driver.module.IModuleManager;
+import de.lystx.hytoracloud.driver.service.group.IGroupManager;
+import de.lystx.hytoracloud.driver.connection.messenger.DefaultChannelMessenger;
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessenger;
+import de.lystx.hytoracloud.driver.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.service.fallback.DefaultFallbackManager;
+import de.lystx.hytoracloud.driver.service.fallback.IFallbackManager;
+import de.lystx.hytoracloud.driver.service.template.def.DefaultTemplateManager;
+import de.lystx.hytoracloud.driver.service.template.ITemplateManager;
+import de.lystx.hytoracloud.driver.command.ICommandManager;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReloadService;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.RequestManager;
+import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketLogMessage;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
+import de.lystx.hytoracloud.driver.event.def.DefaultEventManager;
+import de.lystx.hytoracloud.driver.event.IEventManager;
+import de.lystx.hytoracloud.driver.registry.def.DefaultServiceRegistry;
+import de.lystx.hytoracloud.driver.registry.IServiceRegistry;
+import de.lystx.hytoracloud.driver.command.DefaultCommandManager;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.connection.database.IDatabaseManager;
+import de.lystx.hytoracloud.driver.service.util.IBukkit;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionPool;
+import de.lystx.hytoracloud.driver.player.ICloudPlayerManager;
+import de.lystx.hytoracloud.driver.service.IServiceManager;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
+import de.lystx.hytoracloud.driver.console.logger.Loggers;
+import de.lystx.hytoracloud.driver.service.minecraft.other.TicksPerSecond;
+import de.lystx.hytoracloud.driver.utils.other.CloudRunnable;
+import de.lystx.hytoracloud.driver.utils.other.CloudMap;
+import de.lystx.hytoracloud.driver.config.impl.MessageConfig;
+import de.lystx.hytoracloud.driver.registry.ICloudService;
+import de.lystx.hytoracloud.driver.config.FileService;
+import de.lystx.hytoracloud.driver.library.LibraryService;
+import de.lystx.hytoracloud.driver.utils.other.UUIDPool;
 import lombok.Getter;
-import lombok.Setter;
-import de.lystx.hytoracloud.networking.connection.NetworkConnection;
-import de.lystx.hytoracloud.networking.elements.component.Component;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
-import lombok.SneakyThrows;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -106,19 +106,18 @@ public class CloudDriver {
 
     //Non final other values
     private DriverParent parent; //The driver parent for console and stuff
-    private ProxyBridge proxyBridge; //The proxy bridge for player and proxy management
     private BridgeInstance bridgeInstance; //The bridge instance for service side management
-    private NetworkConnection connection; //The current Executor for sending Packets and requests
+    private INetworkConnection connection; //The current Executor for sending Packets and requests
     private IBukkit bukkit; //The provided bukkit features
-
-    @Setter
     private PermissionPool permissionPool; //The current PermissionPool for perms management
-    private NetworkConfig networkConfig; //The network config of this instance
 
     //Non-Final managers
     private ICloudPlayerManager playerManager; //Manages all players
     private IDatabaseManager databaseManager; //Manages database-entries
     private IServiceManager serviceManager; //Manages services
+    private IGroupManager groupManager; //Manages groups
+    private IConfigManager configManager; //Manages config
+    private IScreenManager screenManager; //Manages screen
 
     //Final managers
     private final IReceiverManager receiverManager; //Manages receivers
@@ -129,9 +128,11 @@ public class CloudDriver {
     private final IModuleManager moduleManager; //Manage modules info
     private final IChannelMessenger messageManager; //Manage to message
     private final IMinecraftManager minecraftManager; //Manages minecraft
+    private final ICommandManager commandManager; //Manages commands
+    private final ICloudFlareManager cloudFlareManager; //Manages cloudflare
     private final ExecutorService executorService; //For task-execution
     private final RequestManager requestManager; //For request managing
-
+    private final Scheduler scheduler;
 
     /**
      * Initialises the Driver with a Type
@@ -143,6 +144,7 @@ public class CloudDriver {
         this.driverType = driverType;
 
         //Setting default interface implementations
+        this.scheduler = new SchedulerObject();
         this.serviceRegistry = new DefaultServiceRegistry();
         this.eventManager = new DefaultEventManager();
         this.receiverManager = new DefaultReceiverManager();
@@ -151,13 +153,14 @@ public class CloudDriver {
         this.moduleManager = new DefaultModuleManager();
         this.messageManager = new DefaultChannelMessenger();
         this.minecraftManager = new DefaultMinecraftManager();
+        this.commandManager = new DefaultCommandManager();
+        this.cloudFlareManager = new DefaultCloudFlareManager();
 
         //Setting other default values
         this.networkHandlers = new LinkedList<>();
         this.implementedData = new CloudMap<>();
         this.permissionPool = new PermissionPool();
         this.mojangPool = new UUIDPool(1);
-        this.networkConfig = NetworkConfig.defaultConfig();
         this.ticksPerSecond = new TicksPerSecond();
         this.idService = new IDService();
         this.portService = new PortService(25565, 30000);
@@ -165,15 +168,13 @@ public class CloudDriver {
 
         //Register Default-Services
         CloudDriver.getInstance().getServiceRegistry().registerService(new FileService());
-        CloudDriver.getInstance().getServiceRegistry().registerService(new Scheduler());
-        CloudDriver.getInstance().getServiceRegistry().registerService(new CommandService());
 
         if (!CloudDriver.getInstance().getDriverType().equals(CloudType.BRIDGE)) {
-            this.getInstance(FileService.class).check();
+            this.serviceRegistry.getInstance(FileService.class).check();
         }
 
         //Check for libraries
-        File libraryDirectory = driverType.equals(CloudType.BRIDGE) ? new File("../../../../../global/libs/") : this.getInstance(FileService.class).getLibraryDirectory();
+        File libraryDirectory = driverType.equals(CloudType.BRIDGE) ? new File("../../../../../global/libs/") : this.serviceRegistry.getInstance(FileService.class).getLibraryDirectory();
 
         this.libraryService = new LibraryService(libraryDirectory, ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
         this.libraryService.installDefaultLibraries();
@@ -199,63 +200,6 @@ public class CloudDriver {
 
     /*
      * ======================================
-     *    Command and EventManaging
-     * ======================================
-     */
-
-    /**
-     * This method registers a CloudCommand class object
-     * And all Methods in this class that have the {@link CommandExecutor}
-     * and the {@link String[]} parameter will be cached to be executed after
-     * And the method should have a {@link de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command}-Annotation
-     * to declare its really a command that executed
-     *
-     * @param command the class object
-     */
-    public void registerCommand(Object command) {
-        this.getInstance(CommandService.class).registerCommand(command);
-    }
-
-    /**
-     * Unregisters a command if the command object
-     * has been registered before using {@link CloudDriver#registerCommand(Object)}
-     *
-     * @param command the command
-     */
-    public void unregisterCommand(Object command) {
-        this.getInstance(CommandService.class).unregisterCommand(command);
-    }
-
-    /**
-     * Calls an Event with the driver 
-     * If this instance is bridge it calls an event
-     * and sets this service on blacklist to receive the same event again
-     * to prevent double-executing events
-     * 
-     * If this instance is cloud it just sends packets to all
-     * clients and sets the cloud on blacklist to receive the same event again
-     *
-     * @param iEvent the event to call
-     */
-    public boolean callEvent(IEvent iEvent) {
-        if ((this.serviceManager == null || this.serviceManager.getThisService() == null)&& this.driverType == CloudType.BRIDGE) {
-            return false;
-        }
-
-        if (this.driverType == CloudType.BRIDGE) {
-            if (this.connection != null) {
-                this.connection.sendPacket(new PacketCallEvent(iEvent, this.serviceManager.getThisService().getName()));
-            }
-        } else {
-            if (this.connection != null) {
-                this.connection.sendPacket(new PacketCallEvent(iEvent, "cloud"));
-            }
-        }
-        return this.eventManager.callEvent(iEvent);
-    }
-
-    /*
-     * ======================================
      * Messaging the CloudInstances
      * ======================================
      */
@@ -271,7 +215,7 @@ public class CloudDriver {
             System.out.println("[" + prefix + "] " + ConsoleColor.stripColor(message));
             return;
         }
-        this.parent.getConsole().getLogger().sendMessage(prefix, message);
+        this.parent.getConsole().sendMessage(prefix, message);
     }
 
     /**
@@ -356,28 +300,6 @@ public class CloudDriver {
         }
     }
 
-    /**
-     * Transfers a {@link Packet} to a {@link Component}
-     * with default timeOut of 3000ms
-     *
-     * @param packet the packet
-     * @return response
-     */
-    public Component getResponse(Packet packet) {
-        return this.getResponse(packet, 3000);
-    }
-
-    /**
-     * Transfers a {@link Packet} to a {@link Component}
-     *
-     * @param responsePacket the packet
-     * @param timeOut the timeout
-     * @return response
-     */
-    public Component getResponse(Packet responsePacket, int timeOut) {
-        return responsePacket.toReply(connection, timeOut);
-    }
-    
     /*
      * ======================================
      *         Service Managing
@@ -389,7 +311,7 @@ public class CloudDriver {
      *
      * @return inetAddress
      */
-    public InetSocketAddress getCloudAddress() {
+    public InetSocketAddress getAddress() {
         if (driverType == CloudType.BRIDGE) {
             JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
             return new InetSocketAddress(jsonDocument.getString("host"), jsonDocument.getInteger("port"));
@@ -397,46 +319,10 @@ public class CloudDriver {
             IReceiver receiver = IReceiver.current();
             return new InetSocketAddress(receiver.getHost(), receiver.getPort());
         } else if (driverType == CloudType.CLOUDSYSTEM){
-            NetworkConfig networkConfig = getInstance(ConfigService.class).getNetworkConfig();
+            NetworkConfig networkConfig  = this.configManager.getNetworkConfig();
             return new InetSocketAddress(networkConfig.getHost(), networkConfig.getPort());
         } else {
             return null;
-        }
-    }
-
-    /**
-     * Loads the {@link ProxyConfig} if this is the CloudBridge
-     *
-     * @return proxy config or null
-     */
-    public ProxyConfig getProxyConfig() {
-        if (this.driverType != CloudType.BRIDGE) {
-            return null;
-        }
-        NetworkConfig networkConfig = CloudDriver.getInstance().getNetworkConfig();
-        if (networkConfig == null || CloudDriver.getInstance().getServiceManager().getThisService() == null) {
-            return ProxyConfig.defaultConfig();
-        }
-        ProxyConfig proxyConfig = networkConfig.getProxyConfigs().get(CloudDriver.getInstance().getServiceManager().getThisService().getGroup().getName());
-        return proxyConfig == null ? ProxyConfig.defaultConfig() : proxyConfig;
-    }
-
-    /**
-     * The {@link ServiceType} of the current process
-     * Comparable with {@link CloudDriver#getDriverType()}
-     * to identify the process and determine if allowed
-     *
-     * @return type
-     */
-    public ServiceType getServiceType() {
-        if (this.driverType == CloudType.CLOUDSYSTEM) {
-            return ServiceType.CLOUDSYSTEM;
-        } else {
-            if (this.serviceManager == null || this.serviceManager.getThisService() == null) {
-                return ServiceType.NONE;
-            } else {
-                return this.serviceManager.getThisService().getGroup().getType();
-            }
         }
     }
 
@@ -446,57 +332,13 @@ public class CloudDriver {
      * ======================================
      */
 
-
-    /**
-     * Sets the network config and updates the port values
-     *
-     * @param networkConfig config
-     */
-    public void setNetworkConfig(NetworkConfig networkConfig) {
-        this.networkConfig = networkConfig;
-        try {
-            this.portService.setServerPort(networkConfig.getServerStartPort());
-            this.portService.setProxyPort(networkConfig.getProxyStartPort());
-        } catch (NullPointerException e) {
-            //Ignoring
-        }
-    }
-
-    /**
-     * This Method iterates through all registered
-     * {@link ICloudService}s and checks if the given class
-     * matches the parameter class
-     *
-     * @param tClass the class to get the service of
-     * @return Service searched by class
-     */
-    public <T extends ICloudService> T getInstance(Class<T> tClass) {
-        return this.serviceRegistry.getInstance(tClass);
-    }
-
     /**
      * Returns the Cloud prefix from the {@link MessageConfig}
      *
      * @return string prefix
      */
     public String getPrefix() {
-        return this.getNetworkConfig().getMessageConfig().getPrefix().replace("&", "§");
-    }
-
-    /**
-     * Makes the Cloud execute a command
-     * @param command the command to execute
-     */
-    public void executeCloudCommand(String command) {
-        this.sendPacket(new PacketCommand("null", command));
-    }
-
-    /**
-     * Returns CloudProvided Scheduler
-     * @return scheduler
-     */
-    public Scheduler getScheduler() {
-        return Scheduler.getInstance();
+        return this.configManager.getNetworkConfig().getMessageConfig().getPrefix().replace("&", "§");
     }
 
     /**
@@ -510,7 +352,6 @@ public class CloudDriver {
         cloudRunnable.setStopAfterExecute(true);
 
         boolean[] b = new boolean[] {false};
-
         this.getScheduler().scheduleRepeatingTaskAsync(() -> {
             if (request.isAccepted()) {
                 cloudRunnable.run();
@@ -518,21 +359,6 @@ public class CloudDriver {
             }
         }, 1L, 1L).cancelIf(() -> b[0]);
 
-    }
-
-    /**
-     * Updates the {@link ClassLoader} instance
-     *
-     * @param classLoader the classloader
-     */
-    @SneakyThrows
-    public void setClassLoader(ClassLoader classLoader) {
-
-        Field scl = ClassLoader.class.getDeclaredField("scl"); // Get system class loader
-        scl.setAccessible(true); // Set accessible
-        scl.set(null, classLoader); // Update it to your class loader
-
-        Thread.currentThread().setContextClassLoader(classLoader);
     }
 
     /**
@@ -547,9 +373,9 @@ public class CloudDriver {
             RunTaskSynchronous runTaskSynchronous = object.getAnnotation(RunTaskSynchronous.class);
             if (runTaskSynchronous.delay() != -1 || runTaskSynchronous.unit() != TimeUnit.NANOSECONDS) {
                 if (runTaskSynchronous.value()) {
-                    Scheduler.getInstance().scheduleDelayedTask(runnable, runTaskSynchronous.delay());
+                    CloudDriver.getInstance().getScheduler().scheduleDelayedTask(runnable, runTaskSynchronous.delay());
                 } else {
-                    Scheduler.getInstance().scheduleDelayedTaskAsync(runnable, runTaskSynchronous.delay());
+                    CloudDriver.getInstance().getScheduler().scheduleDelayedTaskAsync(runnable, runTaskSynchronous.delay());
                 }
             }
         } else {
@@ -568,30 +394,17 @@ public class CloudDriver {
     }
 
     /**
-     * Gets the version via {@link DriverInfo} annotation
-     *
-     * @return current version of cloud
-     */
-    public String getVersion() {
-        return driverInfo() == null ? "UNKNOWN" : driverInfo().version();
-    }
-
-    /**
      * The {@link DriverInfo} of this driver
      *
      * @return cloud based information
      */
-    public DriverInfo driverInfo() {
-        if (CloudDriver.class.isAnnotationPresent(DriverInfo.class)) {
-            return CloudDriver.class.getAnnotation(DriverInfo.class);
-        } else {
-            return null;
-        }
+    public DriverInfo getInfo() {
+        return CloudDriver.class.isAnnotationPresent(DriverInfo.class) ? CloudDriver.class.getAnnotation(DriverInfo.class) : null;
     }
 
     /*
      * ======================================
-     *         Driver managing Methods
+     *      Driver managing Methods
      * ======================================
      */
 
@@ -612,6 +425,8 @@ public class CloudDriver {
         }
         if (this.driverType == CloudType.BRIDGE) {
             this.sendPacket(new PacketReload());
+        } else if (driverType == CloudType.CLOUDSYSTEM) {
+            CloudDriver.getInstance().getEventManager().callEvent(new DriverEventReload());
         }
     }
 

@@ -1,6 +1,6 @@
 package net.hytora.discordbot.commands;
 
-import de.lystx.hytoracloud.driver.cloudservices.global.scheduler.Scheduler;
+import de.lystx.hytoracloud.driver.CloudDriver;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,7 +27,7 @@ public class StopCommand extends CommandHandler {
 
         Hytora.getHytora().getLogManager().preset(channel, "Shutdown", Hytora.getHytora().getDiscord().getSelfUser(), message -> {
 
-            Scheduler.getInstance().scheduleDelayedTask(() -> {
+            CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
                 message.delete().queue(unused -> Hytora.getHytora().shutdown());
             }, 20L);
 

@@ -1,10 +1,10 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInUpdateServiceGroup;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInUpdateServiceGroup;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ public class BukkitHandlerGroupUpdate implements PacketHandler {
                         if (onlinePlayer.hasPermission("cloudsystem.group.maintenance")) {
                             continue;
                         }
-                        onlinePlayer.kickPlayer(CloudDriver.getInstance().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix())
+                        onlinePlayer.kickPlayer(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getMessageConfig().getMaintenanceGroup().replace("&", "§").replace("%prefix%", CloudDriver.getInstance().getPrefix())
                                 .replace("%group%", group.getName()));
                     }
                 }

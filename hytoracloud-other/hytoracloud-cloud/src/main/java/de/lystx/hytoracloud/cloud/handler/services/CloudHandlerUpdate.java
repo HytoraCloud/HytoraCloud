@@ -1,17 +1,18 @@
 package de.lystx.hytoracloud.cloud.handler.services;
 
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.commons.packets.both.service.PacketServiceUpdate;
+import de.lystx.hytoracloud.driver.service.screen.IScreen;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.requests.base.DriverRequest;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.commons.storage.JsonObject;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.wrapped.ServiceObject;
-import de.lystx.hytoracloud.networking.elements.packet.Packet;
-import de.lystx.hytoracloud.networking.elements.packet.handler.PacketHandler;
-import de.lystx.hytoracloud.networking.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
+import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.response.ResponseStatus;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -31,6 +32,9 @@ public class CloudHandlerUpdate implements PacketHandler {
                     String name = document.getString("name");
                     IService service = CloudDriver.getInstance().getServiceManager().getCachedObject(name);
                     driverRequest.createResponse().data(service).send();
+                } else if (driverRequest.equalsIgnoreCase("SCREEN_GET_ALL")) {
+                    List<IScreen> screens = CloudDriver.getInstance().getScreenManager().getScreens();
+                    driverRequest.createResponse().data(screens).send();
                 } else {
                     if (!document.has("name")) {
                         return;
@@ -74,6 +78,10 @@ public class CloudHandlerUpdate implements PacketHandler {
                         CloudDriver.getInstance().getServiceManager().updateService(service);
                         CloudDriver.getInstance().reload();
                         driverRequest.createResponse().data(service).send();
+                    } else if (driverRequest.equalsIgnoreCase("SCREEN_GET_NAME")) {
+                        IScreen orRequest = CloudDriver.getInstance().getScreenManager().getOrRequest(name);
+                        driverRequest.createResponse().data(orRequest).send();
+
                     }
                 }
             }

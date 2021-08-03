@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.inventory.Item;
+import de.lystx.hytoracloud.driver.player.inventory.Item;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;

@@ -1,6 +1,6 @@
 package net.hytora.discordbot.manager.conversation;
 
-import de.lystx.hytoracloud.driver.utils.Utils;
+import de.lystx.hytoracloud.driver.utils.other.Utils;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;

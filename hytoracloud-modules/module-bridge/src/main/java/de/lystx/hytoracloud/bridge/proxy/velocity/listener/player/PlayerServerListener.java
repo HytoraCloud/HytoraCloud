@@ -9,8 +9,8 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.bridge.proxy.velocity.VelocityBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.service.IService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.service.IService;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import net.kyori.adventure.text.Component;
 
 import java.util.Objects;

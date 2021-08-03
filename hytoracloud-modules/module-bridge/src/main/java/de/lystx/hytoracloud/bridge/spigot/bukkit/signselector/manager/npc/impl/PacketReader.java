@@ -3,14 +3,13 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.manager.npc.impl;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.cloudservices.managing.serverselector.npc.NPCMeta;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.CloudErrors;
-import de.lystx.hytoracloud.driver.commons.events.player.other.DriverEventPlayerNPC;
-import de.lystx.hytoracloud.driver.commons.packets.in.PacketInNPCDelete;
+import de.lystx.hytoracloud.driver.serverselector.npc.NPCMeta;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudErrors;
+import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerNPC;
+import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInNPCDelete;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -101,7 +100,7 @@ public class PacketReader {
                     }
 
                     DriverEventPlayerNPC event = new DriverEventPlayerNPC(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName()), meta, true);
-                    CloudDriver.getInstance().callEvent(event);
+                    CloudDriver.getInstance().getEventManager().callEvent(event);
                 } else if (getValue(packet, "action").toString().equalsIgnoreCase("ATTACK")) {
                     if (CloudDriver.getInstance().getImplementedData().getList("uuidList").contains(player.getUniqueId())) {
                         NPC getSafe = ServerSelector.getInstance().getNpcManager().getNPC(npc.getLocation());
@@ -127,7 +126,7 @@ public class PacketReader {
                     }
 
                     DriverEventPlayerNPC event = new DriverEventPlayerNPC(CloudDriver.getInstance().getPlayerManager().getCachedObject(player.getName()), meta, false);
-                    CloudDriver.getInstance().callEvent(event);
+                    CloudDriver.getInstance().getEventManager().callEvent(event);
 
                 }
             }

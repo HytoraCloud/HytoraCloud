@@ -1,35 +1,35 @@
 package de.lystx.hytoracloud.cloud.commands;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.commons.storage.PropertyObject;
-import de.lystx.hytoracloud.driver.commons.service.IServiceGroup;
-import de.lystx.hytoracloud.driver.commons.enums.cloud.ServiceType;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.CommandService;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.command.TabCompletable;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.CommandExecutor;
-import de.lystx.hytoracloud.driver.cloudservices.managing.command.base.Command;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.ConfigService;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.fallback.Fallback;
-import de.lystx.hytoracloud.driver.cloudservices.global.config.impl.fallback.FallbackConfig;
-import de.lystx.hytoracloud.driver.cloudservices.managing.permission.impl.PermissionGroup;
-import de.lystx.hytoracloud.driver.cloudservices.cloud.server.impl.GroupService;
-import de.lystx.hytoracloud.driver.commons.wrapped.ServiceGroupObject;
-import de.lystx.hytoracloud.cloud.impl.setup.FallbackSetup;
-import de.lystx.hytoracloud.cloud.impl.setup.GroupSetup;
-import de.lystx.hytoracloud.cloud.impl.setup.PermsGroupSetup;
+import de.lystx.hytoracloud.driver.command.execution.CommandListenerTabComplete;
+import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
+import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
+import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
+import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
+import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
+import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideConfigManager;
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.service.fallback.Fallback;
+import de.lystx.hytoracloud.driver.config.impl.fallback.FallbackConfig;
+import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
+import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideGroupManager;
+import de.lystx.hytoracloud.driver.wrapped.GroupObject;
+import de.lystx.hytoracloud.cloud.setups.FallbackSetup;
+import de.lystx.hytoracloud.cloud.setups.GroupSetup;
+import de.lystx.hytoracloud.cloud.setups.PermsGroupSetup;
 
 import java.util.*;
 
-public class CreateCommand implements TabCompletable {
+@CommandInfo(name = "create", description = "Creates cloudstuff", aliases = "add")
+public class CreateCommand implements CommandListenerTabComplete {
 
-    @Command(name = "create", description = "Creates cloudstuff", aliases = "add")
+    @Override
     public void execute(CommandExecutor sender, String[] args) {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("group")) {
-                CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
+                CloudDriver.getInstance().getCommandManager().setActive(false);
                 new GroupSetup().start(setup -> {
-                    CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
+                    CloudDriver.getInstance().getCommandManager().setActive(true);
                     if (setup.isCancelled()) {
                         return;
                     }
@@ -43,11 +43,11 @@ public class CreateCommand implements TabCompletable {
                         maxPlayers = setup.getMaxPlayers();
                     }
 
-                    IServiceGroup group = new ServiceGroupObject(
+                    IServiceGroup group = new GroupObject(
                             UUID.randomUUID(),
                             setup.getServerName(),
                             "default",
-                            ServiceType.valueOf(setup.getType().toUpperCase()),
+                            ServerEnvironment.valueOf(setup.getType().toUpperCase()),
                             setup.getReceiver(),
                             setup.getMaxyServer(),
                             setup.getMinServer(),
@@ -61,14 +61,14 @@ public class CreateCommand implements TabCompletable {
                             new LinkedList<>()
                     );
                     sender.sendMessage("INFO", "§2Created ServiceGroup §a" + group.getName() + " §7| §bMemory " + group.getMemory() + " §7| §bMinServer " + group.getMinServer() + " §7| §bMaxServer" + group.getMaxServer());
-                    CloudDriver.getInstance().getInstance(GroupService.class).createGroup(group);
+                    CloudDriver.getInstance().getServiceRegistry().getInstance(CloudSideGroupManager.class).createGroup(group);
 
                     CloudDriver.getInstance().reload();
                 });
             } else if (args[0].equalsIgnoreCase("fallback")) {
-                CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
+                CloudDriver.getInstance().getCommandManager().setActive(false);
                 new FallbackSetup().start(setup -> {
-                    CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
+                    CloudDriver.getInstance().getCommandManager().setActive(true);
                     if (setup.isCancelled()) {
                         return;
                     }
@@ -80,21 +80,21 @@ public class CreateCommand implements TabCompletable {
                     }
                     Fallback fallback = new Fallback(setup.getId(), setup.getName(), permission);
 
-                    NetworkConfig networkConfig = CloudDriver.getInstance().getInstance(ConfigService.class).getNetworkConfig();
+                    NetworkConfig networkConfig = CloudDriver.getInstance().getConfigManager().getNetworkConfig();
                     FallbackConfig fallbackConfig = networkConfig.getFallbackConfig();
                     List<Fallback> fallbacks = fallbackConfig.getFallbacks();
                     fallbacks.add(fallback);
                     fallbackConfig.setFallbacks(fallbacks);
                     networkConfig.setFallbackConfig(fallbackConfig);
-                    CloudDriver.getInstance().getInstance(ConfigService.class).setNetworkConfig(networkConfig);
-                    CloudDriver.getInstance().getInstance(ConfigService.class).shutdown();
-                    CloudDriver.getInstance().getInstance(ConfigService.class).reload();
+                    CloudDriver.getInstance().getConfigManager().setNetworkConfig(networkConfig);
+                    CloudDriver.getInstance().getConfigManager().shutdown();
+                    CloudDriver.getInstance().getConfigManager().reload();
                     sender.sendMessage("INFO", "§2Created Fallback §a" + fallback.getGroupName() + " §7| §bID " + fallback.getPriority() + " §7| §bPermission " + fallback.getPermission());
                 });
             } else if (args[0].equalsIgnoreCase("perms")) {
-                CloudDriver.getInstance().getInstance(CommandService.class).setActive(false);
+                CloudDriver.getInstance().getCommandManager().setActive(false);
                 new PermsGroupSetup().start(setup -> {
-                    CloudDriver.getInstance().getInstance(CommandService.class).setActive(true);
+                    CloudDriver.getInstance().getCommandManager().setActive(true);
                     if (setup.isCancelled()) {
                         return;
                     }
