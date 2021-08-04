@@ -8,16 +8,10 @@ import de.lystx.hytoracloud.bridge.global.handler.*;
 import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
 import de.lystx.hytoracloud.bridge.proxy.global.listener.TabListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
-import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery;
-import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
 import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
-import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
-import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.utils.interfaces.PlaceHolder;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
@@ -32,9 +26,6 @@ import de.lystx.hytoracloud.driver.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.player.permission.PermissionService;
 
 
-import de.lystx.hytoracloud.driver.wrapped.GroupObject;
-import de.lystx.hytoracloud.driver.wrapped.PlayerObject;
-import de.lystx.hytoracloud.driver.wrapped.ReceiverObject;
 import de.lystx.hytoracloud.driver.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
 import lombok.Getter;
@@ -53,7 +44,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 @Getter @Setter
 public class CloudBridge {
@@ -65,6 +55,7 @@ public class CloudBridge {
     private final NetworkClient client;
     private final BridgeInstance bridgeInstance;
     private final Map<InetSocketAddress, InetSocketAddress> addresses;
+    private boolean received;
 
     private ProxyBridge proxyBridge;
 
@@ -183,37 +174,6 @@ public class CloudBridge {
             @Override
             public void onHandshake() {
                 System.out.println("[CloudBridge] This Service is now registered and has Hands shaken with the CloudSystem");
-
-                CloudDriver.getInstance().executeIf(() -> {
-
-                    IService service = CloudDriver.getInstance().getServiceManager().getThisService();
-                    System.out.println("[CloudBridge] Verifying Service '" + service.getName() + "' that it is fully set up!");
-
-                    try {
-                        String host;
-                        if (service.getGroup().getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER)) {
-                            host = "127.0.0.1";
-                        } else {
-                            host = InetAddress.getLocalHost().getHostAddress();
-                        }
-
-                        service = service.verify(host, true, ServiceState.AVAILABLE, service.getProperties()).setTimeOut(30, service).pullValue();
-                        service.update();
-
-                        System.out.println("[CloudBridge] Authentication for '" + service.getName() + "' executed: " + (service.getState() == ServiceState.BOOTING ? "FAILED" : "SUCCESS"));
-                        System.out.println("[CloudBridge] Summary: " + service.getName() + ":");
-                        System.out.println("[CloudBridge]   > State: " + service.getState().name());
-                        System.out.println("[CloudBridge]   > Authenticated: " + service.isAuthenticated());
-                        System.out.println("[CloudBridge]   > Receiver: " + service.getReceiver().getName());
-                        System.out.println("[CloudBridge]   > Port: " + service.getPort());
-                        System.out.println("[CloudBridge]   > ServiceId: " + service.getId());
-                        System.out.println("[CloudBridge]   > Address: " + service.getAddress());
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    }
-                }, () -> CloudDriver.getInstance().getServiceManager().getThisService() != null);
-
-
             }
 
             @Override
@@ -226,6 +186,39 @@ public class CloudBridge {
 
             @Override
             public void packetIn(Packet packet) {
+                if (received) {
+                    return;
+                }
+                if (packet instanceof PacketOutGlobalInfo) {
+                    received = true;
+                    CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
+                        IService service = CloudDriver.getInstance().getServiceManager().getThisService();
+                        System.out.println("[CloudBridge] Verifying Service '" + service.getName() + "' that it is fully set up!");
+
+                        try {
+                            String host;
+                            if (service.getGroup().getReceiver().equalsIgnoreCase(Utils.INTERNAL_RECEIVER)) {
+                                host = "127.0.0.1";
+                            } else {
+                                host = InetAddress.getLocalHost().getHostAddress();
+                            }
+
+                            service = service.verify(host, true, ServiceState.AVAILABLE, service.getProperties()).setTimeOut(30, service).pullValue();
+                            service.update();
+
+                            System.out.println("[CloudBridge] Authentication for '" + service.getName() + "' executed: " + (service.getState() == ServiceState.BOOTING ? "FAILED" : "SUCCESS"));
+                            System.out.println("[CloudBridge] Summary: " + service.getName() + ":");
+                            System.out.println("[CloudBridge]   > State: " + service.getState().name());
+                            System.out.println("[CloudBridge]   > Authenticated: " + service.isAuthenticated());
+                            System.out.println("[CloudBridge]   > Receiver: " + service.getReceiver().getName());
+                            System.out.println("[CloudBridge]   > Port: " + service.getPort());
+                            System.out.println("[CloudBridge]   > ServiceId: " + service.getId());
+                            System.out.println("[CloudBridge]   > Address: " + service.getAddress());
+                        } catch (UnknownHostException e) {
+                            e.printStackTrace();
+                        }
+                    }, 2L);
+                }
             }
 
             @Override

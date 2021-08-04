@@ -96,7 +96,7 @@ public class CloudCommand implements CommandListenerTabComplete {
                 } else if (args.length == 2) {
                     if (args[0].equalsIgnoreCase("run")) {
                         String groupname = args[1];
-                        IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(groupname);
+                        IServiceGroup group = CloudDriver.getInstance().getGroupManager().getCachedObject(groupname);
                         if (group == null) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cseems not to exist!");
                             return;
@@ -191,7 +191,7 @@ public class CloudCommand implements CommandListenerTabComplete {
 
                     } else if (args[0].equalsIgnoreCase("tps")) {
                         String groupname = args[1];
-                        IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(groupname);
+                        IServiceGroup group = CloudDriver.getInstance().getGroupManager().getCachedObject(groupname);
                         if (group == null) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cseems not to exist!");
                             return;
@@ -215,7 +215,7 @@ public class CloudCommand implements CommandListenerTabComplete {
                         CloudDriver.getInstance().getServiceManager().stopService(IService);
                     } else if (args[0].equalsIgnoreCase("stopGroup")) {
                         String g = args[1];
-                        IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(g);
+                        IServiceGroup group = CloudDriver.getInstance().getGroupManager().getCachedObject(g);
                         if (group == null) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + g + " §cseems not to exist!");
                             return;
@@ -244,7 +244,7 @@ public class CloudCommand implements CommandListenerTabComplete {
                         try {
                             int id = Integer.parseInt(args[2]);
                             String groupname = args[1];
-                            IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(groupname);
+                            IServiceGroup group = CloudDriver.getInstance().getGroupManager().getCachedObject(groupname);
 
                             if (group == null) {
                                 player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cseems not to exist!");
@@ -258,7 +258,7 @@ public class CloudCommand implements CommandListenerTabComplete {
                         }
                     } else if (args[0].equalsIgnoreCase("toggle") && args[1].equalsIgnoreCase("maintenance")) {
                         String groupname = args[2];
-                        IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(groupname);
+                        IServiceGroup serviceGroup = CloudDriver.getInstance().getGroupManager().getCachedObject(groupname);
                         if (serviceGroup == null) {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThe group §e" + groupname + " §cdoesn't exist!");
                             return;
@@ -350,11 +350,11 @@ public class CloudCommand implements CommandListenerTabComplete {
             } else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("log")) {
                 return Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedObjects());
             } else if (args[0].equalsIgnoreCase("stopGroup") || args[0].equalsIgnoreCase("run") || args[0].equalsIgnoreCase("tps")) {
-                return Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedGroups());
+                return Utils.toStringList(CloudDriver.getInstance().getGroupManager().getCachedObjects());
             }
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("maintenance")) {
-                List<String> groups = Utils.toStringList(CloudDriver.getInstance().getServiceManager().getCachedGroups());
+                List<String> groups = Utils.toStringList(CloudDriver.getInstance().getGroupManager().getCachedObjects());
                 groups.add("switch");
                 return groups;
             }

@@ -14,7 +14,7 @@ public class ServerConnectListener {
     public void onConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
         String servername = event.getOriginalServer().getServerInfo().getName();
-        IServiceGroup IServiceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(servername.split("-")[0]);
+        IServiceGroup IServiceGroup = CloudDriver.getInstance().getGroupManager().getCachedObject(servername.split("-")[0]);
         if (IServiceGroup != null && IServiceGroup.isMaintenance())
             if (player.hasPermission("cloudsystem.group.maintenance")) {
                 event.setResult(ServerPreConnectEvent.ServerResult.allowed(VelocityBridge.getInstance().getServer().getServer(servername).get()));

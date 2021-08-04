@@ -127,7 +127,7 @@ public class PlayerListener implements Listener {
                 cloudPlayer.update();
             }
         }
-        IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(event.getTarget().getName().split("-")[0]);
+        IServiceGroup serviceGroup = CloudDriver.getInstance().getGroupManager().getCachedObject(event.getTarget().getName().split("-")[0]);
         if (serviceGroup.isMaintenance() && (!CloudDriver.getInstance().getPermissionPool().hasPermission(player.getUniqueId(), "cloudsystem.group.maintenance") || !event.getPlayer().hasPermission("cloudsystem.group.maintenance"))) {
 
             if (event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {

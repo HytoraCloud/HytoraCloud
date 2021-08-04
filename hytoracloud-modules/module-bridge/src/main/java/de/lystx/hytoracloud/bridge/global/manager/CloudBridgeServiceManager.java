@@ -34,11 +34,6 @@ public class CloudBridgeServiceManager implements IServiceManager {
     }
 
     @Override
-    public IServiceGroup getServiceGroup(String groupName) {
-        return this.getCachedGroups().stream().filter(serviceGroup -> serviceGroup.getName().equalsIgnoreCase(groupName)).findFirst().orElse(null);
-    }
-
-    @Override
     public IService getThisService() {
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
         return this.getCachedObject(jsonDocument.getString("server"));
@@ -63,20 +58,6 @@ public class CloudBridgeServiceManager implements IServiceManager {
                 }
             }
         }
-    }
-
-    @Override
-    public void updateGroup(IServiceGroup group) {
-        IServiceGroup serviceGroup = this.getServiceGroup(group.getName());
-
-        for (IService service : this.cachedObjects) {
-            if (service.getGroup().getName().equalsIgnoreCase(group.getName())) {
-                int i = cachedObjects.indexOf(service);
-                service.setGroup(serviceGroup);
-                this.cachedObjects.set(i, service);
-            }
-        }
-
     }
 
     @Override
@@ -223,15 +204,6 @@ public class CloudBridgeServiceManager implements IServiceManager {
         for (IService cachedObject : this.getCachedObjects(serviceGroup)) {
             this.stopService(cachedObject);
         }
-    }
-
-    @Override
-    public List<IServiceGroup> getCachedGroups() {
-        List<IServiceGroup> list = new LinkedList<>();
-        for (IService cachedObject : this.cachedObjects) {
-            list.add(cachedObject.getGroup());
-        }
-        return list;
     }
 
     @Override

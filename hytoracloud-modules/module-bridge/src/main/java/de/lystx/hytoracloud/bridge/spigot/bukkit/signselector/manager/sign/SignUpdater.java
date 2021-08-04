@@ -163,7 +163,7 @@ public class SignUpdater implements Runnable {
                         }
 
                         Sign bukkitSign = (Sign) blockAt.getState();
-                        if (CloudDriver.getInstance().getServiceManager().getServiceGroup(group) != null && CloudDriver.getInstance().getServiceManager().getServiceGroup(group).isMaintenance()) {
+                        if (CloudDriver.getInstance().getGroupManager().getCachedObject(group) != null && CloudDriver.getInstance().getGroupManager().getCachedObject(group).isMaintenance()) {
                             this.updateBukkitSign(bukkitSign, current);
                             return;
                         }

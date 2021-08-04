@@ -140,7 +140,7 @@ public class ServiceCommand implements CommandListener {
                             return;
                         }
                         String serverGroup = args[1];
-                        IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(serverGroup);
+                        IServiceGroup group = CloudDriver.getInstance().getGroupManager().getCachedObject(serverGroup);
 
 
                         if (group != null) {
@@ -225,7 +225,7 @@ public class ServiceCommand implements CommandListener {
                             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere is already an §eNPC §cfor this location!");
                             return;
                         }
-                        IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(groupName);
+                        IServiceGroup group = CloudDriver.getInstance().getGroupManager().getCachedObject(groupName);
                         if (group != null) {
                             CloudDriver.getInstance().sendPacket(new PacketInNPCCreate(new NPCMeta(UUID.randomUUID(), name, skin, groupName, location.serialize())));
                             ServerSelector.getInstance().getNpcManager().updateNPCS();

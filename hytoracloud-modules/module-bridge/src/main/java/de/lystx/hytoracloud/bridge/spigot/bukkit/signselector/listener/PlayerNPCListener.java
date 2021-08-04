@@ -83,7 +83,7 @@ public class PlayerNPCListener implements IEventHandler<DriverEventPlayerNPC> {
     public Inventory getInventory(Player player, String group) {
         Map<Integer, IService> serviceMap = new HashMap<>();
         NPCConfig config = ServerSelector.getInstance().getNpcManager().getNpcConfig();
-        IServiceGroup serviceGroup = CloudDriver.getInstance().getServiceManager().getServiceGroup(group);
+        IServiceGroup serviceGroup = CloudDriver.getInstance().getGroupManager().getCachedObject(group);
 
         if (serviceGroup == null) {
             player.sendMessage(CloudDriver.getInstance().getPrefix() + "§cThere was an error!");
@@ -187,7 +187,7 @@ public class PlayerNPCListener implements IEventHandler<DriverEventPlayerNPC> {
 
             }
             if (IServiceGroup != null) {
-                IServiceGroup group = CloudDriver.getInstance().getServiceManager().getServiceGroup(IServiceGroup.getName());
+                IServiceGroup group = CloudDriver.getInstance().getGroupManager().getCachedObject(IServiceGroup.getName());
                 input = input.replace("%group%", group.getName());
                 input = input.replace("%template%", IServiceGroup.getCurrentTemplate().getName());
                 input = input.replace("%type%", IServiceGroup.getEnvironment().name());

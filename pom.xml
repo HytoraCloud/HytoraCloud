@@ -17,13 +17,11 @@
         <module>hytoracloud-modules/module-labymod</module>
 
         <!-- Depends -->
-        <module>hytoracloud-depends</module>
-        <module>hytoracloud-depends/hytoracloud-driver</module>
+        <module>hytoracloud-driver</module>
 
         <!-- Other -->
-        <module>hytoracloud-other</module>
-        <module>hytoracloud-other/hytoracloud-discordbot</module>
-        <module>hytoracloud-other/hytoracloud-cloud</module>
+        <module>hytoracloud-discordbot</module>
+        <module>hytoracloud-cloud</module>
     </modules>
 
     <properties>
