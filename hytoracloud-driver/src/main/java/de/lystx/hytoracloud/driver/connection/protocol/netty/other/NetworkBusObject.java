@@ -1,11 +1,16 @@
 package de.lystx.hytoracloud.driver.connection.protocol.netty.other;
 
 import com.google.common.base.Charsets;
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkBus;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.NetworkChannelObject;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.data.INettyClient;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.IChannelHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.PacketChannelMessage;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.NettyPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.forwarding.ForwardingPacket;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketClientCredentials;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
@@ -14,6 +19,7 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -62,7 +68,23 @@ public class NetworkBusObject implements INetworkBus {
             adapter.onPacketReceive(packet);
         }
 
+        if (packet instanceof ForwardingPacket) {
+            ForwardingPacket<?> forwardingPacket = (ForwardingPacket<?>)packet;
+            if (forwardingPacket.isForward()) {
+                this.processOut(channel, (IPacket) forwardingPacket.forward(false));
+            }
+        }
+
         if (packet instanceof PacketHandshake) {
+            return;
+        }
+        if (packet instanceof PacketChannelMessage) {
+            PacketChannelMessage packetChannelMessage =(PacketChannelMessage) packet;
+            IChannelMessage channelMessage = packetChannelMessage.getChannelMessage();
+            List<IChannelHandler> channelHandlers = networkConnection.getChannelHandlers(channelMessage.getChannel());
+            for (IChannelHandler channelHandler : channelHandlers) {
+                channelHandler.handle(packetChannelMessage, "", channelMessage);
+            }
             return;
         }
         if (packet instanceof PacketClientCredentials && networkConnection instanceof INetworkServer) {
@@ -78,10 +100,9 @@ public class NetworkBusObject implements INetworkBus {
                 System.out.println("[NettyServer] Exception when reading ClientCredentials: Channel of packet was null!");
                 return;
             }
-            nettyClient.setChannel(packet.getChannel());
+            nettyClient.setChannel(new NetworkChannelObject(networkConnection, packet.getChannel()));
             ((INetworkServer)networkConnection).getClientManager().registerClient(nettyClient);
 
-            nettyClient.sendPacket(networkConnection, new PacketHandshake());
             return;
         }
         // call packets processing

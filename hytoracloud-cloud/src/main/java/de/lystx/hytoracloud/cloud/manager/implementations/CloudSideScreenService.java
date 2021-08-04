@@ -1,13 +1,12 @@
 package de.lystx.hytoracloud.cloud.manager.implementations;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.service.screen.IScreen;
 import de.lystx.hytoracloud.driver.service.screen.IScreenManager;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverScreenRequest;
 import de.lystx.hytoracloud.driver.wrapped.ScreenObject;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
 
 import java.util.*;
 
@@ -103,33 +102,29 @@ public class CloudSideScreenService implements IScreenManager {
         if (this.map.containsKey(name)) {
             return this.map.get(name);
         } else {
-            //Creating packet request and waiting for component-response
-            PacketReceiverScreenRequest screenRequest = new PacketReceiverScreenRequest(name);
-            Component component = screenRequest.toReply(CloudDriver.getInstance().getConnection(), 100);
+        //Creating packet request and waiting for component-response
 
-            if (component != null) {
-                //Request successful
-                List<String> cachedLines = component.get("lines"); //Requested cached lines
-                List<String> list = this.cachedLines.get(name); //This lines cached
+        DriverRequest<List> request = DriverRequest.create("SCREEN_GET_LINES", "CLOUD", List.class);
 
-                //New screen instance
-                IScreen serviceOutput = new ScreenObject(null, null, null, name);
+        request.append("screen", name);
+        List<String> cachedLines = request.execute().setTimeOut(40, new LinkedList<>()).pullValue();
 
-                if (cachedLines == null) {
-                    serviceOutput.setCachedLines(list == null ? new LinkedList<>() : list);
-                } else {
-                    if (cachedLines.size() > (list == null ? 0 : list.size())) {
-                        serviceOutput.setCachedLines(cachedLines);
-                    } else {
-                        serviceOutput.setCachedLines(list == null ? cachedLines : list);
-                    }
-                }
-                return serviceOutput;
+            List<String> list = this.cachedLines.get(name); //This lines cached
+
+            //New screen instance
+            IScreen serviceOutput = new ScreenObject(null, null, null, name);
+
+            if (cachedLines == null) {
+                serviceOutput.setCachedLines(list == null ? new LinkedList<>() : list);
             } else {
-                //Request failed no screen provided
-                //Returning null...
-                return null;
+                if (cachedLines.size() > (list == null ? 0 : list.size())) {
+                    serviceOutput.setCachedLines(cachedLines);
+                } else {
+                    serviceOutput.setCachedLines(list == null ? cachedLines : list);
+                }
             }
+            return serviceOutput;
+
         }
     }
 

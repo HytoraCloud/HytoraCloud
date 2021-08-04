@@ -1,13 +1,14 @@
 package de.lystx.hytoracloud.global;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.global.process.ServiceStarter;
 import de.lystx.hytoracloud.global.process.ServiceStopper;
 import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutStopServer;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.*;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutStopServer;
+import de.lystx.hytoracloud.driver.packets.receiver.*;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
@@ -15,7 +16,7 @@ import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
 import de.lystx.hytoracloud.driver.utils.other.CloudMap;
 import de.lystx.hytoracloud.driver.utils.other.Action;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
+
 import de.lystx.hytoracloud.driver.wrapped.ReceiverObject;
 import de.lystx.hytoracloud.driver.wrapped.ServiceObject;
 import lombok.Getter;
@@ -65,9 +66,9 @@ public class InternalReceiver extends ReceiverObject implements IReceiver {
     @Override
     public long getMemory() {
         if (this.isPacketVar()) {
-            PacketReceiverMemoryUsage packetReceiverMemoryUsage = new PacketReceiverMemoryUsage(this);
-            Component component = packetReceiverMemoryUsage.toReply(CloudDriver.getInstance().getConnection());
-            return component == null ? -1L : component.get("memory");
+            DriverRequest<Long> request = DriverRequest.create("RECEIVER_MEMORY_USAGE", "CLOUD", Long.class);
+            request.append("name", this.getName());
+            return request.execute().setTimeOut(30, -1L).pullValue();
         }
         return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576L;
     }

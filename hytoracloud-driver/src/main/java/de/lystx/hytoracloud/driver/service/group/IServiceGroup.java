@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.utils.interfaces.Syncable;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
 
 
 import java.io.Serializable;

@@ -1,5 +1,7 @@
 package de.lystx.hytoracloud.cloud.handler.group;
 
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.service.group.IGroupManager;
 import de.lystx.hytoracloud.driver.service.template.ITemplate;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
@@ -8,17 +10,17 @@ import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.wrapped.TemplateObject;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInUpdateServiceGroup;
+import de.lystx.hytoracloud.driver.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideGroupManager;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.response.ResponseStatus;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
+
+
 
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class CloudHandlerGroupUpdate implements PacketHandler {
+public class CloudHandlerGroupUpdate implements IPacketHandler {
 
     public CloudHandlerGroupUpdate() {
         CloudDriver.getInstance().getRequestManager().registerRequestHandler(new Consumer<DriverRequest<?>>() {
@@ -114,7 +116,7 @@ public class CloudHandlerGroupUpdate implements PacketHandler {
         });
     }
 
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketInUpdateServiceGroup) {
             PacketInUpdateServiceGroup packetInUpdateServiceGroup = (PacketInUpdateServiceGroup)packet;
             IServiceGroup group = packetInUpdateServiceGroup.getServiceGroup();

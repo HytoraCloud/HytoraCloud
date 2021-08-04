@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerSe
 import de.lystx.hytoracloud.driver.wrapped.PlayerObject;
 import de.lystx.hytoracloud.driver.service.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.event.events.EventResult;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.PacketUnregisterPlayer;
+import de.lystx.hytoracloud.driver.packets.out.PacketUnregisterPlayer;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.utils.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.player.ICloudPlayer;

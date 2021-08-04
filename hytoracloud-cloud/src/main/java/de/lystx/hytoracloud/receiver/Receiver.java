@@ -1,38 +1,42 @@
 package de.lystx.hytoracloud.receiver;
 
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.client.INetworkClient;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.client.NetworkClient;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.other.INetworkAdapter;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.global.CloudProcess;
 import de.lystx.hytoracloud.receiver.impl.setup.ReceiverSetup;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideScreenService;
 import de.lystx.hytoracloud.driver.config.FileService;
 import de.lystx.hytoracloud.driver.wrapped.ReceiverObject;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReload;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketShutdown;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverLogin;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverShutdown;
+import de.lystx.hytoracloud.driver.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.packets.in.PacketShutdown;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverLogin;
+import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverShutdown;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideServiceManager;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
 
 import de.lystx.hytoracloud.global.InternalReceiver;
 import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerActions;
-import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerRegister;
 import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerScreen;
 import de.lystx.hytoracloud.receiver.impl.manager.ConfigService;
+import io.netty.channel.Channel;
+import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.client.ClientListener;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.client.NetworkClient;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.IProtocolSender;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.other.NetworkLogin;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.UUID;
 
@@ -46,7 +50,7 @@ public class Receiver extends CloudProcess {
     /**
      * The client connection
      */
-    private NetworkClient networkClient;
+    private INetworkClient networkClient;
 
     public Receiver() {
         super(CloudType.RECEIVER);
@@ -124,62 +128,12 @@ public class Receiver extends CloudProcess {
             CloudDriver.getInstance().getParent().getConsole().sendMessage("INFO", "§7Loading §6Receiver§f...");
             CloudDriver.getInstance().getParent().getConsole().sendMessage("§8");
 
-            (this.networkClient = new NetworkClient(receiver.getHost(), receiver.getPort())).login(new NetworkLogin(receiver.getName())).listener(new ClientListener() {
-                @Override
-                public void onConnect(InetSocketAddress socketAddress) {
-                    log("INFO", "§7Successfully §aconnected §7to §3Main-CloudInstance §h@ §b" + socketAddress.toString() + "§h!");
-                }
+            this.networkClient = new NetworkClient(receiver.getHost(), receiver.getPort(), ClientType.CLOUD, receiver.getName());
+
+            this.networkClient.registerNetworkAdapter(new INetworkAdapter() {
 
                 @Override
-                public void onHandshake() {
-
-                    receiver.setAuthenticated(true);
-                    receiver.update();
-
-                    new PacketReceiverLogin((ReceiverObject) receiver, keyAuth.getKey()).toReply(networkClient, component -> {
-                        boolean allow = component.get("allowed");
-                        String message = component.get("message");
-
-                        log(allow ? "INFO" : "ERROR", message);
-
-                        if (!allow) {
-                            //Wrong key or any other error.... stopping receiver
-                            System.exit(0);
-                        } else {
-                            log("INFO", "§7Waiting for §bCacheUpdate §7of §3Main-CloudInstance §7to start §aServices§h...");
-
-                            //Force cloud to reload
-                            sendPacket(new PacketReload());
-                            getConnection().registerPacketHandler(new PacketHandler() {
-                                @Override
-                                public void handle(Packet packet) {
-
-                                    if (packet instanceof PacketOutGlobalInfo) {
-                                        PacketOutGlobalInfo globalInfo = (PacketOutGlobalInfo)packet;
-                                        CloudDriver.getInstance().getConfigManager().setNetworkConfig(globalInfo.getNetworkConfig());
-                                        CloudDriver.getInstance().setInstance("serviceManager", new CloudSideServiceManager(globalInfo.getGroups()));
-                                        log("INFO", "§7Received §bCacheUpdate §7from §3Main-CloudInstance §h!");
-
-                                        getConnection().unregisterPacketHandler(this);
-                                    }
-                                }
-                            });
-
-                        }
-                    });
-
-                }
-
-                @Override
-                public void onDisconnect() {
-
-                }
-
-                @Override
-                public void onReceive(IProtocolSender sender, Object object) {}
-
-                @Override
-                public void packetIn(Packet packet) {
+                public void onPacketReceive(IPacket packet) {
                     if (packet instanceof PacketShutdown) {
                         log("WARNING", "§cAttention!!!!!");
                         log("WARNING", "§cThe §eMain-CloudInstance §ccut the connection and now the Receiver won't work without it");
@@ -188,15 +142,78 @@ public class Receiver extends CloudProcess {
                 }
 
                 @Override
-                public void packetOut(Packet packet) {}
-            }).createConnection();
+                public void onHandshakeReceive(PacketHandshake handshake) {
+                    receiver.setAuthenticated(true);
+                    receiver.update();
+
+                    DriverRequest<Pair> request = DriverRequest.create("RECEIVER_LOGIN_REQUEST", "CLOUD", Pair.class);
+
+                    request.append("key", keyAuth.getKey());
+                    request.append("receiver", receiver);
+
+                    Pair<String, Boolean> pair = request.execute().setTimeOut(60, new Pair<String, Boolean>("§cThe request §cTimed out§c!", false)).pullValue();
+
+
+
+                    boolean allow = pair.getValue();
+                    String message = pair.getKey();
+
+                    log(allow ? "INFO" : "ERROR", message);
+
+                    if (!allow) {
+                        //Wrong key or any other error.... stopping receiver
+                        System.exit(0);
+                    } else {
+                        log("INFO", "§7Waiting for §bCacheUpdate §7of §3Main-CloudInstance §7to start §aServices§h...");
+
+                        //Force cloud to reload
+                        sendPacket(new PacketReload());
+                        getConnection().registerPacketHandler(new IPacketHandler() {
+                            @Override
+                            public void handle(IPacket packet) {
+
+                                if (packet instanceof PacketOutGlobalInfo) {
+                                    PacketOutGlobalInfo globalInfo = (PacketOutGlobalInfo)packet;
+                                    CloudDriver.getInstance().getConfigManager().setNetworkConfig(globalInfo.getNetworkConfig());
+                                    CloudDriver.getInstance().setInstance("serviceManager", new CloudSideServiceManager(globalInfo.getGroups()));
+                                    log("INFO", "§7Received §bCacheUpdate §7from §3Main-CloudInstance §h!");
+
+                                    getConnection().unregisterPacketHandler(this);
+                                }
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onPacketSend(IPacket packet) {
+
+                }
+
+                @Override
+                public void onChannelActive(INetworkChannel channel) {
+
+                }
+
+                @Override
+                public void onChannelInactive(INetworkChannel channel) {
+
+                }
+            });
 
             //Registering packet handler
-            this.networkClient.registerPacketHandler(new ReceiverHandlerRegister());
             this.networkClient.registerPacketHandler(new ReceiverHandlerScreen());
             this.networkClient.registerPacketHandler(new ReceiverHandlerActions());
 
             CloudDriver.getInstance().setInstance("connection", this.networkClient);
+
+            try {
+                this.networkClient.bootstrap();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -214,7 +231,11 @@ public class Receiver extends CloudProcess {
             ((CloudSideServiceManager) CloudDriver.getInstance().getServiceManager()).setRunning(false);
             CloudDriver.getInstance().getServiceManager().shutdownAll(() -> {
                 log("WARNING", "§cShutting down §e'" + receiver.getName() + "'§c...");
-                this.networkClient.close();
+                try {
+                    this.networkClient.shutdown();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
                     try {
                         FileUtils.deleteDirectory(this.getServiceRegistry().getInstance(FileService.class).getDynamicServerDirectory());
@@ -230,7 +251,7 @@ public class Receiver extends CloudProcess {
     }
 
     @Override
-    public void sendPacket(Packet packet) {
+    public void sendPacket(IPacket packet) {
         this.networkClient.sendPacket(packet);
     }
 

@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.connection.protocol.netty.other;
 
 import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.NetworkChannelObject;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.NettyPacket;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -39,7 +40,7 @@ public class NettyHandler extends SimpleChannelInboundHandler<NettyPacket> {
 
         // call handler event
         for (INetworkAdapter adapter : networkConnection.getNetworkAdapters()) {
-            adapter.onChannelActive(ctx.channel());
+            adapter.onChannelActive(new NetworkChannelObject(networkConnection, ctx.channel()));
         }
     }
 
@@ -50,7 +51,7 @@ public class NettyHandler extends SimpleChannelInboundHandler<NettyPacket> {
 
         // call handler event
         for (INetworkAdapter adapter : networkConnection.getNetworkAdapters()) {
-            adapter.onChannelInactive(ctx.channel());
+            adapter.onChannelInactive(new NetworkChannelObject(networkConnection, ctx.channel()));
         }
     }
 }

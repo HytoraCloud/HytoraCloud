@@ -1,15 +1,17 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.wrapped.ServiceInfoObject;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
+
 
 import java.util.function.Consumer;
 
-public class BukkitHandlerRequest implements PacketHandler {
+public class BukkitHandlerRequest implements IPacketHandler {
 
     public BukkitHandlerRequest() {
         CloudDriver.getInstance().getRequestManager().registerRequestHandler(new Consumer<DriverRequest<?>>() {
@@ -30,7 +32,7 @@ public class BukkitHandlerRequest implements PacketHandler {
     }
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
     }
 
 }

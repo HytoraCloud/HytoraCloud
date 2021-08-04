@@ -1,19 +1,21 @@
 package de.lystx.hytoracloud.cloud.handler.other;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketShutdown;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.in.PacketShutdown;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
+
 
 
 @AllArgsConstructor @Getter
-public class CloudHandlerShutdown implements PacketHandler {
+public class CloudHandlerShutdown implements IPacketHandler {
 
     private final CloudSystem cloudSystem;
 
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketShutdown) {
             this.cloudSystem.shutdown();
         }

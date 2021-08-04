@@ -1,4 +1,9 @@
 
+import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.IChannelHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.PacketChannelMessage;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.NetworkClient;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.INetworkClient;
@@ -8,7 +13,12 @@ import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPa
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.server.INetworkServer;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.server.NetworkServer;
+import de.lystx.hytoracloud.driver.player.ICloudPlayer;
+import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import io.netty.channel.Channel;
+
+import java.util.Arrays;
+import java.util.UUID;
 
 public class NettyTest {
 
@@ -21,9 +31,18 @@ public class NettyTest {
         networkServer.registerPacketHandler(new IPacketHandler() {
             @Override
             public void handle(IPacket packet) {
-                System.out.println("[" + packet.getClass().getSimpleName() + "] " + packet.getDif() + "ms");
+                System.out.println(packet.getDif() + "ms");
+
             }
         });
+
+        networkClient.registerPacketHandler(new IPacketHandler() {
+            @Override
+            public void handle(IPacket packet) {
+                System.out.println("[Client] " + packet.getClass().getName());
+            }
+        });
+
 
         networkClient.registerNetworkAdapter(new INetworkAdapter() {
             @Override
@@ -32,8 +51,8 @@ public class NettyTest {
 
             @Override
             public void onHandshakeReceive(PacketHandshake handshake) {
-                networkClient.sendPacket(new TestPacket("Jonas", 11));
-                networkClient.sendPacket(new SamplePacket("Jonas", 11));
+
+                networkClient.sendPacket(new TestPacket2("YES"));
             }
 
             @Override
@@ -41,11 +60,11 @@ public class NettyTest {
             }
 
             @Override
-            public void onChannelActive(Channel channel) {
+            public void onChannelActive(INetworkChannel channel) {
             }
 
             @Override
-            public void onChannelInactive(Channel channel) {
+            public void onChannelInactive(INetworkChannel channel) {
             }
         });
 

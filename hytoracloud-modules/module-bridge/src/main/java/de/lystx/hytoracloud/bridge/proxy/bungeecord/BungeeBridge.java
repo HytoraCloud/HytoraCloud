@@ -381,7 +381,7 @@ public class BungeeBridge extends Plugin implements BridgeInstance {
 
     public void shutdown() {
         try {
-            CloudDriver.getInstance().getConnection().close();
+            CloudDriver.getInstance().getConnection().shutdown();
         } catch (IOException e) {
             e.printStackTrace();
         }

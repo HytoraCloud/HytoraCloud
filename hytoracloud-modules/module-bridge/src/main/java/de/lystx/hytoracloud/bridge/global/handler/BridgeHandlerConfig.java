@@ -1,20 +1,22 @@
 package de.lystx.hytoracloud.bridge.global.handler;
 
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketUpdateNetworkConfig;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutRegisterServer;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.in.PacketUpdateNetworkConfig;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutRegisterServer;
+
+
 
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import lombok.SneakyThrows;
 
-public class BridgeHandlerConfig implements PacketHandler {
+public class BridgeHandlerConfig implements IPacketHandler {
 
 
     @SneakyThrows
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketOutGlobalInfo) {
             PacketOutGlobalInfo packetOutGlobalInfo = ((PacketOutGlobalInfo) packet);
 

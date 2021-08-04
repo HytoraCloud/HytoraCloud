@@ -1,11 +1,14 @@
 package de.lystx.hytoracloud.cloud.manager.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.server.INetworkServer;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.server.NetworkServer;
 import de.lystx.hytoracloud.driver.registry.ICloudService;
 import de.lystx.hytoracloud.driver.registry.CloudServiceInfo;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
 import lombok.Getter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.server.NetworkServer;
+
+import java.io.IOException;
 
 @Getter
 @CloudServiceInfo(
@@ -17,14 +20,18 @@ import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.server.
 )
 public class NetworkService implements ICloudService {
 
-    private final NetworkServer hytoraServer;
+    private final INetworkServer networkServer;
 
     public NetworkService() {
 
-        this.hytoraServer = new NetworkServer(CloudDriver.getInstance().getConfigManager().getNetworkConfig().getPort());
+        this.networkServer = new NetworkServer("127.0.0.1", CloudDriver.getInstance().getConfigManager().getNetworkConfig().getPort());
+        CloudDriver.getInstance().setInstance("connection", this.networkServer);
 
-        Utils.setField(CloudDriver.class, CloudDriver.getInstance(), "connection", this.hytoraServer);
-        this.hytoraServer.createConnection();
+        try {
+            this.networkServer.bootstrap();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -32,7 +39,11 @@ public class NetworkService implements ICloudService {
      * Stops server
      */
     public void shutdown() {
-        this.hytoraServer.close();
+        try {
+            this.networkServer.shutdown();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

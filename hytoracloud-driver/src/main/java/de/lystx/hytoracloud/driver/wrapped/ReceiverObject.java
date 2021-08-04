@@ -1,15 +1,16 @@
 package de.lystx.hytoracloud.driver.wrapped;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.player.ICloudPlayer;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.*;
+import de.lystx.hytoracloud.driver.packets.receiver.*;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
+
 
 import java.net.InetAddress;
 import java.util.List;
@@ -95,9 +96,10 @@ public class ReceiverObject extends WrappedObject<IReceiver, ReceiverObject> imp
 
     @Override
     public long getMemory() {
-        PacketReceiverMemoryUsage packetReceiverMemoryUsage = new PacketReceiverMemoryUsage(this);
-        Component component = packetReceiverMemoryUsage.toReply(CloudDriver.getInstance().getConnection());
-        return component == null ? -1L : component.get("memory");
+
+        DriverRequest<Long> request = DriverRequest.create("RECEIVER_MEMORY_USAGE", "CLOUD", Long.class);
+        request.append("name", this.getName());
+        return request.execute().setTimeOut(30, -1L).pullValue();
     }
 
     @Override

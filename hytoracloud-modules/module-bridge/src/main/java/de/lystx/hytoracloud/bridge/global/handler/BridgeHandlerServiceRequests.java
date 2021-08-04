@@ -1,19 +1,20 @@
 package de.lystx.hytoracloud.bridge.global.handler;
 
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketServiceMinecraftInfo;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
 import lombok.Getter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
+
 
 import java.util.function.Consumer;
 
 @Getter
-public class BridgeHandlerServiceRequests implements PacketHandler {
+public class BridgeHandlerServiceRequests implements IPacketHandler {
 
 
     public BridgeHandlerServiceRequests() {
@@ -30,18 +31,9 @@ public class BridgeHandlerServiceRequests implements PacketHandler {
     }
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (CloudDriver.getInstance().getServiceManager().getThisService() == null) {
             return;
-        }
-       if (packet instanceof PacketServiceMinecraftInfo) {
-            PacketServiceMinecraftInfo packetServiceInfo = (PacketServiceMinecraftInfo)packet;
-            if (!packetServiceInfo.getService().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getThisService().getName())) {
-                return;
-            }
-
-            BridgeInstance bridgeInstance = CloudBridge.getInstance().getBridgeInstance();
-            packet.reply(component -> component.put("info", bridgeInstance.loadExtras().get("info")));
         }
     }
 }

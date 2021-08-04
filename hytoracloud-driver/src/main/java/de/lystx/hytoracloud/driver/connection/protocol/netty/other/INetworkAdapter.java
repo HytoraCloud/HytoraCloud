@@ -1,5 +1,6 @@
 package de.lystx.hytoracloud.driver.connection.protocol.netty.other;
 
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
 import io.netty.channel.Channel;
@@ -10,18 +11,25 @@ import io.netty.channel.Channel;
 public interface INetworkAdapter {
 
     /**
-     * When the instance receives a packet
-     *
-     * @param packet The packet
-     */
-    void onPacketReceive(IPacket packet);
-
-    /**
      * When the instance receives a handshake packet
      *
      * @param handshake The handshake packet
      */
     void onHandshakeReceive(PacketHandshake handshake);
+
+    /**
+     * When the instance connected to the server or when a client connected to the instance
+     *
+     * @param channel The channel
+     */
+    void onChannelActive(INetworkChannel channel);
+
+    /**
+     * When the instance disconnected from the server or when a client disconnected from the instance
+     *
+     * @param channel The channel
+     */
+    void onChannelInactive(INetworkChannel channel);
 
     /**
      * When the instance wants to send a packet
@@ -31,17 +39,10 @@ public interface INetworkAdapter {
     void onPacketSend(IPacket packet);
 
     /**
-     * When the instance connected to the server or when a client connected to the instance
+     * When the instance receives a packet
      *
-     * @param channel The channel
+     * @param packet The packet
      */
-    void onChannelActive(Channel channel);
-
-    /**
-     * When the instance disconnected from the server or when a client disconnected from the instance
-     *
-     * @param channel The channel
-     */
-    void onChannelInactive(Channel channel);
+    void onPacketReceive(IPacket packet);
 
 }

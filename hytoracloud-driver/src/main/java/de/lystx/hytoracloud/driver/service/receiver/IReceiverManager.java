@@ -1,8 +1,9 @@
 package de.lystx.hytoracloud.driver.service.receiver;
 
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
 import de.lystx.hytoracloud.driver.utils.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.service.IService;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -64,5 +65,5 @@ public interface IReceiverManager {
      * @param receiver the receiver
      * @param packet the packet
      */
-    void sendPacket(IReceiver receiver, Packet packet);
+    void sendPacket(IReceiver receiver, IPacket packet);
 }

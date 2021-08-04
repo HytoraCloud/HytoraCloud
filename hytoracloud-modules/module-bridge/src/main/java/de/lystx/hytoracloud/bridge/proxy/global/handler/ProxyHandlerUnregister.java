@@ -2,16 +2,18 @@ package de.lystx.hytoracloud.bridge.proxy.global.handler;
 
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutStopServer;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutStopServer;
 import de.lystx.hytoracloud.driver.service.IService;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
 
-public class ProxyHandlerUnregister implements PacketHandler {
+
+
+public class ProxyHandlerUnregister implements IPacketHandler {
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketOutStopServer) {
             PacketOutStopServer packetOutStopServer = (PacketOutStopServer)packet;
             IService IService = CloudDriver.getInstance().getServiceManager().getCachedObject(packetOutStopServer.getService());

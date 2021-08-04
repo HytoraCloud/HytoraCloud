@@ -2,10 +2,15 @@ package de.lystx.hytoracloud.driver.connection.protocol.netty.client;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.DriverInfo;
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkBus;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.NetworkChannelObject;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.data.DefaultNettyClient;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.data.INettyClient;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.IChannelHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.PacketChannelMessage;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.other.NetworkBusObject;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.other.INetworkAdapter;
@@ -15,6 +20,7 @@ import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketC
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.server.NetworkServer;
 import de.lystx.hytoracloud.driver.utils.other.PipelineUtil;
+import de.lystx.hytoracloud.driver.wrapped.ChannelMessageObject;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -24,8 +30,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * In a netty network this is the client which connects to the {@link NetworkServer}
@@ -68,7 +76,7 @@ public class NetworkClient extends Thread implements INetworkClient {
      * The netty channel of the instance
      */
     @Setter
-    private Channel channel;
+    private INetworkChannel channel;
 
     /**
      * All registered adapters
@@ -83,7 +91,8 @@ public class NetworkClient extends Thread implements INetworkClient {
     /**
      * The name of the client
      */
-    private final String username;
+    @Setter
+    private String username;
 
     /**
      * The type
@@ -94,6 +103,10 @@ public class NetworkClient extends Thread implements INetworkClient {
      * The info
      */
     private final INettyClient nettyClient;
+    /**
+     * All registered channelHandlers
+     */
+    private final Map<String, List<IChannelHandler>> channelHandlers;
 
     public NetworkClient(String host, int port, ClientType type, String username) {
         this.host = host;
@@ -106,6 +119,7 @@ public class NetworkClient extends Thread implements INetworkClient {
 
         this.networkAdapters = new LinkedList<>();
         this.packetHandlers = new LinkedList<>();
+        this.channelHandlers = new HashMap<>();
         this.networkBus = new NetworkBusObject(this);
 
         this.registerNetworkAdapter(new INetworkAdapter() {
@@ -115,6 +129,7 @@ public class NetworkClient extends Thread implements INetworkClient {
 
             @Override
             public void onHandshakeReceive(PacketHandshake handshake) {
+                sendPacket(new PacketClientCredentials(nettyClient));
             }
 
             @Override
@@ -122,12 +137,11 @@ public class NetworkClient extends Thread implements INetworkClient {
             }
 
             @Override
-            public void onChannelActive(Channel channel) {
-                sendPacket(new PacketClientCredentials(nettyClient));
+            public void onChannelActive(INetworkChannel channel) {
             }
 
             @Override
-            public void onChannelInactive(Channel channel) {
+            public void onChannelInactive(INetworkChannel channel) {
             }
         });
     }
@@ -139,6 +153,34 @@ public class NetworkClient extends Thread implements INetworkClient {
 
     @Override
     public void sendPacket(INetworkConnection connection, IPacket packet) {
+    }
+
+    @Override
+    public void registerChannelHandler(String channel, IChannelHandler channelHandler) {
+        List<IChannelHandler> channelHandlers = this.channelHandlers.get(channel);
+        if (channelHandlers == null) {
+            channelHandlers = new LinkedList<>();
+        }
+        channelHandlers.add(channelHandler);
+        this.channelHandlers.put(channel, channelHandlers);
+    }
+
+    public List<IChannelHandler> getChannelHandlers() {
+        List<IChannelHandler> channelHandlers = new LinkedList<>();
+        for (List<IChannelHandler> value : this.channelHandlers.values()) {
+            channelHandlers.addAll(value);
+        }
+        return channelHandlers;
+    }
+
+    @Override
+    public List<IChannelHandler> getChannelHandlers(String channel) {
+        return this.channelHandlers.getOrDefault(channel, new LinkedList<>());
+    }
+
+    @Override
+    public void sendChannelMessage(IChannelMessage message) {
+        this.sendPacket(new PacketChannelMessage(message));
     }
 
     @Override
@@ -157,7 +199,7 @@ public class NetworkClient extends Thread implements INetworkClient {
         EventLoopGroup eventExecutors = new NioEventLoopGroup();
 
         try {
-            this.channel = bootstrap.connect(getHost(), getPort()).sync().channel();
+            this.channel = new NetworkChannelObject(this, bootstrap.connect(getHost(), getPort()).sync().channel());
             channel.closeFuture().sync().syncUninterruptibly();
         } catch (Exception e) {
             try {
@@ -177,12 +219,17 @@ public class NetworkClient extends Thread implements INetworkClient {
 
     @Override
     public void sendPacket(IPacket packet) {
-        this.networkBus.processOut(channel, packet);
+        this.channel.sendPacket(packet);
     }
 
     @Override
     public void registerNetworkAdapter(INetworkAdapter adapter) {
         this.networkAdapters.add(adapter);
+    }
+
+    @Override
+    public void unregisterPacketHandler(IPacketHandler packetHandler) {
+        this.packetHandlers.remove(packetHandler);
     }
 
     @Override

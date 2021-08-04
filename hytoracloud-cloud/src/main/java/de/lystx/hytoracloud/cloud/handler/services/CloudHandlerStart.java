@@ -2,23 +2,25 @@ package de.lystx.hytoracloud.cloud.handler.services;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStartGroup;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStartGroupWithProperties;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStartService;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.in.PacketInStartGroup;
+import de.lystx.hytoracloud.driver.packets.in.PacketInStartGroupWithProperties;
+import de.lystx.hytoracloud.driver.packets.in.PacketInStartService;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 
 import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideGroupManager;
 import lombok.AllArgsConstructor;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
+
 
 @AllArgsConstructor
-public class CloudHandlerStart implements PacketHandler {
+public class CloudHandlerStart implements IPacketHandler {
 
     private final CloudSystem cloudSystem;
     
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketInStartGroup) {
             PacketInStartGroup packetInStartGroup = (PacketInStartGroup) packet;
             IServiceGroup group = packetInStartGroup.getServiceGroup();

@@ -7,7 +7,7 @@ import de.lystx.hytoracloud.driver.service.screen.IScreen;
 import de.lystx.hytoracloud.driver.service.screen.IScreenManager;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverScreenCache;
+import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverScreenCache;
 import lombok.Getter;
 import lombok.Setter;
 

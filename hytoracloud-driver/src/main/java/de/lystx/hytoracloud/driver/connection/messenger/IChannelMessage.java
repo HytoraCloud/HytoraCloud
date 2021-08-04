@@ -2,7 +2,6 @@ package de.lystx.hytoracloud.driver.connection.messenger;
 
 import de.lystx.hytoracloud.driver.utils.interfaces.Identifiable;
 import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
 
 import java.io.Serializable;
 
@@ -72,32 +71,4 @@ public interface IChannelMessage extends Serializable {
      */
     void setSender(Identifiable sender);
 
-    /**
-     * Transforms this message to a {@link Component}
-     *
-     * @return component
-     */
-    Component toComponent();
-
-    /**
-     * Replies with a given message
-     *
-     * @param message the message
-     */
-    void respond(IChannelMessage message);
-
-    /**
-     * Replies with a document data
-     *
-     * @param document the data
-     */
-    void respond(JsonDocument document);
-
-    /**
-     * Replies with a key and a document data
-     *
-     * @param key the key
-     * @param document the document
-     */
-    void respond(String key, JsonDocument document);
 }

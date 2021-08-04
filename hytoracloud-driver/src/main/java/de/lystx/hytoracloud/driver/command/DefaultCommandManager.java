@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.command.execution.ICommand;
 import de.lystx.hytoracloud.driver.command.executor.CommandExecutor;
 import de.lystx.hytoracloud.driver.command.execution.CommandInfo;
 import de.lystx.hytoracloud.driver.command.execution.CommandListener;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketCommand;
+import de.lystx.hytoracloud.driver.packets.both.PacketCommand;
 
 import lombok.Getter;
 import lombok.Setter;

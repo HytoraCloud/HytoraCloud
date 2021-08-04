@@ -2,16 +2,18 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.handler;
 
 import de.lystx.hytoracloud.bridge.spigot.bukkit.signselector.ServerSelector;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketServiceUpdate;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.service.IService;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
-public class BukkitHandlerSignUpdate implements PacketHandler {
+
+
+public class BukkitHandlerSignUpdate implements IPacketHandler {
 
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketServiceUpdate) {
             PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;
             IService service = packetServiceUpdate.getService();

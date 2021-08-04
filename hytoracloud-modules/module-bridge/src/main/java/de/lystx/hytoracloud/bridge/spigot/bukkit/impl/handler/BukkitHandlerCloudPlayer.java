@@ -3,12 +3,13 @@ package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.BukkitBridge;
 import de.lystx.hytoracloud.bridge.spigot.bukkit.utils.BukkitItem;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.player.inventory.Item;
 import de.lystx.hytoracloud.driver.service.minecraft.world.MinecraftLocation;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
 
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatMessageType;
@@ -25,7 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class BukkitHandlerCloudPlayer implements PacketHandler {
+public class BukkitHandlerCloudPlayer implements IPacketHandler {
 
     public BukkitHandlerCloudPlayer() {
         CloudDriver.getInstance().getRequestManager().registerRequestHandler(new Consumer<DriverRequest<?>>() {
@@ -184,6 +185,6 @@ public class BukkitHandlerCloudPlayer implements PacketHandler {
     }
 
     @SneakyThrows
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
     }
 }

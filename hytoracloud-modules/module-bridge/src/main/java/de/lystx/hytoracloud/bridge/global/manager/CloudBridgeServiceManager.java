@@ -2,7 +2,7 @@ package de.lystx.hytoracloud.bridge.global.manager;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.utils.interfaces.Requestable;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.*;
+import de.lystx.hytoracloud.driver.packets.in.*;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.utils.json.JsonDocument;

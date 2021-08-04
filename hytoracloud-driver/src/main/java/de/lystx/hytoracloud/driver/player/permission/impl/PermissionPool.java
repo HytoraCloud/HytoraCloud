@@ -5,7 +5,7 @@ import de.lystx.hytoracloud.driver.utils.interfaces.ObjectPool;
 import de.lystx.hytoracloud.driver.event.events.player.permissions.DriverEventPlayerGroupReceive;
 import de.lystx.hytoracloud.driver.event.events.player.permissions.DriverEventPlayerGroupRemove;
 import de.lystx.hytoracloud.driver.utils.interfaces.ScheduledForVersion;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.other.PacketUpdatePermissionPool;
+import de.lystx.hytoracloud.driver.packets.both.other.PacketUpdatePermissionPool;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.connection.database.IDatabase;
 import de.lystx.hytoracloud.driver.config.FileService;

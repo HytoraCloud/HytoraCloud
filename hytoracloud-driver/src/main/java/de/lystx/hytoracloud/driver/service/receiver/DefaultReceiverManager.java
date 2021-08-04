@@ -1,15 +1,18 @@
 package de.lystx.hytoracloud.driver.service.receiver;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.client.data.INettyClient;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.manager.IClientManager;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.server.INetworkServer;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverUpdate;
+import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverUpdate;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.NetworkBridge;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.other.UserManager;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+
 
 import java.util.*;
 
@@ -80,15 +83,19 @@ public class DefaultReceiverManager implements IReceiverManager {
     }
 
     @Override
-    public void sendPacket(IReceiver receiver, Packet packet) {
+    public void sendPacket(IReceiver receiver, IPacket packet) {
         if (receiver.getName().equalsIgnoreCase(Utils.INTERNAL_RECEIVER)) {
             return;
         }
-        UserManager userManager = CloudDriver.getInstance().getConnection().getUserManager();
-        NetworkBridge user = userManager.getUser(receiver.getName());
-        if (user == null) {
-            return;
+        INetworkConnection connection = CloudDriver.getInstance().getConnection();
+        if (connection instanceof INetworkServer) {
+            INetworkServer networkServer = (INetworkServer) connection;
+            IClientManager clientManager = networkServer.getClientManager();
+            INettyClient client = clientManager.getClient(receiver.getName());
+            if (client == null) {
+                return;
+            }
+            client.sendPacket(connection, packet);
         }
-        user.processIn(packet);
     }
 }

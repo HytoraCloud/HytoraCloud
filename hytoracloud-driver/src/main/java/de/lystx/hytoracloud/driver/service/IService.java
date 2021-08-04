@@ -1,6 +1,8 @@
 package de.lystx.hytoracloud.driver.service;
 
 import de.lystx.hytoracloud.driver.config.impl.proxy.Motd;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
 import de.lystx.hytoracloud.driver.service.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
@@ -11,8 +13,6 @@ import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.response.ResponseStatus;
 
 
 import java.io.Serializable;
@@ -24,11 +24,11 @@ import java.util.Optional;
 public interface IService extends Serializable, Syncable<IService>, Identifiable {
 
     /**
-     * Sends a {@link Packet} to only this {@link IService}
+     * Sends a {@link IPacket} to only this {@link IService}
      *
      * @param packet the packet
      */
-    void sendPacket(Packet packet);
+    void sendPacket(IPacket packet);
 
     /**
      * Sets the host of this service

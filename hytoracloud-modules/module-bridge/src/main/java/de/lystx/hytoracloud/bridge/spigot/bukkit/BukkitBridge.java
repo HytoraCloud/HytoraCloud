@@ -22,7 +22,7 @@ import de.lystx.hytoracloud.driver.service.minecraft.entity.MinecraftEntity;
 import de.lystx.hytoracloud.driver.service.minecraft.entity.MinecraftPlayer;
 import de.lystx.hytoracloud.driver.service.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.service.minecraft.world.*;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInStopServer;
+import de.lystx.hytoracloud.driver.packets.in.PacketInStopServer;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.service.minecraft.other.NetworkInfo;
 import de.lystx.hytoracloud.driver.utils.other.CloudMap;
@@ -76,7 +76,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
 
         CloudBridge.load(this);
 
-        if (CloudDriver.getInstance().getConnection() == null || !CloudDriver.getInstance().getConnection().isAvailable()) {
+        if (CloudDriver.getInstance().getConnection() == null || !CloudDriver.getInstance().getConnection().isConnected()) {
             CloudBridge.load(this);
         }
 
@@ -125,7 +125,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
     public void onDisable() {
         this.serverSelector.shutdown();
         try {
-            CloudDriver.getInstance().getConnection().close();
+            CloudDriver.getInstance().getConnection().shutdown();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -465,7 +465,7 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
         CloudDriver.getInstance().sendPacket(new PacketInStopServer(CloudDriver.getInstance().getServiceManager().getThisService().getName()));
 
         try {
-            CloudDriver.getInstance().getConnection().close();
+            CloudDriver.getInstance().getConnection().shutdown();
         } catch (IOException e) {
             e.printStackTrace();
         }

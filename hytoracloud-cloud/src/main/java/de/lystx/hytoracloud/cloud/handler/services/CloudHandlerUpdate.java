@@ -1,23 +1,25 @@
 package de.lystx.hytoracloud.cloud.handler.services;
 
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.service.screen.IScreen;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketServiceUpdate;
+import de.lystx.hytoracloud.driver.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.response.ResponseStatus;
+
+
+import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 
-public class CloudHandlerUpdate implements PacketHandler {
+public class CloudHandlerUpdate implements IPacketHandler {
 
     public CloudHandlerUpdate() {
         CloudDriver.getInstance().getRequestManager().registerRequestHandler(new Consumer<DriverRequest<?>>() {
@@ -89,7 +91,7 @@ public class CloudHandlerUpdate implements PacketHandler {
     }
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketServiceUpdate) {
             PacketServiceUpdate packetServiceUpdate = (PacketServiceUpdate)packet;
             IService service = packetServiceUpdate.getService();

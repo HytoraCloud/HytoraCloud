@@ -8,7 +8,7 @@ import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
+
 
 import java.lang.reflect.Field;
 
@@ -40,62 +40,36 @@ public class ChannelMessageObject extends WrappedObject<IChannelMessage, Channel
     /**
      * The receiver
      */
-    private final Identifiable receiver;
+    private final IdentifiableObject receiver;
 
     /**
      * The sender
      */
-    private Identifiable sender;
+    private IdentifiableObject sender;
 
     public ChannelMessageObject(String key, String channel, long id, JsonObject<?> document, Identifiable receiver) {
         this.key = key;
         this.channel = channel;
         this.id = id;
         this.document = document == null ? "{}" : document.toString();
-        this.receiver = receiver;
+        this.receiver = (IdentifiableObject) receiver;
     }
 
     public JsonDocument getDocument() {
         return new JsonDocument(this.document);
     }
 
-    @Override @SneakyThrows
-    public void respond(IChannelMessage message) {
-        message.setId(this.id);
-        message.setSender(this.sender);
-
-        Component component = message.toComponent();
-
-        component.setReceiver(message.getSender().getName());
-        component.setChannel(this.channel);
-        component.put("iMessage", message);
-
-        CloudDriver.getInstance().getConnection().sendComponent(component);
+    public void setSender(Identifiable sender) {
+        this.sender = (IdentifiableObject) sender;
     }
 
-    @Override
-    public void respond(JsonDocument document) {
-        this.respond(IChannelMessage.builder().document(document).build());
+
+    public Identifiable getSender() {
+        return sender;
     }
 
-    @Override
-    public void respond(String key, JsonDocument document) {
-        this.respond(IChannelMessage.builder().key(key).document(document).build());
-    }
-
-    @Override @SneakyThrows
-    public Component toComponent() {
-        Component component = new Component();
-        component.setChannel(this.channel);
-
-        //Setting request-id to this id
-        Field requestID = component.getClass().getDeclaredField("requestID");
-        requestID.setAccessible(true);
-        requestID.set(component, this.id);
-
-        component.setReceiver(receiver == null ? "ALL" : receiver.getName());
-        component.put("iMessage", this);
-        return component;
+    public Identifiable getReceiver() {
+        return receiver;
     }
 
     @Override

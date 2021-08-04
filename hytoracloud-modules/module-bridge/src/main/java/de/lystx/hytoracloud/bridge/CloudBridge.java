@@ -8,7 +8,14 @@ import de.lystx.hytoracloud.bridge.global.handler.*;
 import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
 import de.lystx.hytoracloud.bridge.proxy.global.listener.TabListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.client.INetworkClient;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.client.NetworkClient;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.other.INetworkAdapter;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
 import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
@@ -19,7 +26,7 @@ import de.lystx.hytoracloud.driver.utils.other.CloudMap;
 import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketRegisterService;
+import de.lystx.hytoracloud.driver.packets.both.service.PacketRegisterService;
 import de.lystx.hytoracloud.driver.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.config.impl.proxy.TabList;
 import de.lystx.hytoracloud.driver.module.cloud.ModuleService;
@@ -28,18 +35,16 @@ import de.lystx.hytoracloud.driver.player.permission.PermissionService;
 
 import de.lystx.hytoracloud.driver.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
+import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.client.ClientListener;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.client.NetworkClient;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.IProtocolSender;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.other.NetworkLogin;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
+
 
 import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +57,7 @@ public class CloudBridge {
     private static CloudBridge instance;
 
     private final CloudDriver cloudDriver;
-    private final NetworkClient client;
+    private final INetworkClient client;
     private final BridgeInstance bridgeInstance;
     private final Map<InetSocketAddress, InetSocketAddress> addresses;
     private boolean received;
@@ -70,7 +75,7 @@ public class CloudBridge {
         CloudDriver.getInstance().setInstance("bridgeInstance", bridgeInstance);
 
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
-        this.client = new NetworkClient(jsonDocument.getString("host"), jsonDocument.getInteger("port"));
+        this.client = new NetworkClient(jsonDocument.getString("host"), jsonDocument.getInteger("port"), ClientType.PROXY, "");
 
         CloudDriver.getInstance().setInstance("connection", this.client);
         CloudDriver.getInstance().setInstance("driverType", CloudType.BRIDGE);
@@ -89,7 +94,6 @@ public class CloudBridge {
         CloudDriver.getInstance().registerPacketHandler(
                 new BridgeHandlerConfig(),
                 new BridgeHandlerCommand(),
-                new BridgeHandlerCommunication(),
                 new BridgeHandlerPlayer(),
                 new BridgeHandlerServiceUpdate(),
                 new BridgeHandlerPerms(),
@@ -143,52 +147,11 @@ public class CloudBridge {
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
 
         System.out.println("[CloudBridge] Trying to connect to Cloud@" + jsonDocument.getString("host") + ":" + jsonDocument.getInteger("port") + " via user '" + jsonDocument.getString("server") + "' ...");
-        this.client.listener(new ClientListener() {
+        ((NetworkClient)this.client).setUsername(jsonDocument.getString("server"));
 
+        this.client.registerNetworkAdapter(new INetworkAdapter() {
             @Override
-            public void onConnect(InetSocketAddress socketAddress) {
-
-
-                System.out.println("\n" +
-                        "   _____ _                 _ ____       _     _            \n" +
-                        "  / ____| |               | |  _ \\     (_)   | |           \n" +
-                        " | |    | | ___  _   _  __| | |_) |_ __ _  __| | __ _  ___ \n" +
-                        " | |    | |/ _ \\| | | |/ _` |  _ <| '__| |/ _` |/ _` |/ _ \\\n" +
-                        " | |____| | (_) | |_| | (_| | |_) | |  | | (_| | (_| |  __/\n" +
-                        "  \\_____|_|\\___/ \\__,_|\\__,_|____/|_|  |_|\\__,_|\\__, |\\___|\n" +
-                        "                                                 __/ |     \n" +
-                        "                                                |___/      ");
-                System.out.println("-------------------------");
-                System.out.println("[CloudBridge] Bridge has connected to cloud at [" + socketAddress.toString() + "]");
-                System.out.println("[CloudBridge] But this Service has not received a Handshake-Component yet!");
-
-                JsonObject<?> document = new JsonDocument(new File("./CLOUD/orientation.json"));
-                IService service = document.getAs(ServiceObject.class);
-                document.delete();
-
-                PacketRegisterService packetRegisterService = new PacketRegisterService(jsonDocument.getString("server"), service);
-                CloudDriver.getInstance().sendPacket(packetRegisterService);
-            }
-
-            @SneakyThrows
-            @Override
-            public void onHandshake() {
-                System.out.println("[CloudBridge] This Service is now registered and has Hands shaken with the CloudSystem");
-            }
-
-            @Override
-            public void onDisconnect() {
-            }
-
-            @Override
-            public void onReceive(IProtocolSender sender, Object object) {
-            }
-
-            @Override
-            public void packetIn(Packet packet) {
-                if (received) {
-                    return;
-                }
+            public void onPacketReceive(IPacket packet) {
                 if (packet instanceof PacketOutGlobalInfo) {
                     received = true;
                     CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
@@ -222,10 +185,49 @@ public class CloudBridge {
             }
 
             @Override
-            public void packetOut(Packet packet) {
-            }
-        }).login(new NetworkLogin(jsonDocument.getString("server"))).createConnection();
+            public void onHandshakeReceive(PacketHandshake handshake) {
+                SocketAddress socketAddress = handshake.getAddress();
+                System.out.println("\n" +
+                        "   _____ _                 _ ____       _     _            \n" +
+                        "  / ____| |               | |  _ \\     (_)   | |           \n" +
+                        " | |    | | ___  _   _  __| | |_) |_ __ _  __| | __ _  ___ \n" +
+                        " | |    | |/ _ \\| | | |/ _` |  _ <| '__| |/ _` |/ _` |/ _ \\\n" +
+                        " | |____| | (_) | |_| | (_| | |_) | |  | | (_| | (_| |  __/\n" +
+                        "  \\_____|_|\\___/ \\__,_|\\__,_|____/|_|  |_|\\__,_|\\__, |\\___|\n" +
+                        "                                                 __/ |     \n" +
+                        "                                                |___/      ");
+                System.out.println("-------------------------");
+                System.out.println("[CloudBridge] Bridge has connected to cloud at [" + socketAddress.toString() + "]");
+                System.out.println("[CloudBridge] This Service is now registered and has Hands shaken with the CloudSystem");
 
+                JsonObject<?> document = new JsonDocument(new File("./CLOUD/orientation.json"));
+                IService service = document.getAs(ServiceObject.class);
+                document.delete();
+
+                PacketRegisterService packetRegisterService = new PacketRegisterService(jsonDocument.getString("server"), service);
+                CloudDriver.getInstance().sendPacket(packetRegisterService);
+            }
+
+            @Override
+            public void onPacketSend(IPacket packet) {
+
+            }
+
+            @Override
+            public void onChannelActive(INetworkChannel channel) {
+            }
+
+            @Override
+            public void onChannelInactive(INetworkChannel channel) {
+
+            }
+        });
+
+        try {
+            this.client.bootstrap();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -8,14 +8,7 @@ import java.io.IOException;
 /**
  * This packet is for the handshake between two instances (at least a bit of authentication)
  */
-public class PacketHandshake extends NettyPacket {
+public class PacketHandshake extends EmptyPacket {
 
-    @Override
-    public void read(PacketBuffer buf) throws IOException {
-    }
-
-    @Override
-    public void write(PacketBuffer buf) throws IOException {
-    }
 
 }

@@ -1,16 +1,18 @@
 package de.lystx.hytoracloud.cloud.handler.services;
 
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutRegisterServer;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutRegisterServer;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketRegisterService;
+import de.lystx.hytoracloud.driver.packets.both.service.PacketRegisterService;
 import de.lystx.hytoracloud.driver.service.IService;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
-public class CloudHandlerRegister implements PacketHandler {
+
+
+public class CloudHandlerRegister implements IPacketHandler {
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketRegisterService) {
             PacketRegisterService packetRegisterService = (PacketRegisterService)packet;
             IService service = packetRegisterService.getIService();

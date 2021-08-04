@@ -3,17 +3,19 @@ package de.lystx.hytoracloud.bridge.proxy.global.handler;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.*;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.both.player.*;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
+
 
 
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class ProxyHandlerCloudPlayer implements PacketHandler {
+public class ProxyHandlerCloudPlayer implements IPacketHandler {
 
 
     public ProxyHandlerCloudPlayer() {
@@ -53,7 +55,7 @@ public class ProxyHandlerCloudPlayer implements PacketHandler {
     }
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         ProxyBridge proxyBridge = CloudBridge.getInstance().getProxyBridge();
 
         if (packet instanceof PacketSendComponent) {

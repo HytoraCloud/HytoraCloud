@@ -11,7 +11,7 @@ public enum ClientType {
     /**
      * A server instance (spigot/bukkit, ...)
      */
-    SERVER,
+    SPIGOT,
 
     /**
      * A proxy instance (bungee, ...)

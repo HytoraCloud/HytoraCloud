@@ -1,18 +1,20 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInUpdateServiceGroup;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
+
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class BukkitHandlerGroupUpdate implements PacketHandler {
+public class BukkitHandlerGroupUpdate implements IPacketHandler {
 
     
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketInUpdateServiceGroup) {
 
             PacketInUpdateServiceGroup packetPlayOutUpdateServiceGroup = (PacketInUpdateServiceGroup) packet;

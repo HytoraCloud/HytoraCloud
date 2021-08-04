@@ -4,7 +4,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.config.IConfigManager;
 import de.lystx.hytoracloud.driver.config.impl.proxy.ProxyConfig;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketUpdateNetworkConfig;
+import de.lystx.hytoracloud.driver.packets.in.PacketUpdateNetworkConfig;
 
 import de.lystx.hytoracloud.driver.service.fallback.Fallback;
 import de.lystx.hytoracloud.driver.config.impl.fallback.FallbackConfig;

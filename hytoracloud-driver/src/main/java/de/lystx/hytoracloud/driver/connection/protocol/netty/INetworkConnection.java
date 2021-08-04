@@ -1,5 +1,8 @@
 package de.lystx.hytoracloud.driver.connection.protocol.netty;
 
+import de.lystx.hytoracloud.driver.connection.messenger.IChannelMessage;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.IChannelHandler;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.other.INetworkAdapter;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.other.NetworkBusObject;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
@@ -16,7 +19,7 @@ public interface INetworkConnection {
      *
      * @return channel
      */
-    Channel getChannel();
+    INetworkChannel getChannel();
 
     /**
      * Sends a {@link IPacket}
@@ -53,6 +56,13 @@ public interface INetworkConnection {
     void registerPacketHandler(IPacketHandler packetHandler);
 
     /**
+     * Unregisters an {@link IPacketHandler}
+     *
+     * @param packetHandler the handler
+     */
+    void unregisterPacketHandler(IPacketHandler packetHandler);
+
+    /**
      * Gets al ist of all registered {@link IPacketHandler}s
      *
      * @return list of handlers
@@ -74,6 +84,36 @@ public interface INetworkConnection {
     List<INetworkAdapter> getNetworkAdapters();
 
     /**
+     * Registers an {@link IChannelHandler}
+     *
+     * @param channel the channel name
+     * @param channelHandler the handler
+     */
+    void registerChannelHandler(String channel, IChannelHandler channelHandler);
+
+    /**
+     * All registered {@link IChannelHandler}s
+     *
+     * @return list
+     */
+    List<IChannelHandler> getChannelHandlers();
+
+    /**
+     * All registered {@link IChannelHandler}s for a given channel
+     *
+     * @param channel the channel
+     * @return list
+     */
+    List<IChannelHandler> getChannelHandlers(String channel);
+
+    /**
+     * Sends an {@link IChannelMessage} message
+     *
+     * @param message the message
+     */
+    void sendChannelMessage(IChannelMessage message);
+
+    /**
      * The {@link NetworkBusObject} for processing
      * {@link IPacket}s in and out
      *
@@ -87,4 +127,5 @@ public interface INetworkConnection {
      * @return boolean
      */
     boolean isConnected();
+
 }

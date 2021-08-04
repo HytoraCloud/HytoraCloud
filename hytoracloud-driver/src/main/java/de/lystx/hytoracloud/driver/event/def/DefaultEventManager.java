@@ -10,7 +10,7 @@ import de.lystx.hytoracloud.driver.event.base.NetworkHandlerListener;
 import de.lystx.hytoracloud.driver.event.handle.EventHandler;
 import de.lystx.hytoracloud.driver.event.handle.IListener;
 import de.lystx.hytoracloud.driver.event.handle.IEventHandler;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.other.PacketCallEvent;
+import de.lystx.hytoracloud.driver.packets.both.other.PacketCallEvent;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
 import lombok.Getter;
 

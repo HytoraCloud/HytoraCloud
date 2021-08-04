@@ -2,20 +2,22 @@ package de.lystx.hytoracloud.cloud.handler.other;
 
 import de.lystx.hytoracloud.cloud.CloudSystem;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.other.PacketCallEvent;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.both.other.PacketCallEvent;
+
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor @Getter
-public class CloudHandlerEvent implements PacketHandler {
+public class CloudHandlerEvent implements IPacketHandler {
 
     private final CloudSystem cloudSystem;
 
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
         if (packet instanceof PacketCallEvent) {
             PacketCallEvent packetCallEvent = (PacketCallEvent)packet;
 

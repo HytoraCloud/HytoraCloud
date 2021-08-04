@@ -4,6 +4,9 @@ import ch.qos.logback.classic.LoggerContext;
 import de.lystx.hytoracloud.driver.connection.cloudflare.ICloudFlareManager;
 import de.lystx.hytoracloud.driver.connection.cloudflare.def.DefaultCloudFlareManager;
 import de.lystx.hytoracloud.driver.config.IConfigManager;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.event.events.network.DriverEventReload;
 import de.lystx.hytoracloud.driver.service.screen.IScreenManager;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
@@ -31,11 +34,11 @@ import de.lystx.hytoracloud.driver.service.fallback.IFallbackManager;
 import de.lystx.hytoracloud.driver.service.template.def.DefaultTemplateManager;
 import de.lystx.hytoracloud.driver.service.template.ITemplateManager;
 import de.lystx.hytoracloud.driver.command.ICommandManager;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReload;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketReloadService;
+import de.lystx.hytoracloud.driver.packets.both.PacketReload;
+import de.lystx.hytoracloud.driver.packets.both.PacketReloadService;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.RequestManager;
 import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.PacketLogMessage;
+import de.lystx.hytoracloud.driver.packets.both.PacketLogMessage;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.event.def.DefaultEventManager;
@@ -60,10 +63,8 @@ import de.lystx.hytoracloud.driver.config.FileService;
 import de.lystx.hytoracloud.driver.library.LibraryService;
 import de.lystx.hytoracloud.driver.utils.other.UUIDPool;
 import lombok.Getter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.INetworkConnection;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
+
+
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +95,10 @@ public class CloudDriver {
 
     @Getter
     private static CloudDriver instance; //The global driver instance
+
+    public static Optional<CloudDriver> instance() {
+        return Optional.ofNullable(instance);
+    }
 
     //Final other values
     private final CloudType driverType; //The type of this instance
@@ -254,8 +259,8 @@ public class CloudDriver {
      * Registers a PacketHandler
      * @param handler the handlers
      */
-    public void registerPacketHandler(PacketHandler... handler) {
-        for (PacketHandler o : handler) {
+    public void registerPacketHandler(IPacketHandler... handler) {
+        for (IPacketHandler o : handler) {
             connection.registerPacketHandler(o);
         }
     }
@@ -273,18 +278,8 @@ public class CloudDriver {
      * Without consumer to call back
      * @param packet the packet to send
      */
-    public void sendPacket(Packet packet) {
-        this.sendPacket(packet,  null);
-
-    }
-
-    /**
-     * Sends a networking {@link Component}
-     *
-     * @param component the component
-     */
-    public void sendComponent(Component component) {
-        this.connection.sendComponent(component);
+    public void sendPacket(IPacket packet) {
+        this.connection.sendPacket(packet);
     }
 
     /**
@@ -292,13 +287,9 @@ public class CloudDriver {
      * @param packet the packet to send
      * @param consumer the consumer to accept the response
      */
-    public void sendPacket(Packet packet, Consumer<Component> consumer) {
-        if (consumer == null) {
-            this.connection.sendPacket(packet);
-        } else {
-            Component reply = packet.toReply(connection);
-            consumer.accept(reply);
-        }
+    public void sendPacket(IPacket packet, Consumer<Void> consumer) {
+        this.sendPacket(packet);
+        consumer.accept(null);
     }
 
     /*

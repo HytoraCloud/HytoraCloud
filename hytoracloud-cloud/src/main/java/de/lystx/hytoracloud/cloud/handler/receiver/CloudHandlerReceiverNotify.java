@@ -1,17 +1,20 @@
 package de.lystx.hytoracloud.cloud.handler.receiver;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverNotifyStart;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverNotifyStop;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.receiver.PacketReceiverScreenCache;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverNotifyStart;
+import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverNotifyStop;
+import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverScreenCache;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideServiceManager;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.handler.PacketHandler;
 
-public class CloudHandlerReceiverNotify implements PacketHandler {
+
+
+public class CloudHandlerReceiverNotify implements IPacketHandler {
+
     @Override
-    public void handle(Packet packet) {
+    public void handle(IPacket packet) {
 
         if (packet instanceof PacketReceiverNotifyStart) {
 

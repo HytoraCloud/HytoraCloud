@@ -81,7 +81,7 @@ public class ChannelMessageBuilder {
      */
     public IChannelMessage build() {
         IChannelMessage message = new ChannelMessageObject(key, this.channel, new Random().nextLong(), this.document, this.receiver);
-        message.setSender(new IdentifiableObject(CloudDriver.getInstance().getConnection().getName()));
+       // message.setSender(new IdentifiableObject(CloudDriver.getInstance().getConnection().getName()));
         return message;
     }
 }

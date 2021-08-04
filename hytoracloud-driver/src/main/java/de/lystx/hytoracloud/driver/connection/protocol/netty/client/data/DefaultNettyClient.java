@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.connection.protocol.netty.client.data;
 
 import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
 import io.netty.channel.Channel;
@@ -32,14 +33,14 @@ public class DefaultNettyClient implements INettyClient {
     private final int port;
 
     /**
-     * The type of the client (e.g.: {@link ClientType#SERVER})
+     * The type of the client (e.g.: {@link ClientType#SPIGOT})
      */
     private ClientType type;
 
     /**
      * The netty channel of the connection
      */
-    private Channel channel;
+    private INetworkChannel channel;
 
     /**
      * Returns the host and port of the client as {@link InetSocketAddress} object
@@ -57,6 +58,6 @@ public class DefaultNettyClient implements INettyClient {
      * @param packet the packet
      */
     public void sendPacket(INetworkConnection connection, IPacket packet) {
-        connection.getNetworkBus().processOut(this.channel, packet);
+        this.channel.sendPacket(packet);
     }
 }

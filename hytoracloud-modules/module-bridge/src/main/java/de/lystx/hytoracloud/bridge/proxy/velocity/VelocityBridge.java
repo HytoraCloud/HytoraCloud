@@ -384,7 +384,7 @@ public class VelocityBridge implements BridgeInstance {
     @Override
     public void shutdown() {
         try {
-            CloudDriver.getInstance().getConnection().close();
+            CloudDriver.getInstance().getConnection().shutdown();
         } catch (IOException e) {
             e.printStackTrace();
         }

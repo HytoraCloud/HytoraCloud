@@ -6,7 +6,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.serverselector.npc.NPCMeta;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudErrors;
 import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerNPC;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketInNPCDelete;
+import de.lystx.hytoracloud.driver.packets.in.PacketInNPCDelete;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;

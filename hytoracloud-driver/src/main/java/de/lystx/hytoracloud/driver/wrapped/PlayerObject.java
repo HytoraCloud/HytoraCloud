@@ -1,6 +1,7 @@
 package de.lystx.hytoracloud.driver.wrapped;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.packets.out.PacketUpdatePlayer;
 import de.lystx.hytoracloud.driver.player.permission.impl.PermissionEntry;
 import de.lystx.hytoracloud.driver.player.permission.impl.PermissionGroup;
 import de.lystx.hytoracloud.driver.player.permission.impl.PermissionValidity;
@@ -13,7 +14,7 @@ import de.lystx.hytoracloud.driver.service.minecraft.chat.ChatComponent;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.event.events.player.other.DriverEventPlayerUpdate;
 import de.lystx.hytoracloud.driver.service.minecraft.world.MinecraftLocation;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.player.*;
+import de.lystx.hytoracloud.driver.packets.both.player.*;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery;
 import de.lystx.hytoracloud.driver.service.IService;
@@ -45,21 +46,32 @@ public class PlayerObject extends WrappedObject<ICloudPlayer, PlayerObject> impl
     /**
      * The connection of the player
      */
-    private IPlayerConnection connection;
+    private PlayerConnectionObject connection;
 
     /**
      * The information of the player
      */
     private OfflinePlayer offlinePlayer;
 
+    public IPlayerConnection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(IPlayerConnection connection) {
+        this.connection = (PlayerConnectionObject) connection;
+    }
+
     public PlayerObject(PlayerConnectionObject connection) {
         this(connection, "Bungee-1"); //Just a dummy proxy
     }
 
     public PlayerObject(IPlayerConnection connection, String proxy) {
-        this.connection = connection;
+        this.connection = (PlayerConnectionObject) connection;
         this.proxy = proxy;
-        this.setOfflinePlayer(CloudDriver.getInstance().getPermissionPool().getCachedObject(connection.getUniqueId()));
+
+        CloudDriver.instance().ifPresent(cloudDriver -> {
+            this.setOfflinePlayer(cloudDriver.getPermissionPool().getCachedObject(connection.getUniqueId()));
+        });
     }
 
     @Override

@@ -3,12 +3,13 @@ package de.lystx.hytoracloud.driver.wrapped;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
 import de.lystx.hytoracloud.driver.service.screen.IScreen;
 import de.lystx.hytoracloud.driver.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;
 import de.lystx.hytoracloud.driver.service.minecraft.plugin.PluginInfo;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.service.PacketServiceUpdate;
+import de.lystx.hytoracloud.driver.packets.both.service.PacketServiceUpdate;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverQuery;
@@ -22,13 +23,10 @@ import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.connection.INetworkConnection;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.Packet;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.packet.response.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.elements.component.Component;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
@@ -352,12 +350,8 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
     }
 
     @Override
-    public void sendPacket(Packet packet) {
-        INetworkConnection connection = CloudDriver.getInstance().getConnection();
-
-        Component component = connection.packetToComponent(packet);
-        component.setReceiver(this.getName());
-        connection.sendComponent(component);
+    public void sendPacket(IPacket packet) {
+        CloudDriver.getInstance().getConnection().sendPacket(packet);
     }
 
     @Override

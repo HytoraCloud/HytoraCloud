@@ -8,9 +8,9 @@ import de.lystx.hytoracloud.cloud.manager.other.NPCService;
 import de.lystx.hytoracloud.cloud.manager.other.SignService;
 import de.lystx.hytoracloud.global.CloudProcess;
 import de.lystx.hytoracloud.global.webserver.WebServer;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.both.other.PacketUpdatePermissionPool;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.in.PacketUpdateNetworkConfig;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutGlobalInfo;
+import de.lystx.hytoracloud.driver.packets.both.other.PacketUpdatePermissionPool;
+import de.lystx.hytoracloud.driver.packets.in.PacketUpdateNetworkConfig;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.cloud.handler.player.CloudHandlerPlayerRequest;
@@ -26,7 +26,7 @@ import de.lystx.hytoracloud.driver.config.FileService;
 import de.lystx.hytoracloud.driver.utils.enums.versions.ProxyVersion;
 import de.lystx.hytoracloud.driver.utils.enums.versions.SpigotVersion;
 import de.lystx.hytoracloud.driver.wrapped.GroupObject;
-import de.lystx.hytoracloud.driver.connection.protocol.hytora.packets.out.PacketOutServerSelector;
+import de.lystx.hytoracloud.driver.packets.out.PacketOutServerSelector;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.ServerEnvironment;
 import de.lystx.hytoracloud.driver.console.logger.LogService;
 import de.lystx.hytoracloud.driver.utils.other.Action;
@@ -227,7 +227,7 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().getReceiverManager().registerReceiver(receiver);
             CloudDriver.getInstance().getConnection().registerPacketHandler(new ReceiverHandlerActions());
 
-            CloudDriver.getInstance().setInstance("connection", CloudDriver.getInstance().getServiceRegistry().getInstance(NetworkService.class).getHytoraServer());
+            CloudDriver.getInstance().setInstance("connection", CloudDriver.getInstance().getServiceRegistry().getInstance(NetworkService.class).getNetworkServer());
             CloudDriver.getInstance().setInstance("serviceManager", new CloudSideServiceManager(CloudDriver.getInstance().getGroupManager().getCachedObjects()));
 
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerRegister());
@@ -242,13 +242,11 @@ public class CloudSystem extends CloudProcess {
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerPerms(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerMessage(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerUpdate());
-            CloudDriver.getInstance().registerPacketHandler(new CloudHandlerCommunication(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerCommand(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerTemplateCreate(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerLog(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerEvent(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerRequest(this));
-            CloudDriver.getInstance().registerPacketHandler(new CloudHandlerMemoryUsage(this));
 
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerSignSystem(this));
             CloudDriver.getInstance().registerPacketHandler(new CloudHandlerNPC(this));
