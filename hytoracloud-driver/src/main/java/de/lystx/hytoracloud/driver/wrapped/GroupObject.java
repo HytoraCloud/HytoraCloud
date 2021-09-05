@@ -15,7 +15,7 @@ import de.lystx.hytoracloud.driver.service.util.ServiceBuilder;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
 import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
-import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

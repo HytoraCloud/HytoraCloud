@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.driver.connection.messenger;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.IChannelHandler;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.messenger.PacketChannelMessage;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.handling.IChannelHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.PacketChannelMessage;
 import de.lystx.hytoracloud.driver.utils.interfaces.Identifiable;
 import lombok.Getter;
 
@@ -16,7 +16,6 @@ public class DefaultChannelMessenger implements IChannelMessenger {
 
     public DefaultChannelMessenger() {
         this.cache = new HashMap<>();
-
     }
 
     @Override
@@ -34,7 +33,7 @@ public class DefaultChannelMessenger implements IChannelMessenger {
 
     @Override
     public void unregisterChannel(String channel) {
-        this.cache.remove(channel);
+        this.cache.remove(channel); //TODO
         //CloudDriver.getInstance().getConnection().unregisterChannelHandlers(channel);
     }
 

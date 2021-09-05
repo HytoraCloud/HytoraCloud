@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.bridge.spigot.bukkit.impl.handler;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 

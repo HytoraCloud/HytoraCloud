@@ -1,9 +1,9 @@
 package de.lystx.hytoracloud.driver.connection.protocol.netty.client.data;
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.api.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.identification.ConnectionType;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
 import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
@@ -27,9 +27,9 @@ public interface INettyClient {
     int getPort();
 
     /**
-     * The type of the client (e.g.: {@link ClientType#SPIGOT})
+     * The type of the client
      */
-    ClientType getType();
+    ConnectionType getType();
 
     /**
      * The netty {@link Channel}

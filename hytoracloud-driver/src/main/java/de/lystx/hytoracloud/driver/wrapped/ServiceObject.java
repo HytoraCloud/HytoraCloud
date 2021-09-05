@@ -3,7 +3,7 @@ package de.lystx.hytoracloud.driver.wrapped;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
 import de.lystx.hytoracloud.driver.service.screen.IScreen;
 import de.lystx.hytoracloud.driver.config.impl.proxy.Motd;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.CloudType;
@@ -23,7 +23,7 @@ import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
 import de.lystx.hytoracloud.driver.utils.json.JsonObject;
 import de.lystx.hytoracloud.driver.utils.json.PropertyObject;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
-import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.response.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -330,9 +330,13 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public DriverQuery<Long> getMemoryUsage() {
+        if (!this.authenticated) {
+            return DriverQuery.dummy("SERVICE_GET_MEMORY", -1L);
+        }
         if (CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE && this.getName().equalsIgnoreCase(CloudDriver.getInstance().getServiceManager().getThisService().getName())) {
             return DriverQuery.dummy("SERVICE_GET_MEMORY", CloudDriver.getInstance().getBridgeInstance().loadMemoryUsage());
         } else {
+            System.out.println(true);
             DriverRequest<Long> request = DriverRequest.create("SERVICE_GET_MEMORY", this.getName(), Long.class);
             return request.execute();
         }
@@ -364,6 +368,9 @@ public class ServiceObject extends WrappedObject<IService, ServiceObject> implem
 
     @Override
     public DriverQuery<String> getTPS() {
+        if (!this.authenticated) {
+            return DriverQuery.dummy("SERVICE_GET_TPS", "§c???");
+        }
         if (getGroup() != null && this.getGroup().getEnvironment() == ServerEnvironment.PROXY) {
             return DriverQuery.dummy("SERVICE_GET_TPS", "§cNo TPS for Proxy");
         }

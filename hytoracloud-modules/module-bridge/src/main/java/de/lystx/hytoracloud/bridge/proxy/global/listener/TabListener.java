@@ -16,19 +16,31 @@ public class TabListener implements IListener {
     @EventHandler
     public void handleJoin(DriverEventPlayerJoin event) {
         ICloudPlayer player = event.getPlayer();
-        update(CloudBridge.getInstance().loadRandomTablist(), player, player.sync().getServiceAsString());
+        try {
+            update(CloudBridge.getInstance().loadRandomTablist(), player, player.sync().getServiceAsString());
+        } catch (NullPointerException e) {
+            //ignoring if joining failed
+        }
     }
 
     @EventHandler
     public void handleQuit(DriverEventPlayerQuit event) {
         ICloudPlayer player = event.getPlayer();
-        update(CloudBridge.getInstance().loadRandomTablist(), player, player.sync().getServiceAsString());
+        try {
+             update(CloudBridge.getInstance().loadRandomTablist(), player, player.sync().getServiceAsString());
+        } catch (NullPointerException e) {
+            //ignoring if joining failed
+        }
     }
 
     @EventHandler
     public void handleServerSwitch(DriverEventPlayerServerChange event) {
         ICloudPlayer player = event.getPlayer();
-        update(CloudBridge.getInstance().loadRandomTablist(), player, event.getService().getName());
+        try {
+            update(CloudBridge.getInstance().loadRandomTablist(), player, event.getService().getName());
+        } catch (NullPointerException e) {
+            //ignoring if joining failed
+        }
     }
 
     @EventHandler

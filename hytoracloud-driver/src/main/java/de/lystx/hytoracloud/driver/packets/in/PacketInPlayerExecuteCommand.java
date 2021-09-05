@@ -2,14 +2,10 @@ package de.lystx.hytoracloud.driver.packets.in;
 
 
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.json.JsonPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.json.PacketSerializable;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.json.JsonPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.json.PacketSerializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-
-
-import java.io.Serializable;
 
 /**
  * This packet just shows

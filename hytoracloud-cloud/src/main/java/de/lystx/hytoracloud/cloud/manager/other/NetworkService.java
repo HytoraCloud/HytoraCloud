@@ -1,11 +1,11 @@
 package de.lystx.hytoracloud.cloud.manager.other;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.identification.ConnectionType;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.server.INetworkServer;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.server.NetworkServer;
 import de.lystx.hytoracloud.driver.registry.ICloudService;
 import de.lystx.hytoracloud.driver.registry.CloudServiceInfo;
-import de.lystx.hytoracloud.driver.utils.other.Utils;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -24,15 +24,16 @@ public class NetworkService implements ICloudService {
 
     public NetworkService() {
 
-        this.networkServer = new NetworkServer("127.0.0.1", CloudDriver.getInstance().getConfigManager().getNetworkConfig().getPort());
+        this.networkServer = new NetworkServer("127.0.0.1", CloudDriver.getInstance().getConfigManager().getNetworkConfig().getPort(), ConnectionType.CLOUD_INSTANCE);
         CloudDriver.getInstance().setInstance("connection", this.networkServer);
 
-        try {
-            this.networkServer.bootstrap();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        new Thread(() -> {
+            try {
+                this.networkServer.bootstrap();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "networkServer").start();
     }
 
     /**

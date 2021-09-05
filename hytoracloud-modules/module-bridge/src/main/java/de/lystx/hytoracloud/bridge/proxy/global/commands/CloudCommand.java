@@ -18,7 +18,7 @@ import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
 import de.lystx.hytoracloud.driver.player.ICloudPlayer;
 import de.lystx.hytoracloud.driver.player.required.OfflinePlayer;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
-import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.response.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;

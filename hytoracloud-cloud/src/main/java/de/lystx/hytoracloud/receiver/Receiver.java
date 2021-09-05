@@ -1,13 +1,13 @@
 package de.lystx.hytoracloud.receiver;
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.api.channel.INetworkChannel;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.INetworkClient;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.NetworkClient;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.other.INetworkAdapter;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.identification.ConnectionType;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.handling.INetworkAdapter;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.PacketHandshake;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
 import de.lystx.hytoracloud.global.CloudProcess;
 import de.lystx.hytoracloud.receiver.impl.setup.ReceiverSetup;
@@ -18,7 +18,6 @@ import de.lystx.hytoracloud.driver.wrapped.ReceiverObject;
 import de.lystx.hytoracloud.driver.packets.both.PacketReload;
 import de.lystx.hytoracloud.driver.packets.in.PacketShutdown;
 import de.lystx.hytoracloud.driver.packets.out.PacketOutGlobalInfo;
-import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverLogin;
 import de.lystx.hytoracloud.driver.packets.receiver.PacketReceiverShutdown;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideServiceManager;
@@ -28,7 +27,6 @@ import de.lystx.hytoracloud.global.InternalReceiver;
 import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerActions;
 import de.lystx.hytoracloud.receiver.handler.ReceiverHandlerScreen;
 import de.lystx.hytoracloud.receiver.impl.manager.ConfigService;
-import io.netty.channel.Channel;
 import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
@@ -128,7 +126,7 @@ public class Receiver extends CloudProcess {
             CloudDriver.getInstance().getParent().getConsole().sendMessage("INFO", "§7Loading §6Receiver§f...");
             CloudDriver.getInstance().getParent().getConsole().sendMessage("§8");
 
-            this.networkClient = new NetworkClient(receiver.getHost(), receiver.getPort(), ClientType.CLOUD, receiver.getName());
+            this.networkClient = new NetworkClient(receiver.getHost(), receiver.getPort(), ConnectionType.CLOUD_INSTANCE, receiver.getName());
 
             this.networkClient.registerNetworkAdapter(new INetworkAdapter() {
 

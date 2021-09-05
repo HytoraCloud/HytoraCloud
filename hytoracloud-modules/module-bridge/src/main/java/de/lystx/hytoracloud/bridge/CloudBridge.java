@@ -1,6 +1,5 @@
 package de.lystx.hytoracloud.bridge;
 
-
 import de.lystx.hytoracloud.bridge.global.manager.*;
 import de.lystx.hytoracloud.bridge.proxy.global.handler.*;
 import de.lystx.hytoracloud.bridge.proxy.global.commands.*;
@@ -8,13 +7,13 @@ import de.lystx.hytoracloud.bridge.global.handler.*;
 import de.lystx.hytoracloud.bridge.proxy.global.listener.NotifyListener;
 import de.lystx.hytoracloud.bridge.proxy.global.listener.TabListener;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.channel.INetworkChannel;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.api.channel.INetworkChannel;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.INetworkClient;
 import de.lystx.hytoracloud.driver.connection.protocol.netty.client.NetworkClient;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.other.ClientType;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.other.INetworkAdapter;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.PacketHandshake;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.identification.ConnectionType;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.handling.INetworkAdapter;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.PacketHandshake;
 import de.lystx.hytoracloud.driver.packets.out.PacketOutGlobalInfo;
 import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
 import de.lystx.hytoracloud.bridge.proxy.ProxyBridge;
@@ -32,14 +31,10 @@ import de.lystx.hytoracloud.driver.config.impl.proxy.TabList;
 import de.lystx.hytoracloud.driver.module.cloud.ModuleService;
 import de.lystx.hytoracloud.driver.player.permission.PermissionService;
 
-
 import de.lystx.hytoracloud.driver.wrapped.ServiceObject;
 import de.lystx.hytoracloud.driver.utils.other.Utils;
-import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
-
 
 import java.io.File;
 import java.net.InetAddress;
@@ -75,7 +70,7 @@ public class CloudBridge {
         CloudDriver.getInstance().setInstance("bridgeInstance", bridgeInstance);
 
         JsonDocument jsonDocument = new JsonDocument(new File("./CLOUD/HYTORA-CLOUD.json"));
-        this.client = new NetworkClient(jsonDocument.getString("host"), jsonDocument.getInteger("port"), ClientType.PROXY, "");
+        this.client = new NetworkClient(jsonDocument.getString("host"), jsonDocument.getInteger("port"), ConnectionType.CLOUD_BRIDGE, "");
 
         CloudDriver.getInstance().setInstance("connection", this.client);
         CloudDriver.getInstance().setInstance("driverType", CloudType.BRIDGE);
@@ -152,6 +147,10 @@ public class CloudBridge {
         this.client.registerNetworkAdapter(new INetworkAdapter() {
             @Override
             public void onPacketReceive(IPacket packet) {
+                if (received) {
+                    return;
+                }
+
                 if (packet instanceof PacketOutGlobalInfo) {
                     received = true;
                     CloudDriver.getInstance().getScheduler().scheduleDelayedTask(() -> {
@@ -168,6 +167,7 @@ public class CloudBridge {
 
                             service = service.verify(host, true, ServiceState.AVAILABLE, service.getProperties()).setTimeOut(30, service).pullValue();
                             service.update();
+
 
                             System.out.println("[CloudBridge] Authentication for '" + service.getName() + "' executed: " + (service.getState() == ServiceState.BOOTING ? "FAILED" : "SUCCESS"));
                             System.out.println("[CloudBridge] Summary: " + service.getName() + ":");
@@ -223,12 +223,13 @@ public class CloudBridge {
             }
         });
 
-        try {
-            this.client.bootstrap();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        new Thread(() -> {
+            try {
+                this.client.bootstrap();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "cloudBridge_client").start();
     }
 
     public static void load(BridgeInstance bridgeInstance) {

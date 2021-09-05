@@ -24,7 +24,6 @@ public interface ICloudFlareManager {
      */
     void setZoneId(String zoneId);
 
-
     /**
      * Gets a list of all {@link CloudFlareUser}s
      *
@@ -122,7 +121,6 @@ public interface ICloudFlareManager {
      * @return list of records
      */
     List<DNSRecord> getDNSRecords();
-
 
     /**
      * Gets an {@link DNSRecord} by name

@@ -3,8 +3,8 @@ package de.lystx.hytoracloud.cloud.handler.managing;
 import de.lystx.hytoracloud.driver.CloudDriver;
 
 import de.lystx.hytoracloud.driver.config.IConfigManager;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.packets.in.PacketUpdateNetworkConfig;
 import de.lystx.hytoracloud.driver.config.impl.NetworkConfig;
 

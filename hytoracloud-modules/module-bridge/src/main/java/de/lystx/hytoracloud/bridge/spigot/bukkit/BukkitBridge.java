@@ -76,11 +76,6 @@ public class BukkitBridge extends JavaPlugin implements BridgeInstance {
 
         CloudBridge.load(this);
 
-        if (CloudDriver.getInstance().getConnection() == null || !CloudDriver.getInstance().getConnection().isConnected()) {
-            CloudBridge.load(this);
-        }
-
-
         CloudDriver.getInstance().setInstance("bukkit", new BukkitObject());
         CloudDriver.getInstance().getBukkit().setVersion(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
 

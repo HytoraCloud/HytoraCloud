@@ -2,8 +2,8 @@ package de.lystx.hytoracloud.cloud.handler.managing;
 
 import de.lystx.hytoracloud.cloud.manager.other.SignService;
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.serverselector.sign.CloudSign;
 import de.lystx.hytoracloud.driver.packets.in.PacketInCloudSignCreate;
 import de.lystx.hytoracloud.driver.packets.in.PacketInCloudSignDelete;

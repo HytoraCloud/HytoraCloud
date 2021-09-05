@@ -4,9 +4,9 @@ import ch.qos.logback.classic.LoggerContext;
 import de.lystx.hytoracloud.driver.connection.cloudflare.ICloudFlareManager;
 import de.lystx.hytoracloud.driver.connection.cloudflare.def.DefaultCloudFlareManager;
 import de.lystx.hytoracloud.driver.config.IConfigManager;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.INetworkConnection;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.INetworkConnection;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.event.events.network.DriverEventReload;
 import de.lystx.hytoracloud.driver.service.screen.IScreenManager;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
@@ -146,6 +146,15 @@ public class CloudDriver {
      * @param driverType the type
      */
     public CloudDriver(CloudType driverType) {
+        this(driverType, true);
+    }
+
+    /**
+     * Initialises the Driver with a Type
+     *
+     * @param driverType the type
+     */
+    public CloudDriver(CloudType driverType, boolean installLibraries) {
         instance = this;
         this.driverType = driverType;
 
@@ -183,13 +192,15 @@ public class CloudDriver {
         File libraryDirectory = driverType.equals(CloudType.BRIDGE) ? new File("../../../../../global/libs/") : this.serviceRegistry.getInstance(FileService.class).getLibraryDirectory();
 
         this.libraryService = new LibraryService(libraryDirectory, ClassLoader.getSystemClassLoader() instanceof URLClassLoader ? ClassLoader.getSystemClassLoader() : null);
-        this.libraryService.installDefaultLibraries();
 
-        if (this.driverType != CloudType.BRIDGE) {
-            //Disable netty and mongoDB logging
-            Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver", "org.apache.http.impl.conn.PoolingHttpClientConnectionManager"});
-            loggers.disable();
-            AnsiConsole.systemInstall();
+        if (installLibraries) {
+            this.libraryService.installDefaultLibraries();
+            if (this.driverType != CloudType.BRIDGE) {
+                //Disable netty and mongoDB logging
+                Loggers loggers = new Loggers((LoggerContext) LoggerFactory.getILoggerFactory(), new String[]{"io.netty", "org.mongodb.driver", "org.apache.http.impl.conn.PoolingHttpClientConnectionManager"});
+                loggers.disable();
+                AnsiConsole.systemInstall();
+            }
         }
 
 

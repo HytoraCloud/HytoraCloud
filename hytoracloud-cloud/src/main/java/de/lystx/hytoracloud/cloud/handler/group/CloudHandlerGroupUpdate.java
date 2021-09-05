@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.cloud.handler.group;
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.service.group.IGroupManager;
 import de.lystx.hytoracloud.driver.service.template.ITemplate;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
@@ -13,7 +13,7 @@ import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.packets.in.PacketInUpdateServiceGroup;
 import de.lystx.hytoracloud.driver.service.group.IServiceGroup;
 import de.lystx.hytoracloud.cloud.manager.implementations.CloudSideGroupManager;
-import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.response.ResponseStatus;
 
 
 

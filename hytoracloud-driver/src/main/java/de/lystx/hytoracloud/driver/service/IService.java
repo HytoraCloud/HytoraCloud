@@ -1,8 +1,8 @@
 package de.lystx.hytoracloud.driver.service;
 
 import de.lystx.hytoracloud.driver.config.impl.proxy.Motd;
-import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.response.ResponseStatus;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
 import de.lystx.hytoracloud.driver.service.minecraft.plugin.PluginInfo;
 import de.lystx.hytoracloud.driver.service.receiver.IReceiver;
 import de.lystx.hytoracloud.driver.utils.enums.cloud.ServiceState;

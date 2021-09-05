@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.packets.both;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.EmptyPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.EmptyPacket;
 
 /**
  * When handling this packet

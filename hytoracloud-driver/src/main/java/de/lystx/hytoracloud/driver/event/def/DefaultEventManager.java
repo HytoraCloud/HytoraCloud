@@ -81,7 +81,6 @@ public class DefaultEventManager implements IEventManager {
     @Override
     public boolean callEvent(IEvent event) {
 
-
         if ((CloudDriver.getInstance().getServiceManager() == null || CloudDriver.getInstance().getServiceManager().getThisService() == null) && CloudDriver.getInstance().getDriverType() == CloudType.BRIDGE) {
             return false;
         }

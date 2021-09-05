@@ -30,7 +30,7 @@ public class SchedulerObject extends WrappedObject<Scheduler, SchedulerObject> i
 
 	@Override
 	public SchedulerFuture getTask(int id) {
-		return this.tasks.stream().filter(task -> task.getId() == id).findFirst().orElse(null);
+		return new LinkedList<>(this.tasks).stream().filter(task -> task.getId() == id).findFirst().orElse(null);
 	}
 
 	@Override @Deprecated

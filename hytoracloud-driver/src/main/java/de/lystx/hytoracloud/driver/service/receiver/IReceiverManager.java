@@ -1,6 +1,6 @@
 package de.lystx.hytoracloud.driver.service.receiver;
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
 import de.lystx.hytoracloud.driver.utils.interfaces.ScheduledForVersion;
 import de.lystx.hytoracloud.driver.service.IService;
 

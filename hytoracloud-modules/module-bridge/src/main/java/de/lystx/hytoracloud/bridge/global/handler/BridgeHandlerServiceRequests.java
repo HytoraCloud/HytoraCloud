@@ -1,8 +1,7 @@
 package de.lystx.hytoracloud.bridge.global.handler;
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
-import de.lystx.hytoracloud.driver.service.bridge.BridgeInstance;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.bridge.CloudBridge;
 import de.lystx.hytoracloud.driver.CloudDriver;
 import de.lystx.hytoracloud.driver.connection.protocol.requests.base.DriverRequest;
@@ -32,8 +31,5 @@ public class BridgeHandlerServiceRequests implements IPacketHandler {
 
     @Override
     public void handle(IPacket packet) {
-        if (CloudDriver.getInstance().getServiceManager().getThisService() == null) {
-            return;
-        }
     }
 }

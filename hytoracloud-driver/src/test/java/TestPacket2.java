@@ -1,6 +1,6 @@
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.forwarding.ForwardingPacketJson;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.json.PacketSerializable;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.forwarding.ForwardingPacketJson;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.json.PacketSerializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;

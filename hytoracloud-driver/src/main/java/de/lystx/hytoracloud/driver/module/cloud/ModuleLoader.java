@@ -13,6 +13,7 @@ import de.lystx.hytoracloud.driver.utils.json.JsonDocument;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.val;
 
 import java.io.File;
 import java.net.URLClassLoader;
@@ -120,8 +121,6 @@ public class ModuleLoader {
                     Class<?> loadedClass = null;
                     URLClassLoader urlClassLoader = classLoader.classLoader();
 
-
-
                     JsonObject jsonObject = classLoader.loadJson("config.json");
 
                     if (jsonObject.keySet().isEmpty()) {
@@ -195,7 +194,6 @@ public class ModuleLoader {
                     } else {
                         this.cloudDriver.log("MODULES", "§cThe class §e" + loadedClass.getName() + " §cof the Module §e" + file.getName() + " §cdoesn't have a §e@" + ModuleInfo.class.getSimpleName() + "-Annotation!");
                     }
-
                     }
                 }
             }

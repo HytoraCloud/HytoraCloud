@@ -3,14 +3,11 @@ package de.lystx.hytoracloud.cloud.handler.managing;
 import de.lystx.hytoracloud.cloud.CloudSystem;
 
 import de.lystx.hytoracloud.driver.CloudDriver;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.IPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.handling.IPacketHandler;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.IPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.handling.IPacketHandler;
 import de.lystx.hytoracloud.driver.packets.both.PacketLogMessage;
 import de.lystx.hytoracloud.driver.console.logger.LogService;
 import lombok.AllArgsConstructor;
-
-
-import de.lystx.hytoracloud.driver.connection.protocol.requests.ResponseStatus;
 
 @AllArgsConstructor
 public class CloudHandlerMessage implements IPacketHandler {

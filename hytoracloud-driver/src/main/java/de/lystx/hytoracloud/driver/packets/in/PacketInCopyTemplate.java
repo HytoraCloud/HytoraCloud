@@ -1,7 +1,7 @@
 package de.lystx.hytoracloud.driver.packets.in;
 
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.json.JsonPacket;
-import de.lystx.hytoracloud.driver.connection.protocol.netty.packet.impl.json.PacketSerializable;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.json.JsonPacket;
+import de.lystx.hytoracloud.driver.connection.protocol.netty.global.packet.impl.json.PacketSerializable;
 import de.lystx.hytoracloud.driver.service.template.ITemplate;
 import de.lystx.hytoracloud.driver.service.IService;
 import de.lystx.hytoracloud.driver.wrapped.ServiceObject;
